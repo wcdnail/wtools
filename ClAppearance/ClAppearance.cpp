@@ -40,12 +40,11 @@ CAtlApp _AtlModule;
 return _AtlModule.WinMain(showCmd);
 #endif
 
-CClassicAppearance _AtlModule;
-
 extern "C"
 int WINAPI _tWinMain(HINSTANCE instHnd, HINSTANCE, LPTSTR, int showCmd)
 {
-    HRESULT hr = _AtlModule.Run(instHnd, showCmd);
+    CClassicAppearance app;
+    HRESULT hr = app.Run(instHnd, showCmd);
     return static_cast<int>(hr);
 }
 
@@ -72,7 +71,7 @@ namespace
         CCtrlInit()
             : result(S_OK)
         {
-            ::DefWindowProc(nullptr, 0, 0, 0L);
+            ::DefWindowProcW(nullptr, 0, 0, 0L);
             if (!WTL::AtlInitCommonControls(ICC_BAR_CLASSES)) {
                 result = ::GetLastError();
                 if (SUCCEEDED(result)) {
@@ -129,6 +128,7 @@ HRESULT CClassicAppearance::Run(HINSTANCE instHnd, int showCmd)
         hr = ::GetLastError();
         return hr;
     }
+    ATLTRACE2(atlTraceUI, 0, _T("All OK, launch main window [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
     m_MainFrame.ShowWindow(showCmd);
     hr = loop.Run();
     RemoveMessageLoop();

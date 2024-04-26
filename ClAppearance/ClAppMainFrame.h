@@ -6,7 +6,9 @@
 struct CClassicAppearance;
 
 struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
-                   WTL::CDialogResize<CMainFrame>
+                   WTL::CDialogResize<CMainFrame>,
+                   CMessageFilter,
+                   CIdleHandler
 {
     using   Super = WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>;
     using Resizer = WTL::CDialogResize<CMainFrame> ;
@@ -21,7 +23,10 @@ struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
     using Super::SetIcon;
 
 private:
+    struct CView;
+
     CClassicAppearance& m_App;
+    CView*            m_pView;
 
     friend class Super;
     friend class Resizer;
@@ -49,6 +54,9 @@ private:
     BOOL OnEraseBkgnd(CDCHandle dc);
     void OnActivate(UINT, BOOL, HWND);
     void OnKeyDown(UINT code, UINT, UINT);
+
+    BOOL PreTranslateMessage(MSG* pMsg) override;
+    BOOL OnIdle() override;
 
 private:
     CMainFrame(CMainFrame const&) = delete;
