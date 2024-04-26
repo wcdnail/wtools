@@ -1,0 +1,18 @@
+// ClAppearance.idl : IDL source for ClAppearance
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ClAppearance.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(a189a989-5210-498e-9326-eadb11ad6d14),
+	version(1.0),
+]
+library ClAppearanceLib
+{
+	importlib("stdole2.tlb");
+};
+
