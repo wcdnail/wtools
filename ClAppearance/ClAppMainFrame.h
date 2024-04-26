@@ -1,7 +1,8 @@
 #pragma once
 
-#include <atlframe.h>
 #include <atlwin.h>
+#include <atlframe.h>
+#include <atlctrlx.h>
 
 struct CClassicAppearance;
 
@@ -23,18 +24,19 @@ struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
     using Super::SetIcon;
 
 private:
+    enum : int
+    {
+        CTRL_ID_VIEW = 1000,
+    };
+
     struct CView;
 
-    CClassicAppearance& m_App;
-    CView*            m_pView;
+    CClassicAppearance&       m_App;
+    CView*                  m_pView;
+    CMultiPaneStatusBarCtrl  m_SBar;
 
     friend class Super;
     friend class Resizer;
-
-    enum
-    {
-        IdView = 1000,
-    };
 
     BEGIN_MSG_MAP_EX(CMainFrame)
       MSG_WM_CREATE(OnCreate)
@@ -46,7 +48,9 @@ private:
     END_MSG_MAP()
 
     BEGIN_DLGRESIZE_MAP(CMainFrame)
-      //DLGRESIZE_CONTROL(IdView, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+        DLGRESIZE_CONTROL(ATL_IDW_STATUS_BAR,   DLSZ_SIZE_X)
+        DLGRESIZE_CONTROL(CTRL_ID_VIEW,         DLSZ_SIZE_X | DLSZ_SIZE_Y)
+    
     END_DLGRESIZE_MAP()
 
     int OnCreate(LPCREATESTRUCT);

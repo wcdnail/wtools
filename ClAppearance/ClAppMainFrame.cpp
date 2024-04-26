@@ -64,13 +64,27 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
         SetIcon(raw, TRUE);
     }
 
+    CreateSimpleStatusBar();
+    m_SBar.SubclassWindow(m_hWndStatusBar);
+    int arrParts[] =
+    {
+        ID_DEFAULT_PANE,
+      //ID_DEFAULT_PANE + 1,
+      //ID_DEFAULT_PANE + 2
+    };
+    m_SBar.SetPanes(arrParts, _countof(arrParts), false);
+
     CRect rc;
     GetClientRect(rc);
     rc.InflateRect(1, 1);
 
     if (m_pView) {
         CRect rcView = rc;
-        m_hWndClient = m_pView->Create(m_hWnd, rcView, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, WS_EX_CLIENTEDGE);
+        m_hWndClient = m_pView->Create(m_hWnd, rcView, nullptr,
+            WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+            WS_EX_CLIENTEDGE,
+            ATL::_U_MENUorID(CTRL_ID_VIEW)
+        );
         if (!m_hWndClient) {
             HRESULT hr = ::GetLastError();
             ATLTRACE2(atlTraceUI, 0, _T("FAILED create VIEW [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
@@ -91,6 +105,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
 
 void CMainFrame::OnDestroy()
 {
+    CMessageLoop* pLoop = m_App.GetMessageLoop();
+    ATLASSERT(pLoop != NULL);
+    pLoop->RemoveIdleHandler(this);
+    pLoop->RemoveMessageFilter(this);
+
     bool isMaximized = (TRUE == IsZoomed());
     if(!isMaximized) {
         CRect rc;
