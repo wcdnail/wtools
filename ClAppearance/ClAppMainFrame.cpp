@@ -4,8 +4,10 @@
 #include "resource.h"
 #include <atlwin.h>
 
-struct CMainFrame::CView: ATL::CWindowImpl<CView>
+struct CMainFrame::CView: ATL::CDialogImpl<CView>
 {
+    enum { IDD = IDD_MF_VIEW };
+
     ~CView()
     {
     }
@@ -14,16 +16,31 @@ struct CMainFrame::CView: ATL::CWindowImpl<CView>
     {
     }
 
-    DECLARE_WND_CLASS(NULL)
+    //void DoInitTemplate() 
+    //{
+    //}
+    //
+    //void DoInitControls() 
+    //{
+    //}
 
-    BOOL PreTranslateMessage(MSG* pMsg)
+    BEGIN_MSG_MAP(CAboutDlg)
+        MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+        COMMAND_ID_HANDLER(IDOK, OnCloseCmd)
+        COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
+    END_MSG_MAP()
+
+    LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
     {
-        pMsg;
-        return FALSE;
+        //CenterWindow(GetParent());
+        return TRUE;
     }
 
-    BEGIN_MSG_MAP(CView)
-    END_MSG_MAP()
+    LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+    {
+        //EndDialog(wID);
+        return 0;
+    }
 };
 
 
@@ -44,9 +61,9 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
     if (Super::PreTranslateMessage(pMsg)) {
         return TRUE;
     }
-    if (m_pView && m_pView->PreTranslateMessage(pMsg)) {
-        return TRUE;
-    }
+    //if (m_pView && m_pView->PreTranslateMessage(pMsg)) {
+    //    return TRUE;
+    //}
     return FALSE;
 }
 
@@ -80,17 +97,23 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
 
     if (m_pView) {
         CRect rcView = rc;
-        m_hWndClient = m_pView->Create(m_hWnd, rcView, nullptr,
-            WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-            WS_EX_CLIENTEDGE,
-            ATL::_U_MENUorID(CTRL_ID_VIEW)
-        );
+        m_hWndClient = m_pView->Create(m_hWnd, rcView, reinterpret_cast<LPARAM>(this));
+      //m_hWndClient = m_pView->Create(m_hWnd, rcView, nullptr,
+      //    WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+      //    WS_EX_CLIENTEDGE,
+      //    ATL::_U_MENUorID(CTRL_ID_VIEW)
+      //);
         if (!m_hWndClient) {
             HRESULT hr = ::GetLastError();
             ATLTRACE2(atlTraceUI, 0, _T("FAILED create VIEW [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
         }
         else {
-            m_pView->Invalidate();
+            ////m_pView->Invalidate();
+            //ATL::_U_MENUorID mnu(CTRL_ID_VIEW);
+            //if (!::SetMenu(m_hWndClient, mnu.m_hMenu)) {
+            //    HRESULT hr = ::GetLastError();
+            //    ATLTRACE2(atlTraceUI, 0, _T("FAILED set VIEW id [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
+            //}
         }
     }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "resource.h"
 #include <atlwin.h>
 #include <atlframe.h>
 #include <atlctrlx.h>
@@ -39,18 +40,17 @@ private:
     friend class Resizer;
 
     BEGIN_MSG_MAP_EX(CMainFrame)
-      MSG_WM_CREATE(OnCreate)
-      MSG_WM_DESTROY(OnDestroy)
-      MSG_WM_ERASEBKGND(OnEraseBkgnd)
-      MSG_WM_ACTIVATE(OnActivate)
-      MSG_WM_KEYDOWN(OnKeyDown)
-      CHAIN_MSG_MAP(Resizer)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_ERASEBKGND(OnEraseBkgnd)
+        MSG_WM_ACTIVATE(OnActivate)
+        MSG_WM_KEYDOWN(OnKeyDown)
+        CHAIN_MSG_MAP(Resizer)
     END_MSG_MAP()
 
     BEGIN_DLGRESIZE_MAP(CMainFrame)
         DLGRESIZE_CONTROL(ATL_IDW_STATUS_BAR,   DLSZ_SIZE_X)
-        DLGRESIZE_CONTROL(CTRL_ID_VIEW,         DLSZ_SIZE_X | DLSZ_SIZE_Y)
-    
+        //DLGRESIZE_CONTROL(CTRL_ID_VIEW,         DLSZ_SIZE_X | DLSZ_SIZE_Y)
     END_DLGRESIZE_MAP()
 
     int OnCreate(LPCREATESTRUCT);
