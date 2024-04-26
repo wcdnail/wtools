@@ -19,7 +19,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="ClAppMainFrame.h" />
     <ClInclude Include="ClAppearance.h" />
-    <ClInclude Include="Resource.h">
+    <ClInclude Include="resource.h">
       <Filter>res</Filter>
     </ClInclude>
   </ItemGroup>
@@ -45,5 +45,10 @@
     <Midl Include="ClAppearance.idl">
       <Filter>res</Filter>
     </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="rom.ico">
+      <Filter>res</Filter>
+    </Image>
   </ItemGroup>
 </Project>

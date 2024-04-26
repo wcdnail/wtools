@@ -227,7 +227,7 @@
     <ClInclude Include="ClAppMainFrame.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -262,6 +262,9 @@
   </ItemGroup>
   <ItemGroup>
     <Midl Include="ClAppearance.idl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="rom.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

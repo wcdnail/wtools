@@ -99,8 +99,11 @@ CClassicAppearance::CClassicAppearance()
 
 HRESULT CClassicAppearance::Run(HINSTANCE instHnd, int showCmd)
 {
-    HRESULT          hr = S_OK;
-    HWND           hwnd = nullptr;
+    static constexpr int MF_Initial_CX = 1000;
+    static constexpr int MF_Initial_CY = 600;
+
+    HRESULT          hr;
+    HWND           hwnd;
     CMessageLoop   loop;
     OleInit     oleInit;
     CCtrlInit cctrlInit;
@@ -119,8 +122,8 @@ HRESULT CClassicAppearance::Run(HINSTANCE instHnd, int showCmd)
         hr = ::GetLastError();
         return hr;
     }
-    CRect rc(0, 0, static_cast<int>(Rc::Screen.Width() / 2.2), Rc::Screen.Height());
-    Rc::PutInto(Rc::Screen, rc, Rc::Right);
+    CRect rc(0, 0, MF_Initial_CX, MF_Initial_CY);
+    Rc::PutInto(Rc::Screen, rc, Rc::Center);
     hwnd = m_MainFrame.Create(nullptr, rc, nullptr);
     if (!hwnd) {
         hr = ::GetLastError();

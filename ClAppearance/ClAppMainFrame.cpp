@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ClAppMainFrame.h"
 #include "ClAppearance.h"
+#include "resource.h"
 
 CMainFrame::~CMainFrame()
 {
@@ -14,10 +15,11 @@ CMainFrame::CMainFrame(CClassicAppearance& app)
 
 int CMainFrame::OnCreate(LPCREATESTRUCT)
 {
-    CIcon icon(::LoadIconW(m_App.GetModuleInstance(), L"MAIN_ICON"));
+    CIcon icon(::LoadIconW(m_App.GetModuleInstance(), MAKEINTRESOURCEW(IDI_MAIN)));
     if (nullptr != icon) {
-        SetIcon(icon, FALSE);
-        SetIcon(icon, TRUE);
+        HICON raw = icon.Detach();
+        SetIcon(raw, FALSE);
+        SetIcon(raw, TRUE);
     }
 
     CRect rc;
