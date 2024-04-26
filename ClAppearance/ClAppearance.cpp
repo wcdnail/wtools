@@ -2,32 +2,132 @@
 #include "ClAppearance.h"
 #include "CRectPutInto.h"
 
-CClAppearanceModule _AtlModule;
+#if 0
+#include "ClAppearance_i.h"
+#include <atlbase.h>
+
+struct CAtlApp: ATL::CAtlExeModuleT<CAtlApp>
+{
+    using    Super = ATL::CAtlExeModuleT<CAtlApp>;
+    using SuperMod = ATL::CAtlModuleT<CAtlApp>;
+
+    ~CAtlApp() override;
+    CAtlApp();
+
+private:
+    friend Super;
+    friend SuperMod;
+
+    CClassicAppearance m_App;
+
+    DECLARE_LIBID(LIBID_ClAppearanceLib)
+    DECLARE_REGISTRY_APPID_RESOURCEID(IDR_CLAPPEARANCE, "{a189a989-5210-498e-9326-eadb11ad6d14}")
+
+    HRESULT Run(int showCmd);
+};
+
+CAtlApp::~CAtlApp()
+{
+}
+
+CAtlApp::CAtlApp()
+    : Super()
+    , m_App()
+{
+}
+
+CAtlApp _AtlModule;
+return _AtlModule.WinMain(showCmd);
+#endif
+
+CClassicAppearance _AtlModule;
 
 extern "C"
-int WINAPI _tWinMain(HINSTANCE instHnd, HINSTANCE, LPTSTR lpCmdLine, int showCmd)
+int WINAPI _tWinMain(HINSTANCE instHnd, HINSTANCE, LPTSTR, int showCmd)
 {
-	return _AtlModule.WinMain(showCmd);
+    HRESULT hr = _AtlModule.Run(instHnd, showCmd);
+    return static_cast<int>(hr);
 }
 
-CClAppearanceModule::~CClAppearanceModule()
+namespace
+{
+    struct OleInit
+    {
+        HRESULT result;
+        OleInit()
+            : result(::OleInitialize(nullptr))
+        {
+        }
+        ~OleInit()
+        {
+            if (SUCCEEDED(result)) {
+                ::OleUninitialize();
+            }
+        }
+    };
+
+    struct CCtrlInit
+    {
+        HRESULT result;
+        CCtrlInit()
+            : result(S_OK)
+        {
+            ::DefWindowProc(nullptr, 0, 0, 0L);
+            if (!WTL::AtlInitCommonControls(ICC_BAR_CLASSES)) {
+                result = ::GetLastError();
+                if (SUCCEEDED(result)) {
+                    result = DISP_E_UNKNOWNINTERFACE;
+                }
+            }
+        }
+        ~CCtrlInit()
+        {
+            /* ##TODO: Deinitialize CommonControls */
+        }
+    };
+}
+
+CClassicAppearance::~CClassicAppearance()
 {
 }
 
-CClAppearanceModule::CClAppearanceModule()
-    : m_MainFrame(modInst)
+CClassicAppearance::CClassicAppearance()
+    : Super()
+    , m_MainFrame(*this)
 {
 }
 
-HRESULT CClAppearanceModule::Run(int showCmd)
+HRESULT CClassicAppearance::Run(HINSTANCE instHnd, int showCmd)
 {
-	CMessageLoop loop;
-    //Super::AddMessageLoop(&loop);
+    HRESULT          hr = S_OK;
+    HWND           hwnd = nullptr;
+    CMessageLoop   loop;
+    OleInit     oleInit;
+    CCtrlInit cctrlInit;
 
-    HRESULT rv = S_OK;
-
-    CRect rc(0, 0, (Rc::Screen.Width() / 2.2), Rc::Screen.Height());
+    if (FAILED(oleInit.result)) {
+        return oleInit.result;
+    }
+    if (FAILED(cctrlInit.result)) {
+        return cctrlInit.result;
+    }
+    hr = Init(nullptr, instHnd);
+    if (FAILED(hr)) {
+        return hr;
+    }
+    if (!AddMessageLoop(&loop)) {
+        hr = ::GetLastError();
+        return hr;
+    }
+    CRect rc(0, 0, static_cast<int>(Rc::Screen.Width() / 2.2), Rc::Screen.Height());
     Rc::PutInto(Rc::Screen, rc, Rc::Right);
-
-	return rv;
+    hwnd = m_MainFrame.Create(nullptr, rc, nullptr);
+    if (!hwnd) {
+        hr = ::GetLastError();
+        return hr;
+    }
+    m_MainFrame.ShowWindow(showCmd);
+    hr = loop.Run();
+    RemoveMessageLoop();
+    return hr;
 }

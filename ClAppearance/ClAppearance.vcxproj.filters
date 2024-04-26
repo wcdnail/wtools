@@ -16,10 +16,12 @@
     </ClInclude>
     <ClInclude Include="framework.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Resource.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ClAppMainFrame.h" />
     <ClInclude Include="ClAppearance.h" />
+    <ClInclude Include="Resource.h">
+      <Filter>res</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClAppearance_i.c">

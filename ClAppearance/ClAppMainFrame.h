@@ -3,13 +3,15 @@
 #include <atlframe.h>
 #include <atlwin.h>
 
+struct CClassicAppearance;
+
 struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
                    WTL::CDialogResize<CMainFrame>
 {
     using   Super = WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>;
     using Resizer = WTL::CDialogResize<CMainFrame> ;
 
-    CMainFrame(HINSTANCE hResInst);
+    CMainFrame(CClassicAppearance& app);
     ~CMainFrame();
 
     using Super::Create;
@@ -19,7 +21,7 @@ struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
     using Super::SetIcon;
 
 private:
-    HINSTANCE m_hResInst;
+    CClassicAppearance& m_App;
 
     friend class Super;
     friend class Resizer;
@@ -29,7 +31,7 @@ private:
         IdView = 1000,
     };
 
-    BEGIN_MSG_MAP_EX(MainFrame)
+    BEGIN_MSG_MAP_EX(CMainFrame)
       MSG_WM_CREATE(OnCreate)
       MSG_WM_DESTROY(OnDestroy)
       MSG_WM_ERASEBKGND(OnEraseBkgnd)
@@ -38,8 +40,8 @@ private:
       CHAIN_MSG_MAP(Resizer)
     END_MSG_MAP()
 
-    BEGIN_DLGRESIZE_MAP(MainFrame)
-      DLGRESIZE_CONTROL(IdView, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+    BEGIN_DLGRESIZE_MAP(CMainFrame)
+      //DLGRESIZE_CONTROL(IdView, DLSZ_SIZE_X | DLSZ_SIZE_Y)
     END_DLGRESIZE_MAP()
 
     int OnCreate(LPCREATESTRUCT);

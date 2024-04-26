@@ -1,22 +1,24 @@
 #include "pch.h"
 #include "ClAppMainFrame.h"
+#include "ClAppearance.h"
 
 CMainFrame::~CMainFrame()
 {
 }
 
-CMainFrame::CMainFrame(HINSTANCE hResInst)
+CMainFrame::CMainFrame(CClassicAppearance& app)
     : Super()
-    , m_hResInst(hResInst)
+    , m_App(app)
 {
 }
 
 int CMainFrame::OnCreate(LPCREATESTRUCT)
 {
-    CIcon icon(::LoadIconW(m_hResInst, L"MAIN_ICON"));
-
-    SetIcon(icon, FALSE);
-    SetIcon(icon, TRUE);
+    CIcon icon(::LoadIconW(m_App.GetModuleInstance(), L"MAIN_ICON"));
+    if (nullptr != icon) {
+        SetIcon(icon, FALSE);
+        SetIcon(icon, TRUE);
+    }
 
     CRect rc;
     GetClientRect(rc);

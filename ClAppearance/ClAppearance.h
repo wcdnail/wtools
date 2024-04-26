@@ -1,29 +1,19 @@
 #pragma once
 
 #include "ClAppMainFrame.h"
-#include "ClAppearance_i.h"
-#include <atlbase.h>
+#include <atlapp.h>
 
-struct CClAppearanceModule;
-
-extern CClAppearanceModule _AtlModule;
-
-struct CClAppearanceModule: ATL::CAtlExeModuleT<CClAppearanceModule>
+struct CClassicAppearance: CAppModule
 {
-    using    Super = ATL::CAtlExeModuleT<CClAppearanceModule>;
-    using SuperMod = ATL::CAtlModuleT<CClAppearanceModule>;
+    using Super = CAppModule;
 
     CMainFrame m_MainFrame;
 
-    ~CClAppearanceModule() override;
-    CClAppearanceModule();
+    ~CClassicAppearance() override;
+    CClassicAppearance();
+
+    HRESULT Run(HINSTANCE instHnd, int showCmd);
 
 private:
     friend Super;
-    friend SuperMod;
-
-    DECLARE_LIBID(LIBID_ClAppearanceLib)
-    DECLARE_REGISTRY_APPID_RESOURCEID(IDR_CLAPPEARANCE, "{a189a989-5210-498e-9326-eadb11ad6d14}")
-
-    HRESULT Run(int showCmd);
 };
