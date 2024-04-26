@@ -11,3 +11,9 @@
 #include <atlbase.h>
 #include <atlcom.h>
 #include <atlctl.h>
+
+#include <atlapp.h>
+#include <atlwin.h>
+#include <atltypes.h>
+#include <atlframe.h>
+#include <atlcrack.h>

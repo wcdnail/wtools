@@ -1,9 +1,3 @@
-// ClAppearance.idl : IDL source for ClAppearance
-//
-
-// This file will be processed by the MIDL tool to
-// produce the type library (ClAppearance.tlb) and marshalling code.
-
 import "oaidl.idl";
 import "ocidl.idl";
 

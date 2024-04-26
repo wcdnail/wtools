@@ -5,6 +5,12 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClAppearance", "ClAppearance\ClAppearance.vcxproj", "{87E7753F-DB66-4F70-A70D-1042428D4676}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{39D7F34E-6DC6-40F9-AE09-369C8ED9E28A}"
+	ProjectSection(SolutionItems) = preProject
+		Common\CRectPutInto.h = Common\CRectPutInto.h
+		Common\CRectScreen.h = Common\CRectScreen.h
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
