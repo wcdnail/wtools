@@ -2,17 +2,23 @@
 #include "dh.tracing.h"
 #include "dh.timer.h"
 #include "string.utils.format.h"
+#include "windows.gui.leaks.h"
 #include "info/runtime.information.h"
 #include <fstream>
 #include <atlstr.h>
 #include <atlconv.h>
-#include <mutex>
-#include <filesystem>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <filesystem>
+#include <memory>
+#include <mutex>
 
 #ifndef _TRACE_LOG_ENABLED
 #  define _TRACE_LOG_ENABLED true
+#endif
+
+#ifdef _DEBUG
+#  define _DEBUG_EXTRA_INFO
 #endif
 
 namespace Dh
@@ -33,8 +39,9 @@ namespace Dh
             std::filesystem::path tempath = Runtime::Info().Executable.Filename;
             Name = boost::to_upper_copy(tempath.filename().replace_extension().wstring());
         }
-        else
+        else {
             Name = name;
+        }
     }
 
     TraceCategory::~TraceCategory()
@@ -44,63 +51,89 @@ namespace Dh
     {
         struct UpTimer: Timer
         {
-            UpTimer()
-                : Timer()
-            {}
-
+            UpTimer(): Timer() {}
             ~UpTimer() {}
-
             using Timer::Seconds;
         };
-
         const UpTimer _Uptime;
     }
 
-    // WARN: Don't use virtual functions in this.
-    struct TracingContext
+    struct LogCtx
     {
-        std::recursive_mutex& Mutex() { return MyMx; }
+        using ABool = std::atomic<bool>;
+        using Mutex = std::recursive_mutex;
+
+        struct ScopedLockFree
+        {
+            ScopedLockFree() {}
+            virtual ~ScopedLockFree() {}
+        };
+
+        struct ScopedGuard: ScopedLockFree
+        {
+            Mutex& mx_;
+            ScopedGuard(Mutex& mx)
+                : mx_(mx)
+            {
+                mx_.lock();
+            }
+            ~ScopedGuard() override
+            {
+                mx_.unlock();
+            }
+        };
+
+        ScopedLockFree ScopedLock()
+        {
+            return multiThreaded_ ? ScopedGuard(mx_) : ScopedLockFree();
+        }
 
         template <typename C>
         void Puts(C const* text)
         {
-            if (IsLogEnabled())
+            if (IsLogEnabled()) {
                 PutsImpl(text);
+            }
         }
 
         void FlushLog()
         {
-            if (IsLogEnabled())
-                Log << std::flush;
-        }
-
-    private:
-        friend TracingContext& TraceContext();
-
-        TracingContext() 
-            : MyMx()
-            , LogEnabled(_TRACE_LOG_ENABLED)
-            , Log() 
-        {
-            if (LogEnabled)
-            {
-                std::string name = GenLogName();
-                Log.open(name.c_str());
-
-#ifdef _DEBUG_EXTRA_INFO
-                std::wostringstream temp;
-                Runtime::Info().SimpleReport(temp);
-                ThreadPrintfc(Category::Module, "System info:\n%s", temp.str().c_str());
-#else
-                ThreadPrintfc(Category::Module, L"Launched on %s (%s)\n"
-                    , Runtime::Info().Host.Name.c_str()
-                    , Runtime::Info().System.Version.DisplayName.c_str()
-                    );
-#endif
+            if (IsLogEnabled()) {
+                log_ << std::flush;
             }
         }
 
-        ~TracingContext() 
+        static LogCtx& instance(bool mt = true)
+        {
+            static LogCtx self(mt);
+            if (!self.isInitialized_) {
+                ScopedGuard lk(self.mx_);
+                if (self.logEnabled_) {
+                    std::string name = GenLogName();
+                    self.log_.open(name.c_str());
+                }
+                self.isInitialized_ = true;
+            }
+            return self;
+        }
+
+    private:
+        Mutex              mx_;
+        std::ofstream     log_;
+        bool       logEnabled_;
+        bool    multiThreaded_;
+        ABool   isInitialized_;
+
+        LogCtx(bool multiThreaded)
+            :            mx_()
+            ,           log_()
+            ,    logEnabled_(_TRACE_LOG_ENABLED)
+            , multiThreaded_(multiThreaded)
+            , isInitialized_(false)
+        {
+        }
+
+        ~LogCtx()
         {
             FlushLog();
         }
@@ -108,72 +141,51 @@ namespace Dh
         static std::filesystem::path GetLogPath(int n)
         {
             std::filesystem::path result = Runtime::Info().Executable.Directory;
-
             result /= Runtime::Info().Executable.Version.ProductName + L".log." 
                     + boost::lexical_cast<std::wstring>(n) + L".txt";
-
             return result;
         }
 
         static std::string GenLogName()
         {
             std::filesystem::path temp;
-
-            for (int i=2; i>=0; i--)
-            {
+            for (int i=2; i>=0; i--) {
                 temp = GetLogPath(i);
-                if (std::filesystem::exists(temp))
-                {
+                if (std::filesystem::exists(temp)) {
                     std::filesystem::path next = GetLogPath(i + 1);
-
                     std::error_code ec;
                     std::filesystem::remove(next, ec);
                     std::filesystem::rename(temp, next, ec);
                 }
             }
-
             return temp.string();
         }
 
-        bool IsLogEnabled() const { return LogEnabled && Log.is_open(); }
-        void PutsImpl(char const* text) { Log << text; }
+        bool IsLogEnabled() const { return logEnabled_ && log_.is_open(); }
+        void PutsImpl(char const* text) { log_ << text; }
 
         void PutsImpl(wchar_t const* text)
         {
-            if (text && *text)
-            {
+            if (text && *text) {
                 size_t len = ::wcslen(text) + 1;
-
                 CStringA temp;
                 int cl = ::WideCharToMultiByte(CP_ACP, 0, text, (int)len, temp.GetBufferSetLength((int)len), (int)len, NULL, NULL);
                 temp.ReleaseBufferSetLength(cl);
-
-                Log << (char const*)temp; 
+                log_ << (char const*)temp; 
             }
         }
-
-    private:
-        std::recursive_mutex MyMx;
-        bool LogEnabled;
-        std::ofstream Log;
     };
-
-    TracingContext& TraceContext()
-    {
-        static TracingContext instance;
-        return instance;
-    }
 
     static void Puts(char const* text) 
     {
         ::OutputDebugStringA(text); 
-        TraceContext().Puts(text);
+        LogCtx::instance().Puts(text);
     }
 
     static void Puts(wchar_t const* text)
     { 
         ::OutputDebugStringW(text); 
-        TraceContext().Puts(text);
+        LogCtx::instance().Puts(text);
     }
 
     void Printf(PCSTR format, ...)
@@ -181,9 +193,9 @@ namespace Dh
         va_list ap;
         va_start(ap, format);
         {
-            std::lock_guard lk(TraceContext().Mutex());
+            auto lk = LogCtx::instance().ScopedLock();
             Puts(Str::Elipsis<char>::FormatV(format, ap));
-            TraceContext().FlushLog();
+            LogCtx::instance().FlushLog();
         }
         va_end(ap);
     }
@@ -193,9 +205,9 @@ namespace Dh
         va_list ap;
         va_start(ap, format);
         {
-            std::lock_guard lk(TraceContext().Mutex());
+            auto lk = LogCtx::instance().ScopedLock();
             Puts(Str::Elipsis<wchar_t>::FormatV(format, ap));
-            TraceContext().FlushLog();
+            LogCtx::instance().FlushLog();
         }
         va_end(ap);
     }
@@ -203,19 +215,19 @@ namespace Dh
     template <typename C>
     static void ThreadPrintfT(C const* format, va_list ap)
     {
-        std::lock_guard lk(TraceContext().Mutex());
+        auto lk = LogCtx::instance().ScopedLock();
         Puts(Str::Elipsis<wchar_t>::Format(L"%0*.8f [%06d] ", 20, _Uptime.Seconds(), ::GetCurrentThreadId()));
         Puts(Str::Elipsis<C>::FormatV(format, ap));
-        TraceContext().FlushLog();
+        LogCtx::instance().FlushLog();
     }
 
     template <typename C>
     static void ThreadPrintfT(TraceCategory const& cat, C const* format, va_list ap)
     {
-        std::lock_guard lk(TraceContext().Mutex());
+        auto lk = LogCtx::instance().ScopedLock();
         Puts(Str::Elipsis<wchar_t>::Format(L"%0*.8f [%06d] %8s: ", 20, _Uptime.Seconds(), ::GetCurrentThreadId(), cat.GetName()));
         Puts(Str::Elipsis<C>::FormatV(format, ap));
-        TraceContext().FlushLog();
+        LogCtx::instance().FlushLog();
     }
 
     void ThreadPrintf(char const* format, ...)
@@ -252,13 +264,13 @@ namespace Dh
 
     static inline void _Start_ScopedThreadLog(PCWSTR message) 
     {
-        ThreadPrintfc(Category::Module, L"%s thread started...\n", message); 
+        ThreadPrintfc(Category::Module, L"%s thread started...\n", message);
     }
 
-    static inline void _Stop_ScopedThreadLog(PCWSTR message, Dh::Timer const& liveTime)  
+    static inline void _Stop_ScopedThreadLog(PCWSTR message, Dh::Timer const& liveTime)
     {
-        ThreadPrintfc(Category::Module, L"%s thread stopped %f seconds (%f hours)\n", message
-            , liveTime.Seconds(), liveTime.Seconds() / 3600.); 
+        ThreadPrintfc(Category::Module, L"%s thread stopped %f seconds (%f hours)\n", message,
+            liveTime.Seconds(), liveTime.Seconds() / 3600.); 
     }
 
     ScopedThreadLog::ScopedThreadLog(wchar_t const* message)
@@ -291,5 +303,22 @@ namespace Dh
     ScopedThreadLog::~ScopedThreadLog()
     {
         _Stop_ScopedThreadLog(Message, Time);
+    }
+
+    void PrintLogHeader()
+    {
+        LogCtx::instance();
+
+#ifdef _DEBUG_EXTRA_INFO
+        std::wostringstream temp;
+        Runtime::Info().SimpleReport(temp);
+        std::wstring report = temp.str();
+        ThreadPrintfc(Category::Module, L"System info:\n%s", report.c_str());
+#else
+        ThreadPrintfc(Category::Module, L"Launched on %s (%s)\n",
+            Runtime::Info().Host.Name.c_str(),
+            Runtime::Info().System.Version.DisplayName.c_str()
+        );
+#endif
     }
 }

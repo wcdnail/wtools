@@ -12,6 +12,8 @@
 
 namespace Dh
 {
+    WCDAFX_API void PrintLogHeader();
+
     class TraceCategory
     {
     public:

@@ -2,6 +2,7 @@
 #include "dialogz.find.h"
 #include "twins.state.h"
 #include "file.list.h"
+#include "brute_cast.h"
 #include <shell.imagelist.h>
 #include <twins.langs/twins.lang.strings.h>
 #include <dh.tracing.h>
@@ -656,7 +657,7 @@ namespace Twins
 
             Conf.Texts.LoadTo(TextPattern);
 
-            TextSearchRxFlags = (unsigned)TextPatternRxType.GetItemDataPtr(TextPatternRxType.GetCurSel());
+            TextSearchRxFlags = brute_cast<unsigned>(TextPatternRxType.GetItemDataPtr(TextPatternRxType.GetCurSel()));
 
             if (TextSearchIgnoringCase)
                 TextSearchRxFlags |= boost::regex_constants::icase;
@@ -682,16 +683,13 @@ namespace Twins
         }
     }
 
-    void FindDialog::PrepareNotOlder()
-    {
-        if (UseNotOlder)
-        {
-            int unit = (int)NotOlderUnit.GetItemDataPtr(NotOlderUnit.GetCurSel());
+    void FindDialog::PrepareNotOlder() {
+        if (UseNotOlder) {
+            int  unit = brute_cast<int>(NotOlderUnit.GetItemDataPtr(NotOlderUnit.GetCurSel()));
             int value = GetDlgItemInt(IDC_EB_NOTOLDER, NULL, FALSE);
 
             ATL::CTimeSpan span;
-            switch (unit)
-            {
+            switch (unit) {
             case NotOlderYears:   span = CTimeSpan(365 * value, 0, 0, 0); break;
             case NotOlderMonths:  span = CTimeSpan(30 * value, 0, 0, 0); break;
             case NotOlderWeeks:   span = CTimeSpan(7 * value, 0, 0, 0); break;
@@ -700,7 +698,6 @@ namespace Twins
             case NotOlderMinutes: span = CTimeSpan(0, 0, value, 0); break;
             case NotOlderSeconds: span = CTimeSpan(0, 0, 0, value); break;
             }
-
             NotOlderTime = CTime::GetCurrentTime() - span;
             Dh::ThreadPrintf(L"Searchin: NotOlderTime %s\n", NotOlderTime.Format(L"%d.%m.%Y %H:%M:%S"));
         }
@@ -710,8 +707,8 @@ namespace Twins
     {
         if (UseSize)
         {
-            int optype = (int)SizeOp.GetItemDataPtr(SizeOp.GetCurSel());
-            int unit = (int)SizeUnit.GetItemDataPtr(SizeUnit.GetCurSel());
+            int optype = brute_cast<int>(SizeOp.GetItemDataPtr(SizeOp.GetCurSel()));
+            int   unit = brute_cast<int>(SizeUnit.GetItemDataPtr(SizeUnit.GetCurSel()));
             uint64_t size = (uint64_t)GetDlgItemInt(IDC_EB_SIZE, NULL, FALSE);
 
             SizeComparand = size * unit;

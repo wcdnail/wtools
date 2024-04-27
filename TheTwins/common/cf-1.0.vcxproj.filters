@@ -480,6 +480,7 @@
     <ClInclude Include="null.pointee.h">
       <Filter>__</Filter>
     </ClInclude>
+    <ClInclude Include="brute_cast.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

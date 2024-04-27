@@ -78,6 +78,7 @@ namespace Twins
             ::SetEvent(break_);
             ::CloseHandle(break_);
             ::CloseHandle(enumerate_);
+            thread_.join();
         }
 
         void Enumerator::Acquire()
@@ -88,15 +89,15 @@ namespace Twins
         void Enumerator::ThreadProc()
         {
             Dh::ScopedThreadLog lg(L"DRIVENUM:");
-
             HANDLE events[] = { enumerate_, break_ };
-            for (;;)
-            {
+            for (;;) {
                 DWORD eventId = ::WaitForMultipleObjects(_countof(events), events, FALSE, INFINITE);
-                if (WAIT_OBJECT_0 == eventId)
+                if (WAIT_OBJECT_0 == eventId) {
                     EnumProc();
-                else
+                }
+                else {
                     break;
+                }
             }
         }
 
@@ -119,10 +120,8 @@ namespace Twins
                 tempIcons.Create(16, 16, ILC_COLOR32, 1, 1);
 
                 int count = 0;
-                for (DWORD n=0; n<MaximalDriveNum; n++)
-                {
-                    if (0 != (mask & (1 << n)))
-                    {
+                for (DWORD n=0; n<MaximalDriveNum; n++) {
+                    if (0 != (mask & (1 << n))) {
                         TCHAR path[] = {_T('a') + (TCHAR)n, _T(':'), _T('\\'), 0};
                         TCHAR label[MAX_PATH + 1] = {0};
                         TCHAR fs[MAX_PATH + 1] = {0};

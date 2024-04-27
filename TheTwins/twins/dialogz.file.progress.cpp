@@ -6,6 +6,8 @@
 #include "file.list.h"
 #include <twins.langs/twins.lang.strings.h>
 #include <string.utils.human.size.h>
+
+#include "brute_cast.h"
 #include "res/resource.h"
 
 namespace Twins
@@ -117,7 +119,7 @@ namespace Twins
 
     void FileProgressDialog::ShowFileReplaceDialog(LPARAM lParam) const
     {
-        REPLACEDLG_PARAMS* param = reinterpret_cast<REPLACEDLG_PARAMS*>(lParam);
+        REPLACEDLG_PARAMS* param = brute_cast<REPLACEDLG_PARAMS*>(lParam);
         FileReplaceDialog dlg;
         param->flags = dlg.Ask(param->source, param->dest, param->flags, m_hWnd);
     }

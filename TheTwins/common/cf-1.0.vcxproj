@@ -469,6 +469,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClCompile Include="wtl.scrollbar.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="brute_cast.h" />
     <ClInclude Include="cf-resources\resource.h" />
     <ClInclude Include="cf.windef.target.h" />
     <ClInclude Include="color.stuff.h" />
