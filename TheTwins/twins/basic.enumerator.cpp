@@ -108,13 +108,13 @@ namespace Twins
                     if (!args.SkipUpper)
                         OnEntry(Item(UpperDirFindData, args));
 
-                    return Ec(::GetLastError(), boost::system::system_category());
+                    return Ec(::GetLastError(), std::system_category());
                 }
             }
         }
 
         ec.clear();
-        boost::shared_ptr<void> autoFind(handle, FindClose);
+        std::shared_ptr<void> autoFind(handle, FindClose);
 
         if (!IsCurrentDir(data))
             OnEntry(Item(data, args));
@@ -123,7 +123,7 @@ namespace Twins
         {
             if (Canceled())
             {
-                ec = Ec(ERROR_CANCELLED, boost::system::system_category());
+                ec = Ec(ERROR_CANCELLED, std::system_category());
                 break;
             }
 

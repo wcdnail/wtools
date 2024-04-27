@@ -5,7 +5,6 @@
 #include <dh.tracing.h>
 #include <atlstr.h>
 #include <windows.gdi.rects.h>
-#include <boost/bind.hpp>
 #include <algorithm>
 #include <functional>
 
@@ -217,13 +216,13 @@ namespace Twins
 
     TabBarItem const& TabBar::GetItem(CPoint const& point) const
     {
-        ItemVec::const_iterator it = std::find_if(Items.begin(), Items.end(), boost::bind(&TabBarItem::IsIn, _1, point));
+        ItemVec::const_iterator it = std::find_if(Items.begin(), Items.end(), std::bind(&TabBarItem::IsIn, std::placeholders::_1, point));
         return it == Items.end() ? ptDummyItem : *it;
     }
 
     TabBarItem& TabBar::GetItem(CPoint const& point)
     {
-        ItemVec::iterator it = std::find_if(Items.begin(), Items.end(), boost::bind(&TabBarItem::IsIn, _1, point));
+        ItemVec::iterator it = std::find_if(Items.begin(), Items.end(), std::bind(&TabBarItem::IsIn, std::placeholders::_1, point));
         return it == Items.end() ? ptDummyItem : *it;
     }
 

@@ -3,7 +3,6 @@
 #include "iconoz.h"
 #include <twins.langs/twins.lang.strings.h>
 #include <dh.tracing.h>
-#include <boost/bind.hpp>
 
 namespace Twins
 {
@@ -88,7 +87,7 @@ namespace Twins
         CRect rcButtons = rc;
         rcButtons.top = rcButtons.bottom - GetButtonsCy();
         Buttons.Create(m_hWnd, rcButtons, NULL, WS_CHILD | WS_VISIBLE | SS_SUNKEN | WS_TABSTOP, 0, ID_BUTTONS);
-        Buttons.OnClick() = boost::bind(&CommonDialog::OnCommandById, this, _1);
+        Buttons.OnClick() = std::bind(&CommonDialog::OnCommandById, this, std::placeholders::_1);
         Buttons.SetIconSize(16, 16);
 
         CenterWindow(GetParent());

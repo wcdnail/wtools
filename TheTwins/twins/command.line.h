@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include <boost/noncopyable.hpp>
-#include <boost/function.hpp>
 #include <boost/thread/mutex.hpp>
 #include <atltypes.h>
 #include <atlwin.h>
@@ -27,8 +26,8 @@ namespace Ui
         typedef ATL::CWindowImpl<CommandLine> Super;
         typedef std::vector<std::wstring> HistoryStore;
         typedef Ref::Container<HistoryStore> RefHistoryStore;
-        typedef boost::function<bool(CString const&)> EnterCallback;
-        typedef boost::function<void(WTL::CComboBoxEx& combo)> CancelCallback;
+        typedef std::function<bool(CString const&)> EnterCallback;
+        typedef std::function<void(WTL::CComboBoxEx& combo)> CancelCallback;
 
         CancelCallback OnCancel;
         RefHistoryStore History;

@@ -88,7 +88,7 @@ namespace Cf
         struct NcPainContext;
 
         struct ControlBase;
-        typedef boost::shared_ptr<ControlBase> ControlBasePtr;
+        typedef std::shared_ptr<ControlBase> ControlBasePtr;
         template <typename T> struct Control;
         template <typename U> struct Details;
         template <typename U> struct SpecificMembers;

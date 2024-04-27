@@ -1,8 +1,6 @@
 #ifndef _CF_render_element_h__
 #define _CF_render_element_h__
 
-#include <boost/shared_ptr.hpp>
-
 namespace CF  // Common framework
 {
     class RenderElement
@@ -33,7 +31,7 @@ namespace CF  // Common framework
             T const& ref_;
         };
 
-        boost::shared_ptr<IRef> ref_;
+        std::shared_ptr<IRef> ref_;
     };
 
     inline RenderElement::IRef::~IRef()

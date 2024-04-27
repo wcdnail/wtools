@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "fs.links.h"
-#include <boost/shared_ptr.hpp>
 #include <winioctl.h>
 
 namespace Cf
@@ -74,8 +73,8 @@ namespace Cf
         ::AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL);
         ::CloseHandle(hToken);
 
-        HANDLE hDir = ::CreateFileW(rawPathName, rw ? (GENERIC_READ | GENERIC_WRITE) : GENERIC_READ
-            , 0, NULL, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, NULL);
+        HANDLE hDir = ::CreateFileW(rawPathName, rw ? (GENERIC_READ | GENERIC_WRITE) : GENERIC_READ,
+            0, NULL, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
         return hDir;
     }
@@ -83,15 +82,15 @@ namespace Cf
     bool IsDirectoryJunction(PCWSTR rawPathName, HANDLE dir) 
     {
         DWORD dwAttr = ::GetFileAttributesW(rawPathName);
-        if (dwAttr == -1) 
+        if (dwAttr == -1) {
             return false;
-
-        if ((dwAttr & DIR_ATTR) != DIR_ATTR) 
+        }
+        if ((dwAttr & DIR_ATTR) != DIR_ATTR) {
             return false;
-
-        if (INVALID_HANDLE_VALUE == dir) 
+        }
+        if (INVALID_HANDLE_VALUE == dir) {
             return false;
-
+        }
         BYTE buf[MAXIMUM_REPARSE_DATA_BUFFER_SIZE];
         REPARSE_MOUNTPOINT_DATA_BUFFER& ReparseBuffer = (REPARSE_MOUNTPOINT_DATA_BUFFER&)buf;
         DWORD dwRet;
@@ -99,22 +98,22 @@ namespace Cf
         return br ? (ReparseBuffer.ReparseTag == IO_REPARSE_TAG_MOUNT_POINT) : false;
     }
 
-    std::wstring QueryLinkTarget(std::wstring const& dirpath, boost::system::error_code& ec)
+    std::wstring QueryLinkTarget(std::wstring const& dirpath, std::error_code& ec)
     {
         std::wstring result;
         HANDLE dir = OpenDirectory(dirpath.c_str(), false);
 
         if (INVALID_HANDLE_VALUE == dir) 
-            ec.assign(::GetLastError(), boost::system::system_category());
+            ec.assign(::GetLastError(), std::system_category());
 
         else
         {
-            boost::shared_ptr<void> dirh(dir, CloseHandle);
+            std::shared_ptr<void> dirh(dir, CloseHandle);
             DWORD dwRet = 0;
             BYTE buf[MAXIMUM_REPARSE_DATA_BUFFER_SIZE] = {0};
             REPARSE_MOUNTPOINT_DATA_BUFFER& ReparseBuffer = (REPARSE_MOUNTPOINT_DATA_BUFFER&)buf;
             if (!::DeviceIoControl(dir, FSCTL_GET_REPARSE_POINT, NULL, 0, &ReparseBuffer, MAXIMUM_REPARSE_DATA_BUFFER_SIZE, &dwRet, NULL))
-                ec.assign(::GetLastError(), boost::system::system_category());
+                ec.assign(::GetLastError(), std::system_category());
 
             else
             {

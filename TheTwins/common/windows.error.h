@@ -1,6 +1,6 @@
 #pragma once
 
-#if 0                   // boost::system::error_code
+#if 0                   // std::error_code
 #include <atlstr.h>
 #include <winerror.h>
 

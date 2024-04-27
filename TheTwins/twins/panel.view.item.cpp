@@ -13,12 +13,17 @@ namespace Twins
     FItem::~FItem()
     {}
 
-    FUpDirItem::FUpDirItem()
+    FUpDirItem::~FUpDirItem()
     {
+    }
+
+    FUpDirItem::FUpDirItem()
+        : FItem()
+    {
+        ::wcsncpy_s(_dummy, L"..", 3);
         FileAttributes = FILE_ATTRIBUTE_DIRECTORY;
         FileNameLength = 2;
         ShortNameLength = 2;
-
         ::wcsncpy_s(ShortName, L"..", 2);
         FileName[0] = L'.';
         FileName[1] = L'.';

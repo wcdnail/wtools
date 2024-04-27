@@ -7,11 +7,11 @@
 #include "wcdafx.api.h"
 #include "rectz.h"
 #include "settings.details.h"
+#include <boost/noncopyable.hpp>
+#include <unordered_map>
 #include <string>
 #include <memory>
 #include <sstream>
-#include <boost/noncopyable.hpp>
-#include <boost/unordered_map.hpp>
 
 namespace Conf
 {
@@ -38,18 +38,16 @@ namespace Conf
     class Storage: boost::noncopyable
     {
     public:
-        WCDAFX_API virtual ~Storage() = 0;
-
-        virtual bool Open(std::wstring const& name, int flags = ConfCurrentUser) = 0;
+        WCDAFX_API virtual ~Storage();
+        virtual bool Open(std::wstring_view name, int flags = ConfCurrentUser) = 0;
         virtual void Close() = 0;
         virtual std::wstring const& GetName() const = 0;
-        virtual bool ValueExists(std::wstring const& name) const = 0;
-        virtual int GetInt(std::wstring const& name) const = 0;
-        virtual std::wstring GetString(std::wstring const& name ) const = 0;
-        virtual bool SetInt(std::wstring const& name, int value) const = 0;
-        virtual bool SetString(std::wstring const& name, std::wstring const& value) const = 0;
+        virtual bool ValueExists(std::wstring_view name) const = 0;
+        virtual int GetInt(std::wstring_view name) const = 0;
+        virtual std::wstring GetString(std::wstring_view name ) const = 0;
+        virtual bool SetInt(std::wstring_view name, int value) const = 0;
+        virtual bool SetString(std::wstring_view name, std::wstring const& value) const = 0;
         virtual bool LastFailed() const = 0;
-
     protected:
         WCDAFX_API Storage();
     };
@@ -59,25 +57,21 @@ namespace Conf
     //
     // VarBase
     //
-    class VarBase: boost::noncopyable
+    struct VarBase: boost::noncopyable
     {
-    public:
-        WCDAFX_API virtual ~VarBase() = 0;
-
-        virtual void Assign(std::wstring const&) = 0;
+        WCDAFX_API virtual ~VarBase();
+        virtual void Assign(std::wstring_view) = 0;
         virtual std::wstring const& GetName() const = 0;
-
         virtual bool Get(StoragePtr const& conf) const = 0;
         virtual bool Set(StoragePtr const& conf) const = 0;
         virtual bool Eq(StoragePtr const& conf) const = 0;
 
     protected:
         WCDAFX_API VarBase();
-
         WCDAFX_API static void SetupStream(std::wstringstream& stream);
     };
 
-    typedef boost::shared_ptr<VarBase> VarPtr;
+    using VarPtr = std::unique_ptr<VarBase>;
 
     //
     // VarT
@@ -86,28 +80,17 @@ namespace Conf
     class VarT: public VarBase
     {
     public:
-        VarT(T& v)
-            : Name()
-            , Pointee(&v) 
-        {}
-
-        virtual ~VarT() {}
-
-        virtual void Assign(std::wstring const& name) { Name = name; }
-        virtual std::wstring const& GetName() const { return Name; }
-
-        virtual bool Get(StoragePtr const&) const;
-        virtual bool Set(StoragePtr const&) const;
-        virtual bool Eq(StoragePtr const&) const;
-
+        VarT(T& v): Name(), Pointee(&v) {}
+        ~VarT() override {}
+        void Assign(std::wstring_view name) override { Name = name; }
+        std::wstring const& GetName() const override { return Name; }
+        bool Get(StoragePtr const&) const override;
+        bool Set(StoragePtr const&) const override;
+        bool Eq(StoragePtr const&) const override;
     private:
         std::wstring Name;
-        T *Pointee;
-
-        VarT(T& v, std::wstring const& name)
-            : Name(name)
-            , Pointee(&v) 
-        {}
+        T*        Pointee;
+        VarT(T& v, std::wstring_view name): Name(name), Pointee(&v) {}
     };
 
     template <> 
@@ -168,7 +151,7 @@ namespace Conf
     inline bool VarT<T>::Eq(StoragePtr const& store) const 
     { 
         T temp;
-        VarT<T> tv(temp, Name);
+        VarT<T> tv(temp, { Name.c_str(), Name.length() });
 
         if (!tv.Get(store))
             return true;
@@ -188,19 +171,21 @@ namespace Conf
     //
     // Var
     // 
-    class Var
+    struct Var
     {
-    public:
-        template <typename T>
-        Var(T& v)
-            : Ptr(new VarT<T>(v))
-        {}
+        VarPtr pointee_;
 
-    private:
-        friend class Section;
+        WCDAFX_API ~Var();
+        WCDAFX_API std::wstring_view GetName() const;
 
-        VarPtr Ptr;
+        template <typename T> Var(T& v);
     };
+
+    template <typename T>
+    inline Var::Var(T& v)
+        : pointee_(std::make_unique<VarT<T>>(v))
+    {
+    }
 
     //
     // Связывает обычные переменные
@@ -216,46 +201,45 @@ namespace Conf
         // для корректной работы Watcher
         // под-ветки необходимо создавать с помощью этих конструкторов 
         //
-        WCDAFX_API Section(const Section & parent, std::wstring const& name);
+        WCDAFX_API Section(Section const& parent, std::wstring_view name);
         WCDAFX_API ~Section();
 
-        WCDAFX_API bool Bind(std::wstring const& name, Var var);
+        WCDAFX_API bool Bind(std::wstring_view name, Var&& var);
         WCDAFX_API bool Save() const;
 
     private:
         friend class WatchDog;
 
-        typedef boost::unordered_map<std::wstring, VarPtr> VarMap;
-        typedef std::vector<Section*> SectionVec;
+        using     VarMap = std::unordered_map<std::wstring_view, VarPtr>;
+        using SectionVec = std::vector<Section*>;
 
         virtual void OnChange() const;
         virtual void OnParamChange(VarPtr const& vr) const;
         virtual void OnParamDelete(VarPtr const& vr) const;
 
-        void Open(const Section & parent, std::wstring const& name, int flags);
+        void Open(Section const& parent, std::wstring_view name, int flags);
         PlatformDependedStorage* GetStorage() const;
 
-        VarMap Vars;
-        StoragePtr Store;
-        unsigned Flags;
+        VarMap                 Vars;
+        StoragePtr            Store;
+        unsigned              Flags;
         mutable SectionVec Sections;
     };
 
     class WatchDog: boost::noncopyable
     {
     public:
-        WCDAFX_API WatchDog(Section& client);
         WCDAFX_API ~WatchDog();
+        WCDAFX_API WatchDog(Section& client);
 
     private:
-        Section *Client;
+        Section*         Client;
 #ifdef _WIN32
-        HANDLE StopFlag;
+        HANDLE         StopFlag;
         std::thread WatchThread;
 
         void WatchProc();
 #endif
-
         void Stop();
     };
 }

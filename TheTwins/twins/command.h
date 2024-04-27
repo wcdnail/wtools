@@ -2,7 +2,7 @@
 
 #include "command.ids.h"
 #include <string>
-#include <boost/function.hpp>
+#include <functional>
 
 namespace Twins
 {
@@ -10,7 +10,7 @@ namespace Twins
     {
         struct Definition
         {
-            typedef boost::function<void(void)> Handler;
+            using Handler = std::function<void(void)>;
 
             int Id;
             std::wstring Name;

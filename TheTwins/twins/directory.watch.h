@@ -9,7 +9,7 @@ namespace Twins
     {
     public:
         struct Error;
-        typedef boost::shared_ptr<void> Handle;
+        typedef std::shared_ptr<void> Handle;
 
         enum Flags
         {

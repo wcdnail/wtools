@@ -30,13 +30,14 @@ namespace Twins
             bool rv = TRUE == ::ShellExecuteExW(&info);
             HRESULT hr = ::GetLastError();
 
-            Dh::ThreadPrintf(L"RUNEXTRN: `%s (%s)` - %s - %p %p\n"
-                , item.Name.c_str(), item.Path.c_str(), (rv ? L"OK" : L"FAIL")
-                , info.hInstApp, info.hProcess);
+            Dh::ThreadPrintf(L"RUNEXTRN: `%s (%s)` - %s - %p %p\n",
+                item.Name.c_str(), item.Path.c_str(), (rv ? L"OK" : L"FAIL"),
+                info.hInstApp, info.hProcess
+            );
 
-            if (NULL != info.hProcess)
+            if (nullptr != info.hProcess) {
                 ::CloseHandle(info.hProcess);
-
+            }
             return hr;
         }
     }

@@ -3,9 +3,7 @@
 #include <todo.fixme.etc.h>
 #include <dh.tracing.h>
 #include <algorithm>
-#include <boost/bind.hpp>
 #include <filesystem>
-#include <boost/filesystem/operations.hpp>
 
 namespace Fl
 {
@@ -122,7 +120,7 @@ namespace Fl
     template <class Iter>
     static Iter _FindByName(Iter beg, Iter end, std::wstring const& name)
     {
-        return std::find_if(beg, end, boost::bind(&Entry::IsFilenameEq, _1, name));
+        return std::find_if(beg, end, std::bind(&Entry::IsFilenameEq, std::placeholders::_1, name));
     }
 
     List::const_iterator List::FindByName(std::wstring const& name) const
@@ -151,17 +149,14 @@ namespace Fl
     void List::OnAddNew(wchar_t const* dirpath, Twins::DirectoryNotifyPtr const& nitem, LESSFN const& lessfn, bool ascending)
     {
         Entry info(dirpath, *nitem);
-        if (info.IsValid())
-        {
+        if (info.IsValid()) {
             CalcExtraInfo(info);
-
-            if (Array.empty() || !lessfn)
-                Array.push_back(info);
-
-            else
-            {
-                const_iterator iafter = std::find_if(Array.begin(), Array.end(), boost::bind(lessfn, info, _1, ascending));
-                Array.insert(iafter, info);
+            if (Array.empty() || !lessfn) {
+                Array.emplace_back(std::move(info));
+            }
+            else {
+                const_iterator iafter = std::find_if(Array.begin(), Array.end(), std::bind(lessfn, info, std::placeholders::_1, ascending));
+                Array.emplace(iafter, std::move(info));
             }
         }
     }
@@ -169,15 +164,17 @@ namespace Fl
     void List::OnRemoveExisting(Twins::DirectoryNotifyPtr const& nitem)
     {
         const_iterator it = _FindByName(Begin(), End(), std::wstring(nitem->Filename));
-        if (it != End())
+        if (it != End()) {
             Array.erase(it);
+        }
     }
 
     void List::OnUpdateExisting(Twins::DirectoryNotifyPtr const& nitem)
     {
         iterator it = _FindByName(Array.begin(), Array.end(), std::wstring(nitem->Filename));
-        if (it != End())
+        if (it != End()) {
             it->Update();
+        }
     }
 
     double List::Sort(LESSFN pf, bool ascending)

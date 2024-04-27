@@ -9,7 +9,7 @@ namespace Ntfs
 {
     HANDLE OpenDirectory(PCWSTR rawPathName, bool rw);
     bool IsDirectoryJunction(PCWSTR rawPathName, HANDLE dir);
-    WidecharString QueryLinkTarget(WidecharString const& dirpath, boost::system::error_code& ec);
+    WidecharString QueryLinkTarget(WidecharString const& dirpath, std::error_code& ec);
 }
 
 #endif

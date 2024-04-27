@@ -3,8 +3,6 @@
 #include "file.operation.types.h"
 #include "dialogz.common.h"
 #include "dialogz.file.additional.h"
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
 
 namespace Twins
 {
@@ -35,7 +33,7 @@ namespace Twins
         void AdjustControlPositions();
 
     private:
-        typedef boost::function<void(void)> InitFunction;
+        typedef std::function<void(void)> InitFunction;
         InitFunction Init;
 
         CStatic Hint;
@@ -63,7 +61,7 @@ namespace Twins
     template <class Operation>
     inline int PromptDialog::Show(Operation const& operation, FileList files, HWND parent /*= NULL*/)
     {
-        Init = boost::bind(&Operation::InitPrompt, &operation, boost::ref(*this), boost::cref(files));
+        Init = std::bind(&Operation::InitPrompt, &operation, std::ref(*this), std::cref(files));
 
         INT_PTR rv = DoModal(parent);
         return (int)rv;

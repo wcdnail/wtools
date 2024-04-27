@@ -3,13 +3,13 @@
 #include "panel.view.item.h"
 #include <dir.manager.h>
 #include <settings.h>
-#include <thread>
-#include <boost/thread/mutex.hpp>
-#include <boost/scoped_array.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/function.hpp>
+#include <cstdint>
+#include <thread>
+#include <memory>
 #include <vector>
 #include <string>
+#include <functional>
 
 namespace Twins
 {
@@ -17,38 +17,41 @@ namespace Twins
 
     struct FScanner: boost::noncopyable
     {
-        typedef boost::function<void(double)> Callback;
+        using  Callback = std::function<void(double)>;
+        using DataArray = std::unique_ptr<uint8_t[]>;
 
         FScanner();
+        void Spawn();
         ~FScanner();
 
         void Cancel();
-        void Fetch(wchar_t const* path = NULL);
+        void Fetch(PCWSTR path = nullptr);
         void UpdatePath(std::wstring const& line);
 
-        Cf::DirManager Path;
-        std::wstring Mask;
-        FItemVector Items;
-        Callback OnFetchDone;
-        volatile bool InProgress;
-        bool IsError;
-        HRESULT ErrorCode;
-        std::wstring ErrorText;
-        std::wstring SelectedName;
-        bool DisplayHidden;
+        Cf::DirManager            Path;
+        std::wstring              Mask;
+        FItemVector              Items;
+        Callback           OnFetchDone;
+        volatile bool       InProgress;
+        bool                   IsError;
+        HRESULT              ErrorCode;
+        std::wstring         ErrorText;
+        std::wstring      SelectedName;
+        bool             DisplayHidden;
 
     private:
-        boost::scoped_array<unsigned char> Data;
-        volatile bool AbortFetch;
-        std::thread Thread;
+        DataArray                 Data;
+        volatile bool       AbortFetch;
+        std::thread             Thread;
 
-        static size_t Ds;
-        static Conf::Section ClassSettings;
+        static size_t   infoCacheSize_;
+        static Conf::Section settings_;
 
-        enum 
-        { FlagStop = 0
-        , FlagFetch
-        , FlagCount 
+        enum
+        {
+            FlagStop = WAIT_OBJECT_0,
+            FlagFetch,
+            FlagCount
         };
 
         HANDLE Flag[FlagCount];
@@ -56,6 +59,12 @@ namespace Twins
         void HeavyDutyProc();
         void ParseBuffer();
 
-        static void ReadDir(wchar_t const* path, unsigned char* buffer, size_t bsize);
+        struct InternalError
+        {
+            HRESULT             Hr;
+            wchar_t const* Message;
+        };
+
+        static InternalError ReadDir(PCWSTR path, uint8_t buffer[], size_t bsize);
     };
 }

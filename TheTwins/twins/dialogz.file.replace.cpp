@@ -5,7 +5,6 @@
 #include <string.utils.human.size.h>
 #include <generic.div.h>
 #include <atltime.h>
-#include <boost/bind.hpp>
 #include "res/resource.h"
 
 namespace Twins
@@ -51,13 +50,13 @@ namespace Twins
         rc.bottom = rc.top + bh;
         TopButtons.Create(m_hWnd, rc, NULL, WS_CHILD | WS_VISIBLE | SS_SUNKEN | WS_TABSTOP | WS_GROUP, 0, ID_BUTTONS2);
         TopButtons.SetWindowPos(GetDlgItem(IDC_DEST_GB), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOREDRAW);
-        TopButtons.OnClick() = boost::bind(&FileReplaceDialog::OnCommandById, this, _1);
+        TopButtons.OnClick() = std::bind(&FileReplaceDialog::OnCommandById, this, std::placeholders::_1);
 
         rc.top = rc.bottom + 2;
         rc.bottom = rc.top + bh;
         MidButtons.Create(m_hWnd, rc, NULL, WS_CHILD | WS_VISIBLE | SS_SUNKEN | WS_TABSTOP | WS_GROUP, 0, ID_BUTTONS1);
         MidButtons.SetWindowPos(TopButtons, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOREDRAW);
-        MidButtons.OnClick() = boost::bind(&FileReplaceDialog::OnCommandById, this, _1);
+        MidButtons.OnClick() = std::bind(&FileReplaceDialog::OnCommandById, this, std::placeholders::_1);
 
         DefaultId = SpecFlags::Replace;
 

@@ -13,7 +13,7 @@ namespace Twins
     class Enumerator
     {
     public:
-        typedef boost::system::error_code Ec;
+        typedef std::error_code Ec;
 
         Enumerator();
         virtual ~Enumerator();

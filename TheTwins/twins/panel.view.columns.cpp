@@ -107,7 +107,7 @@ namespace Twins
     void PanelColumns::OnCreate(PanelHeader& header)
     {
         AssignedHeaders.push_back(&header);
-        header.OnColumnResizeDone() = boost::bind(&PanelColumns::OnResizeDone, this, _1, _2);
+        header.OnColumnResizeDone() = std::bind(&PanelColumns::OnResizeDone, this, std::placeholders::_1, std::placeholders::_2);
         ResetHeader(header);
     }
 

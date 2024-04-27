@@ -110,7 +110,7 @@ namespace Fv
     bool Viewer::IsLineWrapOn() const { return FileBuffer::npos != State.WrappedLineWidth; } 
 
     Viewer::Fonts::Fonts()
-        : Default(::CreateFont(-13, 0, 0, 0, 0, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Courier New")))
+        : Default(::CreateFont(-13, 0, 0, 0, 0, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Consolas")))
         , Terminal(::CreateFont(-12, 0, 0, 0, 0, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Fixedsys")))
         , Status(::CreateFont(-11, 0, 0, 0, 0, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Lucida Console")))
     {}
@@ -139,11 +139,11 @@ namespace Fv
     ErrorCode Viewer::Create(HWND parent, CRect& rc, UINT id)
     {
         if (NULL != m_hWnd)
-            return ErrorCode(ERROR_ALREADY_INITIALIZED, boost::system::system_category());
+            return ErrorCode(ERROR_ALREADY_INITIALIZED, std::system_category());
 
         Super::Create(parent, rc, NULL, WS_CHILD | WS_VISIBLE | WS_BORDER, 0, id);
         HRESULT hr = ::GetLastError();
-        return ErrorCode(NULL == m_hWnd ? hr : 0, boost::system::system_category());
+        return ErrorCode(NULL == m_hWnd ? hr : 0, std::system_category());
     }
 
     void Viewer::Reset(bool invalidate)

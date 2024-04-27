@@ -1,7 +1,6 @@
 #pragma once
 
 #include "tab.bar.h"
-#include <boost/function.hpp>
 
 namespace Twins
 {
@@ -13,7 +12,7 @@ namespace Twins
         typedef TabBar Super;
 
     public:
-        typedef boost::function<void(int, int)> ColumnResizeDoneCallback;
+        typedef std::function<void(int, int)> ColumnResizeDoneCallback;
 
         enum
         {

@@ -8,7 +8,7 @@
 namespace Fl
 {
     typedef std::filesystem::path Path;
-    typedef boost::system::error_code Error;
+    typedef std::error_code Error;
 
     class Entry: public Twins::Entry
     {

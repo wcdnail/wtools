@@ -12,35 +12,31 @@
 #include <windows.wtl.message.h>
 #include <string.utils.error.code.h>
 #include <twins.langs/twins.lang.strings.h>
-#include <boost/bind.hpp>
 #include <atltime.h>
 
 namespace Twins
 {
-    enum
-    {
-        PanelViewStatusHeight = 22
-    };
+    enum { PanelViewStatusHeight = 22 };
 
     PanelView::PanelView(int id)
-        : iHot(0)
-        , Scanner()
-        , Status()
-        , Cursor(::LoadCursor(NULL, IDC_ARROW))
-        , IconSize(16, 16)
-        , Renamer()
-        , MyFont(CreateFont(-13, 0, 0, 0, FW_MEDIUM, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Courier New")))
-        , iFirst(0)
-        , Header()
-        , Edit()
-        , Locker(PaintAreUnlocked)
-        , Search(*this)
-        , Selector()
+        :       iHot(0)
+        ,    Scanner()
+        ,     Status()
+        ,     Cursor(::LoadCursor(NULL, IDC_ARROW))
+        ,   IconSize(16, 16)
+        ,    Renamer()
+        ,     MyFont(CreateFont(-13, 0, 0, 0, FW_MEDIUM, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Consolas")))
+        ,     iFirst(0)
+        ,     Header()
+        ,       Edit()
+        ,     Locker(PaintAreUnlocked)
+        ,     Search(*this)
+        ,   Selector()
         , SnapshotDc()
-        , DragnDrop(*this)
-        , Sorter()
-        , LastPath()
-        , Options(::Settings(), std::wstring(L"Panel#") + std::to_wstring(id))
+        ,  DragnDrop(*this)
+        ,     Sorter()
+        ,   LastPath()
+        ,    Options(::Settings(), std::wstring(L"Panel#") + std::to_wstring(id))
     {
         FromSettings(Options, Columns.iHot);
         FromSettings(Options, Columns.Used);
@@ -69,8 +65,9 @@ namespace Twins
             Scanner.SelectedName.clear();
         }
 
-        if (invalidate)
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+        if (invalidate) {
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
+        }
     }
 
     int PanelView::OnCreate(LPCREATESTRUCT cs)
@@ -79,15 +76,14 @@ namespace Twins
         ::GetClientRect(m_hWnd, rc);
         
         CRect rcHeader(0, 0, rc.right, HeaderHeight);
-        if (Header.Create(m_hWnd, rcHeader, NULL, 0, 0, ID_HEADER))
-        {
+        if (Header.Create(m_hWnd, rcHeader, NULL, 0, 0, ID_HEADER)) {
             Columns.OnCreate(Header);
-            Header.OnClick() = boost::bind(&PanelView::OnSort, this, _1, _2);
+            Header.OnClick() = std::bind(&PanelView::OnSort, this, std::placeholders::_1, std::placeholders::_2);
         }
 
         Edit.Create(m_hWnd, rcDefault, NULL, WS_CHILD, WS_EX_CLIENTEDGE, ID_LABELEDIT);
         Edit.SetFont(MyFont);
-        Edit.OnEditDone() = boost::bind(&PanelView::OnLabelEditDone, this, _1, _2);
+        Edit.OnEditDone() = std::bind(&PanelView::OnLabelEditDone, this, std::placeholders::_1, std::placeholders::_2);
 
         SetCursor(Cursor);
 
@@ -120,16 +116,18 @@ namespace Twins
     {
         ::InterlockedExchange(&Locker, PaintAreLocked);
 
-        if (invalidate)
+        if (invalidate) {
             ::InvalidateRect(m_hWnd, NULL, FALSE);
+        }
     }
 
     void PanelView::Unlock(bool invalidate) const
     {
         ::InterlockedExchange(&Locker, PaintAreUnlocked);
 
-        if (invalidate)
+        if (invalidate) {
             ::InvalidateRect(m_hWnd, NULL, FALSE);
+        }
     }
 
     bool PanelView::IsLocked() const
@@ -145,23 +143,23 @@ namespace Twins
             CRect rcList = GetListRect();
             dc.FillSolidRect(rcList, 0x00050505);
 
-            if (SnapshotDc.m_hDC)
+            if (SnapshotDc.m_hDC) {
                 dc.BitBlt(rcList.left, rcList.top, rcList.Width(), rcList.Height(), SnapshotDc, rcList.left, rcList.top, SRCCOPY);
+            }
         }
 
         return 1;
     }
 
-    void PanelView::OnPaint(CDCHandle senderDc) const
+    void PanelView::OnPaint(CDCHandle /*senderDc*/) const
     {
         WTL::CPaintDC paintDc(m_hWnd);
         CRect rcList = GetListRect();
 
-        if (IsLocked())
+        if (IsLocked()) {
             OnEraseBkgnd(paintDc.m_hDC);
-
-        else
-        {
+        }
+        else {
             CRect rcAll;
             GetClientRect(rcAll);
             BufferedPaint paintBuffer(paintDc, rcAll, rcList, SnapshotDc, SnapshotBm);
@@ -574,7 +572,7 @@ namespace Twins
         //Fl::List::const_iterator it = 
         //     std::find_if(Entries.Begin() + from
         //                , Entries.End()
-        //                , boost::bind(&Fl::Entry::IsNameStartsWith, _1, prefix, ignoreCase)
+        //                , std::bind(&Fl::Entry::IsNameStartsWith, _1, prefix, ignoreCase)
         //                );
         //
         //if (it == Entries.End())
@@ -651,7 +649,7 @@ namespace Twins
 
     void PanelView::OnDropFiles(HDROP dropInfo)
     {
-        boost::shared_ptr<void> drop(dropInfo, DragFinish);
+        std::shared_ptr<void> drop(dropInfo, DragFinish);
         ::SendMessage(GetParent(), WM_DROPFILES, (WPARAM)dropInfo, 0);
     }
 

@@ -99,22 +99,22 @@ namespace Ntfs
         return br ? (ReparseBuffer.ReparseTag == IO_REPARSE_TAG_MOUNT_POINT) : false;
     }
 
-    WidecharString QueryLinkTarget(WidecharString const& dirpath, boost::system::error_code& ec)
+    WidecharString QueryLinkTarget(WidecharString const& dirpath, std::error_code& ec)
     {
         WidecharString result;
         HANDLE dir = OpenDirectory(dirpath.c_str(), false);
 
         if (INVALID_HANDLE_VALUE == dir) 
-            ec.assign(::GetLastError(), boost::system::system_category());
+            ec.assign(::GetLastError(), std::system_category());
 
         else
         {
-            boost::shared_ptr<void> dirh(dir, CloseHandle);
+            std::shared_ptr<void> dirh(dir, CloseHandle);
             DWORD dwRet = 0;
             BYTE buf[MAXIMUM_REPARSE_DATA_BUFFER_SIZE] = {0};
             REPARSE_MOUNTPOINT_DATA_BUFFER& ReparseBuffer = (REPARSE_MOUNTPOINT_DATA_BUFFER&)buf;
             if (!::DeviceIoControl(dir, FSCTL_GET_REPARSE_POINT, NULL, 0, &ReparseBuffer, MAXIMUM_REPARSE_DATA_BUFFER_SIZE, &dwRet, NULL))
-                ec.assign(::GetLastError(), boost::system::system_category());
+                ec.assign(::GetLastError(), std::system_category());
 
             else
             {

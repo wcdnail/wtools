@@ -44,6 +44,8 @@
 #endif
 
 #include <boost/config.hpp>
+#include <boost/noncopyable.hpp>
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -58,15 +60,12 @@
 #include <iomanip>
 #include <fstream>
 #include <stdexcept>
-#include <boost/cstdint.hpp>
-#include <boost/bind.hpp>
+#include <cstdint>
+#include <functional>
 #include <thread>
-#include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/shared_array.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/system/error_code.hpp>
+#include <filesystem>
+#include <system_error>
+
 #include <todo.fixme.etc.h>
 
 extern void _NotImplementedYet(wchar_t const* caption);

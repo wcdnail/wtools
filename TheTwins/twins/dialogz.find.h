@@ -83,7 +83,7 @@ namespace Twins
             void Cancel();
 
         private:
-            typedef boost::shared_ptr<FindEnumerator> InnerPtr;
+            typedef std::shared_ptr<FindEnumerator> InnerPtr;
             typedef std::deque<InnerPtr> InnerDeque;
 
             FindDialog& Owner;

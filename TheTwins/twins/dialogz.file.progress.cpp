@@ -3,12 +3,11 @@
 #include "dialogz.file.replace.h"
 #include "file.operation.base.h"
 #include "tab.bar.item.h"
+#include "res/resource.h"
+#include "brute_cast.h"
 #include "file.list.h"
 #include <twins.langs/twins.lang.strings.h>
 #include <string.utils.human.size.h>
-
-#include "brute_cast.h"
-#include "res/resource.h"
 
 namespace Twins
 {
@@ -41,19 +40,15 @@ namespace Twins
 
     bool FileProgressDialog::CancelThread(unsigned msec)
     {
-        if (Paused)
-        {
+        if (Paused) {
             PauseCn.notify_all();
             Paused = false;
         }
-
-        if (Worker.joinable())
-        {
+        if (Worker.joinable()) {
             Canceled = TRUE;
-            return Worker.timed_join(boost::posix_time::millisec(msec));
+            Worker.join();
         }
-
-        return false;
+        return true;
     }
 
     BOOL FileProgressDialog::OnInitDialog(HWND hwnd, LPARAM param)
@@ -76,9 +71,9 @@ namespace Twins
         HTotal.SetWindowText(_T(""));
         HSize.SetWindowText(_T(""));
 
-        if (WorkerFunctor)
-            Worker = boost::thread(WorkerFunctor);
-
+        if (WorkerFunctor) {
+            Worker = std::thread(WorkerFunctor);
+        }
         return TRUE;
     }
 
@@ -173,7 +168,7 @@ namespace Twins
     void FileProgressDialog::Start(OperationBase const& operation, FileList files, SpecFlags flags, OperationResult& error, HWND parent /*= NULL*/)
     {
         OperationBase::Params p(operation, flags, error, *this);
-        WorkerFunctor = boost::bind(&OperationBase::Process, &operation, boost::cref(files), p);
+        WorkerFunctor = std::bind(&OperationBase::Process, &operation, std::cref(files), p);
         DoModal(parent);
     }
 

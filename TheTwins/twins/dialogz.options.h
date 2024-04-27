@@ -5,7 +5,6 @@
 #include <atlddx.h>
 #include <atlctrls.h>
 #include <atltypes.h>
-#include <boost/function.hpp>
 
 namespace Twins
 {
@@ -15,7 +14,7 @@ namespace Twins
     private:
         typedef CommonDialog Super;
         typedef CDialogResize<AppConfigDialog> Resizer;
-        typedef boost::function<void(AppConfigDialog&)> OnApplyCallback;
+        typedef std::function<void(AppConfigDialog&)> OnApplyCallback;
 
     public:
         enum

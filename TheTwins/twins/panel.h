@@ -19,15 +19,14 @@ namespace Twins
                  ATL::CWindowImpl<Panel, ATL::CWindow, Panel0Traits>,
                  CDialogResize<Panel>
     {
-    private:
         typedef ATL::CWindowImpl<Panel, ATL::CWindow, Panel0Traits> Super;
         typedef CDialogResize<Panel> SuperResizer;
 
     public:
-        const int Id;
-        PanelView View;
+        const int    Id;
+        PanelView  View;
         DriveBar Drives;
-        PathBar Paths;
+        PathBar   Paths;
 
         Panel();
         ~Panel();
@@ -62,7 +61,7 @@ namespace Twins
         void OnSetFocus(HWND);
         void OnKeyDown(UINT code, UINT rep, UINT flags);
         void OnDriveSelect(int drive, int prev);
-        void FetchContent(wchar_t const* path);
+        void FetchContent(PCWSTR path);
         void LoadContentCancel();
         void FetchContentDone(double elapsed);
         void StoreSelection(std::wstring const& selected, bool isDir);
@@ -106,5 +105,5 @@ namespace Twins
     inline PCWSTR Panel::GetCurrentPath() const { return GetDirManager().FullPath().wstring().c_str(); }
     inline Cf::DirManager const& Panel::GetDirManager() const { return View.Scanner.Path; }
     inline Cf::DirManager& Panel::GetDirManager() { return View.Scanner.Path; }
-    inline void Panel::Reload() { FetchContent(NULL); }
+    inline void Panel::Reload() { FetchContent(nullptr); }
 }

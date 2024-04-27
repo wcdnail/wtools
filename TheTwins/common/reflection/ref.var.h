@@ -38,7 +38,7 @@ namespace Ref
     private:
         class Int;
         template <class> class Impl;
-        boost::shared_ptr<Int> ref_;
+        std::shared_ptr<Int> ref_;
 
         static void CheckType(CharString const& name, std::type_info const& target, std::type_info const& source);
     };

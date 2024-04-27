@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 template <typename TargetType, typename SourceType>
 inline TargetType brute_cast(SourceType&& from)
 {

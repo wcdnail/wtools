@@ -186,24 +186,23 @@ namespace Twins
         App().Panels[0].Create(vSplitter, rcLeft);
         App().Panels[1].Create(vSplitter, rcRight);
 
-        Twins::Drive::Enum().OnEnumDone() = boost::bind(DriveBar::InitializeDrives, 
-            boost::ref(App().Panels[0].Drives), 
-            boost::ref(App().Panels[1].Drives), 
-            _1);
+        Twins::Drive::Enum().OnEnumDone() = std::bind(DriveBar::InitializeDrives,
+            std::ref(App().Panels[0].Drives), std::ref(App().Panels[1].Drives),
+            std::placeholders::_1);
 
         Commands().Initialize();
         App().Commandline.OnCancel = CancelEditCommandLine;
 
         UINT dflags = DT_CENTER | DT_SINGLELINE | DT_VCENTER;
-
-        for (size_t i=0; i<_countof(App().ButtonBarId); i++)
-        {
+        for (size_t i=0; i<_countof(App().ButtonBarId); i++) {
             Command::Definition const& def = Commands().GetCommand(App().ButtonBarId[i]);
             WidecharString name = def.GetKeyIdName() + L" " + def.Name.c_str();
-            ButtonBar.Add(name.c_str(), dflags, NULL, App().ButtonBarId[i]);
+            ButtonBar.Add(name.c_str(), dflags, nullptr, App().ButtonBarId[i]);
         }
 
-        ButtonBar.OnClick() = boost::bind(&MainFrame::OnButtonCommand, this, boost::ref(ButtonBar), _1, _2);
+        ButtonBar.OnClick() = std::bind(&MainFrame::OnButtonCommand, this, 
+            std::ref(ButtonBar), std::placeholders::_1, std::placeholders::_2
+        );
 
         vSplitter.SetSplitterPanes(App().Panels[0], App().Panels[1]);
 

@@ -3,7 +3,6 @@
 #include <atlwin.h>
 #include <atlctrls.h>
 #include <atlstr.h>
-#include <boost/function.hpp>
 
 namespace Twins
 {
@@ -13,7 +12,7 @@ namespace Twins
         typedef CWindowImpl<LabelEdit, CEdit> Super;
 
     public:
-        typedef boost::function<void(int, CString const&)> DoneHandler;
+        typedef std::function<void(int, CString const&)> DoneHandler;
 
         LabelEdit();
         ~LabelEdit();

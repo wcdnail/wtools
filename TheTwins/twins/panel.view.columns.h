@@ -4,7 +4,6 @@
 #include "panel.view.item.h"
 #include <reflection/ref.std.h>
 #include <boost/noncopyable.hpp>
-#include <boost/function.hpp>
 #include <vector>
 #include <string>
 #include <atltypes.h>

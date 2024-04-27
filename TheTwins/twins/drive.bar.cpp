@@ -30,7 +30,7 @@ namespace Twins
         , PrevDrive(-1)
         , ChangeDrive()
         , MyFont(CreateFont(-11, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Tahoma")))
-        , MyComboFont(CreateFont(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Courier New")))
+        , MyComboFont(CreateFont(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Consolas")))
         , MyTextColor(0xdfdfdf)
         , MyBackColor(0x202020)
         , MyBackBrush(::CreateSolidBrush(MyBackColor))
@@ -94,7 +94,7 @@ namespace Twins
 
         Combo.Invalidate(TRUE);
 
-        Disks.OnClick() = boost::bind(&DriveBar::OnSelectTab, this, _1, _2);
+        Disks.OnClick() = std::bind(&DriveBar::OnSelectTab, this, std::placeholders::_1, std::placeholders::_2);
 
         DlgResize_Init(false, false);
         return 0;

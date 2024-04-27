@@ -2,7 +2,6 @@
 
 #include "tab.bar.h"
 #include "drive.enum.h"
-#include <boost/function.hpp>
 #include <wtl.combobox.h>
 #include <atlwin.h>
 #include <atlstr.h>
@@ -19,7 +18,7 @@ namespace Twins
     private:
         typedef ATL::CWindowImpl<DriveBar, ATL::CWindow, DriveBarTraits> Super;
         typedef CDialogResize<DriveBar> SuperResizer;
-        typedef boost::function<void(int, int)> ChangeDriveCallback;
+        typedef std::function<void(int, int)> ChangeDriveCallback;
 
     public:
         DriveBar(Panel& owner);

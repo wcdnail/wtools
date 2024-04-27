@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "panel.view.header.h"
 #include "tab.bar.item.h"
-#include <boost/bind.hpp>
 
 namespace Twins
 {
@@ -45,7 +44,7 @@ namespace Twins
         }
         else
         {
-            ItemVec::iterator it = std::find_if(Items.begin(), Items.end(), boost::bind(&TabBarItem::IsInSeparator, _1, point));
+            ItemVec::iterator it = std::find_if(Items.begin(), Items.end(), std::bind(&TabBarItem::IsInSeparator, std::placeholders::_1, point));
             ResizedItem = it != Items.end() ? &(*it) : NULL;
             if (NULL != ResizedItem)
             {

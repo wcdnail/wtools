@@ -12,7 +12,7 @@ namespace Ui
         , PromptMx()
         , Combo()
         , OnEnter(onEnter)
-        , MyFont(::CreateFont(-11, 0, 0, 0, 0, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, PROOF_QUALITY, 0, _T("Courier New")))
+        , MyFont(::CreateFont(-11, 0, 0, 0, 0, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, PROOF_QUALITY, 0, _T("Consolas")))
         , MyTextColor(0xdfdfdf)
         , MyBackColor(0x202020)
         , MyBackBrush(::CreateSolidBrush(MyBackColor))

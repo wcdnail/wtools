@@ -16,7 +16,6 @@
 #include <windows.wtl.message.h>
 #include <twins.langs/twins.lang.strings.h>
 #include <atlconv.h>
-#include <boost/bind.hpp>
 #include <thread>
 
 namespace Twins
@@ -64,9 +63,9 @@ namespace Twins
         Paths.Create(m_hWnd, rcPath, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, ID_PATH_BAR);
         View.Create(m_hWnd, rcView, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, ID_PANEL_VIEW);
 
-        Drives.OnChangeDrive() = boost::bind(&Panel::OnDriveSelect, this, _1, _2);
-        View.Renamer = boost::bind(&Panel::OnRename, this, _1, _2);
-        View.Scanner.OnFetchDone = boost::bind(&Panel::FetchContentDone, this, _1);
+        Drives.OnChangeDrive() = std::bind(&Panel::OnDriveSelect, this, std::placeholders::_1, std::placeholders::_2);
+        View.Renamer = std::bind(&Panel::OnRename, this, std::placeholders::_1, std::placeholders::_2);
+        View.Scanner.OnFetchDone = std::bind(&Panel::FetchContentDone, this, std::placeholders::_1);
 
         DlgResize_Init(false, false);
         return 0;
@@ -151,7 +150,7 @@ namespace Twins
 //            //Extern::Item extrn(ename, info.GetPath());
 //            //HRESULT hr = Extern::Run(extrn, GetDirManager().FullPath().native(), L"", 1, NULL);
 //            //
-//            //SetMainframeStatus(boost::system::error_code((int)(E_PENDING == hr ? 0 : hr), boost::system::system_category())
+//            //SetMainframeStatus(std::error_code((int)(E_PENDING == hr ? 0 : hr), std::system_category())
 //            //    , info.LoadShellIcon(), _LS(StrId_Launchs), ename.c_str());
 //        }
     }
@@ -162,7 +161,7 @@ namespace Twins
         ::EnableWindow(Drives, enable);
     }
 
-    void Panel::FetchContent(wchar_t const* path)
+    void Panel::FetchContent(PCWSTR path)
     {
         LoadContentCancel();
         Paths.SetPathHint(_T("..."));
@@ -193,7 +192,7 @@ namespace Twins
     bool Panel::OnRename(FItem const* it, wchar_t const* newname)
     {
 #pragma message(_TODO("Implementation"))
-        boost::system::error_code ec;
+        std::error_code ec;
 
         //std::filesystem::path newpath = DirMan.FullPath();
         //newpath /= newname;
@@ -296,9 +295,9 @@ namespace Twins
             std::filesystem::path newname = dlg.GetText();
             newpath /= newname;
 
-            boost::system::error_code ec;
+            std::error_code ec;
             if (!std::filesystem::create_directories(newpath, ec))
-                ec.assign(ERROR_ALREADY_EXISTS, boost::system::system_category());
+                ec.assign(ERROR_ALREADY_EXISTS, std::system_category());
 
             SetMainframeStatus(ec.value(), NULL, _LS(StrId_Creatingdirectorys), newname.c_str());
 

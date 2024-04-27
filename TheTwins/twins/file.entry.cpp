@@ -35,7 +35,7 @@ namespace Fl
             ::FindClose(hfound);
         }
         else
-            ec.assign((int)::GetLastError(), boost::system::system_category());
+            ec.assign((int)::GetLastError(), std::system_category());
 #endif // _WIN32
     }
 

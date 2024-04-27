@@ -3,7 +3,6 @@
 #include <windows.wtl.buffered.paint.h>
 #include <atlctrls.h>
 #include <atltypes.h>
-#include <boost/function.hpp>
 
 namespace Twins
 {
@@ -17,7 +16,7 @@ namespace Twins
     public:
         typedef ATL::CWindowImpl<TabBar, ATL::CWindow, PanelTabTraits> Super;
         typedef std::vector<TabBarItem> ItemVec;
-        typedef boost::function<int(int, PCTSTR)> ClickCallback;
+        typedef std::function<int(int, PCTSTR)> ClickCallback;
 
         enum
         {

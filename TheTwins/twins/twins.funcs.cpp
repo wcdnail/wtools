@@ -81,14 +81,13 @@ namespace Twins
     void RenameEntry() { ActivePanel().View.StartLabelEdit(); }
     void ViewEntries() { ActivePanel().RunViewer(); }
 
-    void RunEditor(Panel& panel, std::wstring const& pathname)
+    void RunEditor(Panel& panel, std::wstring_view pathname)
     {
-        HRESULT hr = Extern::Run(App().ExtrnAkelpad, panel.GetCurrentPath(), pathname);
-
-        if (S_OK != hr)
-            hr = Extern::Run(App().ExtrnNotepad, panel.GetCurrentPath(), pathname);
-
-        SetMainframeStatus(hr, LoadShellIcon(pathname), _LS(StrId_Launcheditorfors), pathname.c_str());
+        HRESULT hr = Extern::Run(App().ExtrnAkelpad, panel.GetCurrentPath(), pathname.data());
+        if (S_OK != hr) {
+            hr = Extern::Run(App().ExtrnNotepad, panel.GetCurrentPath(), pathname.data());
+        }
+        SetMainframeStatus(hr, LoadShellIcon(pathname.data()), _LS(StrId_Launcheditorfors), pathname.data());
     }
 
     void EditEntry() 

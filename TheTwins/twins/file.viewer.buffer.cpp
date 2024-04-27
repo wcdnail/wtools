@@ -56,7 +56,7 @@ namespace Fv
         if (!::SetFilePointerEx(Input.get(), lrOffset, NULL, FILE_BEGIN))
         {
             hr = ::GetLastError();
-            error.assign((int)hr, boost::system::system_category());
+            error.assign((int)hr, std::system_category());
         }
         else
         {
@@ -64,7 +64,7 @@ namespace Fv
             if (!::ReadFile(Input.get(), def.bytes.get(), (DWORD)BlockSize, &readed, NULL))
             {
                 hr = ::GetLastError();
-                error.assign((int)hr, boost::system::system_category());
+                error.assign((int)hr, std::system_category());
             }
             def.size = readed;
         }
@@ -99,7 +99,7 @@ namespace Fv
         if (!::GetFileSizeEx(input.get(), &liFileSize))
         {
             HRESULT hr = ::GetLastError();
-            return ErrorCode((int)hr, boost::system::system_category());
+            return ErrorCode((int)hr, std::system_category());
         }
 
         SizeType fileSize = static_cast<SizeType>(liFileSize.QuadPart);
@@ -120,7 +120,7 @@ namespace Fv
         ErrorCode error;
 
         if (!blockSize || blockSize > (2lu * (1024lu * 1024lu * 1024lu)))
-            error.assign(EINVAL, boost::system::generic_category());
+            error.assign(EINVAL, std::generic_category());
 
         else
         {
@@ -136,7 +136,7 @@ namespace Fv
             hr = ::GetLastError();
 
             if (INVALID_HANDLE_VALUE == inp)
-                error.assign((int)hr, boost::system::system_category());
+                error.assign((int)hr, std::system_category());
 
             else
             {

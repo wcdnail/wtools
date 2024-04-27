@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "twins.h"
+#include "brute_cast.h"
+#include "res/resource.h"
 #include "options.all.pages.h"
 #include <twins.langs/twins.lang.strings.h>
 #include <wtl.controls.helpers.h>
 #include <atlconv.h>
-#include "res/resource.h"
 
 namespace Twins
 {
@@ -51,7 +52,7 @@ namespace Twins
         for (size_t i = 0; i<_countof(lang); i++)
         {
             int n = CbLang.AddString(lang[i].Name);
-            CbLang.SetItemDataPtr(n, (void*)lang[i].Id);
+            CbLang.SetItemDataPtr(n, brute_cast<void*>(lang[i].Id));
 
             if (App().LanguageId == lang[i].Id)
             {

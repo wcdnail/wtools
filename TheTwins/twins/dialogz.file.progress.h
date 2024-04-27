@@ -4,9 +4,6 @@
 #include "file.operation.types.h"
 #include <generic.div.h>
 #include <large.progress.h>
-#include <boost/function.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
 #include <thread>
 #include <mutex>
 
@@ -18,7 +15,7 @@ namespace Twins
     {
     private:
         typedef CommonDialog Super;
-        typedef boost::function<void(void)> WorkerFunction;
+        typedef std::function<void(void)> WorkerFunction;
 
     public:
         typedef Cf::LargeProgress<FileSize> FileProgress;
@@ -28,7 +25,7 @@ namespace Twins
         ~FileProgressDialog();
 
         void Close(int result);
-        boost::thread& GetThread();
+        std::thread& GetThread();
         void Start(OperationBase const& operation, FileList files, SpecFlags flags, OperationResult& error, HWND parent = NULL);
         void SetSource(std::wstring const& filename);
         void SetDest(std::wstring const& filename);
@@ -54,7 +51,7 @@ namespace Twins
         CProgressBarCtrl PTotal;
         FileProgress FTotal;
         CStatic HSize;
-        boost::thread Worker;
+        std::thread Worker;
         WorkerFunction WorkerFunctor;
         volatile BOOL Canceled;
         volatile bool Paused;
@@ -82,7 +79,7 @@ namespace Twins
     inline FileProgressDialog::FileProgress& FileProgressDialog::Total() { return FTotal; }
     inline volatile BOOL* FileProgressDialog::CanceledPtr() { return &Canceled; }
     inline void FileProgressDialog::Close(int result) { ::EndDialog(m_hWnd, result); }
-    inline boost::thread& FileProgressDialog::GetThread() { return Worker; }
+    inline std::thread& FileProgressDialog::GetThread() { return Worker; }
     inline void FileProgressDialog::SetSource(std::wstring const& filename) { Source.SetWindowText(filename.c_str()); }
     inline void FileProgressDialog::SetDest(std::wstring const& filename) { Dest.SetWindowText(filename.c_str()); }
 }

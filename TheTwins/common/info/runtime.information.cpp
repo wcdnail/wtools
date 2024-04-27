@@ -575,20 +575,15 @@ namespace Runtime
         system.AllocationGranularity = si.dwAllocationGranularity;
 
         HRESULT hr = 0;
-
         OSVERSIONINFOEXW vi = {};
         vi.dwOSVersionInfoSize = sizeof(vi);
-
-        if (!::GetVersionExW((LPOSVERSIONINFOW)&vi))
-        {
+        if (!::GetVersionExW((LPOSVERSIONINFOW)&vi)) {
             hr = ::GetLastError();
             Dh::ThreadPrintf(L"OSVRSION: init failed %d `%s`\n", hr, Str::ErrorCode<>::SystemMessage(hr));
         }
-
         version.Major = vi.dwMajorVersion;
         version.Minor = vi.dwMinorVersion;
         version.DisplayName = GetOsDisplayString(vi, si);
-
         return hr;
 #endif
     }

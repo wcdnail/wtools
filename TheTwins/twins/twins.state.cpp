@@ -48,7 +48,7 @@ namespace Obsolete
         , ExtrnAkelpad(L"AkelPad", L"%AKEL_ROOT%\\AkelPad.exe")
         , ExtrnNotepad(L"Notepad", L"notepad")
         , Viewer(ViewerRect)
-        , Commandline(boost::bind(&AppState::OnEnterCommandLine, this, _1))
+        , Commandline(std::bind(&AppState::OnEnterCommandLine, this, _1))
         , ShellIcons(false)
         , ShellSmallIcons(true)
         , FindDialogConfig(ShellSmallIcons)
@@ -127,16 +127,16 @@ namespace Obsolete
         LPanel->Create(parent, rcLeft);
         RPanel->Create(parent, rcRight);
 
-        Twins::Drive::Enum().OnEnumDone() = boost::bind(DriveBar::InitializeDrives, 
-            boost::ref(LPanel->GetDriveBar()), 
-            boost::ref(RPanel->GetDriveBar()), 
+        Twins::Drive::Enum().OnEnumDone() = std::bind(DriveBar::InitializeDrives, 
+            std::ref(LPanel->GetDriveBar()), 
+            std::ref(RPanel->GetDriveBar()), 
             _1);
 
         Twins::Drive::Enum().Acquire();
 
         Commands().Initialize(*this);
 
-        Commandline.GetCancelCallback() = boost::bind(&AppState::OnCommandLineCancel, this, _1);
+        Commandline.GetCancelCallback() = std::bind(&AppState::OnCommandLineCancel, this, _1);
     }
 
 
@@ -199,7 +199,7 @@ namespace Obsolete
             bbar.Add(name.c_str(), dflags, NULL, ButtonBarIds[i]);
         }
 
-        bbar.OnClick() = boost::bind(&AppState::OnButtonsCommand, this, boost::ref(bbar), _1, _2);
+        bbar.OnClick() = std::bind(&AppState::OnButtonsCommand, this, std::ref(bbar), _1, _2);
     }
 
     int AppState::OnButtonsCommand(TabBar& buttons, int id, PCTSTR text)
@@ -242,7 +242,7 @@ namespace Obsolete
         if (S_OK != hr)
             hr = Extern::Run(ExtrnNotepad, panel.GetCurrentPath(), pathname);
 
-        SetMainframeStatus(Error((int)hr, boost::system::system_category())
+        SetMainframeStatus(Error((int)hr, std::system_category())
             , Fl::Entry(pathname, true).LoadShellIcon()
             , _LS(StrId_Launcheditorfors)
             , pathname.c_str()
@@ -378,7 +378,7 @@ namespace Obsolete
 
     void AppState::ShowConfigDialog()
     {
-        AppConfigDialog configBox(_LS(StrId_Configuration), *this, boost::bind(&AppState::OnConfigurationCahnged, this, _1));
+        AppConfigDialog configBox(_LS(StrId_Configuration), *this, std::bind(&AppState::OnConfigurationCahnged, this, _1));
 
         INT_PTR dialogResult = configBox.DoModal();
 

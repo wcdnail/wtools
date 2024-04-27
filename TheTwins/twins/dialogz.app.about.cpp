@@ -14,7 +14,7 @@ namespace Twins
         , HeaderFont(::CreateFont(-14, 0, 0, 0, FW_HEAVY, 0, 1, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Arial Black")))
         , Header2Font(::CreateFont(-12, 0, 0, 0, 0, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Tahoma")))
         , VersionFont(::CreateFont(-12, 0, 0, 0, 0, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Tahoma")))
-        , AuthorsFont(::CreateFont(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Courier New")))
+        , AuthorsFont(::CreateFont(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Consolas")))
         , Header()
         , Header2()
         , Software()

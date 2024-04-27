@@ -266,7 +266,8 @@ namespace Twins
 
     void AppConfigDialog::SetupCategories()
     {
-        OptionPage::SomethingChangedCallback changedCallback = boost::bind(&AppConfigDialog::OnSomethingChanged, this, _1, _2, _3, _4);
+        OptionPage::SomethingChangedCallback changedCallback = std::bind(&AppConfigDialog::OnSomethingChanged, 
+            this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 
         FileManagerPage.Create(m_hWnd, RcPage);
         AppearancePage.Create(m_hWnd, RcPage);
@@ -276,16 +277,16 @@ namespace Twins
 
         const Category fileman[] = 
         {
-          Category(NULL, GreenRound, _L(StrId_Panels)),  
-          Category(NULL, GreenRound, _L(StrId_View)),
-          Category(NULL, GreenRound, _L(StrId_Utils)),
+            Category(NULL, GreenRound, _L(StrId_Panels)),
+            Category(NULL, GreenRound, _L(StrId_View)),
+            Category(NULL, GreenRound, _L(StrId_Utils)),
         };
         
         const Category categories[] = 
-        { 
-          Category(&FileManagerPage, GreenRound, _L(StrId_Filemanager), fileman, _countof(fileman)),
-          Category(&AppearancePage, GreenRound, _L(StrId_Appearance)),
-          Category(NULL, GreenRound, _L(StrId_Reportsandstatistics))
+        {
+            Category(&FileManagerPage, GreenRound, _L(StrId_Filemanager), fileman, _countof(fileman)),
+            Category(&AppearancePage, GreenRound, _L(StrId_Appearance)),
+            Category(NULL, GreenRound, _L(StrId_Reportsandstatistics))
         };
 
         Categories.LockWindowUpdate(TRUE);

@@ -94,7 +94,7 @@ namespace Twins
                 view->DestroyWindow();
 
             if (!error)
-                error.assign(EINVAL, boost::system::generic_category());
+                error.assign(EINVAL, std::generic_category());
         }
 
         return error;

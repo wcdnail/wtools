@@ -10,18 +10,18 @@ namespace Twins
 
     typedef CWinTraits<WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0> PathBarTraits;
 
-    class PathBar: ATL::CWindowImpl<PathBar, ATL::CWindow, PathBarTraits>
-                 , CDialogResize<PathBar>
+    class PathBar: ATL::CWindowImpl<PathBar, ATL::CWindow, PathBarTraits>,
+                   CDialogResize<PathBar>
     {
     private:
         typedef ATL::CWindowImpl<PathBar, ATL::CWindow, PathBarTraits> Super;
         typedef CDialogResize<PathBar> SuperResizer;
 
     public:
-        enum { WmHeightChanged = WM_USER + 0x7000 };
+        enum { MYWM_HEIGHT_CHANGED = WM_USER + 0x7000 };
 
-        PathBar(Panel& owner);
-        ~PathBar();
+        ~PathBar() override;
+        explicit PathBar(Panel& owner);
 
         using Super::Create;
         using Super::GetWindowRect;
@@ -37,23 +37,22 @@ namespace Twins
         friend Super;
         friend SuperResizer;
 
-        Panel& Owner;
-        CTabCtrl BookmarkBar;
-        CStatic Path;
-        CButton Favorite;
-        CButton History;
-        LabelEdit PathEdit;
-
-        // Appearance
-        CFont MyFont;
-        COLORREF MyTextColor;
-        COLORREF MyBackColor;
+        Panel&               Owner;
+        CTabCtrl       BookmarkBar;
+        CStatic               Path;
+        CButton           Favorite;
+        CButton            History;
+        LabelEdit         PathEdit;
+        // Appearance -----------------------
+        CFont               MyFont;
+        COLORREF       MyTextColor;
+        COLORREF       MyBackColor;
         COLORREF MyActiveTextColor;
         COLORREF MyActiveBackColor;
-        CBrush MyActiveBackBrush;
+        CBrush   MyActiveBackBrush;
         CBrush MyInactiveBackBrush;
-        CBrush MyBackBrush;
-        CPen MyPen;
+        CBrush         MyBackBrush;
+        CPen                 MyPen;
         COLORREF MyButtonBackColor[2];
 
         BOOL OnEraseBkgnd(CDCHandle dc);

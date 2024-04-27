@@ -1,13 +1,13 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <thread>
-#include <boost/function.hpp>
 #include <wtypes.h>
 #include <atluser.h>
 #include <atlctrls.h>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <mutex>
+#include <thread>
 
 namespace Twins
 {
@@ -55,7 +55,7 @@ namespace Twins
             };
 
             typedef std::vector<Item> ItemVector;
-            typedef boost::function<void(ItemVector const&)> EnumDoneCallback;
+            typedef std::function<void(ItemVector const&)> EnumDoneCallback;
 
             void Acquire();
             bool IsIndexValid(int driveId) const;
@@ -73,6 +73,7 @@ namespace Twins
 
             Enumerator();
             ~Enumerator();
+            void Stop();
 
             HANDLE enumerate_;
             HANDLE break_;

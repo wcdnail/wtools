@@ -10,40 +10,39 @@
 #include "panel.view.status.h"
 #include "panel.view.dnd.h"
 #include <settings.h>
-#include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <atltypes.h>
 #include <atlctrls.h>
 #include <atlgdi.h>
+#include <functional>
 
 namespace Twins
 {
-    typedef CWinTraits< WS_CHILD | WS_VISIBLE 
+    typedef CWinTraits< WS_CHILD | WS_VISIBLE
                       | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
                       | WS_BORDER
                       , 0
                       | WS_EX_ACCEPTFILES
                       > PVTraits;
 
-    class PanelView: boost::noncopyable
-                   , ATL::CWindowImpl<PanelView, ATL::CWindow, PVTraits>
-                   , WTL::CDialogResize<PanelView>
+    class PanelView: boost::noncopyable,
+                     ATL::CWindowImpl<PanelView, ATL::CWindow, PVTraits>,
+                     WTL::CDialogResize<PanelView>
     {
         DECLARE_WND_CLASS_EX(_T("[Twins]PanelView"), CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS, COLOR_WINDOW)
 
-    private:
-        typedef boost::function<bool(FItem const*, CString const&)> RenameCallback;
-        typedef ATL::CWindowImpl<PanelView, ATL::CWindow, PVTraits> Super;
-        typedef WTL::CDialogResize<PanelView> SuperResizer;
+        using RenameCallback = std::function<bool(FItem const*, CString const&)>;
+        using          Super = ATL::CWindowImpl<PanelView, ATL::CWindow, PVTraits>;
+        using   SuperResizer = WTL::CDialogResize<PanelView>;
 
     public:
         enum { InvalidIndex = -1 };
 
-        int iHot;
-        FScanner Scanner;
-        ViewStatus Status;
-        CCursor Cursor;
-        CSize IconSize;
+        int               iHot;
+        FScanner       Scanner;
+        ViewStatus      Status;
+        CCursor         Cursor;
+        CSize         IconSize;
         RenameCallback Renamer;
 
         PanelView(int id);
@@ -93,19 +92,19 @@ namespace Twins
         friend class DragnDropHelper;
         friend struct AutoLocker;
 
-        CFont MyFont;
-        int iFirst;
-        PanelHeader Header;
-        LabelEdit Edit;
+        CFont                 MyFont;
+        int                   iFirst;
+        PanelHeader           Header;
+        LabelEdit               Edit;
         mutable volatile long Locker;
-        QuickSearchHelper Search;
-        SelectHelper Selector;
-        PanelColumns Columns;
-        mutable CDC SnapshotDc;
-        mutable HBITMAP SnapshotBm;
-        DragnDropHelper DragnDrop;
-        FSort Sorter;
-        std::wstring LastPath;
+        QuickSearchHelper     Search;
+        SelectHelper        Selector;
+        PanelColumns         Columns;
+        mutable CDC       SnapshotDc;
+        mutable HBITMAP   SnapshotBm;
+        DragnDropHelper    DragnDrop;
+        FSort                 Sorter;
+        std::wstring        LastPath;
 
         void ResetView(bool invalidate);
         int GetScrollerWidth() const;

@@ -13,7 +13,6 @@
 #include <windows.uses.commoncontrols.h>
 #include <windows.uses.richedit.h>
 #include <dialogz.messagebox.h>
-#include <boost/bind.hpp>
 
 namespace Twins
 {
@@ -41,7 +40,7 @@ namespace Twins
         ,      ShellSmallIcons(true)
         ,          MessageLoop()
         ,             AppFrame()
-        ,          Commandline(boost::bind(&Application::RunSome, this, _1))
+        ,          Commandline(std::bind(&Application::RunSome, this, std::placeholders::_1))
         ,        ActivePanelId(0)
         ,              Options(::Settings(), L"Options")
     {

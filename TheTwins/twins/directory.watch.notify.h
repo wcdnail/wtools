@@ -27,6 +27,6 @@ namespace Twins
         static CString GetFilename(PFILE_NOTIFY_INFORMATION ninfo);
     };
 
-    typedef boost::shared_ptr<DirectoryNotify> DirectoryNotifyPtr;
+    typedef std::shared_ptr<DirectoryNotify> DirectoryNotifyPtr;
     typedef std::map<CString, DirectoryNotifyPtr> DirectoryNotifyMap;
 }

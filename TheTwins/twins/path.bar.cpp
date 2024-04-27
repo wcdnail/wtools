@@ -8,28 +8,29 @@
 namespace Twins
 {
     PathBar::PathBar(Panel& owner)
-        : Owner(owner)
-        , BookmarkBar()
-        , Path()
-        , Favorite()
-        , History()
-        , PathEdit()
-        , MyFont(CreateFont(-11, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Tahoma")))
-        , MyTextColor(0x7f7f7f)
-        , MyBackColor(0x202020)
-        , MyActiveTextColor(0xffffff)
-        , MyActiveBackColor(0x5c5c5c)
-        , MyActiveBackBrush(::CreateSolidBrush(MyActiveBackColor))
+        :               Owner(owner)
+        ,         BookmarkBar()
+        ,                Path()
+        ,            Favorite()
+        ,             History()
+        ,            PathEdit()
+        ,              MyFont(CreateFont(-11, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Tahoma")))
+        ,         MyTextColor(0x7f7f7f)
+        ,         MyBackColor(0x202020)
+        ,   MyActiveTextColor(0xffffff)
+        ,   MyActiveBackColor(0x5c5c5c)
+        ,   MyActiveBackBrush(::CreateSolidBrush(MyActiveBackColor))
         , MyInactiveBackBrush(::CreateSolidBrush(0x121212))
-        , MyBackBrush(::CreateSolidBrush(MyBackColor))
-        , MyPen(::CreatePen(PS_SOLID, 1, 0x7f7f7f))
+        ,         MyBackBrush(::CreateSolidBrush(MyBackColor))
+        ,               MyPen(::CreatePen(PS_SOLID, 1, 0x7f7f7f))
     {
         MyButtonBackColor[0] = 0x7f7f7f;
         MyButtonBackColor[1] = 0x000000;
     }
 
     PathBar::~PathBar()
-    {}
+    {
+    }
 
     BOOL PathBar::OnEraseBkgnd(CDCHandle dc)
     {
@@ -53,11 +54,10 @@ namespace Twins
         History.SetFont(MyFont);
         Favorite.SetFont(MyFont);
 
-        PathEdit.OnEditDone() = boost::bind(&PathBar::OnPathEditDone, this, _1, _2);
+        PathEdit.OnEditDone() = std::bind(&PathBar::OnPathEditDone, this, std::placeholders::_1, std::placeholders::_2);
 
         //BookmarkBar.InsertItem(0, _T("Trololo..."));
         AdjustPositions();
-
         DlgResize_Init(false, false);
         return 0;
     }
@@ -114,7 +114,7 @@ namespace Twins
         //Favorite.MoveWindow(rcFav);
 
         //SetWindowPos(NULL, 0, 0, rc.Width(), rc.Height(), SWP_NOMOVE | SWP_NOZORDER);
-        //::SendMessage(GetParent(), WmHeightChanged, (WPARAM)rcPager.Height(), 0);
+        //::SendMessage(GetParent(), MYWM_HEIGHT_CHANGED, (WPARAM)rcPager.Height(), 0);
     }
 
     HBRUSH PathBar::OnCtlColorStatic(CDCHandle dc, HWND)
@@ -157,10 +157,7 @@ namespace Twins
     {
         struct Helper
         {
-            static CString _Concat(HistoryDeque::value_type const& p)
-            {
-                return p.c_str();
-            }
+            static CString _Concat(HistoryDeque::value_type const& p) { return p.c_str(); }
         };
 
         Cf::PopupMenu menu;

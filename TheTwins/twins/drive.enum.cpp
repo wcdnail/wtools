@@ -75,10 +75,18 @@ namespace Twins
 
         Enumerator::~Enumerator()
         {
-            ::SetEvent(break_);
+            Stop();
+        }
+
+        void Enumerator::Stop()
+        {
+            if (thread_.joinable()) {
+                ::SetEvent(break_);
+                std::this_thread::yield();
+                thread_.join();
+            }
             ::CloseHandle(break_);
             ::CloseHandle(enumerate_);
-            thread_.join();
         }
 
         void Enumerator::Acquire()

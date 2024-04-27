@@ -14,7 +14,7 @@ namespace Twins
         , selectDirs_(TRUE)
         , closeAfterSelectTemplate_(TRUE)
         , history_(history)
-        , MyFixedFont(CreateFont(-13, 0, 0, 0, FW_MEDIUM, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Courier New")))
+        , MyFixedFont(CreateFont(-13, 0, 0, 0, FW_MEDIUM, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Consolas")))
     {
     }
         

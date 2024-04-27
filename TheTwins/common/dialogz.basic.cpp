@@ -12,7 +12,7 @@ namespace Cf
         , TextBody()
         , Icon()
         , UiFont((HFONT)::GetStockObject(DEFAULT_GUI_FONT))
-        , MsgFont(::CreateFont(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Courier New")))
+        , MsgFont(::CreateFont(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Consolas")))
     {}
 
     BasicDialog::BasicDialog(WidecharString const& message, WidecharString const& title, unsigned flags) 
@@ -22,7 +22,7 @@ namespace Cf
         , TextBody(message)
         , Icon()
         , UiFont((HFONT)::GetStockObject(DEFAULT_GUI_FONT))
-        , MsgFont(::CreateFont(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Courier New")))
+        , MsgFont(::CreateFont(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Consolas")))
     {}
 
     BasicDialog::~BasicDialog()
@@ -123,8 +123,7 @@ namespace Cf
         RectzAllocator<double> buttonRectAlloc(btnAlloc.Next(0, 0));
         double buttonWidth = (buttonRectAlloc.Width() + (2*count)) / (count ? count : 1);
 
-        #pragma message(_FIXME("Localization required!"))
-
+#pragma message(_FIXME("Localization required!"))
         static PCTSTR buttonText[] = 
         { 
           _T("Ok")

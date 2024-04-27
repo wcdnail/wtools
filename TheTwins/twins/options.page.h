@@ -1,7 +1,6 @@
 #pragma once
 
 #include <atlwin.h>
-#include <boost/function.hpp>
 #include <wtl.colorizer.h>
 
 namespace Twins
@@ -19,7 +18,7 @@ namespace Twins
         typedef ATL::CDialogImpl<OptionPage> Super;
 
     public:
-        typedef boost::function<void(OptionPage const&, bool, UINT, HTREEITEM)> SomethingChangedCallback;
+        typedef std::function<void(OptionPage const&, bool, UINT, HTREEITEM)> SomethingChangedCallback;
 
         virtual void Init() = 0;
         virtual void Destroy();

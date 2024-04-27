@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brute_cast.h"
 #include <atlstr.h>
 #include <atltypes.h>
 #include <atlctrls.h>
@@ -49,6 +50,6 @@ namespace Helpers
     template <typename Return>
     inline Return GetCurrentValueDataAs(WTL::CComboBox const& combo)
     {
-        return (Return)combo.GetItemDataPtr(combo.GetCurSel());
+        return brute_cast<Return>(combo.GetItemDataPtr(combo.GetCurSel()));
     }
 }
