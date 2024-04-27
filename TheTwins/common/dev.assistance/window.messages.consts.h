@@ -451,7 +451,7 @@
         _ON_CONST(LB_INITSTORAGE          ); // 0x01A8
         _ON_CONST(LB_ITEMFROMPOINT        ); // 0x01A9
 #endif // WINVER >= 0x0400
-#if(_WIN32_WCE >= 0x0400)
+#if defined(_WIN32_WCE) && (_WIN32_WCE >= 0x0400)
         _ON_CONST(LB_MULTIPLEADDSTRING    ); // 0x01B1
 #endif
 
@@ -497,7 +497,7 @@
         _ON_CONST(CB_GETDROPPEDWIDTH          ); // 0x015f
         _ON_CONST(CB_SETDROPPEDWIDTH          ); // 0x0160
         _ON_CONST(CB_INITSTORAGE              ); // 0x0161
-#if(_WIN32_WCE >= 0x0400)
+#if defined(_WIN32_WCE) && (_WIN32_WCE >= 0x0400)
         _ON_CONST(CB_MULTIPLEADDSTRING        ); // 0x0163
 #endif
 #endif // WINVER >= 0x0400

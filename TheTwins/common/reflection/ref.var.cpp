@@ -47,4 +47,14 @@ namespace Ref
             throw CrashException(message.str().c_str(), ERROR_DATATYPE_MISMATCH);
         }
     }
+
+    template <>
+    void Var::Serialize(std::basic_ostream<char>& stream)
+    {
+    }
+
+    template <>
+    void Var::Serialize(std::basic_ostream<wchar_t>& stream)
+    {
+    }
 }

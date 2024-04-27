@@ -236,14 +236,14 @@ namespace Twins
 //        if (selected)
 //            tcolor = Cf::IncreaseColor(Cf::ReduceColor(tcolor, 0, 100, 100), 80, 0, 0);
 //
-//#pragma message(_TODO("Configure dark or light theme"))
+//// ##TODO: Configure dark or light theme"))
 //        if (info.IsHidden()) 
 //            tcolor = Cf::ReduceColor(tcolor, 63, 63, 63); 
 //
 //        int bi = (index % 2) & 1;
 //        COLORREF bcolor = colors.background[bi];
 //
-//#pragma message(_TODO("Configure dark or light theme"))
+//// ##TODO: Configure dark or light theme"))
 //        if (hot)
 //            bcolor = panelActive ? colors.hotItemBackgroundColor : Cf::ReduceColor(colors.hotItemBackgroundColor, 31, 31, 31);
 //                                                                   

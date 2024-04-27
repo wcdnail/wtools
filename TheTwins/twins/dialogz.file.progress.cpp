@@ -114,7 +114,7 @@ namespace Twins
 
     void FileProgressDialog::ShowFileReplaceDialog(LPARAM lParam) const
     {
-        REPLACEDLG_PARAMS* param = brute_cast<REPLACEDLG_PARAMS*>(lParam);
+        REPLACEDLG_PARAMS* param = cast_to_ptr<REPLACEDLG_PARAMS*>(lParam);
         FileReplaceDialog dlg;
         param->flags = dlg.Ask(param->source, param->dest, param->flags, m_hWnd);
     }

@@ -74,11 +74,11 @@ namespace Fv
         , Color()
         , Font()
         , DisplayMode(PlainText)                
-#pragma message(_TODO("Configure viewer disp mode"))
+// ##TODO: Configure viewer disp mode"))
         , ShowStatusBar(true)                   
-#pragma message(_TODO("Configure viewer status bar mode"))
+// ##TODO: Configure viewer status bar mode"))
         , MiceScrollAmount(4)                   
-#pragma message(_TODO("Configure viewer mice scroll amount"))
+// ##TODO: Configure viewer mice scroll amount"))
         , InputStatus()
         , MemoryStatus()
         , DebugStatus()
@@ -96,13 +96,13 @@ namespace Fv
         , DisplayOffset(0)
         , VisibleLineLen()
         , FixedLineWidth(80)                    
-#pragma message(_TODO("Configure FixedLineWidth"))
+// ##TODO: Configure FixedLineWidth"))
         , WrappedLineWidth((SizeType)-1)        
-#pragma message(_TODO("Configure WrappedLineWidth"))
+// ##TODO: Configure WrappedLineWidth"))
         , HexLineWidth(16)                      
-#pragma message(_TODO("Configure HexLineWidth"))
+// ##TODO: Configure HexLineWidth"))
         , ShowSpecChars(false)                  
-#pragma message(_TODO("Configure ShowSpecChars"))
+// ##TODO: Configure ShowSpecChars"))
     {
         ::memset(&TextMetric, 0, sizeof(TextMetric));
     }
@@ -513,12 +513,12 @@ namespace Fv
         if (up)
         {
             offset = s.InBuffer.FindPrevLine(dy, offset);
-#pragma message(_TODO("Adjust offset in line-wrap mode"))
+// ##TODO: Adjust offset in line-wrap mode"))
         }
         else
         {
             offset = s.InBuffer.FindNextLine(dy, offset, s.WrappedLineWidth);
-#pragma message(_TODO("Adjust offset at end of file"))
+// ##TODO: Adjust offset at end of file"))
         }
 
         return offset;
@@ -527,7 +527,7 @@ namespace Fv
     SizeType Viewer::Go2EndInText(DisplayState& s) 
     {
         SizeType offset = s.InBuffer.FindPrevLineFromEnd(s.LineCount); 
-#pragma message(_TODO("Adjust offset in line-wrap mode"))
+// ##TODO: Adjust offset in line-wrap mode"))
         return offset;
     }
 

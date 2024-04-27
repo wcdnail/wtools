@@ -105,7 +105,7 @@ namespace Cf
 
         if (icon_)
         {
-#pragma message(_TODO("Get icon size."))
+// ##TODO: Get icon size."))
             rc.right = 48;
             rc.bottom = 48;
         }
@@ -131,7 +131,7 @@ namespace Cf
                 SIZE sz = {0};
                 dc.GetTextExtent(line, line.GetLength(), &sz);
 
-#pragma message(_TODO("Horizontal text rendering"))
+// ##TODO: Horizontal text rendering"))
                 rc.right = max(rc.right, sz.cx);
                 textHeight += sz.cy;
             }
@@ -178,7 +178,7 @@ namespace Cf
         myHintHeight_ = (rc.Height() + HintYSpacing);
         nextHintY_ += myHintHeight_;
 
-#pragma message(_TODO("Popup from right bottom corner..."))
+// ##TODO: Popup from right bottom corner..."))
         rc.MoveToX(right - (rc.Width() + HintXSpacing));
         rc.bottom = rc.top = bottom - HintYSpacing;
 

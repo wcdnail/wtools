@@ -536,7 +536,7 @@ namespace Twins
 
     static bool ContainWildcards(std::wstring const& pattern)
     {
-#pragma message(_TODO("Find full wildcard list."))
+// ##TODO: Find full wildcard list."))
         return std::wstring::npos != pattern.find_first_of(L"*?");
     }
 
@@ -657,7 +657,7 @@ namespace Twins
 
             Conf.Texts.LoadTo(TextPattern);
 
-            TextSearchRxFlags = brute_cast<unsigned>(TextPatternRxType.GetItemDataPtr(TextPatternRxType.GetCurSel()));
+            TextSearchRxFlags = cast_from_ptr<unsigned>(TextPatternRxType.GetItemDataPtr(TextPatternRxType.GetCurSel()));
 
             if (TextSearchIgnoringCase)
                 TextSearchRxFlags |= boost::regex_constants::icase;
@@ -685,7 +685,7 @@ namespace Twins
 
     void FindDialog::PrepareNotOlder() {
         if (UseNotOlder) {
-            int  unit = brute_cast<int>(NotOlderUnit.GetItemDataPtr(NotOlderUnit.GetCurSel()));
+            int  unit = cast_from_ptr<int>(NotOlderUnit.GetItemDataPtr(NotOlderUnit.GetCurSel()));
             int value = GetDlgItemInt(IDC_EB_NOTOLDER, NULL, FALSE);
 
             ATL::CTimeSpan span;
@@ -705,14 +705,13 @@ namespace Twins
 
     void FindDialog::PrepareSize()
     {
-        if (UseSize)
-        {
-            int optype = brute_cast<int>(SizeOp.GetItemDataPtr(SizeOp.GetCurSel()));
-            int   unit = brute_cast<int>(SizeUnit.GetItemDataPtr(SizeUnit.GetCurSel()));
+        if (UseSize) {
+            int optype = cast_from_ptr<int>(SizeOp.GetItemDataPtr(SizeOp.GetCurSel()));
+            int   unit = cast_from_ptr<int>(SizeUnit.GetItemDataPtr(SizeUnit.GetCurSel()));
             uint64_t size = (uint64_t)GetDlgItemInt(IDC_EB_SIZE, NULL, FALSE);
 
             SizeComparand = size * unit;
-            SizeOperator = optype;
+            SizeOperator  = optype;
         }
     }
 

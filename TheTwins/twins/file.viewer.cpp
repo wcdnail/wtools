@@ -217,7 +217,7 @@ namespace Twins
     void FileViewer::UpdateInfos(Fv::Viewer const* view)
     {
         CString caption; 
-#pragma message(_TODO("Caption"))
+// ##TODO: Caption"))
         caption.Format(L"%s: %s", _LS(StrId_View), view->GetPath().c_str()); 
         SetWindowText(caption);
 

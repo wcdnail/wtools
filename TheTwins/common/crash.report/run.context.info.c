@@ -15,7 +15,7 @@
 #include <strsafe.h>
 #include "../todo.fixme.etc.h"
 
-#pragma message(_TODO("Load SECUR32 dynamically"))
+// ##TODO: Load SECUR32 dynamically"))
 #pragma comment(lib, "SECUR32")
 
 void get_context(HANDLE thread, DWORD threadId, PCONTEXT context, DWORD flags);

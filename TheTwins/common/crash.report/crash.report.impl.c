@@ -1,6 +1,11 @@
 #define WIN32_LEAN_AND_MEAN
 #define _WIN32_WINNT 0x0500
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4312) // warning C4312: 'type cast': conversion from 'int' to 'HMENU' of greater size
+#endif
+
 #include "../todo.fixme.etc.h"
 #include "string.buffer.h"
 #include <windows.h>
@@ -188,7 +193,7 @@ static LRESULT WINAPI crash_report_window_proc(HWND window, UINT message, WPARAM
         static const int buttonWidth = 140;
         static const int buttonHeight = 24;
 
-//#pragma message(_TODO("Customize colors...."))
+//// ##TODO: Customize colors...."))
 
 #if STD_COLORS_USED
         TextColor = GetSysColor(COLOR_BTNTEXT);
@@ -377,3 +382,7 @@ void crash_report_window(STRING_BUFFER_PTR buffer)
     DeleteFont(rinfo.font);
     free((void*)message);
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif

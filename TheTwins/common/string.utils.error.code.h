@@ -7,17 +7,19 @@ namespace Str
     template <class Ct = wchar_t>
     struct ErrorCode
     {
-        typedef typename Ct* RawStringType;
-        typedef typename CStringT< Ct, StrTraitATL< Ct, ChTraitsCRT< Ct > > > StringType;
+        using RawStringType = Ct*;
+        using    StringType = CStringT< Ct, StrTraitATL<Ct, ChTraitsCRT<Ct>>> ;
 
         template <class CodeType>
         static StringType SystemMessage(CodeType code)
         {
             StringType result;
 
-            HLOCAL local = NULL;
-            DWORD len = ATL::ChTraitsOS<Ct>::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
-                NULL, code, LANG_USER_DEFAULT, (RawStringType)&local, 0, NULL);
+            HLOCAL local = nullptr;
+            DWORD    len = ATL::ChTraitsOS<Ct>::FormatMessage(
+                FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER, nullptr,
+                static_cast<DWORD>(code), LANG_USER_DEFAULT,
+                reinterpret_cast<RawStringType>(&local), 0, nullptr);
 
             if (len > 2) { // CRLF
                 RawStringType message = static_cast<RawStringType>(::LocalLock(local));

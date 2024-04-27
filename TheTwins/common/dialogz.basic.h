@@ -3,16 +3,16 @@
 #include "wcdafx.api.h"
 #include "wtl.colorizer.h"
 #include "dialogz.types.h"
-#include "rect.alloc.h"
 #include "string.hp.h"
+#include "rect.alloc.h"
 #include "cf-resources/resource.h"
 #include <atltypes.h>
 #include <atlwin.h>
 
 namespace Cf
 {
-    class BasicDialog: ATL::CDialogImpl<BasicDialog>
-                     , Colorizer
+    class BasicDialog: ATL::CDialogImpl<BasicDialog>,
+                       Colorizer
     {
     public:
         enum { IDD = IDD_BASIC };
@@ -33,31 +33,31 @@ namespace Cf
         friend class Super;
         using Super::SetMsgHandled;
 
-        DialogResult Rv;
-        unsigned Flags;
-        WidecharString Title;
+        DialogResult         Rv;
+        unsigned          Flags;
+        WidecharString    Title;
         WidecharString TextBody;
-        CIcon Icon;
-        CFont UiFont;
-        CFont MsgFont;
+        CIcon              Icon;
+        CFont            UiFont;
+        CFont           MsgFont;
 
         enum ControlIds
         {
-          IdFirst = 1001
-        , IdOk = IdFirst
-        , IdYes
-        , IdNo
-        , IdCancel
-        , IdAbort
-        , IdRetry
-        , IdIgnore
-        , IdClose
-        , IdHelp
-        , IdContinue
-        , IdLast
+            IdFirst = 1001,
+            IdOk = IdFirst,
+            IdYes,
+            IdNo,
+            IdCancel,
+            IdAbort,
+            IdRetry,
+            IdIgnore,
+            IdClose,
+            IdHelp,
+            IdContinue,
+            IdLast
         };
 
-        CRect SetupIcon(Cf::RectzAllocator<LONG>& rcAlloc);
+        CRect SetupIcon(RectzAllocator<LONG>& rcAlloc);
 
     private:
         void CreateButtons(Cf::RectzAllocator<LONG>& btnAlloc);

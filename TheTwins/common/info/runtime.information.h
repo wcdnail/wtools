@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../wcdafx.api.h"
+#include "wcdafx.api.h"
 #include <iosfwd>
 #include <string>
 #include <sstream>
@@ -28,31 +28,31 @@ namespace Runtime
         {
             struct VersionInfo
             {
-                int Major;
-                int Minor;
+                DWORD        Major;
+                DWORD        Minor;
                 String DisplayName;
 
             private:
                 friend SystemInfo;
-
-                VersionInfo(SystemInfo& system);
                 ~VersionInfo();
+                VersionInfo();
             };
 
-            unsigned CpuType;
-            unsigned CpuNum;
-            unsigned PageSize;
+            unsigned               CpuType;
+            unsigned                CpuNum;
+            unsigned              PageSize;
             unsigned AllocationGranularity;
-            String RootDirectory;
-            String HomeDirectory;
-            VersionInfo Version;
+            String           RootDirectory;
+            String           HomeDirectory;
+            VersionInfo            Version;
+
+            void Initialize();
 
             static Endianness GetEndian();
-            static wchar_t const* const GetEndianString();
+            static wchar_t const* GetEndianString();
 
         private:
             friend InfoStore;
-
             SystemInfo();
             ~SystemInfo();
         };

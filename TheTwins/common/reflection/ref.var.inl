@@ -1,8 +1,10 @@
 #pragma once
 
 #include "wcdafx.api.h"
+#if 0
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
+#endif
 
 namespace Ref
 {
@@ -14,8 +16,10 @@ namespace Ref
 
         std::type_info const& Type() const { return type_; }
 
+#if 0
         virtual void Serialize(boost::archive::xml_oarchive& ar) = 0;
         virtual void Serialize(boost::archive::xml_iarchive& ar) = 0;
+#endif
         virtual void Serialize(std::ostream& ar) = 0;
         virtual void Serialize(std::wostream& ar) = 0;
 
@@ -40,8 +44,10 @@ namespace Ref
 
         T& GetRef() const { return ref_; }
 
+#if 0
         virtual void Serialize(boost::archive::xml_oarchive& ar);
         virtual void Serialize(boost::archive::xml_iarchive& ar);
+#endif
         virtual void Serialize(std::ostream& ar);
         virtual void Serialize(std::wostream& ar);
 

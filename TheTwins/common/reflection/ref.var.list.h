@@ -6,7 +6,7 @@
 
 namespace Ref
 {
-    class List: public Serializable<List>
+    class List // : public Serializable<List>
     {
     public:
         class Accessor;

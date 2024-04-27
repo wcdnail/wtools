@@ -11,10 +11,9 @@ namespace Twins
     void LocalizeControl(HWND hwnd);
     void LocalizeControl(HWND owenr, UINT id);
 
-    class OptionPage: ATL::CDialogImpl<OptionPage>
-                    , Cf::Colorizer
+    class OptionPage: ATL::CDialogImpl<OptionPage>,
+                      Cf::Colorizer
     {
-    private:
         typedef ATL::CDialogImpl<OptionPage> Super;
 
     public:

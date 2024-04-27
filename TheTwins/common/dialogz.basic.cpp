@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "dialogz.basic.h"
-#include <windows.icons.h>
-#include <todo.fixme.etc.h>
+#include "windows.icons.h"
 
 namespace Cf
 {
@@ -107,23 +106,22 @@ namespace Cf
 
     void BasicDialog::CreateButtons(Cf::RectzAllocator<LONG>& btnAlloc)
     {
-        if (0 == (Flags & DialogFlags::HasButtons))
+        if (0 == (Flags & DialogFlags::HasButtons)) {
             return ;
-
+        }
         // Get count of the buttons...
         unsigned bit = 1, count = 0;
-        for (UINT i=IdFirst; i<IdLast; i++)
-        {
-            if (0 != (Flags & bit))
+        for (UINT i=IdFirst; i<IdLast; i++) {
+            if (0 != (Flags & bit)) {
                 ++count;
-
+            }
             bit <<= 1;
         }
 
         RectzAllocator<double> buttonRectAlloc(btnAlloc.Next(0, 0));
         double buttonWidth = (buttonRectAlloc.Width() + (2*count)) / (count ? count : 1);
 
-#pragma message(_FIXME("Localization required!"))
+        // ##TODO: Localization required!
         static PCTSTR buttonText[] = 
         { 
           _T("Ok")

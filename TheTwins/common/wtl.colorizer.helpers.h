@@ -9,58 +9,22 @@ namespace Cf
 {
     struct Colorizer::PaintContext
     {
-        PaintContext(HWND hwnd, HFONT font)
-            : PaindDC(hwnd)
-            , Rect()
-            , PrevFont(PaindDC.SelectFont(font))
-        {
-            ::GetClientRect(hwnd, Rect);
-        }
-
-        ~PaintContext()
-        {
-            PaindDC.SelectFont(PrevFont);
-        }
+        ~PaintContext();
+        PaintContext(HWND hwnd, HFONT font);
 
         WTL::CPaintDC PaindDC;
-        CRect Rect;
-
-    private:
-        HFONT PrevFont;
+        CRect            Rect;
+        HFONT        PrevFont;
     };
 
     struct Colorizer::NcPainContext
     {
-        NcPainContext(HWND hwnd, CRgnHandle rgn)
-            : Dc(::GetWindowDC(hwnd))
-            , Rect()
-            , Rgn(rgn)
-            , ControlHandle(hwnd)
-        {
-            CRect wrc;
-            ::GetWindowRect(hwnd, wrc);
-
-            if (!Rgn || (1 == (WPARAM)Rgn)) 
-            {
-                Rect = wrc;
-                Rect.right -= Rect.left + 1;
-                Rect.bottom -= Rect.top + 1;
-                Rect.left = Rect.top = 0;
-            } 
-            else 
-                ::GetRgnBox(Rgn, Rect);
-        }
-
-        ~NcPainContext()
-        {
-            ::ReleaseDC(ControlHandle, Dc);
-        }
+        ~NcPainContext();
+        NcPainContext(HWND hwnd, CRgnHandle rgn);
 
         WTL::CDCHandle Dc;
-        CRect Rect;
-        HRGN Rgn;
-
-    private:
-        HWND ControlHandle;
+        CRect        Rect;
+        HRGN          Rgn;
+        HWND        hCtrl;
     };
 }

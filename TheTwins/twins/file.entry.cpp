@@ -237,7 +237,7 @@ namespace Fl
     {
         SHFILEINFO info = {};
         DWORD_PTR rv = ::SHGetFileInfoW(Root.c_str(), IntFlags, &info, sizeof(info), SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | flags);
-#pragma message(_TODO("Handle `NULL == info.hIcon`"))
+// ##TODO: Handle `NULL == info.hIcon`"))
         HICON icon = info.hIcon;
         return icon;
     }

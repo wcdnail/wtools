@@ -3,34 +3,32 @@
 
 namespace Dh
 {
-    int GetWindowType(HWND winHandle)
+    uint64_t GetWindowType(HWND winHandle)
     {
-        TCHAR className[32];
-        int classNameLen = GetClassName(winHandle, className, _countof(className));
-        if (classNameLen > 0)
-        {
-            struct winTypeName
+        TCHAR cls[256] = { 0 };
+        size_t    clen = static_cast<size_t>(GetClassName(winHandle, cls, _countof(cls)));
+        if (clen > 0) {
+            struct WTYPE_NAME
             {
-                PCTSTR name;
-                int n;
+                PCTSTR  name;
+                uint64_t   n;
+            };
+            static const WTYPE_NAME names[] = 
+            {
+                {     _T("Static"), StaticClt },
+                {       _T("Edit"), EditClt },
+                {     _T("Button"), ButtonClt },
+                {    _T("Listbox"), ListBoxCtl },
+                {   _T("Combobox"), ComboBoxCtl },
+                { TOOLBARCLASSNAME, ToolBarCtl | CommonCtl },
+                {   REBARCLASSNAME, ReBarCtl | CommonCtl },
+                {  STATUSCLASSNAME, StatusBarClt | CommonCtl },
             };
 
-            static const winTypeName names[] = 
-            {
-              { _T("Static"), StaticClt }
-            , { _T("Edit"), EditClt }
-            , { _T("Button"), ButtonClt }
-            , { _T("Listbox"), ListBoxCtl }
-            , { _T("Combobox"), ComboBoxCtl }
-            , { TOOLBARCLASSNAME, ToolBarCtl | CommonCtl }
-            , { REBARCLASSNAME, ReBarCtl | CommonCtl }
-            , { STATUSCLASSNAME, StatusBarClt | CommonCtl }
-            };
-
-            for (size_t i=0; i<_countof(names); i++)
-            {
-                if (0 == _tcsncicmp(className, names[i].name, classNameLen))
-                    return names[i].n;
+            for (const auto& it: names) {
+                if (0 == _tcsncicmp(cls, it.name, clen)) {
+                    return it.n;
+                }
             }
 
           //ATLTRACE(_T("Unknown class `%s` of %x\n"), className, winHandle);
@@ -74,7 +72,7 @@ namespace Dh
 
     PCSTR WM_NC_C2SA(UINT code, HWND win)
     {
-        int winType = GetWindowType(win);
+        uint64_t winType = GetWindowType(win);
 #include "notify.codes.h"
         return "";
     }
@@ -132,7 +130,7 @@ namespace Dh
 
     PCWSTR WM_NC_C2SW(UINT code, HWND win)
     {
-        int winType = GetWindowType(win);
+        uint64_t winType = GetWindowType(win);
 #include "notify.codes.h"
         return L"";
     }

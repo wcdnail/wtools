@@ -56,8 +56,8 @@ namespace Twins
             , _ProgressCb, (PVOID)&p, (LPBOOL)p.Ui.CanceledPtr()
             , (p.Flags.Check(SpecFlags::Replace | SpecFlags::ReplaceAll) ? 0 : COPY_FILE_FAIL_IF_EXISTS)
             | COPY_FILE_ALLOW_DECRYPTED_DESTINATION
-#pragma message(_TODO("COPY_FILE_COPY_SYMLINK"))
-#pragma message(_TODO("COPY_FILE_NO_BUFFERING"))
+// ##TODO: COPY_FILE_COPY_SYMLINK"))
+// ##TODO: COPY_FILE_NO_BUFFERING"))
             );
 
         HRESULT hr = ::GetLastError();

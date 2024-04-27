@@ -1,5 +1,6 @@
 #pragma once
 
+#if 0
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/wrapper.hpp>
 #include <boost/serialization/nvp.hpp>
@@ -37,3 +38,5 @@ namespace Ref
         static_cast<Derived*>(this)->Serialize(ar);
     }
 }
+
+#endif

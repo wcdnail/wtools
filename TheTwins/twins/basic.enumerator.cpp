@@ -56,7 +56,7 @@ namespace Twins
         : Args(params)
         , Name(data.cFileName)
         , Size(((uint64_t)data.nFileSizeLow | (((uint64_t)data.nFileSizeHigh) << 32)))
-#pragma message(_TODO("Configure display time"))
+// ##TODO: Configure display time"))
         , Time(*((uint64_t*)&data.ftLastWriteTime)) // ftCreationTime 
         , Flags(Win32FindDataToFlags(data))
         , Int(data.dwFileAttributes)

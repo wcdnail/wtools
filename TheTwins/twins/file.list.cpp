@@ -112,7 +112,7 @@ namespace Fl
         if ((index >= 0) && (index < Count()))
             return Array[(size_type)index];
 
-#pragma message(_TODO("Throw exception..."))
+// ##TODO: Throw exception..."))
         static Entry dmyEntry;
         return dmyEntry;
     }

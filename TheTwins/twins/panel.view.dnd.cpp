@@ -120,7 +120,7 @@ namespace Twins
 
     void DragnDropHelper::OnDrag(CPoint const& pt)
     {
-#pragma message(_TODO("determine target point"))
+// ##TODO: determine target point"))
         //::SetCursor(rc.PtInRect(screen) ? Cursor.DropNo : Cursor.Current);
     }
 
@@ -219,7 +219,7 @@ namespace Twins
             CComPtr<IDragSourceHelper> helper;
             if (SUCCEEDED(helper.CoCreateInstance(CLSID_DragDropHelper)))
             {
-#pragma message(_TODO("Init helper"))
+// ##TODO: Init helper"))
                 
                 //CPoint pn = pt;
                 //Owner.ClientToScreen(&pn);

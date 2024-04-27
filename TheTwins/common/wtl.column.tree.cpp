@@ -142,7 +142,7 @@ void CCustomTreeChildCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 #ifdef _OWNER_DRAWN_TREE
 			// if the clicked item is partially visible we won't process
 			// the message to avoid background bitmap scrolling
-#pragma message(_TODO("Need to avoid scrolling and process the message"))
+// ##TODO: Need to avoid scrolling and process the message"))
 			CRect rcItem, rcClient;
 			GetClientRect(&rcClient);
 			GetItemRect(hItem,&rcItem,FALSE);

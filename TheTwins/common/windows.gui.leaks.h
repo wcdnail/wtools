@@ -6,7 +6,7 @@
 
 namespace Cf
 {
-    class GUILeaks: boost::noncopyable
+    class GUILeaks
     {
     public:
         GUILeaks();

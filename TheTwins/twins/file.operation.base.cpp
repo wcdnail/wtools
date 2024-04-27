@@ -101,7 +101,7 @@ namespace Twins
 
             p.Flags.CheckSilent();
 
-#pragma message(_TODO("Check other flags"))
+// ##TODO: Check other flags"))
         }
 
         ProcessEntry(source, destpath, p);

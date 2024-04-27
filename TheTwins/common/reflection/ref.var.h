@@ -1,7 +1,7 @@
 #pragma once
 
 #include "wcdafx.api.h"
-#include "ref.serialization.h"
+//#include "ref.serialization.h"
 #include <string.hp.h>
 #include <typeinfo>
 #include <memory>
@@ -9,7 +9,7 @@
 
 namespace Ref
 {
-    class Var: public Serializable<Var>
+    class Var //: public Serializable<Var>
     {
     public:
         WCDAFX_API ~Var();

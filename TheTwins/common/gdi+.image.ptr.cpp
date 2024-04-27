@@ -115,6 +115,6 @@ namespace Ui
 
     void ImagePtr::FromDc(HDC sourceDc)
     {
-#pragma message(_TODO("Implementation"))
+// ##TODO: Implementation"))
     }
 }

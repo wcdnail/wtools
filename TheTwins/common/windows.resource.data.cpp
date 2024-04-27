@@ -49,7 +49,7 @@ namespace Res
     {
         CComPtr<IStream> stream;
         HRESULT hr = ::CreateStreamOnHGlobal(global_, FALSE, &stream);
-#pragma message(_TODO("Handle error"))
+// ##TODO: Handle error"))
         //if (S_OK != hr)
             //resource.message_.Format(_T("CreateStreamOnHGlobal failed: %s"), Str::ErrorCode<>::SystemMessage(hr));
         return stream;

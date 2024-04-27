@@ -71,7 +71,7 @@ namespace Cf
     {
         CRect rc;
         control.GetWindowRect(rc);
-#pragma message(_TODO("Select position by flags"))
+// ##TODO: Select position by flags"))
         return CPoint(rc.left, rc.bottom);
     }
 

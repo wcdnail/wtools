@@ -131,7 +131,7 @@ namespace Twins
 
             if (CompareCommandId == mr)
             {
-#pragma message(_TODO("Compare files..."))
+// ##TODO: Compare files..."))
                 return -2;
             }
 

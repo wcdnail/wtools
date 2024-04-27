@@ -11,10 +11,9 @@ namespace Helpers
     inline int AddTo(WTL::CComboBox& combo, V value, PCWSTR text)
     {
         int it = combo.AddString(text);
-
-        if (CB_ERR != it)
-            combo.SetItemDataPtr(it, (void*)value);
-
+        if (CB_ERR != it) {
+            combo.SetItemDataPtr(it, cast_to_ptr<void*>(value));
+        }
         return it;
     }
 
@@ -50,6 +49,6 @@ namespace Helpers
     template <typename Return>
     inline Return GetCurrentValueDataAs(WTL::CComboBox const& combo)
     {
-        return brute_cast<Return>(combo.GetItemDataPtr(combo.GetCurSel()));
+        return cast_from_ptr<Return>(combo.GetItemDataPtr(combo.GetCurSel()));
     }
 }

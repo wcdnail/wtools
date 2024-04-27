@@ -52,7 +52,7 @@ namespace Twins
         for (size_t i = 0; i<_countof(lang); i++)
         {
             int n = CbLang.AddString(lang[i].Name);
-            CbLang.SetItemDataPtr(n, brute_cast<void*>(lang[i].Id));
+            CbLang.SetItemDataPtr(n, cast_to_ptr<void*>(lang[i].Id));
 
             if (App().LanguageId == lang[i].Id)
             {

@@ -70,7 +70,7 @@ CRect CAdvScrollBar::GetScrollBarRect(CRect const& rc, bool isVert) const
     const int xy = isVert ? rc.Height() : rc.Width();
     const int pos = diff * xy / maximum;
 
-#pragma message(_TODO("Calc size"))
+// ##TODO: Calc size"))
     const int size = 16;
 
     CRect result(0, 0, size, size);

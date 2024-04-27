@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brute_cast.h"
 #include <atlcoll.h>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2835,7 +2836,14 @@ public:
         size_t nNewCount = m_Items.GetCount();
 
         // Send notification
-        NMCTCITEM nmh = {{ this->m_hWnd, this->GetDlgCtrlID(), CTCN_INSERTITEM }, nItem, {-1,-1}};
+        NMCTCITEM nmh = {
+            {
+                this->m_hWnd,
+                static_cast<UINT_PTR>(this->GetDlgCtrlID()),
+                CTCN_INSERTITEM
+            },
+            nItem, {-1,-1}
+        };
         ::SendMessage(this->GetParent(), WM_NOTIFY, nmh.hdr.idFrom, (LPARAM)&nmh);
         // Select if first tab
         if( nNewCount==1 )

@@ -31,7 +31,7 @@ namespace Twins
 
     void QuickSearchHelper::OnAccumulate()
     {
-#pragma message(_TODO("Configure case sensitive quick search"))
+// ##TODO: Configure case sensitive quick search"))
         bool ignoreCase = true;
 
         int i = Owner.QuickSearch(StartIndex, Accumulator, ignoreCase);

@@ -37,10 +37,10 @@ namespace Twins
         CStringW text;
         text.Format(L"%S %s"
             , info.Executable.Version.ProductName.c_str()
-#pragma message(_TODO("Remove TESTING... mark in production"))
+// ##TODO: Remove TESTING... mark in production"))
             , _LS(StrId_OnlyforTESTing)
-#pragma message(_TODO("Append registration info etc..."))
-#pragma message(_TODO("Twins instance counter..."))
+// ##TODO: Append registration info etc..."))
+// ##TODO: Twins instance counter..."))
             );
 
         SetWindowText(text);
@@ -131,7 +131,7 @@ namespace Twins
 
         CRect rcToolbar(rc);
         static const int ToolbarHeight = 24; 
-#pragma message(_TODO("Configure main toolbar height"))
+// ##TODO: Configure main toolbar height"))
 
         rcToolbar.bottom = rcToolbar.top + ToolbarHeight;
         rc.top = rcToolbar.bottom;
@@ -150,7 +150,7 @@ namespace Twins
         UpdateBarsPosition(rc, TRUE); 
 
         static const int ButtonsHeight = 20; 
-#pragma message(_TODO("Configure main bottombar buttons height"))
+// ##TODO: Configure main bottombar buttons height"))
 
         CRect rcButtons(rc.left, rc.bottom - ButtonsHeight - 1, rc.right, rc.bottom);
         rc.bottom -= ButtonsHeight + 1;
@@ -158,7 +158,7 @@ namespace Twins
         ButtonBar.Create(m_hWnd, rcButtons, NULL, 0, 0, ID_BUTTONS);
 
         static const int CommandLineHeight = 24; 
-#pragma message(_TODO("Configure commandline height"))
+// ##TODO: Configure commandline height"))
 
         CRect rcCLine(rc.left, rcButtons.top - CommandLineHeight - 1, rc.right, rcButtons.top);
         rc.bottom -= CommandLineHeight;
@@ -172,7 +172,7 @@ namespace Twins
 
         vSplitter.ModifyStyleEx(WS_EX_CLIENTEDGE, 0);
 
-#pragma message(_TODO("Configure splitter"))
+// ##TODO: Configure splitter"))
         vSplitter.m_cxySplitBar = 3; // Thickness
         vSplitter.m_bFullDrag = false;
         //vSplitter.m_bEraseBk = FALSE;

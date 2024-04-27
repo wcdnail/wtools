@@ -42,7 +42,7 @@ namespace Twins
 
     void ViewStatus::Update(FScanner const& scanner, HWND owner, bool invalidate)
     {
-#pragma message(_TODO("Configure human size units"))
+// ##TODO: Configure human size units"))
 
         //WidecharString sizeUnit = _L(StrId_Kb);
         //WidecharString selectedSizeStr = Str::HumanSize(Str::InKils(SelSize));

@@ -303,7 +303,7 @@ namespace Fv
 
     bool FileBuffer::IsBinary() const
     {
-#pragma message(_TODO("Determine binary file"))
+// ##TODO: Determine binary file"))
         return false;
     }
 }

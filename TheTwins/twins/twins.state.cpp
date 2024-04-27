@@ -264,7 +264,7 @@ namespace Obsolete
 
     void AppState::Delete()                     
     {
-#pragma message(_TODO("Implementation"))
+// ##TODO: Implementation"))
     }
 
     void AppState::CopyRequest()                { PerformOperation(ActivePanel(), CopyFiles(GetInactivePanel().GetCurrentPath()), GetMainframeHwnd()); }
@@ -304,12 +304,12 @@ namespace Obsolete
 
         HRESULT hr = Twins::Extern::Run(it, pwd, L"");
 
-#pragma message(_TODO("Configure `Run in terminal` if `ERROR_FILE_NOT_FOUND == hr`"))
+// ##TODO: Configure `Run in terminal` if `ERROR_FILE_NOT_FOUND == hr`"))
         if (ERROR_FILE_NOT_FOUND == hr)
         {
             Extern::Item cmd(L"CMD", L"%COMSPEC%");
 
-#pragma message(_TODO("Configure `/C` instead `/K`"))
+// ##TODO: Configure `/C` instead `/K`"))
             String args = L"/D /T:F8 /C \"" + commandLine + L"\"";
             hr = Twins::Extern::Run(cmd, pwd, args);
         }
@@ -347,13 +347,13 @@ namespace Obsolete
 
     void AppState::CalcDirSizeRequest(bool multiple) 
     {
-#pragma message(_TODO("Implementation"))
+// ##TODO: Implementation"))
         _NotImplementedYet(_LS(StrId_Subdirectorysize)); 
     }
 
     void AppState::ExitRequest() 
     {
-#pragma message(_FIXME("Destroy mainframe"))
+        // ##TODO: Destroy mainframe"))
         ::DestroyWindow(MainFrameRef); 
     }
 

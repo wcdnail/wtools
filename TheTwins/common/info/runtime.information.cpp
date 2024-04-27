@@ -7,10 +7,18 @@
 #include <boost/version.hpp>
 #include <filesystem>
 #include <cstdint>
+#include <cstring>
+
+#ifdef _MSC_VER
+#  pragma warning(disable: 4191) // 4191: 'reinterpret_cast': unsafe conversion from 'FARPROC' to 'GPI'
+                                 // 4191:         Making a function call using the resulting pointer may cause your program to fail
+#  pragma warning(disable: 4996) // 4996: 'GetVersionExW': was declared deprecated
+#  pragma warning(disable: 4710) // 4710: 'HRESULT StringCchPrintfW(STRSAFE_LPWSTR,size_t,STRSAFE_LPCWSTR,...)': function not inlined
+#  pragma warning(disable: 4514) // 4514: 'StringCchCopyA': unreferenced inline function has been removed
+#endif
 
 #ifdef _WIN32
-#include <atlstr.h>
-#include <strsafe.h>
+#  include <atlstr.h>
 #endif
 
 #define _MKWIDE_(S)  L#S
@@ -23,9 +31,9 @@ namespace Runtime
     wchar_t const* InfoStore::BoostVersion  = _MK_WIDE(BOOST_LIB_VERSION);
     wchar_t const* InfoStore::TargetOs      = _MK_WIDE(BOOST_PLATFORM)
 #ifdef _WIN32
-#ifdef _WIN64
+#  ifdef _WIN64
         L" x64"
-#endif
+#  endif
         L" " _MK_WIDE(BOOST_STRINGIZE(_WIN32_WINNT))
 #endif
         ;
@@ -61,7 +69,8 @@ namespace Runtime
                 return NULL != temp;
             }
 
-            #define InitProcAddress(N) GetAddress(BOOST_STRINGIZE(N), N)
+            #define InitProcAddress(N) \
+                GetAddress(BOOST_STRINGIZE(N), N)
 
         private:
             HMODULE lib_;
@@ -71,7 +80,8 @@ namespace Runtime
         {
             AutoGlobalPtr(SIZE_T cb, UINT flags = GMEM_MOVEABLE)
                 : heap_(::GlobalAlloc(flags, cb))
-            {}
+            {
+            }
 
             ~AutoGlobalPtr() 
             {
@@ -127,8 +137,7 @@ namespace Runtime
 
                 UINT size = 0;
                 LangInfo* li = NULL;
-                if (VerQueryValueW(info, L"\\VarFileInfo\\Translation", (PVOID*)&li, &size))
-                {
+                if (VerQueryValueW(info, L"\\VarFileInfo\\Translation", (PVOID*)&li, &size)) {
                     struct VarDef
                     {
                         PCWSTR varName;
@@ -151,17 +160,13 @@ namespace Runtime
                         { L"SpecialBuild"        , &Version.SpecialBuild         },
                     };
 
-                    for (size_t v = 0; v<_countof(varDef); v++)
-                    {
+                    for (auto& it: varDef) {
                         wchar_t section[64] = {0};
-                        HRESULT hr = ::StringCchPrintfW(section, _countof(section), L"\\StringFileInfo\\%04x%04x\\%s", li->lang, li->cp, varDef[v].varName);
-                        if (SUCCEEDED(hr))
-                        {
-                            UINT size = 0;
-                            PWSTR value = NULL;
-                            if (VerQueryValueW(info, section, (PVOID*)&value, &size))
-                            {
-                                *(varDef[v].destStringPtr) = value;
+                        int rv = ::swprintf_s(section, L"\\StringFileInfo\\%04x%04x\\%s", li->lang, li->cp, it.varName);
+                        if (rv > 0) {
+                            PWSTR value = nullptr;
+                            if (VerQueryValueW(info, section, reinterpret_cast<PVOID*>(&value), &size)) {
+                                *(it.destStringPtr) = value;
                             }
                         }
                     }
@@ -189,8 +194,9 @@ namespace Runtime
 
         RequestWin32VersionInfo(startupInfo.lpTitle, exeInfo.Version);
 
-        if (exeInfo.Version.ProductName.empty())
+        if (exeInfo.Version.ProductName.empty()) {
             exeInfo.Version.ProductName = std::filesystem::path(exeInfo.Filename).filename().replace_extension().wstring();
+        }
 #endif
     }
 
@@ -225,11 +231,9 @@ namespace Runtime
             }
         }
 #endif 
-
         wchar_t tempName[256] = {0};
         DWORD tempNameLen = _countof(tempName);
-        if (::GetComputerNameExW(ComputerNamePhysicalDnsFullyQualified, tempName, &tempNameLen))
-        {
+        if (::GetComputerNameExW(ComputerNamePhysicalDnsFullyQualified, tempName, &tempNameLen)) {
             hostInfo.Name = tempName;
         }
 #endif
@@ -240,21 +244,17 @@ namespace Runtime
 #ifdef _WIN32
         wchar_t tempName[256] = {0};
         DWORD tempNameLen = _countof(tempName);
-        if (::GetUserNameW(tempName, &tempNameLen))
-        {
+        if (::GetUserNameW(tempName, &tempNameLen)) {
             userInfo.Name = tempName;
         }
 #endif
     }
 
-    int Initialize(InfoStore::SystemInfo::VersionInfo& version, InfoStore::SystemInfo& system);
-
-    InfoStore::SystemInfo::VersionInfo::VersionInfo(SystemInfo& system)
+    InfoStore::SystemInfo::VersionInfo::VersionInfo()
         : Major(0)
         , Minor(0)
         , DisplayName()
     {
-        Initialize(*this, system);
     }
 
     InfoStore::SystemInfo::VersionInfo::~VersionInfo()
@@ -272,10 +272,10 @@ namespace Runtime
         : CpuType(0)
         , CpuNum(1)
         , PageSize(4096)
-        , AllocationGranularity(-1)
+        , AllocationGranularity(0)
         , RootDirectory(Env::Expand(ENV_SYSTEMROOT))
         , HomeDirectory(Env::Expand(ENV_HOME))
-        , Version(*this)
+        , Version()
     {}
 
     InfoStore::SystemInfo::~SystemInfo()
@@ -300,7 +300,7 @@ namespace Runtime
         return UnknownEndian;
     }
 
-    wchar_t const* const InfoStore::SystemInfo::GetEndianString()
+    wchar_t const* InfoStore::SystemInfo::GetEndianString()
     {
         static wchar_t const* const es[] = { L"Unknown", L"LittleEndian", L"BigEndian" };
         return es[(int)(GetEndian()) + 1];
@@ -353,13 +353,15 @@ namespace Runtime
         , Host()
         , User()
     {
+        System.Initialize();
         RequestExeInfo(Executable);
         RequestHostInfo(Host);
         RequestUserInfo(User);
     }
 
     InfoStore::~InfoStore()
-    {}
+    {
+    }
 
     void InfoStore::SimpleReport(OStream& stream) const
     {
@@ -422,16 +424,15 @@ namespace Runtime
                 case 2: temp << (VER_NT_WORKSTATION == osvi.wProductType ? L"8 "     : L"Server 2012 "); break;
                 }
 
-                DWORD ptype = (DWORD)-1;
+                DWORD ptype = static_cast<DWORD>(-1);
                 typedef BOOL (WINAPI *GPI)(DWORD, DWORD, DWORD, DWORD, PDWORD);
 
                 HMODULE K32 = ::LoadLibraryW(L"KERNEL32");
-                if (K32)
-                {
-                    GPI gpi = (GPI)::GetProcAddress(K32, "GetProductInfo");
-                    if (NULL != gpi)
+                if (K32) {
+                    GPI gpi = reinterpret_cast<GPI>(::GetProcAddress(K32, "GetProductInfo"));
+                    if (NULL != gpi) {
                         gpi(osvi.dwMajorVersion, osvi.dwMinorVersion, 0, 0, &ptype);
-
+                    }
                     ::FreeLibrary(K32);
                 }
 
@@ -541,50 +542,47 @@ namespace Runtime
 
             temp << L" (build " << osvi.dwBuildNumber << L")";
 
-            if (osvi.dwMajorVersion >= 6)
-            {
-                if (PROCESSOR_ARCHITECTURE_AMD64 == si.wProcessorArchitecture)
+            if (osvi.dwMajorVersion >= 6) {
+                if (PROCESSOR_ARCHITECTURE_AMD64 == si.wProcessorArchitecture) {
                     temp << L", 64-bit";
-
-                else if (PROCESSOR_ARCHITECTURE_INTEL == si.wProcessorArchitecture)
+                }
+                else if (PROCESSOR_ARCHITECTURE_INTEL == si.wProcessorArchitecture) {
                     temp << L", 32-bit";
+                }
             }
         }
-        else
-        {  
+        else {  
             temp << L"(some old version, 9x). You shouldn't see this string in normal product.";
         }
 #endif
-
         return temp.str();
     }
 
-    static int Initialize(InfoStore::SystemInfo::VersionInfo& version, InfoStore::SystemInfo& system)
+    void InfoStore::SystemInfo::Initialize()
     {
 #ifdef _WIN32
         SYSTEM_INFO si = {};
-#if _WIN32_WINNT >= 0x0501
+#  if _WIN32_WINNT >= 0x0501
         ::GetNativeSystemInfo(&si);
-#else
+#  else
         ::GetSystemInfo(&si);
-#endif
+#  endif
+        this->CpuType = si.dwProcessorType;
+        this->CpuNum = si.dwNumberOfProcessors;
+        this->PageSize = si.dwPageSize;
+        this->AllocationGranularity = si.dwAllocationGranularity;
 
-        system.CpuType = si.dwProcessorType;
-        system.CpuNum = si.dwNumberOfProcessors;
-        system.PageSize = si.dwPageSize;
-        system.AllocationGranularity = si.dwAllocationGranularity;
-
-        HRESULT hr = 0;
-        OSVERSIONINFOEXW vi = {};
+        HRESULT          hr = 0;
+        OSVERSIONINFOEXW vi = { 0 };
         vi.dwOSVersionInfoSize = sizeof(vi);
         if (!::GetVersionExW((LPOSVERSIONINFOW)&vi)) {
-            hr = ::GetLastError();
-            Dh::ThreadPrintf(L"OSVRSION: init failed %d `%s`\n", hr, Str::ErrorCode<>::SystemMessage(hr));
+            hr = static_cast<HRESULT>(::GetLastError());
+            const auto errText = Str::ErrorCode<>::SystemMessage(hr);
+            Dh::ThreadPrintf(L"OSVRSION: init failed %d `%s`\n", hr, errText.GetString());
         }
-        version.Major = vi.dwMajorVersion;
-        version.Minor = vi.dwMinorVersion;
-        version.DisplayName = GetOsDisplayString(vi, si);
-        return hr;
+        this->Version.Major = vi.dwMajorVersion;
+        this->Version.Minor = vi.dwMinorVersion;
+        this->Version.DisplayName = GetOsDisplayString(vi, si);
 #endif
     }
 }

@@ -4,11 +4,13 @@
 #include "info/runtime.information.h"
 #include <windef.h>
 #include <uxtheme.h>
-#include <boost/noncopyable.hpp>
 
-class Win567Impl: boost::noncopyable
+class Win567Impl
 {
 public:
+    Win567Impl(Win567Impl const&) = delete;
+    Win567Impl& operator = (Win567Impl const&) = delete;
+
     // XP SP2 stuff...
     //
     // IsWow64Process <kernel32>

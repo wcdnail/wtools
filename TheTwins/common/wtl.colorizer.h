@@ -1,18 +1,20 @@
 #pragma once
 
 #include "wcdafx.api.h"
-#include <map>
 #include <atltypes.h>
 #include <atlstr.h>
 #include <atlcrack.h>
 #include <atlgdi.h>
 #include <atlctrls.h>
-#include <boost/shared_ptr.hpp>
+#include <map>
 
 namespace Cf
 {
     class Colorizer
     {
+        Colorizer(Colorizer const&) = delete;
+        Colorizer& operator = (Colorizer const&) = delete;
+
     protected:
         WCDAFX_API Colorizer();
         WCDAFX_API ~Colorizer();
@@ -21,69 +23,6 @@ namespace Cf
         WCDAFX_API BOOL ProcessWindowMessage(HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD = 0);
 
     protected:
-        COLORREF MyTextColor;
-        COLORREF MyBackColor;
-        COLORREF MyHotTextColor;
-        COLORREF MyHotBackColor;
-        WTL::CPen MyPen;
-        WTL::CPen MyFocusPen;
-        WTL::CPen MyThickEdgePen;
-        COLORREF MyButtonBackColor[2];
-        WTL::CBrush MyBackBrush[3];
-        WTL::CPen MyBorderPen[2];
-
-        static WTL::CImageList SpecGxf;
-
-        enum SpecGfxIndex
-        {
-          SpecgSmallDown = 0
-        , SpecgSmellRight
-        , SpecgChecked
-        , SpecgMinimize
-        , SpecgRestore
-        , SpecgClose
-        , SpecgMaximize
-        , SpecgSmallUp
-        , SpecgFollowDown
-        , SpecgSmallLeft
-        , SpecgSmallCross
-        , SpecgFollowRight
-        , SpecgRound
-        , SpecgDown
-        , SpecgRight
-        , SpecgPin
-        , SpecgPinned
-        , SpecgLeft
-        , SpecgBackward
-        , SpecgForward
-        , SpecgBlackRight
-        , SpecgBlackLeft
-        , SpecgWhiteRight
-        , SpecgWhiteLeft
-        , SpecgUp
-        , SpecgToLeft
-        , SpecgToRight
-        , SpecgArrowLeft
-        , SpecgArrowRight
-        , SpecgDropDown
-        , SpecgDropRight
-        , SpecgFfRight
-        , SpecgFfDown
-        , SpecgBlockDown
-        , SpecgBlackCross
-        , SpecgToOther
-        };
-
-    private:
-        enum BorderFlags 
-        {
-          BorderNone = 0
-        , BorderFrame
-        , BorderSunken
-        , BorderStaticEdge
-        , BorderClientEdge
-        };
-
         struct PaintContext;
         struct NcPainContext;
 
@@ -97,9 +36,76 @@ namespace Cf
         typedef std::map<CStringW, ControlCreator> FactoryMap;
         typedef std::map<HWND, ControlBasePtr> ControlMap;
 
-        mutable bool MsgHandled;
-        HWND MyHwnd;
-        ControlMap Controls;
+        enum : uint64_t
+        {
+            MESSAGE_HANDLED = 0x0000000000000001
+        };
+
+        mutable uint64_t         Flags;
+        HWND                    MyHwnd;
+        ControlMap            Controls;
+        COLORREF           MyTextColor;
+        COLORREF           MyBackColor;
+        COLORREF        MyHotTextColor;
+        COLORREF        MyHotBackColor;
+        WTL::CPen                MyPen;
+        WTL::CPen           MyFocusPen;
+        WTL::CPen       MyThickEdgePen;
+        COLORREF     MyButtonBackColor[2];
+        WTL::CBrush        MyBackBrush[3];
+        WTL::CPen          MyBorderPen[2];
+
+        static WTL::CImageList SpecGxf;
+
+        enum SpecGfxIndex: UINT
+        {
+            SpecgSmallDown = 0,
+            SpecgSmellRight,
+            SpecgChecked,
+            SpecgMinimize,
+            SpecgRestore,
+            SpecgClose,
+            SpecgMaximize,
+            SpecgSmallUp,
+            SpecgFollowDown,
+            SpecgSmallLeft,
+            SpecgSmallCross,
+            SpecgFollowRight,
+            SpecgRound,
+            SpecgDown,
+            SpecgRight,
+            SpecgPin,
+            SpecgPinned,
+            SpecgLeft,
+            SpecgBackward,
+            SpecgForward,
+            SpecgBlackRight,
+            SpecgBlackLeft,
+            SpecgWhiteRight,
+            SpecgWhiteLeft,
+            SpecgUp,
+            SpecgToLeft,
+            SpecgToRight,
+            SpecgArrowLeft,
+            SpecgArrowRight,
+            SpecgDropDown,
+            SpecgDropRight,
+            SpecgFfRight,
+            SpecgFfDown,
+            SpecgBlockDown,
+            SpecgBlackCross,
+            SpecgToOther,
+        };
+
+    private:
+        enum BorderFlags : UINT
+        {
+            BorderNone = 0,
+            BorderFrame,
+            BorderSunken,
+            BorderStaticEdge,
+            BorderClientEdge
+        };
 
         static FactoryMap Factory;
         static void PerformInitStatix();
@@ -110,8 +116,8 @@ namespace Cf
         template <typename T>
         static void InsertToFactory();
 
-        bool IsMsgHandled() const { return MsgHandled; } 
-        void SetMsgHandled(bool nv) const { MsgHandled = nv; }
+        bool IsMsgHandled() const;
+        void SetMsgHandled(bool nv) const;
         BOOL _ProcessWindowMessage(HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD);
 
         int OnCreate(LPCREATESTRUCT);
@@ -129,8 +135,8 @@ namespace Cf
         int DoInitialization(bool isDialog);
         static BOOL CALLBACK InitChild(HWND hwnd, Colorizer* self);
 
-        static BorderFlags GetBorderType(HWND hwnd, unsigned& style, unsigned& estyle);
-        void DrawControlBorder(CDCHandle dc, CRect const& rcPaint, unsigned border) const;
+        static BorderFlags GetBorderType(HWND hwnd, LONG& style, LONG& estyle);
+        void DrawControlBorder(CDCHandle dc, CRect const& rcPaint, BorderFlags border) const;
 
         template <typename T>
         static void PutText(Control<T>& child, CDCHandle dc, CRect const& rc, CString const& text, bool deflate = false, int dx = 0, int dy = 0);
@@ -148,9 +154,5 @@ namespace Cf
 
         template <typename T>
         void DrawComboFace(Control<T>& child, CDCHandle dc, CRect const& rc) const;
-
-    private:
-        Colorizer(Colorizer const&);
-        Colorizer& operator = (Colorizer const&);
     };
 }

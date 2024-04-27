@@ -7,16 +7,12 @@
 #include "dh.tracing.h"
 #include "windows.gdi.rects.h"
 #include <dev.assistance/dev.assist.h>
-#include <atlwin.h>
-#include <atlframe.h>
-#include <atlctrls.h>
-#include <boost/noncopyable.hpp>
 
 namespace Cf
 {
     #pragma region ControlBase
 
-    struct Colorizer::ControlBase: boost::noncopyable
+    struct Colorizer::ControlBase
     {
         typedef ATL::CWindowImpl<ControlBase> ImplBase;
 
@@ -36,17 +32,20 @@ namespace Cf
     #pragma endregion 
 
     template <typename T>
-    struct Colorizer::Control: ControlBase
-                             , ATL::CWindowImpl<Control<T>, T>
-                             , WTL::CCustomDraw<Control<T> >
+    struct Colorizer::Control: ControlBase,
+                               ATL::CWindowImpl<Control<T>, T>,
+                               WTL::CCustomDraw<Control<T>>
     {
-        typedef ATL::CWindowImpl<Control<T>, T> Super;
-        typedef WTL::CCustomDraw<Control<T> > CustomDraw;
+        using      Super = ATL::CWindowImpl<Control<T>, T>;
+        using CustomDraw = WTL::CCustomDraw<Control<T>>;
+
+        Control(Control const&) = delete;
+        Control& operator = (Control const&) = delete;
 
         Control(HWND hwnd, Colorizer* owner);
-        virtual ~Control();
+        ~Control() override;
 
-        virtual ImplBase* Impl();
+        ImplBase* Impl() override;
 
         CString GetItemText(int index) const;
         int GetImageIndex(int index) const;
@@ -59,7 +58,7 @@ namespace Cf
         friend class OwnerDraw;
         friend class CustomDraw;
 
-        Colorizer* Owner;
+        Colorizer*           Owner;
         SpecificMembers<T> Members;
 
         void SpecificPreInit(HWND hwnd);
@@ -81,9 +80,17 @@ namespace Cf
 
         #pragma region Message map
 
-        #define CALL_SPECIFIC_HANDLER() \
-            if (SpecificMessagesHandler(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) \
-                return TRUE;
+        #define CALL_SPECIFIC_HANDLER()                                                     \
+            if (SpecificMessagesHandler(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {  \
+                return TRUE;                                                                  \
+            }
+
+        static constexpr size_t PaddingAdjust = 
+            //sizeof(Owner) + 
+            //sizeof(SpecificMembers<T>) +
+            3;
+
+        uint8_t reserved[PaddingAdjust];
 
         BEGIN_MSG_MAP_EX(Control)
             MSG_WM_DESTROY(OnDestroy)
@@ -95,10 +102,6 @@ namespace Cf
         END_MSG_MAP()
 
         #pragma endregion
-
-    private:
-        Control(Control const&);
-        Control& operator = (Control const&);
     };
 
     #pragma region Inherited
@@ -134,6 +137,12 @@ namespace Cf
     template <typename T>
     inline BOOL Colorizer::Control<T>::SpecificMessagesHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
     {
+        UNREFERENCED_ARG(hWnd);
+        UNREFERENCED_ARG(uMsg);
+        UNREFERENCED_ARG(wParam);
+        UNREFERENCED_ARG(lParam);
+        UNREFERENCED_ARG(lResult);
+        UNREFERENCED_ARG(dwMsgMapID);
         return FALSE;
     }
 
@@ -239,228 +248,6 @@ namespace Cf
     {
         Owner->SetTextColor(dc);
         return Owner->MyBackBrush[0];
-    }
-
-    #pragma endregion
-
-    #pragma region Static specific
-
-    template <>
-    inline void Colorizer::Control<WTL::CStatic>::OnPaint(CDCHandle)
-    {
-        if (Details<WTL::CStatic>::Normal != Details<WTL::CStatic>::GetAppearType(*this))
-            SetMsgHandled(FALSE);
-
-        else
-        {
-            PaintContext pc(*this, GetFont());
-
-            CString text;
-            if (GetWindowText(text))
-            {
-                Owner->SetTextColor(pc.PaindDC.m_hDC);
-                pc.PaindDC.DrawText(text, text.GetLength(), pc.Rect, Details<WTL::CStatic>::GetDrawTextFormat(*this));
-            }
-        }
-    }
-
-    #pragma endregion
-
-    #pragma region Button specific
-
-    template <>
-    inline void Colorizer::Control<WTL::CButton>::OnPaint(CDCHandle)
-    {
-        Details<WTL::CButton>::AppearType type = Details<WTL::CButton>::GetAppearType(*this);
-
-        if ((Details<WTL::CButton>::Ownerdraw == type) || (Details<WTL::CButton>::UserButton == type))
-            SetMsgHandled(FALSE);
-
-        else
-        {
-            PaintContext pc(*this, GetFont());
-
-            CString text;
-            GetWindowText(text);
-
-            Owner->SetTextColor(pc.PaindDC.m_hDC);
-
-            switch (type)
-            {
-            case Details<WTL::CButton>::Groupbox:
-                Owner->DrawGroupBox(*this, pc.PaindDC.m_hDC, pc.Rect, text);
-                break;
-
-            case Details<WTL::CButton>::PushButton:
-            case Details<WTL::CButton>::DefPushButton:
-            case Details<WTL::CButton>::Flat: 
-                Owner->DrawButton(*this, pc.PaindDC.m_hDC, pc.Rect, text
-                    , Details<WTL::CButton>::Flat == type
-                    , Details<WTL::CButton>::DefPushButton == type);
-                break;
-
-            case Details<WTL::CButton>::Checkbox:
-            case Details<WTL::CButton>::AutoCheckbox:
-            case Details<WTL::CButton>::ThreeState:
-            case Details<WTL::CButton>::Auto3State:
-                Owner->DrawCheckBox(*this, pc.PaindDC.m_hDC, pc.Rect, text);
-                break;
-
-            case Details<WTL::CButton>::RadioButton:
-            case Details<WTL::CButton>::AutoRadioButton:
-                Owner->DrawRadioButton(*this, pc.PaindDC.m_hDC, pc.Rect, text);
-                break;
-
-            case Details<WTL::CButton>::Pushbox: 
-                ::DebugBreak();
-                break;
-            }
-        }
-    }
-
-    #pragma endregion
-
-    #pragma region ListBox specific
-
-    template <>
-    void Colorizer::Control<WTL::CListBox>::SpecificPreInit(HWND hwnd)
-    {
-        unsigned ns = ::GetWindowLong(hwnd, GWL_STYLE);
-        ns |= LBS_OWNERDRAWVARIABLE | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT;
-        ::SetWindowLong(hwnd, GWL_STYLE, ns);
-    }
-
-    template <>
-    inline CString Colorizer::Control<WTL::CListBox>::GetItemText(int index) const
-    {
-        CString result;
-        GetText(index, result);
-        return result;
-    }
-
-    template <>
-    BOOL Colorizer::Control<WTL::CListBox>::SpecificMessagesHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
-    {
-        MSG_WM_DRAWITEM(OnDrawItem)
-        return FALSE;
-    }
-
-    #pragma endregion
-
-    #pragma region ComboBox specific
-
-    template <>
-    inline CString Colorizer::Control<WTL::CComboBox>::GetItemText(int index) const
-    {
-        CString result;
-        GetLBText(index, result);
-        return result;
-    }
-
-    template <> inline void Colorizer::Control<WTL::CComboBox>::OnNcPaint(CRgnHandle rgn) {}
-    template <> inline BOOL Colorizer::Control<WTL::CComboBox>::OnEraseBkgnd(CDCHandle dc) { return TRUE; }
-
-    template <>
-    inline void Colorizer::Control<WTL::CComboBox>::OnPaint(CDCHandle)
-    {
-        PaintContext pc(*this, GetFont());
-        Owner->DrawComboFace<WTL::CComboBox>(*this, pc.PaindDC.m_hDC, pc.Rect);
-    }
-
-    template <>
-    inline HBRUSH Colorizer::Control<WTL::CComboBox>::OnCtlColorListBox(CDCHandle dc, HWND hwnd)
-    {
-        if (!Members.Listbox.get() && (m_hWnd != hwnd))
-        {
-            Owner->OnEraseBackground(*this, dc);
-            Members.Listbox.reset(new Control<WTL::CListBox>(hwnd, Owner));
-        }
-
-        Owner->SetTextColor(dc);
-        return Owner->MyBackBrush[0];
-    }
-
-    template <>
-    inline HBRUSH Colorizer::Control<WTL::CComboBox>::OnCtlColorEdit(CDCHandle dc, HWND hwnd)
-    {
-        Owner->SetTextColor(dc);
-        return Owner->MyBackBrush[0];
-    }
-
-    template <>
-    BOOL Colorizer::Control<WTL::CComboBox>::SpecificMessagesHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
-    {
-        MSG_WM_DRAWITEM(OnDrawItem)
-        MSG_WM_CTLCOLORLISTBOX(OnCtlColorListBox)
-        MSG_WM_CTLCOLOREDIT(OnCtlColorEdit)
-        return FALSE;
-    }
-
-    #pragma endregion
-
-    #pragma region ScrollBar specific
-
-    template <>
-    BOOL Colorizer::Control<WTL::CScrollBar>::OnEraseBkgnd(CDCHandle)
-    {
-        SetMsgHandled(FALSE);
-        return FALSE;
-    }
-
-    #pragma endregion
-
-    #pragma region TreeView specific
-
-    template <>
-    void Colorizer::Control<WTL::CTreeViewCtrl>::SpecificPreInit(HWND hwnd)
-    {
-        ::SetWindowLong(hwnd, GWL_EXSTYLE
-            , ::GetWindowLong(hwnd, GWL_EXSTYLE) 
-            | 0x0004 /*TVS_EX_DOUBLEBUFFER*/
-            );
-    }
-
-    template <>
-    LRESULT Colorizer::Control<WTL::CTreeViewCtrl>::OnGetDispinfo(LPNMHDR header)
-    {
-        LPNMTVDISPINFO di = (LPNMTVDISPINFO)header;
-        return 0;
-    }
-
-    template <>
-    DWORD Colorizer::Control<WTL::CTreeViewCtrl>::OnPrePaint(int, LPNMCUSTOMDRAW cd) 
-    {
-        CDCHandle dc(cd->hdc);
-        dc.FillSolidRect(&cd->rc, Owner->MyBackColor);
-        return CDRF_NOTIFYPOSTPAINT | CDRF_NOTIFYITEMDRAW;
-    }
-
-    template <>
-    DWORD Colorizer::Control<WTL::CTreeViewCtrl>::OnItemPrePaint(int, LPNMCUSTOMDRAW cd) 
-    {
-        NMTVCUSTOMDRAW* tv = (NMTVCUSTOMDRAW*)cd;
-
-        HTREEITEM item = (HTREEITEM)cd->dwItemSpec;
-        if (GetItemState(item, TVIS_SELECTED | TVIS_DROPHILITED) & (TVIS_SELECTED | TVIS_DROPHILITED))
-        {
-            tv->clrText = Owner->MyHotTextColor;
-            tv->clrTextBk = Owner->MyHotBackColor;
-        }
-        else
-        {
-            tv->clrText = Owner->MyTextColor;
-            tv->clrTextBk = Owner->MyBackColor;
-        }
-
-        return CDRF_DODEFAULT;
-    }
-
-    template <>
-    BOOL Colorizer::Control<WTL::CTreeViewCtrl>::SpecificMessagesHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
-    {
-      //NOTIFY_CODE_HANDLER_EX(TVN_GETDISPINFO, OnGetDispinfo)
-        CHAIN_MSG_MAP(CustomDraw);
-        return FALSE;
     }
 
     #pragma endregion

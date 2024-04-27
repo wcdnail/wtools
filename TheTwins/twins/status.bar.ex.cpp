@@ -236,7 +236,7 @@ namespace Ui
             rc.left = rcText.right + 2;
         }
 
-#pragma message(_TODO("Handle progress..."))
+// ##TODO: Handle progress..."))
 #if 0
         if (-1 != Progress)
         {
@@ -248,6 +248,6 @@ namespace Ui
 
     void StatusBar::Blink()
     {
-#pragma message(_TODO("Implementation"))
+// ##TODO: Implementation"))
     }
 }

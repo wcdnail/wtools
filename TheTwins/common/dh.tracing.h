@@ -8,7 +8,6 @@
 #include "dh.timer.h"
 #include "string.hp.h"
 #include <string>
-#include <atlstr.h>
 
 namespace Dh
 {
@@ -19,7 +18,7 @@ namespace Dh
     public:
         WCDAFX_API TraceCategory(wchar_t const* name);
         WCDAFX_API ~TraceCategory();
-        wchar_t const* GetName() const { return Name.c_str(); }
+        WidecharString const& GetName() const;
 
     private:
         WidecharString Name;
@@ -32,7 +31,7 @@ namespace Dh
         WCDAFX_API ~ScopedThreadLog();
 
     private:
-        Dh::Timer Time;
+        Dh::Timer  Time;
         wchar_t Message[1024];
     };
 
@@ -61,10 +60,9 @@ namespace Dh
             case /* LF */ 0x0a: return (C)'\x89';
             case /* CR */ 0x0d: return (C)'\xac';
             }
-
-            if (symbol < 0x20)
+            if (symbol < 0x20) {
                 return (C)'\x95';
-
+            }
             return symbol;
         }
 
@@ -72,9 +70,9 @@ namespace Dh
         inline void CopyCharsForPrinting(C* dest, size_t dlen, C const* source, size_t slen)
         {
             size_t llen = min(dlen, slen);
-
-            for (size_t i=0; i<llen; i++)
+            for (size_t i=0; i<llen; i++) {
                 dest[i] = PrintableChar(source[i]);
+            }
         }
     }
 

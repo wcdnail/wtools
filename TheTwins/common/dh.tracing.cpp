@@ -2,24 +2,23 @@
 #include "dh.tracing.h"
 #include "dh.timer.h"
 #include "string.utils.format.h"
-#include "windows.gui.leaks.h"
 #include "info/runtime.information.h"
-#include <fstream>
 #include <atlstr.h>
-#include <atlconv.h>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/case_conv.hpp>
 #include <filesystem>
+#include <algorithm>
+#include <fstream>
 #include <memory>
+#include <atomic>
 #include <mutex>
 
-#ifndef _TRACE_LOG_ENABLED
-#  define _TRACE_LOG_ENABLED true
-#endif
+enum TracerFlags: uint64_t
+{
+    _TRACE_LOG_MULTITHREADED = 0x0000000000000001,
+    _TRACE_LOG_ENABLED       = 0x0000000000000002,
+    _DEBUG_EXTRA_INFO        = 0x0000000000000004,
+};
 
-#ifdef _DEBUG
-#  define _DEBUG_EXTRA_INFO
-#endif
+static constexpr int _TRACE_LOG_MAX_ROTATED_FILES = 3;
 
 namespace Dh
 {
@@ -34,10 +33,9 @@ namespace Dh
     TraceCategory::TraceCategory(wchar_t const* name)
         : Name()
     {
-        if (0 == ::_wcsnicmp(name, _MY_MODULE, ::wcslen(_MY_MODULE)))
-        {
+        if (0 == ::_wcsnicmp(name, _MY_MODULE, ::wcslen(_MY_MODULE))) {
             std::filesystem::path tempath = Runtime::Info().Executable.Filename;
-            Name = boost::to_upper_copy(tempath.filename().replace_extension().wstring());
+            Name = tempath.filename().replace_extension().wstring();
         }
         else {
             Name = name;
@@ -46,6 +44,11 @@ namespace Dh
 
     TraceCategory::~TraceCategory()
     {}
+
+    WidecharString const& TraceCategory::GetName() const
+    {
+        return Name;
+    }
 
     namespace
     {
@@ -60,12 +63,17 @@ namespace Dh
 
     struct LogCtx
     {
-        using ABool = std::atomic<bool>;
-        using Mutex = std::recursive_mutex;
+        using        ABool = std::atomic<bool>;
+        using        Mutex = std::recursive_mutex;
+        using LogStreamPtr = std::unique_ptr<std::ofstream>;
+
+        LogCtx(LogCtx const&) = delete;
+        LogCtx& operator = (LogCtx const&) = delete;
 
         struct ScopedLockFree
         {
-            ScopedLockFree() {}
+            ScopedLockFree(ScopedLockFree const&) {}
+            explicit ScopedLockFree() {}
             virtual ~ScopedLockFree() {}
         };
 
@@ -81,11 +89,13 @@ namespace Dh
             {
                 mx_.unlock();
             }
+
+            ScopedGuard& operator = (ScopedGuard const&) = delete;
         };
 
         ScopedLockFree ScopedLock()
         {
-            return multiThreaded_ ? ScopedGuard(mx_) : ScopedLockFree();
+            return (0 != (flags_ & _TRACE_LOG_MULTITHREADED)) ? ScopedGuard(mx_) : ScopedLockFree();
         }
 
         template <typename C>
@@ -98,39 +108,35 @@ namespace Dh
 
         void FlushLog()
         {
-            if (IsLogEnabled()) {
-                log_ << std::flush;
+            if (log_) {
+                (*log_) << std::flush;
             }
         }
 
-        static LogCtx& instance(bool mt = true)
+        bool CheckFlag(uint64_t bits) const
         {
-            static LogCtx self(mt);
-            if (!self.isInitialized_) {
-                ScopedGuard lk(self.mx_);
-                if (self.logEnabled_) {
-                    std::string name = GenLogName();
-                    self.log_.open(name.c_str());
-                }
-                self.isInitialized_ = true;
-            }
+            return (0 != (flags_ & bits));
+        }
+
+        static LogCtx& instance()
+        {
+            static LogCtx self(_TRACE_LOG_MULTITHREADED);
             return self;
         }
 
     private:
-        Mutex              mx_;
-        std::ofstream     log_;
-        bool       logEnabled_;
-        bool    multiThreaded_;
-        ABool   isInitialized_;
+        uint64_t   flags_;
+        Mutex         mx_;
+        LogStreamPtr log_;
 
-        LogCtx(bool multiThreaded)
-            :            mx_()
-            ,           log_()
-            ,    logEnabled_(_TRACE_LOG_ENABLED)
-            , multiThreaded_(multiThreaded)
-            , isInitialized_(false)
+        LogCtx(uint64_t flags)
+            : flags_(flags)
+            ,    mx_()
+            ,   log_()
         {
+            if (0 != (flags_ & _TRACE_LOG_ENABLED)) {
+                log_ = std::make_unique<std::ofstream>(GenLogName());
+            }
         }
 
         ~LogCtx()
@@ -138,41 +144,50 @@ namespace Dh
             FlushLog();
         }
 
-        static std::filesystem::path GetLogPath(int n)
+        static std::filesystem::path GetLogFilepath(int n)
         {
             std::filesystem::path result = Runtime::Info().Executable.Directory;
-            result /= Runtime::Info().Executable.Version.ProductName + L".log." 
-                    + boost::lexical_cast<std::wstring>(n) + L".txt";
+
+            result /= Runtime::Info().Executable.Version.ProductName + 
+                L".log." +
+                std::to_wstring(n) +
+                L".txt";
+
             return result;
         }
 
         static std::string GenLogName()
         {
             std::filesystem::path temp;
-            for (int i=2; i>=0; i--) {
-                temp = GetLogPath(i);
+            int i = _TRACE_LOG_MAX_ROTATED_FILES - 1;
+            do {
+                temp = GetLogFilepath(i);
                 if (std::filesystem::exists(temp)) {
-                    std::filesystem::path next = GetLogPath(i + 1);
+                    std::filesystem::path next = GetLogFilepath(i + 1);
                     std::error_code ec;
                     std::filesystem::remove(next, ec);
                     std::filesystem::rename(temp, next, ec);
                 }
+                --i;
             }
+            while (i >= 0);
             return temp.string();
         }
 
-        bool IsLogEnabled() const { return logEnabled_ && log_.is_open(); }
-        void PutsImpl(char const* text) { log_ << text; }
+        bool IsLogEnabled() const { return log_ && log_->is_open(); }
+        void PutsImpl(char const* text) { if (log_) (*log_) << text; }
 
         void PutsImpl(wchar_t const* text)
         {
-            if (text && *text) {
-                size_t len = ::wcslen(text) + 1;
-                CStringA temp;
-                int cl = ::WideCharToMultiByte(CP_ACP, 0, text, (int)len, temp.GetBufferSetLength((int)len), (int)len, NULL, NULL);
-                temp.ReleaseBufferSetLength(cl);
-                log_ << (char const*)temp; 
+            if (!log_ || !text || !*text) {
+                return ;
             }
+            int len = static_cast<int>(::wcslen(text)) + 1;
+            CStringA temp;
+            PSTR   buffer = temp.GetBufferSetLength(len);
+            int cen = ::WideCharToMultiByte(CP_ACP, 0, text, len, buffer, len, nullptr, nullptr);
+            temp.ReleaseBufferSetLength(cen);
+            (*log_) << temp.GetString(); 
         }
     };
 
@@ -225,7 +240,7 @@ namespace Dh
     static void ThreadPrintfT(TraceCategory const& cat, C const* format, va_list ap)
     {
         auto lk = LogCtx::instance().ScopedLock();
-        Puts(Str::Elipsis<wchar_t>::Format(L"%0*.8f [%06d] %8s: ", 20, _Uptime.Seconds(), ::GetCurrentThreadId(), cat.GetName()));
+        Puts(Str::Elipsis<wchar_t>::Format(L"%0*.8f [%06d] %8s: ", 20, _Uptime.Seconds(), ::GetCurrentThreadId(), cat.GetName().c_str()));
         Puts(Str::Elipsis<C>::FormatV(format, ap));
         LogCtx::instance().FlushLog();
     }
@@ -276,8 +291,8 @@ namespace Dh
     ScopedThreadLog::ScopedThreadLog(wchar_t const* message)
         : Time()
     {
-        ::memset(Message, 0, _countof(Message)-1);
-        ::wcsncpy_s(Message, message, min(::wcslen(message), _countof(Message)-1));
+        ::memset(Message, 0, std::size(Message));
+        ::wcsncpy_s(Message, message, std::min<size_t>(::wcslen(message), std::size(Message)));
 
         _Start_ScopedThreadLog(Message);
     }
@@ -286,17 +301,12 @@ namespace Dh
         : Time()
     {
         ::memset(Message, 0, _countof(Message)-1);
-
         va_list ap;
         va_start(ap, format);
-
         CStringW temp;
         temp.FormatV(format, ap);
-
-        ::wcsncpy_s(Message, temp, min(temp.GetLength(), (int) _countof(Message)-1));
-
+        ::wcsncpy_s(Message, temp, std::min<size_t>(static_cast<size_t>(temp.GetLength()), std::size(Message)-1));
         va_end(ap);
-
         _Start_ScopedThreadLog(Message);
     }
 
@@ -307,18 +317,17 @@ namespace Dh
 
     void PrintLogHeader()
     {
-        LogCtx::instance();
-
-#ifdef _DEBUG_EXTRA_INFO
-        std::wostringstream temp;
-        Runtime::Info().SimpleReport(temp);
-        std::wstring report = temp.str();
-        ThreadPrintfc(Category::Module, L"System info:\n%s", report.c_str());
-#else
-        ThreadPrintfc(Category::Module, L"Launched on %s (%s)\n",
-            Runtime::Info().Host.Name.c_str(),
-            Runtime::Info().System.Version.DisplayName.c_str()
-        );
-#endif
+        if (0 != (LogCtx::instance().CheckFlag(_DEBUG_EXTRA_INFO))) {
+            std::wostringstream temp;
+            Runtime::Info().SimpleReport(temp);
+            std::wstring report = temp.str();
+            ThreadPrintfc(Category::Module, L"System info:\n%s", report.c_str());
+        }
+        else {
+            ThreadPrintfc(Category::Module, L"Launched on %s (%s)\n",
+                Runtime::Info().Host.Name.c_str(),
+                Runtime::Info().System.Version.DisplayName.c_str()
+            );
+        }
     }
 }

@@ -8,24 +8,31 @@
 #include "win-5-6-7.features.h"
 #include "cf-resources/resource.h"
 
+#ifdef _MSC_VER
+#  pragma warning(disable: 4191) // 4191: 'reinterpret_cast': unsafe conversion from 'BOOL (__cdecl *)(HWND,Cf::Colorizer *)' to 'WNDENUMPROC'
+                                 //        Making a function call using the resulting pointer may cause your program to fail
+#endif
+
 namespace Cf
 {
-    WTL::CImageList Colorizer::SpecGxf;
+    WTL::CImageList       Colorizer::SpecGxf;
     Colorizer::FactoryMap Colorizer::Factory;
 
-    Colorizer::~Colorizer() {}
+    Colorizer::~Colorizer()
+    {
+    }
 
     Colorizer::Colorizer()
-        : MyTextColor(0xdfdfdf)
-        , MyBackColor(0x202020)
+        :     Flags(false)
+        ,         MyHwnd(nullptr)
+        ,       Controls()
+        ,    MyTextColor(0xdfdfdf)
+        ,    MyBackColor(0x202020)
         , MyHotTextColor(0xffffff)
         , MyHotBackColor(0x5c5c5c)
-        , MyPen(::CreatePen(PS_SOLID, 1, 0))
-        , MyFocusPen(::CreatePen(PS_DOT, 1, 0x2f2f2f))
+        ,          MyPen(::CreatePen(PS_SOLID, 1, 0))
+        ,     MyFocusPen(::CreatePen(PS_DOT, 1, 0x2f2f2f))
         , MyThickEdgePen(::CreatePen(PS_SOLID, 2, 0x5f5f5f))
-        , MsgHandled(false)
-        , MyHwnd(NULL)
-        , Controls()
     {
         MyButtonBackColor[0] = 0x3f3f3f;
         MyButtonBackColor[1] = 0x000000;
@@ -38,7 +45,7 @@ namespace Cf
         PerformInitStatix();
     }
 
-    #pragma region ControlBase
+#pragma region ControlBase
 
     Colorizer::ControlBase::ControlBase(HWND hwnd, PCTSTR childClass) 
 #ifdef _DEBUG
@@ -46,43 +53,42 @@ namespace Cf
 #endif
     {
 #ifdef _DEBUG
-        TCHAR _class[256] = {0};
-        int classLen = ::GetClassName(hwnd, _class, _countof(_class)-1);
-        PrevClass = _class;
+        wchar_t _class[256] = {0};
+        int clen = ::GetClassNameW(hwnd, _class, _countof(_class)-1);
+        PrevClass = CString(_class, clen);
 
-        TCHAR text[64] = {0};
-        int len = ::GetWindowText(hwnd, text, _countof(text)-1);
+        wchar_t text[64] = {0};
+        int len = ::GetWindowTextW(hwnd, text, _countof(text)-1);
 
-        TCHAR dispText[64] = {0};
-        Dh::MakePrintable(dispText, text, len);
+        wchar_t dispText[64] = {0};
+        Dh::MakePrintable(dispText, text, static_cast<size_t>(len));
 
-        Dh::ThreadPrintf(_T("Colorize: \t\t++ %p [%s] `%s` ==> `%s`\n"), hwnd, dispText, PrevClass, childClass);
+        Dh::ThreadPrintf(_T("Colorize: \t\t++ %p [%s] `%s` ==> `%s`\n"), hwnd, dispText, PrevClass.GetString(), childClass);
 #endif
     }
 
     Colorizer::ControlBase::~ControlBase() {}
 
-    Colorizer::ControlBase::ImplBase* Colorizer::ControlBase::Impl() { return NULL; }
+    Colorizer::ControlBase::ImplBase* Colorizer::ControlBase::Impl() { return nullptr; }
 
     void Colorizer::ControlBase::OnDestroy(HWND hwnd, PCTSTR childClass)
     {
 #ifdef _DEBUG
-        TCHAR text[64] = {0};
-        int len = ::GetWindowText(hwnd, text, _countof(text)-1);
+        wchar_t text[64] = {0};
+        int len = ::GetWindowTextW(hwnd, text, _countof(text)-1);
 
-        TCHAR dispText[64] = {0};
-        Dh::MakePrintable(dispText, text, len);
+        wchar_t dispText[64] = {0};
+        Dh::MakePrintable(dispText, text, static_cast<size_t>(len));
 
-        Dh::ThreadPrintf(L"Colorize: \t\t-- %p [%s] `%s` <== `%s`\n", hwnd, dispText, PrevClass, childClass);
+        Dh::ThreadPrintf(L"Colorize: \t\t-- %p [%s] `%s` <== `%s`\n", hwnd, dispText, PrevClass.GetString(), childClass);
 #endif
     }
 
-    #pragma endregion 
-
-    #pragma region Controls factory
+#pragma endregion 
+#pragma region Controls factory
 
     template <typename T>
-    static Colorizer::ControlBase* Colorizer::Creator(HWND hwnd, Colorizer* owner)
+    Colorizer::ControlBase* Colorizer::Creator(HWND hwnd, Colorizer* owner)
     {
         return new T(hwnd, owner);
     }
@@ -102,8 +108,7 @@ namespace Cf
 
     void Colorizer::PerformInitStatix()
     {
-        if (Factory.empty())
-        {
+        if (Factory.empty()) {
             InsertToFactory<WTL::CStatic>();
             InsertToFactory<WTL::CButton>();
             InsertToFactory<WTL::CScrollBar>();
@@ -125,9 +130,7 @@ namespace Cf
             InsertToFactory<WTL::CMonthCalendarCtrl>();
             InsertToFactory<WTL::CRichEditCtrl>();
         }
-
-        if (!SpecGxf.m_hImageList)
-        {
+        if (!SpecGxf.m_hImageList) {
             SpecGxf.Create(IDB_SPECGFX, 9, 1, 0xff00ff);
         }
     }
@@ -139,16 +142,32 @@ namespace Cf
     BOOL Colorizer::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID/* = 0*/)
     {
         MyHwnd = hWnd;
-        bool prevMsgHandled = MsgHandled;
+        bool prevMsgHandled = (0 == (Flags & MESSAGE_HANDLED));
         BOOL rv = _ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
-        MsgHandled = prevMsgHandled;
+        Flags = prevMsgHandled;
         return rv;
+    }
+
+    bool Colorizer::IsMsgHandled() const
+    {
+        return (0 != (Flags & MESSAGE_HANDLED));
+    }
+
+    void Colorizer::SetMsgHandled(bool nv) const
+    {
+        if (nv) {
+            Flags |= MESSAGE_HANDLED;
+        }
+        else {
+            Flags &= ~MESSAGE_HANDLED;
+        }
     }
 
     BOOL Colorizer::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
     {
         BOOL bHandled = TRUE;
-
+        UNREFERENCED_ARG(hWnd);
+        UNREFERENCED_ARG(bHandled);
         switch (dwMsgMapID)
         {
         case 0:
@@ -163,14 +182,13 @@ namespace Cf
             MESSAGE_HANDLER_EX(WM_NOTIFY, OnNotify)
             break;
         }
-
         return FALSE;
     }
 
     LRESULT Colorizer::OnDrawItem(UINT message, WPARAM wParam, LPARAM lParam)
     {
-        LPDRAWITEMSTRUCT di = (LPDRAWITEMSTRUCT)lParam;
-        HWND childHwnd = ::GetDlgItem(MyHwnd, di->CtlID);
+        LPDRAWITEMSTRUCT di = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+        HWND childHwnd = ::GetDlgItem(MyHwnd, static_cast<int>(di->CtlID));
         LRESULT rv = ::SendMessage(childHwnd, message, wParam, lParam);
         SetMsgHandled(TRUE);
         return rv;
@@ -248,10 +266,10 @@ namespace Cf
     {
 #ifdef _DEBUG
         WCHAR text[64] = {0};
-        ::GetWindowTextW(hwnd, text, _countof(text)-1);
+        GetWindowTextW(hwnd, text, _countof(text)-1);
         Dh::ThreadPrintf(L"Colorize: + %p %s...\n", hwnd, text);
 #endif
-        ::EnumChildWindows(hwnd, (WNDENUMPROC)InitChild, (LPARAM)this);
+        EnumChildWindows(hwnd, reinterpret_cast<WNDENUMPROC>(InitChild), reinterpret_cast<LPARAM>(this));
     }
 
     BOOL CALLBACK Colorizer::InitChild(HWND hwnd, Colorizer* self)
@@ -268,28 +286,23 @@ namespace Cf
         bool exist = fact != Factory.end();
 
 #ifdef _DEBUG
-        if (!exist)
-            Dh::ThreadPrintf(L"Colorize: \t\t!! %p `%s`\n", hwnd, _class);
+        if (!exist) {
+            Dh::ThreadPrintf(L"Colorize: \t\t!! %p `%s`\n", hwnd, _class.GetString());
+        }
 #endif
-
-        if (exist && !already)
-        {
-            ::ShowWindow(hwnd, SW_HIDE);
-
+        if (exist && !already) {
+            ShowWindow(hwnd, SW_HIDE);
             ControlCreator create = fact->second;
             ControlBasePtr child(create(hwnd, self));
-
             self->Controls[hwnd] = child;
-
-            ::ShowWindow(hwnd, SW_SHOW);
+            ShowWindow(hwnd, SW_SHOW);
         }
 
         return TRUE;
     }
 
-    #pragma endregion 
-
-    #pragma region Common stuff
+#pragma endregion 
+#pragma region Common stuff
 
     void Colorizer::SetTextColor(CDCHandle dc) const
     {
@@ -335,8 +348,8 @@ namespace Cf
         nc.Dc.SelectClipRgn(clientRgn);
         nc.Dc.FillSolidRect(nc.Rect, 0xff00ff);
 
-        unsigned style = 0, estyle = 0;
-        unsigned bt = GetBorderType(MyHwnd, style, estyle);
+        LONG style = 0, estyle = 0;
+        BorderFlags bt = GetBorderType(MyHwnd, style, estyle);
         DrawControlBorder(nc.Dc, nc.Rect, bt);
     }
 
@@ -348,59 +361,49 @@ namespace Cf
         return MyBackBrush[0];
     }
 
-    #pragma endregion 
+#pragma endregion 
+#pragma region Border drawing
 
-    #pragma region Border drawing
-
-    Colorizer::BorderFlags Colorizer::GetBorderType(HWND hwnd, unsigned& style, unsigned& estyle)
+    Colorizer::BorderFlags Colorizer::GetBorderType(HWND hwnd, LONG& style, LONG& estyle)
     {
-        style = ::GetWindowLong(hwnd, GWL_STYLE);
-        estyle = ::GetWindowLong(hwnd, GWL_EXSTYLE);
-
-        unsigned result = 0;
-
-        if (style & WS_BORDER)
+        style = ::GetWindowLongW(hwnd, GWL_STYLE);
+        estyle = ::GetWindowLongW(hwnd, GWL_EXSTYLE);
+        BorderFlags result = BorderNone;
+        if (style & WS_BORDER) {
             result = BorderFrame;
-
-        else if (estyle & WS_EX_CLIENTEDGE)
+        }
+        else if (estyle & WS_EX_CLIENTEDGE) {
             result = BorderClientEdge;
-
-        else if (estyle & WS_EX_STATICEDGE) 
+        }
+        else if (estyle & WS_EX_STATICEDGE) {
             result = BorderStaticEdge;
-                
-        return (BorderFlags)result;
+        }                
+        return result;
     }
     
-    void Colorizer::DrawControlBorder(CDCHandle dc, CRect const& rcPaint, unsigned border) const
+    void Colorizer::DrawControlBorder(CDCHandle dc, CRect const& rcPaint, BorderFlags border) const
     {
         CRect rc = rcPaint;
-
-        for (int i=0; i<2; i++)
-        {
+        for (int i=0; i<2; i++) {
             HPEN lp = dc.SelectPen(MyBorderPen[0]);
-
-            dc.MoveTo(rc.left, rc.bottom, NULL);
+            dc.MoveTo(rc.left, rc.bottom, nullptr);
             dc.LineTo(rc.left, rc.top);
             dc.LineTo(rc.right, rc.top);
-
-            if (BorderFrame != border)
+            if (BorderFrame != border) {
                 dc.SelectPen(MyBorderPen[1]);
-
+            }
             dc.LineTo(rc.right, rc.bottom);
             dc.LineTo(rc.left, rc.bottom);
-
             dc.SelectPen(lp);
-
-            if (BorderClientEdge != border)
+            if (BorderClientEdge != border) {
                 break;
-
+            }
             rc.DeflateRect(1, 1);
         }
     }
 
-    #pragma endregion
-
-    #pragma region Text drawing
+#pragma endregion
+#pragma region Text drawing
 
     template <typename T>
     void Colorizer::PutText(Control<T>& child, CDCHandle dc, CRect const& rc, CString const& text, bool deflate, int dx, int dy)
@@ -428,9 +431,8 @@ namespace Cf
         }
     }
 
-    #pragma endregion
-
-    #pragma region GroupBox drawing
+#pragma endregion
+#pragma region GroupBox drawing
 
     void Colorizer::DrawGroupBox(Control<WTL::CButton>& child, CDCHandle dc, CRect const& rc, CString const& text) const 
     {
@@ -455,7 +457,7 @@ namespace Cf
         {
             CRect rcText = rc;
 
-            unsigned place = child.GetWindowLong(GWL_STYLE) & 0xf00;
+            LONG place = child.GetWindowLong(GWL_STYLE) & 0xf00;
 
             if (BS_CENTER == place)
                 rcText.left = (rcText.Width() - szText.cx) / 2;
@@ -478,40 +480,32 @@ namespace Cf
     }
 
     #pragma endregion 
-
     #pragma region Button drawing
 
     void Colorizer::DrawButton(Control<WTL::CButton>& child, CDCHandle dc, CRect const& rc, CString const& text, bool flat, bool _default) const 
     {
+        UNREFERENCED_ARG(_default);
         unsigned state = child.GetState();
-
-        HPEN lp = dc.SelectPen(MyPen);
-
-        if (!flat)
+        HPEN        lp = dc.SelectPen(MyPen);
+        if (!flat) {
             Cf::GradRect(dc, rc, MyButtonBackColor);
-        else
+        }
+        else {
             dc.FillSolidRect(rc, MyBackColor);
-
+        }
         PutText<WTL::CButton>(child, dc, rc, text, true, 3, 3);
-
         Cf::FrameRect(dc, rc);
-
-        if (state & BST_PUSHED)
-        {
+        if (state & BST_PUSHED) {
             dc.InvertRect(rc);
             // TODO: Make some noise here...
         }
-
-        if (state & BST_FOCUS)
-        {
+        if (state & BST_FOCUS) {
             // TODO: Implement focus marker
             CRect rcFocus(rc);
             rcFocus.DeflateRect(2, 2);
-
             dc.SelectPen(MyFocusPen);
             Cf::FrameRect(dc, rcFocus);
         }
-
         dc.SelectPen(lp);
     }
 
@@ -526,16 +520,14 @@ namespace Cf
         CRect rcBox(0, 0, rc.Height(), rc.Height());
         CRect rcText = rc;
 
-        unsigned style = child.GetWindowLong(GWL_STYLE);
-        unsigned estyle = child.GetWindowLong(GWL_EXSTYLE);
+        LONG  style = child.GetWindowLong(GWL_STYLE);
+        LONG estyle = child.GetWindowLong(GWL_EXSTYLE);
 
-        if ((estyle & WS_EX_RIGHT) || (style & BS_LEFTTEXT))
-        {
+        if ((estyle & WS_EX_RIGHT) || (style & BS_LEFTTEXT)) {
             rcBox.MoveToXY(rc.right - rcBox.Width(), rc.top);
             rcText.right -= rcBox.Width() + 2;
         }
-        else
-        {
+        else {
             rcBox.MoveToXY(rc.left, rc.top);
             rcText.left += rcBox.Width() + 2;
         }
@@ -593,8 +585,8 @@ namespace Cf
         CRect rcBox(0, 0, rc.Height(), rc.Height());
         CRect rcText = rc;
 
-        unsigned style = child.GetWindowLong(GWL_STYLE);
-        unsigned estyle = child.GetWindowLong(GWL_EXSTYLE);
+        LONG  style = child.GetWindowLong(GWL_STYLE);
+        LONG estyle = child.GetWindowLong(GWL_EXSTYLE);
 
         if ((estyle & WS_EX_RIGHT) || (style & BS_LEFTTEXT))
         {
@@ -672,7 +664,7 @@ namespace Cf
         int iindex = child.GetImageIndex(di->itemID);
         CString text = child.GetItemText(di->itemID);
 
-        bool drawIcon = (-1 != iindex) && (NULL != ilist);
+        bool drawIcon = (-1 != iindex) && (nullptr != ilist);
 
         int iconx = 0, icony = 0;
         if (drawIcon)

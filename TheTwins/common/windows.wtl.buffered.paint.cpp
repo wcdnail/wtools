@@ -75,7 +75,7 @@ namespace Cf  // Common framework
 
     void DoubleBuffered::OnSize(UINT type, CSize size)
     {
-#pragma message(_FIXME("Release second buffer"))
+        // ##TODO: Release second buffer"))
         if (secondDc_.m_hDC)
         {
             WTL::CBitmap toDel(secondDc_.GetCurrentBitmap());

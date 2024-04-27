@@ -1,5 +1,6 @@
 #pragma once
 
+#if 0
 #include <boost/serialization/nvp.hpp>
 
 namespace Ref
@@ -29,3 +30,4 @@ namespace Ref
         ar & boost::serialization::make_nvp(name_.c_str(), ref_);
     }
 }
+#endif

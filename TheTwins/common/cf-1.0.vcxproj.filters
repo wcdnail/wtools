@@ -124,6 +124,22 @@
     <ClCompile Include="null.pointee.cpp">
       <Filter>__</Filter>
     </ClCompile>
+    <ClCompile Include="string.utils.format.cpp" />
+    <ClCompile Include="wtl.colorizer.control.details.cpp">
+      <Filter>colorizer</Filter>
+    </ClCompile>
+    <ClCompile Include="wtl.colorizer.control.cpp">
+      <Filter>colorizer</Filter>
+    </ClCompile>
+    <ClCompile Include="wtl.colorizer.control.specific.cpp">
+      <Filter>colorizer</Filter>
+    </ClCompile>
+    <ClCompile Include="wtl.colorizer.helpers.cpp">
+      <Filter>colorizer</Filter>
+    </ClCompile>
+    <ClCompile Include="windows.gdi.rects.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">

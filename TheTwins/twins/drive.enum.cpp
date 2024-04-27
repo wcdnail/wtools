@@ -117,13 +117,13 @@ namespace Twins
 
             try
             {
-#pragma message(_TODO("Get maximal drive number from anywhere..."))
+// ##TODO: Get maximal drive number from anywhere..."))
                 enum { MaximalDriveNum = sizeof(DWORD) * 8 }; 
 
                 ItemVector temp;
                 temp.reserve(MaximalDriveNum);
 
-#pragma message(_TODO("configure drive icons size and type..."))
+// ##TODO: configure drive icons size and type..."))
                 CImageList tempIcons;
                 tempIcons.Create(16, 16, ILC_COLOR32, 1, 1);
 
@@ -142,12 +142,12 @@ namespace Twins
                         {
                         case DRIVE_UNKNOWN     /*0*/:
                         case DRIVE_NO_ROOT_DIR /*1*/: 
-#pragma message(_TODO("Unmounted"))
+// ##TODO: Unmounted"))
                             continue;
 
                         case DRIVE_REMOVABLE   /*2*/: 
                             break;  
-#pragma message(_TODO("Determine floppy drive"))
+// ##TODO: Determine floppy drive"))
 
                         case DRIVE_FIXED       /*3*/:
                         case DRIVE_CDROM       /*5*/:
@@ -156,7 +156,7 @@ namespace Twins
                             break;
 
                         case DRIVE_REMOTE      /*4*/: 
-#pragma message(_FIXME("::GetVolumeInformation to slow"))
+        // ##TODO: ::GetVolumeInformation to slow"))
                             break;
 
                         default:
@@ -246,7 +246,7 @@ namespace Twins
             SHFILEINFO info = {0};
 
             ::SHGetFileInfo(item.path.c_str(), FILE_ATTRIBUTE_DIRECTORY, &info, sizeof(info), SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON);
-#pragma message(_TODO("handle `NULL == info.hIcon`"))
+// ##TODO: handle `NULL == info.hIcon`"))
             item.iconIndex = list.AddIcon(info.hIcon);
             item.icon.Attach(info.hIcon);
         }

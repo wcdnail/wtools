@@ -138,13 +138,13 @@ namespace Twins
 
     void Panel::OnEnter(FItem const* it)
     {
-#pragma message(_TODO("Implementation"))
+// ##TODO: Implementation"))
 //        if (it->IsDir())
 //            ChangeDir(it);
 //
 //        else
 //        {
-//#pragma message(_TODO("Warning! Ask - how and who opens. Ask - before run binary!!!"))
+//// ##TODO: Warning! Ask - how and who opens. Ask - before run binary!!!"))
 //
 //            //std::wstring ename = info.GetFilename().c_str();
 //            //Extern::Item extrn(ename, info.GetPath());
@@ -191,7 +191,7 @@ namespace Twins
 
     bool Panel::OnRename(FItem const* it, wchar_t const* newname)
     {
-#pragma message(_TODO("Implementation"))
+// ##TODO: Implementation"))
         std::error_code ec;
 
         //std::filesystem::path newpath = DirMan.FullPath();
@@ -208,7 +208,7 @@ namespace Twins
 
     void Panel::ChangeDir(FItem const* it)
     {
-#pragma message(_TODO("Implementation"))
+// ##TODO: Implementation"))
         //if (NULL != it)
         //{
         //    FetchPanelContent(it->GetFilename());
@@ -248,7 +248,7 @@ namespace Twins
 
     void Panel::ShowShellContextMenu(std::wstring const& pathname, CPoint point)
     {
-#pragma message(_TODO("Implementation"))
+// ##TODO: Implementation"))
         //Fl::List files;
         //files.PushBack(Fl::Entry::MakeStringEntry(pathname));
         //
@@ -339,13 +339,13 @@ namespace Twins
 
     void Panel::AddCurrentPathToBookmarks() 
     {
-#pragma message(_TODO("Implementation"))
+// ##TODO: Implementation"))
         _NotImplementedYet(_LS(StrId_Addpathtobookmarks)); 
     }
 
     void Panel::RunViewer()
     {
-#pragma message(_TODO("Implementation"))
+// ##TODO: Implementation"))
         _NotImplementedYet(_LS(StrId_View)); 
     }
 
