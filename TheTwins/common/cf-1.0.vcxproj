@@ -1,0 +1,619 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|Win32">
+      <Configuration>debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="product|Win32">
+      <Configuration>product</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="product|x64">
+      <Configuration>product</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|Win32">
+      <Configuration>release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>cf-1.0</ProjectName>
+    <ProjectGuid>{ADF33881-BA12-46F2-A5FC-1A05F4185917}</ProjectGuid>
+    <RootNamespace>unittests</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfAtl>false</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='product|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfAtl>Dynamic</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfAtl>Dynamic</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfAtl>false</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='product|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfAtl>Dynamic</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfAtl>Dynamic</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='product|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='product|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='product|Win32'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='product|Win32'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='product|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='product|x64'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='product|x64'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='product|x64'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='product|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='release|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='product|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='product|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='product|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='release|x64'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='product|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='product|x64'" />
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='product|Win32'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='product|x64'">false</GenerateManifest>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">.;../WTL81_12085/Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(BOOST_ROOT);.;../WTL81_12085/Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product|Win32'">.;../WTL81_12085/Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='debug|x64'">.;../WTL81_12085/Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(BOOST_ROOT);.;../WTL81_12085/Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product|x64'">.;../WTL81_12085/Include;$(IncludePath)</IncludePath>
+    <SourcePath Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(SourcePath)</SourcePath>
+    <SourcePath Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(SourcePath)</SourcePath>
+    <SourcePath Condition="'$(Configuration)|$(Platform)'=='product|Win32'">$(SourcePath)</SourcePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(BOOST_LIB32);$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='product|Win32'">$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(BOOST_LIB64);$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='product|x64'">$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;WCDAFX_DLL_BUILD;JSON_DLL_BUILD;_WINDOWS;_DLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(OutDir)$(ProjectName).map</MapFileName>
+      <MapExports>true</MapExports>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>rem xcopy /F/Y "$(TargetPath)" "\\XP32\BIN0\"
+rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;_ATL_NO_DEFAULT_LIBS;BOOST_DYN_LINK;WCDAFX_DLL_BUILD;JSON_DLL_BUILD;WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='product|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;WCDAFX_DLL_BUILD;JSON_DLL_BUILD;_WINDOWS;_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;WCDAFX_DLL_BUILD;JSON_DLL_BUILD;_WINDOWS;_DLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(OutDir)$(ProjectName).map</MapFileName>
+      <MapExports>true</MapExports>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;_ATL_NO_DEFAULT_LIBS;BOOST_DYN_LINK;WCDAFX_DLL_BUILD;JSON_DLL_BUILD;WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='product|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;WCDAFX_DLL_BUILD;JSON_DLL_BUILD;_WINDOWS;_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="boost.assertion_failed.cpp" />
+    <ClCompile Include="color.stuff.cpp" />
+    <ClCompile Include="crash.report\crash.report.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="crash.report\crash.report.impl.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="crash.report\debug.output.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="crash.report\run.context.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="crash.report\run.context.info.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="crash.report\stack.walker.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="crash.report\string.buffer.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\dev.assist.cpp" />
+    <ClCompile Include="dh.timer.cpp" />
+    <ClCompile Include="dh.tracing.cpp" />
+    <ClCompile Include="dialogz.basic.cpp" />
+    <ClCompile Include="dialogz.messagebox.cpp" />
+    <ClCompile Include="dir.manager.cpp" />
+    <ClCompile Include="fs.links.cpp" />
+    <ClCompile Include="gdi+.animation.cpp" />
+    <ClCompile Include="gdi+.image.ptr.cpp" />
+    <ClCompile Include="info\runtime.information.cpp" />
+    <ClCompile Include="json\json_reader.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="json\json_value.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="json\json_writer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="null.pointee.cpp" />
+    <ClCompile Include="reflection\ref.var.cpp" />
+    <ClCompile Include="reflection\ref.var.list.cpp" />
+    <ClCompile Include="settings.cpp" />
+    <ClCompile Include="shell.imagelist.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="wcdafx.api.cpp" />
+    <ClCompile Include="win-5-6-7.features.cpp" />
+    <ClCompile Include="windows.gdi.base.cpp" />
+    <ClCompile Include="windows.popup.hint.cpp" />
+    <ClCompile Include="windows.resource.custom.cpp" />
+    <ClCompile Include="windows.resource.data.cpp" />
+    <ClCompile Include="windows.uses.gdi+.cpp" />
+    <ClCompile Include="windows.wtl.buffered.paint.cpp" />
+    <ClCompile Include="wtl.colorizer.cpp" />
+    <ClCompile Include="wtl.column.tree.cpp" />
+    <ClCompile Include="wtl.combobox.cpp" />
+    <ClCompile Include="wtl.cool.menu.bar.cpp" />
+    <ClCompile Include="wtl.scrollbar.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cf-resources\resource.h" />
+    <ClInclude Include="cf.windef.target.h" />
+    <ClInclude Include="color.stuff.h" />
+    <ClInclude Include="crash.report\app.entry.adapters.h" />
+    <ClInclude Include="crash.report\crash.report.h" />
+    <ClInclude Include="crash.report\crash.report.hxx" />
+    <ClInclude Include="crash.report\debug.output.h" />
+    <ClInclude Include="crash.report\exception.h" />
+    <ClInclude Include="crash.report\run.context.h" />
+    <ClInclude Include="crash.report\run.context.info.h" />
+    <ClInclude Include="crash.report\stack.walker.h" />
+    <ClInclude Include="crash.report\string.buffer.h" />
+    <ClInclude Include="dev.assistance\dev.assist.h" />
+    <ClInclude Include="dev.assistance\list.view.exstyles.h" />
+    <ClInclude Include="dev.assistance\list.view.styles.h" />
+    <ClInclude Include="dev.assistance\notify.codes.h" />
+    <ClInclude Include="dev.assistance\virtual.keys.consts.h" />
+    <ClInclude Include="dev.assistance\window.messages.consts.h" />
+    <ClInclude Include="dh.timer.h" />
+    <ClInclude Include="dh.tracing.h" />
+    <ClInclude Include="dialogz.basic.h" />
+    <ClInclude Include="dialogz.messagebox.h" />
+    <ClInclude Include="dialogz.types.h" />
+    <ClInclude Include="dir.manager.h" />
+    <ClInclude Include="exceptions.any.h" />
+    <ClInclude Include="exceptions.any.unittest.h" />
+    <ClInclude Include="fs.links.h" />
+    <ClInclude Include="gdi+.animation.h" />
+    <ClInclude Include="gdi+.image.ptr.h" />
+    <ClInclude Include="gdi+.paint.args.h" />
+    <ClInclude Include="gdi.autopaint.dc.h" />
+    <ClInclude Include="generic.div.h" />
+    <ClInclude Include="generic.increment.h" />
+    <ClInclude Include="gl.cube.h" />
+    <ClInclude Include="gl.torus.h" />
+    <ClInclude Include="gl.view.h" />
+    <ClInclude Include="history.deque.h" />
+    <ClInclude Include="info\runtime.information.h" />
+    <ClInclude Include="json\autolink.h" />
+    <ClInclude Include="json\config.h" />
+    <ClInclude Include="json\features.h" />
+    <ClInclude Include="json\forwards.h" />
+    <ClInclude Include="json\json.h" />
+    <ClInclude Include="json\json_batchallocator.h" />
+    <ClInclude Include="json\reader.h" />
+    <ClInclude Include="json\value.h" />
+    <ClInclude Include="json\writer.h" />
+    <ClInclude Include="keyboard.extra.h" />
+    <ClInclude Include="large.progress.h" />
+    <ClInclude Include="map.or.unordered_map.h" />
+    <ClInclude Include="null.pointee.h" />
+    <ClInclude Include="rect.aspect.ratio.h" />
+    <ClInclude Include="rect.gdi+.h" />
+    <ClInclude Include="rect.putinto.h" />
+    <ClInclude Include="rect.screen.h" />
+    <ClInclude Include="reflection\ref.brush.h" />
+    <ClInclude Include="reflection\ref.logfont.h" />
+    <ClInclude Include="reflection\ref.object.h" />
+    <ClInclude Include="reflection\ref.pen.h" />
+    <ClInclude Include="reflection\ref.pod.array.h" />
+    <ClInclude Include="reflection\ref.rect.h" />
+    <ClInclude Include="reflection\ref.serialization.h" />
+    <ClInclude Include="reflection\ref.std.h" />
+    <ClInclude Include="reflection\ref.std.streaming.h" />
+    <ClInclude Include="reflection\ref.var.h" />
+    <ClInclude Include="reflection\ref.var.list.h" />
+    <ClInclude Include="render.conveyor.h" />
+    <ClInclude Include="render.element.h" />
+    <ClInclude Include="rubbish.heap.h" />
+    <ClInclude Include="settings.details.h" />
+    <ClInclude Include="settings.h" />
+    <ClInclude Include="shell.imagelist.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="string.hp.h" />
+    <ClInclude Include="string.shared.allocator.h" />
+    <ClInclude Include="string.utils.env.vars.h" />
+    <ClInclude Include="string.utils.error.code.h" />
+    <ClInclude Include="string.utils.format.h" />
+    <ClInclude Include="string.utils.human.size.h" />
+    <ClInclude Include="string.utils.native.adopt.h" />
+    <ClInclude Include="string.utils.tchar.h" />
+    <ClInclude Include="string.utils.wide2multi.multi2wide.hxx" />
+    <ClInclude Include="todo.fixme.etc.h" />
+    <ClInclude Include="tpoint.h" />
+    <ClInclude Include="trect.h" />
+    <ClInclude Include="wcdafx.api.h" />
+    <ClInclude Include="win-5-6-7.features.h" />
+    <ClInclude Include="windows.error.h" />
+    <ClInclude Include="windows.gdi.base.h" />
+    <ClInclude Include="windows.gdi.rects.h" />
+    <ClInclude Include="windows.gui.leaks.h" />
+    <ClInclude Include="windows.icons.h" />
+    <ClInclude Include="windows.module.helpers.h" />
+    <ClInclude Include="windows.popup.hint.h" />
+    <ClInclude Include="windows.resource.custom.h" />
+    <ClInclude Include="windows.resource.data.h" />
+    <ClInclude Include="windows.uses.com.h" />
+    <ClInclude Include="windows.uses.commoncontrols.h" />
+    <ClInclude Include="windows.uses.gdi+.h" />
+    <ClInclude Include="windows.uses.ole.h" />
+    <ClInclude Include="windows.uses.richedit.h" />
+    <ClInclude Include="windows.wtl.aero.h" />
+    <ClInclude Include="windows.wtl.buffered.paint.h" />
+    <ClInclude Include="windows.wtl.message.h" />
+    <ClInclude Include="windows.wtl.popup.menus.h" />
+    <ClInclude Include="windows.wtl.tooltip.dialog.h" />
+    <ClInclude Include="windows.wtl.win.h" />
+    <ClInclude Include="wtl.colorizer.control.details.h" />
+    <ClInclude Include="wtl.colorizer.control.h" />
+    <ClInclude Include="wtl.colorizer.control.specific.h" />
+    <ClInclude Include="wtl.colorizer.h" />
+    <ClInclude Include="wtl.colorizer.helpers.h" />
+    <ClInclude Include="wtl.colorizer.inline.h" />
+    <ClInclude Include="wtl.column.tree.h" />
+    <ClInclude Include="wtl.combobox.h" />
+    <ClInclude Include="wtl.controls.helpers.h" />
+    <ClInclude Include="wtl.cool.menu.bar.h" />
+    <ClInclude Include="wtl.scrollbar.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cf-1.0.def" />
+    <None Include="json\AUTHORS" />
+    <None Include="json\json_internalarray.inl" />
+    <None Include="json\json_internalmap.inl" />
+    <None Include="json\json_valueiterator.inl" />
+    <None Include="json\LICENSE" />
+    <None Include="json\version" />
+    <None Include="reflection\ref.var.inl" />
+    <None Include="reflection\ref.var.list.inl" />
+    <None Include="reflection\ref.var.list.serialization.inl" />
+    <None Include="reflection\ref.var.list.streaming.inl" />
+    <None Include="reflection\ref.var.serialization.inl" />
+    <None Include="reflection\ref.var.streaming.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="json\README.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="cf-resources\cf-res.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="cf-resources\cheks.bmp" />
+    <Image Include="cf-resources\menuimg-pro24.bmp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

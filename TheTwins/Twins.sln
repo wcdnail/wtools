@@ -1,0 +1,75 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "twins", "twins\twins12.vcxproj", "{66A45253-10FB-4433-949F-B21B33998F96}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6B24C0A3-C8C6-452E-A4ED-A4B32348F4D5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "exa", "exa", "{0F99B1CB-4FDE-44D3-8A7F-27DC01E772D9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{6BCB656B-7688-4BD4-906D-D8C935217133}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "twins.langs", "twins.langs\twins.langs.vcxproj", "{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cf-1.0", "common\cf-1.0.vcxproj", "{ADF33881-BA12-46F2-A5FC-1A05F4185917}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug|Win32 = debug|Win32
+		debug|x64 = debug|x64
+		product|Win32 = product|Win32
+		product|x64 = product|x64
+		release|Win32 = release|Win32
+		release|x64 = release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66A45253-10FB-4433-949F-B21B33998F96}.debug|Win32.ActiveCfg = debug|Win32
+		{66A45253-10FB-4433-949F-B21B33998F96}.debug|Win32.Build.0 = debug|Win32
+		{66A45253-10FB-4433-949F-B21B33998F96}.debug|x64.ActiveCfg = debug|x64
+		{66A45253-10FB-4433-949F-B21B33998F96}.debug|x64.Build.0 = debug|x64
+		{66A45253-10FB-4433-949F-B21B33998F96}.product|Win32.ActiveCfg = product|Win32
+		{66A45253-10FB-4433-949F-B21B33998F96}.product|Win32.Build.0 = product|Win32
+		{66A45253-10FB-4433-949F-B21B33998F96}.product|x64.ActiveCfg = product|x64
+		{66A45253-10FB-4433-949F-B21B33998F96}.product|x64.Build.0 = product|x64
+		{66A45253-10FB-4433-949F-B21B33998F96}.release|Win32.ActiveCfg = release|Win32
+		{66A45253-10FB-4433-949F-B21B33998F96}.release|Win32.Build.0 = release|Win32
+		{66A45253-10FB-4433-949F-B21B33998F96}.release|x64.ActiveCfg = release|x64
+		{66A45253-10FB-4433-949F-B21B33998F96}.release|x64.Build.0 = release|x64
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.debug|Win32.ActiveCfg = debug|Win32
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.debug|Win32.Build.0 = debug|Win32
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.debug|x64.ActiveCfg = debug|x64
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.debug|x64.Build.0 = debug|x64
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.product|Win32.ActiveCfg = product|Win32
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.product|Win32.Build.0 = product|Win32
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.product|x64.ActiveCfg = product|x64
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.product|x64.Build.0 = product|x64
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.release|Win32.ActiveCfg = release|Win32
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.release|Win32.Build.0 = release|Win32
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.release|x64.ActiveCfg = release|x64
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}.release|x64.Build.0 = release|x64
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.debug|Win32.ActiveCfg = debug|Win32
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.debug|Win32.Build.0 = debug|Win32
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.debug|x64.ActiveCfg = debug|x64
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.debug|x64.Build.0 = debug|x64
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.product|Win32.ActiveCfg = product|Win32
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.product|Win32.Build.0 = product|Win32
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.product|x64.ActiveCfg = product|x64
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.product|x64.Build.0 = product|x64
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.release|Win32.ActiveCfg = release|Win32
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.release|Win32.Build.0 = release|Win32
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.release|x64.ActiveCfg = release|x64
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.release|x64.Build.0 = release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8} = {6B24C0A3-C8C6-452E-A4ED-A4B32348F4D5}
+		{ADF33881-BA12-46F2-A5FC-1A05F4185917} = {6B24C0A3-C8C6-452E-A4ED-A4B32348F4D5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {52EAB33F-CB26-436F-A1A4-74E299706ADD}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "twins-c", "twins.c\twins.c.vcxproj", "{66E27AA1-3A33-42C7-A269-7A23E5A897FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug|Win32 = debug|Win32
+		debug|x64 = debug|x64
+		product|Win32 = product|Win32
+		product|x64 = product|x64
+		release|Win32 = release|Win32
+		release|x64 = release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.debug|Win32.ActiveCfg = Debug|Win32
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.debug|Win32.Build.0 = Debug|Win32
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.debug|x64.ActiveCfg = debug|x64
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.debug|x64.Build.0 = debug|x64
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.product|Win32.ActiveCfg = product|Win32
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.product|Win32.Build.0 = product|Win32
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.product|x64.ActiveCfg = product|x64
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.product|x64.Build.0 = product|x64
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.release|Win32.ActiveCfg = release|Win32
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.release|Win32.Build.0 = release|Win32
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.release|x64.ActiveCfg = release|x64
+		{66E27AA1-3A33-42C7-A269-7A23E5A897FD}.release|x64.Build.0 = release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

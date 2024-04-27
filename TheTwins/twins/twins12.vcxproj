@@ -1,0 +1,668 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|Win32">
+      <Configuration>debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="product|Win32">
+      <Configuration>product</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="product|x64">
+      <Configuration>product</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|Win32">
+      <Configuration>release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>twins</ProjectName>
+    <ProjectGuid>{66A45253-10FB-4433-949F-B21B33998F96}</ProjectGuid>
+    <RootNamespace>Twins</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfAtl>false</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='product|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfAtl>false</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfAtl>false</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfAtl>false</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='product|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfAtl>false</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfAtl>false</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='product|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='product|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">false</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='product|Win32'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='product|Win32'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='product|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='product|Win32'">false</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='product|x64'">$(SolutionDir)_bin\$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='product|x64'">$(SolutionDir)_bin\_int\$(ProjectName).$(PlatformShortName).$(Configuration).int\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='product|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='product|x64'">false</GenerateManifest>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='product|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='release|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='product|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='product|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='product|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='release|x64'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='product|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='product|x64'" />
+    <SourcePath Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(SourcePath)</SourcePath>
+    <SourcePath Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(SourcePath)</SourcePath>
+    <SourcePath Condition="'$(Configuration)|$(Platform)'=='product|Win32'">$(SourcePath)</SourcePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product|Win32'">$(IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(BOOST_ROOT);$(IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product|x64'">$(IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(BOOST_ROOT);$(IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='product|Win32'">$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(BOOST_LIB32);$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(VSInstallDir)SDK\v2.0\lib\amd64;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='product|x64'">$(VSInstallDir)SDK\v2.0\lib\amd64;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(BOOST_LIB64);$(VSInstallDir)SDK\v2.0\lib\amd64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_ATL_NO_DEFAULT_LIBS;BOOST_DYN_LINK;WCDAFX_DLL;JSON_DLL;WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
+      <AdditionalOptions>-Zm256 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ManifestFile>
+      </ManifestFile>
+      <EnableUAC>false</EnableUAC>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AllowIsolation>true</AllowIsolation>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>do.post.build.action.cmd "$(ProjectDir)" "$(OutDir)" $(PlatformArchitecture) $(Configuration)</Command>
+      <Message>
+      </Message>
+    </PostBuildEvent>
+    <Xdcmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Xdcmake>
+    <Xdcmake>
+      <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
+    </Xdcmake>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_ATL_NO_DEFAULT_LIBS;BOOST_DYN_LINK;WCDAFX_DLL;JSON_DLL;WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnablePREfast>false</EnablePREfast>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
+      <AdditionalOptions>-Zm256 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ManifestFile>
+      </ManifestFile>
+      <EnableUAC>false</EnableUAC>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AllowIsolation>true</AllowIsolation>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>do.post.build.action.cmd "$(ProjectDir)" "$(OutDir)" $(PlatformArchitecture) $(Configuration)</Command>
+    </PostBuildEvent>
+    <Xdcmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Xdcmake>
+    <Xdcmake>
+      <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
+    </Xdcmake>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;_ATL_NO_DEFAULT_LIBS;BOOST_DYN_LINK;WCDAFX_DLL;JSON_DLL;WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
+      <AdditionalOptions>-Zm256 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ManifestFile>
+      </ManifestFile>
+      <EnableUAC>false</EnableUAC>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AllowIsolation>true</AllowIsolation>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>do.post.build.action.cmd "$(ProjectDir)" "$(OutDir)" $(PlatformArchitecture) $(Configuration)</Command>
+    </PostBuildEvent>
+    <Xdcmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Xdcmake>
+    <Xdcmake>
+      <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
+    </Xdcmake>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='product|Win32'">
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_ATL_NO_DEFAULT_LIBS;BOOST_DYN_LINK;WCDAFX_DLL;JSON_DLL;WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
+      <AdditionalOptions>-Zm256 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ManifestFile>
+      </ManifestFile>
+      <EnableUAC>false</EnableUAC>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AllowIsolation>true</AllowIsolation>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>do.post.build.action.cmd "$(ProjectDir)" "$(OutDir)" $(PlatformArchitecture) $(Configuration)</Command>
+    </PostBuildEvent>
+    <Xdcmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Xdcmake>
+    <Xdcmake>
+      <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
+    </Xdcmake>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;_ATL_NO_DEFAULT_LIBS;BOOST_DYN_LINK;WCDAFX_DLL;JSON_DLL;WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
+      <AdditionalOptions>-Zm256 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ManifestFile>
+      </ManifestFile>
+      <EnableUAC>false</EnableUAC>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AllowIsolation>true</AllowIsolation>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>do.post.build.action.cmd "$(ProjectDir)" "$(OutDir)" $(PlatformArchitecture) $(Configuration)</Command>
+    </PostBuildEvent>
+    <Xdcmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Xdcmake>
+    <Xdcmake>
+      <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
+    </Xdcmake>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='product|x64'">
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_ATL_NO_DEFAULT_LIBS;BOOST_DYN_LINK;WCDAFX_DLL;JSON_DLL;WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
+      <CallingConvention>FastCall</CallingConvention>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <AdditionalOptions>-Zm256 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ManifestFile>
+      </ManifestFile>
+      <EnableUAC>false</EnableUAC>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AllowIsolation>true</AllowIsolation>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PostBuildEvent>
+      <Command>do.post.build.action.cmd "$(ProjectDir)" "$(OutDir)" $(PlatformArchitecture) $(Configuration)</Command>
+    </PostBuildEvent>
+    <Xdcmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Xdcmake>
+    <Xdcmake>
+      <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
+    </Xdcmake>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="config\layout\common.css" />
+    <None Include="config\layout\start.page.html" />
+    <None Include="do.post.build.action.cmd" />
+    <None Include="res\cursors\drop-multiple.cur" />
+    <None Include="res\cursors\drop-no.cur" />
+    <None Include="res\cursors\drop-single.cur" />
+    <None Include="res\icons\cancel.ico" />
+    <None Include="res\icons\confirm.ico" />
+    <None Include="res\icons\floppy.ico" />
+    <None Include="res\icons\hdr_asc.ico" />
+    <None Include="res\icons\hdr_desc.ico" />
+    <None Include="res\icons\link_overlay.ico" />
+    <None Include="res\icons\upper-dir.ico" />
+    <None Include="res\main.frame.ico" />
+    <None Include="res\main.frame.toolbar.bmp" />
+    <None Include="texts\Twins-ExA-TODO-List.docx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\managed.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="basic.entry.h" />
+    <ClInclude Include="basic.enumerator.h" />
+    <ClInclude Include="command.line.h" />
+    <ClInclude Include="dialogz.app.about.h" />
+    <ClInclude Include="iconoz.h" />
+    <ClInclude Include="options.page.h" />
+    <ClInclude Include="options.all.pages.h" />
+    <ClInclude Include="dialogz.options.h" />
+    <ClInclude Include="dialogz.file.additional.h" />
+    <ClInclude Include="dialogz.file.progress.h" />
+    <ClInclude Include="dialogz.file.prompt.h" />
+    <ClInclude Include="dialogz.file.replace.h" />
+    <ClInclude Include="dialogz.find.h" />
+    <ClInclude Include="dialogz.search.text.h" />
+    <ClInclude Include="dnd.dataobject.h" />
+    <ClInclude Include="dnd.dropsource.h" />
+    <ClInclude Include="dnd.droptarget.h" />
+    <ClInclude Include="dnd.enumformat.h" />
+    <ClInclude Include="file.copy.h" />
+    <ClInclude Include="file.delete.h" />
+    <ClInclude Include="file.list.sort.h" />
+    <ClInclude Include="file.move.h" />
+    <ClInclude Include="file.operation.base.h" />
+    <ClInclude Include="file.operation.generic.h" />
+    <ClInclude Include="file.operation.types.h" />
+    <ClInclude Include="file.viewer.buffer.h" />
+    <ClInclude Include="file.viewer.h" />
+    <ClInclude Include="file.viewer.types.h" />
+    <ClInclude Include="file.viewer.view.h" />
+    <ClInclude Include="ntfs.links.h" />
+    <ClInclude Include="dialogz.common.h" />
+    <ClInclude Include="dialogz.name.h" />
+    <ClInclude Include="dialogz.selunsel.h" />
+    <ClInclude Include="directory.watch.h" />
+    <ClInclude Include="directory.watch.misc.h" />
+    <ClInclude Include="directory.watch.notify.h" />
+    <ClInclude Include="drive.bar.h" />
+    <ClInclude Include="drive.enum.h" />
+    <ClInclude Include="drive.info.h" />
+    <ClInclude Include="file.entry.h" />
+    <ClInclude Include="file.list.h" />
+    <ClInclude Include="keyboard.h" />
+    <ClInclude Include="panel.h" />
+    <ClInclude Include="panel.view.columns.h" />
+    <ClInclude Include="panel.view.dnd.h" />
+    <ClInclude Include="panel.view.header.h" />
+    <ClInclude Include="panel.view.item.h" />
+    <ClInclude Include="panel.view.scanner.h" />
+    <ClInclude Include="panel.view.sort.h" />
+    <ClInclude Include="path.bar.h" />
+    <ClInclude Include="panel.scroll.h" />
+    <ClInclude Include="shell.helpers.h" />
+    <ClInclude Include="shell.menus.h" />
+    <ClInclude Include="shell.menus.impl.h" />
+    <ClInclude Include="status.bar.ex.h" />
+    <ClInclude Include="tab.bar.h" />
+    <ClInclude Include="tab.bar.item.h" />
+    <ClInclude Include="panel.view.h" />
+    <ClInclude Include="panel.view.misc.h" />
+    <ClInclude Include="panel.view.edit.h" />
+    <ClInclude Include="panel.view.quicksearch.h" />
+    <ClInclude Include="panel.view.selecting.h" />
+    <ClInclude Include="panel.view.status.h" />
+    <ClInclude Include="res\resource.h" />
+    <ClInclude Include="extern.item.h" />
+    <ClInclude Include="extern.run.h" />
+    <ClInclude Include="status.ui.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="command.h" />
+    <ClInclude Include="command.ids.h" />
+    <ClInclude Include="command.key.ids.h" />
+    <ClInclude Include="commands.h" />
+    <ClInclude Include="twins.funcs.h" />
+    <ClInclude Include="twins.h" />
+    <ClInclude Include="twins.main.frame.h" />
+    <ClInclude Include="twins.state.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='product|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='product|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="res\twins.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="basic.entry.cpp" />
+    <ClCompile Include="basic.enumerator.cpp" />
+    <ClCompile Include="command.line.cpp" />
+    <ClCompile Include="dialogz.app.about.cpp" />
+    <ClCompile Include="iconoz.cpp" />
+    <ClCompile Include="options.page.cpp" />
+    <ClCompile Include="options.all.pages.cpp" />
+    <ClCompile Include="dialogz.options.cpp" />
+    <ClCompile Include="dialogz.file.additional.cpp" />
+    <ClCompile Include="dialogz.file.progress.cpp" />
+    <ClCompile Include="dialogz.file.prompt.cpp" />
+    <ClCompile Include="dialogz.file.replace.cpp" />
+    <ClCompile Include="dialogz.find.cpp" />
+    <ClCompile Include="dialogz.search.text.cpp" />
+    <ClCompile Include="dnd.dataobject.cpp" />
+    <ClCompile Include="dnd.dropsource.cpp" />
+    <ClCompile Include="dnd.droptarget.cpp" />
+    <ClCompile Include="dnd.enumformat.cpp" />
+    <ClCompile Include="file.copy.cpp" />
+    <ClCompile Include="file.delete.cpp" />
+    <ClCompile Include="file.list.sort.cpp" />
+    <ClCompile Include="file.move.cpp" />
+    <ClCompile Include="file.operation.base.cpp" />
+    <ClCompile Include="file.operation.generic.cpp" />
+    <ClCompile Include="file.viewer.buffer.cpp" />
+    <ClCompile Include="file.viewer.cpp" />
+    <ClCompile Include="file.viewer.view.cpp" />
+    <ClCompile Include="ntfs.links.cpp" />
+    <ClCompile Include="dialogz.common.cpp" />
+    <ClCompile Include="dialogz.name.cpp" />
+    <ClCompile Include="dialogz.selunsel.cpp" />
+    <ClCompile Include="directory.watch.cpp" />
+    <ClCompile Include="directory.watch.notify.cpp" />
+    <ClCompile Include="drive.bar.cpp" />
+    <ClCompile Include="drive.enum.cpp" />
+    <ClCompile Include="drive.info.cpp" />
+    <ClCompile Include="file.entry.cpp" />
+    <ClCompile Include="file.list.cpp" />
+    <ClCompile Include="keyboard.cpp" />
+    <ClCompile Include="panel.cpp" />
+    <ClCompile Include="panel.view.columns.cpp" />
+    <ClCompile Include="panel.view.dnd.cpp" />
+    <ClCompile Include="panel.view.header.cpp" />
+    <ClCompile Include="panel.view.item.cpp" />
+    <ClCompile Include="panel.view.scanner.cxx" />
+    <ClCompile Include="panel.view.sort.cxx" />
+    <ClCompile Include="path.bar.cpp" />
+    <ClCompile Include="panel.scroll.cpp" />
+    <ClCompile Include="shell.helpers.cpp" />
+    <ClCompile Include="shell.menus.cpp" />
+    <ClCompile Include="shell.menus.impl.cpp" />
+    <ClCompile Include="status.bar.ex.cpp" />
+    <ClCompile Include="tab.bar.cpp" />
+    <ClCompile Include="tab.bar.item.cpp" />
+    <ClCompile Include="panel.view.cpp" />
+    <ClCompile Include="panel.view.edit.cpp" />
+    <ClCompile Include="panel.view.quicksearch.cpp" />
+    <ClCompile Include="panel.view.selecting.cpp" />
+    <ClCompile Include="panel.view.status.cpp" />
+    <ClCompile Include="extern.item.cpp" />
+    <ClCompile Include="extern.run.cpp" />
+    <ClCompile Include="rubbish.heap.cxx" />
+    <ClCompile Include="status.ui.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="command.cpp" />
+    <ClCompile Include="commands.cpp" />
+    <ClCompile Include="twins.cpp" />
+    <ClCompile Include="twins.funcs.cpp" />
+    <ClCompile Include="twins.main.frame.cpp" />
+    <ClCompile Include="twins.main.frame.menu.cpp" />
+    <ClCompile Include="twins.state.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='product|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='product|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="win.main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\appconf.bar.bmp" />
+    <Image Include="res\icons\stock-cdrom.ico" />
+    <Image Include="res\icons\stock-fixed-disk.ico" />
+    <Image Include="res\icons\stock-floppy-disk.ico" />
+    <Image Include="res\icons\stock-hdd.ico" />
+    <Image Include="res\icons\stock-my-computer.ico" />
+    <Image Include="res\icons\stock-overlay1.ico" />
+    <Image Include="res\icons\stock-shared-folder.ico" />
+    <Image Include="res\logoz.twins.babys.bmp" />
+    <Image Include="res\treebtns.bmp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

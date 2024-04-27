@@ -1,0 +1,24 @@
+109 - clean, UI ready.
+
+110 - drives combo ready.
+
+111 - ui resource storage added.
+
+115 - drives buttons and comboz ready
+
+117 - sync drive selection ok.
+
+118 - Disks free space output
+
+128 - Нормальный кеш иконов, Извлечение иконы из exe!
+
+137 - Отмена загрузки, и прерывание потока загрузки. Кнопки перехода работают. Загрузка без кеширования.
+
+138 - Icon cache reverted - reason: too slow. Standart icons only.
+
+224 - Панели и контролы переписаны;
+    - Глобальный обработчки клавы (через хук);
+    - Отрефакторена конфигурация;
+    - Обновлен Afx;
+    - Загрузка списка файлов пока не реализована;
+

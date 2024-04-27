@@ -1,0 +1,578 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{dc864451-d6fa-463e-a603-7f28c5019f2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager">
+      <UniqueIdentifier>{842c4768-7a2c-4f17-9548-0764959c03eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\controls">
+      <UniqueIdentifier>{38c8c796-b751-45af-9fa6-bdd3296d9ae4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\hard%27n%27soft">
+      <UniqueIdentifier>{5ee8932a-1359-4276-ab90-d95c6b78400c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\keyboard">
+      <UniqueIdentifier>{7df2d9db-b2a4-4d5e-ab95-e804706bac91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res\pixmaps">
+      <UniqueIdentifier>{ee96165b-a08a-41e1-88e4-56a21418f86f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res\icons">
+      <UniqueIdentifier>{8dec9be2-50c4-4c73-b81b-346a4909d7e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\dialogz">
+      <UniqueIdentifier>{67025094-5152-470c-8a23-5ecc4267fa20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\config">
+      <UniqueIdentifier>{039b7105-554f-4f4f-9120-f2fe967debcb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\commands">
+      <UniqueIdentifier>{fd2456ff-58af-4747-8e3b-aa88a8c5e16a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\shell">
+      <UniqueIdentifier>{62ea08d7-87df-414f-be74-14bd7bac2a29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\viewer">
+      <UniqueIdentifier>{8e4d934c-ea4c-4e24-a96f-52e6981da0ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\drag%27n%27drop">
+      <UniqueIdentifier>{de79b109-dc88-46bf-a1fc-809392f6fe27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res\cursors">
+      <UniqueIdentifier>{d34f326e-999f-4d8c-8d59-15c71dacc0e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\config\dialogz">
+      <UniqueIdentifier>{440f842a-2984-48c3-962f-1fc437fd1de0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deploy">
+      <UniqueIdentifier>{92381c3d-b523-4571-82e9-ac8ed3cac6c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\config\layout">
+      <UniqueIdentifier>{a08a4815-9c56-4c9e-80bb-c9b95668e116}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filemanager\shell\operations">
+      <UniqueIdentifier>{731398e4-2e30-447a-9a03-5613e860854a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="texts">
+      <UniqueIdentifier>{69f2e35a-28ce-4d82-b0fc-d6fa74f93362}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\main.frame.toolbar.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\icons\floppy.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\icons\upper-dir.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\icons\link_overlay.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\icons\confirm.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\icons\cancel.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\main.frame.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\icons\hdr_asc.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\icons\hdr_desc.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\cursors\drop-multiple.cur">
+      <Filter>res\cursors</Filter>
+    </None>
+    <None Include="res\cursors\drop-single.cur">
+      <Filter>res\cursors</Filter>
+    </None>
+    <None Include="res\cursors\drop-no.cur">
+      <Filter>res\cursors</Filter>
+    </None>
+    <None Include="do.post.build.action.cmd">
+      <Filter>deploy</Filter>
+    </None>
+    <None Include="config\layout\start.page.html">
+      <Filter>filemanager\config\layout</Filter>
+    </None>
+    <None Include="config\layout\common.css">
+      <Filter>filemanager\config\layout</Filter>
+    </None>
+    <None Include="texts\Twins-ExA-TODO-List.docx">
+      <Filter>texts</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\managed.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="res\resource.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="status.ui.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.scroll.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="drive.bar.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="drive.enum.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboard.h">
+      <Filter>filemanager\keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="drive.info.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="twins.main.frame.h" />
+    <ClInclude Include="twins.state.h" />
+    <ClInclude Include="command.h">
+      <Filter>filemanager\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="command.ids.h">
+      <Filter>filemanager\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="command.key.ids.h">
+      <Filter>filemanager\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="commands.h">
+      <Filter>filemanager\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="extern.run.h">
+      <Filter>filemanager\shell\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.common.h">
+      <Filter>filemanager\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.name.h">
+      <Filter>filemanager\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.edit.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.quicksearch.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.selecting.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.status.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.selunsel.h">
+      <Filter>filemanager\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="directory.watch.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="directory.watch.misc.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="directory.watch.notify.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="extern.item.h">
+      <Filter>filemanager\shell\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="path.bar.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="tab.bar.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="tab.bar.item.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.misc.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="shell.menus.h">
+      <Filter>filemanager\shell</Filter>
+    </ClInclude>
+    <ClInclude Include="shell.menus.impl.h">
+      <Filter>filemanager\shell</Filter>
+    </ClInclude>
+    <ClInclude Include="file.list.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="file.entry.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="file.list.sort.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.file.additional.h">
+      <Filter>filemanager\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.file.prompt.h">
+      <Filter>filemanager\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.file.replace.h">
+      <Filter>filemanager\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="file.copy.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="file.delete.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="file.operation.generic.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="file.operation.types.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.file.progress.h">
+      <Filter>filemanager\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="file.move.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="file.operation.base.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="file.viewer.view.h">
+      <Filter>filemanager\viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="file.viewer.buffer.h">
+      <Filter>filemanager\viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="file.viewer.h">
+      <Filter>filemanager\viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="file.viewer.types.h">
+      <Filter>filemanager\viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.dnd.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="dnd.dataobject.h">
+      <Filter>filemanager\drag%27n%27drop</Filter>
+    </ClInclude>
+    <ClInclude Include="dnd.dropsource.h">
+      <Filter>filemanager\drag%27n%27drop</Filter>
+    </ClInclude>
+    <ClInclude Include="dnd.droptarget.h">
+      <Filter>filemanager\drag%27n%27drop</Filter>
+    </ClInclude>
+    <ClInclude Include="dnd.enumformat.h">
+      <Filter>filemanager\drag%27n%27drop</Filter>
+    </ClInclude>
+    <ClInclude Include="status.bar.ex.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="command.line.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.find.h">
+      <Filter>filemanager\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="basic.entry.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="basic.enumerator.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="ntfs.links.h">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.search.text.h">
+      <Filter>filemanager\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.app.about.h">
+      <Filter>filemanager\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.options.h">
+      <Filter>filemanager\config\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="options.page.h">
+      <Filter>filemanager\config\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="options.all.pages.h">
+      <Filter>filemanager\config\dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="iconoz.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.item.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.scanner.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.sort.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.columns.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="panel.view.header.h">
+      <Filter>filemanager\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="twins.h" />
+    <ClInclude Include="shell.helpers.h">
+      <Filter>filemanager\shell</Filter>
+    </ClInclude>
+    <ClInclude Include="twins.funcs.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="res\twins.exe.manifest">
+      <Filter>res</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="win.main.cpp" />
+    <ClCompile Include="status.ui.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.scroll.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="drive.bar.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="drive.enum.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="keyboard.cpp">
+      <Filter>filemanager\keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="drive.info.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="twins.main.frame.cpp" />
+    <ClCompile Include="twins.state.cpp" />
+    <ClCompile Include="command.cpp">
+      <Filter>filemanager\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="commands.cpp">
+      <Filter>filemanager\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="extern.run.cpp">
+      <Filter>filemanager\shell\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.common.cpp">
+      <Filter>filemanager\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.name.cpp">
+      <Filter>filemanager\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.view.edit.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.view.quicksearch.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.view.selecting.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.view.status.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.selunsel.cpp">
+      <Filter>filemanager\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="rubbish.heap.cxx">
+      <Filter>filemanager\shell\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="directory.watch.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="directory.watch.notify.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="extern.item.cpp">
+      <Filter>filemanager\shell\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="path.bar.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="tab.bar.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="tab.bar.item.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.view.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="shell.menus.cpp">
+      <Filter>filemanager\shell</Filter>
+    </ClCompile>
+    <ClCompile Include="shell.menus.impl.cpp">
+      <Filter>filemanager\shell</Filter>
+    </ClCompile>
+    <ClCompile Include="file.list.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="file.entry.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="file.list.sort.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.file.additional.cpp">
+      <Filter>filemanager\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.file.prompt.cpp">
+      <Filter>filemanager\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.file.replace.cpp">
+      <Filter>filemanager\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="file.copy.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="file.delete.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="file.operation.generic.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.file.progress.cpp">
+      <Filter>filemanager\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="file.move.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="file.operation.base.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="file.viewer.buffer.cpp">
+      <Filter>filemanager\viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="file.viewer.cpp">
+      <Filter>filemanager\viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="file.viewer.view.cpp">
+      <Filter>filemanager\viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.view.dnd.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="dnd.dataobject.cpp">
+      <Filter>filemanager\drag%27n%27drop</Filter>
+    </ClCompile>
+    <ClCompile Include="dnd.dropsource.cpp">
+      <Filter>filemanager\drag%27n%27drop</Filter>
+    </ClCompile>
+    <ClCompile Include="dnd.droptarget.cpp">
+      <Filter>filemanager\drag%27n%27drop</Filter>
+    </ClCompile>
+    <ClCompile Include="dnd.enumformat.cpp">
+      <Filter>filemanager\drag%27n%27drop</Filter>
+    </ClCompile>
+    <ClCompile Include="status.bar.ex.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="command.line.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.find.cpp">
+      <Filter>filemanager\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="basic.entry.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="basic.enumerator.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="ntfs.links.cpp">
+      <Filter>filemanager\hard%27n%27soft</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.search.text.cpp">
+      <Filter>filemanager\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="twins.main.frame.menu.cpp" />
+    <ClCompile Include="dialogz.app.about.cpp">
+      <Filter>filemanager\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.options.cpp">
+      <Filter>filemanager\config\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="options.all.pages.cpp">
+      <Filter>filemanager\config\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="options.page.cpp">
+      <Filter>filemanager\config\dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="iconoz.cpp">
+      <Filter>res</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.view.item.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.view.scanner.cxx">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.view.sort.cxx">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.view.columns.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="panel.view.header.cpp">
+      <Filter>filemanager\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="twins.cpp" />
+    <ClCompile Include="shell.helpers.cpp">
+      <Filter>filemanager\shell</Filter>
+    </ClCompile>
+    <ClCompile Include="twins.funcs.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\icons\stock-cdrom.ico">
+      <Filter>res\icons</Filter>
+    </Image>
+    <Image Include="res\icons\stock-fixed-disk.ico">
+      <Filter>res\icons</Filter>
+    </Image>
+    <Image Include="res\icons\stock-floppy-disk.ico">
+      <Filter>res\icons</Filter>
+    </Image>
+    <Image Include="res\icons\stock-hdd.ico">
+      <Filter>res\icons</Filter>
+    </Image>
+    <Image Include="res\icons\stock-my-computer.ico">
+      <Filter>res\icons</Filter>
+    </Image>
+    <Image Include="res\icons\stock-overlay1.ico">
+      <Filter>res\icons</Filter>
+    </Image>
+    <Image Include="res\icons\stock-shared-folder.ico">
+      <Filter>res\icons</Filter>
+    </Image>
+    <Image Include="res\treebtns.bmp">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+    <Image Include="res\logoz.twins.babys.bmp">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+    <Image Include="res\appconf.bar.bmp">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="centry.cpp" />
+    <ClCompile Include="..\..\niceday\null.pointee.cpp">
+      <Filter>niceday</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\niceday\ellipsis.impl.variant.cpp">
+      <Filter>niceday</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\niceday\ellipsis.impl.writer.cpp">
+      <Filter>niceday</Filter>
+    </ClCompile>
+    <ClCompile Include="calldiv.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="caullrem.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="callrem.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="caulldiv.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="cchkstk.cpp">
+      <Filter>alloca</Filter>
+    </ClCompile>
+    <ClCompile Include="cmalloc.cpp">
+      <Filter>alloca</Filter>
+    </ClCompile>
+    <ClCompile Include="cstring.cpp">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include="cxtos.cpp">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include="cxdtos.cpp">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include="callocaprobe.cpp">
+      <Filter>alloca</Filter>
+    </ClCompile>
+    <ClCompile Include="cftol.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\niceday\debug.trace.cpp">
+      <Filter>niceday</Filter>
+    </ClCompile>
+    <ClCompile Include="cfltused.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="clldvrm.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="template.crt.h" />
+    <ClInclude Include="..\..\niceday\null.pointee.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\ellipsis.impl.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\ellipsis.impl.variant.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\ellipsis.impl.writer.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\strings.common.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\strings.xtoa.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\strings.length.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\strings.compare.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\strings.find.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\strings.type.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\strings.xftoa.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\digimagix.simple.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\strings.copy.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\ellipsis.format.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\unit.tests\ut.ellipsis.h">
+      <Filter>niceday\unit.tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\unit.tests\ut.common.h">
+      <Filter>niceday\unit.tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\ellipsis.impl.puts.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="cdefines.h" />
+    <ClInclude Include="cmalloc.h">
+      <Filter>alloca</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\unit.tests\ut.text.helpers.h">
+      <Filter>niceday\unit.tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\debug.trace.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\core.coutof.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\ellipsis.c.compat.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\niceday\strings.opposite.h">
+      <Filter>niceday</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="niceday">
+      <UniqueIdentifier>{b87560bf-8bf6-457d-ad25-fc7fb0fba435}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="niceday\unit.tests">
+      <UniqueIdentifier>{302547cc-bff7-4f63-bec3-4d018710fbd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{c3552308-f8e5-49c9-80a7-b15e1a16c1e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="alloca">
+      <UniqueIdentifier>{cd88ec4e-0c71-4c6f-b049-4e0e35859f15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="strings">
+      <UniqueIdentifier>{9ac3ed3d-234f-4fa4-8f39-b6cbc30f0334}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

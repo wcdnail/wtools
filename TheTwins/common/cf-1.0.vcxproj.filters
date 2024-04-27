@@ -1,0 +1,578 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="info\runtime.information.cpp">
+      <Filter>info</Filter>
+    </ClCompile>
+    <ClCompile Include="crash.report\crash.report.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="crash.report\crash.report.impl.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="crash.report\debug.output.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="crash.report\run.context.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="crash.report\run.context.info.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="crash.report\stack.walker.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="crash.report\string.buffer.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\dev.assist.cpp">
+      <Filter>dev.assistance</Filter>
+    </ClCompile>
+    <ClCompile Include="reflection\ref.var.cpp">
+      <Filter>reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="reflection\ref.var.list.cpp">
+      <Filter>reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="json\json_reader.cpp">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="json\json_value.cpp">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="json\json_writer.cpp">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="wcdafx.api.cpp">
+      <Filter>_</Filter>
+    </ClCompile>
+    <ClCompile Include="color.stuff.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="dh.timer.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="dh.tracing.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="gdi+.animation.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="gdi+.image.ptr.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="shell.imagelist.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="win-5-6-7.features.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="windows.gdi.base.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="windows.popup.hint.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="windows.resource.custom.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="windows.resource.data.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="windows.uses.gdi+.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="windows.wtl.buffered.paint.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="wtl.column.tree.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="wtl.combobox.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="wtl.cool.menu.bar.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="wtl.scrollbar.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="wtl.colorizer.cpp">
+      <Filter>colorizer</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.basic.cpp">
+      <Filter>dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogz.messagebox.cpp">
+      <Filter>dialogz</Filter>
+    </ClCompile>
+    <ClCompile Include="boost.assertion_failed.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="dir.manager.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="settings.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="fs.links.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="null.pointee.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="info\runtime.information.h">
+      <Filter>info</Filter>
+    </ClInclude>
+    <ClInclude Include="crash.report\app.entry.adapters.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="crash.report\crash.report.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="crash.report\crash.report.hxx">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="crash.report\debug.output.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="crash.report\exception.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="crash.report\run.context.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="crash.report\run.context.info.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="crash.report\stack.walker.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="crash.report\string.buffer.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\dev.assist.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\list.view.exstyles.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\list.view.styles.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\notify.codes.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\virtual.keys.consts.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\window.messages.consts.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ref.brush.h">
+      <Filter>reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ref.logfont.h">
+      <Filter>reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ref.object.h">
+      <Filter>reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ref.pen.h">
+      <Filter>reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ref.pod.array.h">
+      <Filter>reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ref.rect.h">
+      <Filter>reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ref.serialization.h">
+      <Filter>reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ref.std.h">
+      <Filter>reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ref.std.streaming.h">
+      <Filter>reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ref.var.h">
+      <Filter>reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ref.var.list.h">
+      <Filter>reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="json\autolink.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="json\config.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="json\features.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="json\forwards.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="json\json.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="json\json_batchallocator.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="json\reader.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="json\value.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="json\writer.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="wcdafx.api.h">
+      <Filter>_</Filter>
+    </ClInclude>
+    <ClInclude Include="color.stuff.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="dh.timer.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="dh.tracing.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions.any.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions.any.unittest.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="gdi+.animation.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="gdi+.image.ptr.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="gdi+.paint.args.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="gdi.autopaint.dc.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="generic.div.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="generic.increment.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="history.deque.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboard.extra.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="large.progress.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="map.or.unordered_map.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.aspect.ratio.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.gdi+.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.putinto.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.screen.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="render.conveyor.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="render.element.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="rubbish.heap.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="shell.imagelist.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="string.hp.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="string.shared.allocator.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="string.utils.env.vars.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="string.utils.error.code.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="string.utils.format.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="string.utils.human.size.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="string.utils.native.adopt.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="string.utils.tchar.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="todo.fixme.etc.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="tpoint.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="trect.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="win-5-6-7.features.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.error.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.gdi.base.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.gdi.rects.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.gui.leaks.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.module.helpers.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.popup.hint.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.resource.custom.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.resource.data.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.uses.com.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.uses.commoncontrols.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.uses.gdi+.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.uses.ole.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.uses.richedit.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.wtl.aero.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.wtl.buffered.paint.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.wtl.message.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.wtl.popup.menus.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.wtl.tooltip.dialog.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.wtl.win.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.column.tree.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.combobox.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.controls.helpers.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.cool.menu.bar.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.scrollbar.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.colorizer.control.h">
+      <Filter>colorizer</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.colorizer.h">
+      <Filter>colorizer</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.colorizer.helpers.h">
+      <Filter>colorizer</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.colorizer.control.details.h">
+      <Filter>colorizer</Filter>
+    </ClInclude>
+    <ClInclude Include="gl.cube.h">
+      <Filter>gl</Filter>
+    </ClInclude>
+    <ClInclude Include="gl.torus.h">
+      <Filter>gl</Filter>
+    </ClInclude>
+    <ClInclude Include="gl.view.h">
+      <Filter>gl</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.colorizer.inline.h">
+      <Filter>colorizer</Filter>
+    </ClInclude>
+    <ClInclude Include="cf-resources\resource.h">
+      <Filter>cf-resources</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.colorizer.control.specific.h">
+      <Filter>colorizer</Filter>
+    </ClInclude>
+    <ClInclude Include="cf.windef.target.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.basic.h">
+      <Filter>dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.types.h">
+      <Filter>dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="dialogz.messagebox.h">
+      <Filter>dialogz</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.icons.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="dir.manager.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="fs.links.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.details.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="string.utils.wide2multi.multi2wide.hxx">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="null.pointee.h">
+      <Filter>__</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="info">
+      <UniqueIdentifier>{4d368ad8-1b16-41cf-a42b-656f7178823b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="crash.report">
+      <UniqueIdentifier>{b3bec824-0386-48d3-9dea-7a6887602e61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dev.assistance">
+      <UniqueIdentifier>{8ad889d7-ef24-43c9-a865-5fa28d489224}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="reflection">
+      <UniqueIdentifier>{5dc1c8be-6d1e-4941-b332-bf03117f8241}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="json">
+      <UniqueIdentifier>{808443d1-a955-464b-92b8-acf2b2164f06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_">
+      <UniqueIdentifier>{2e6204ab-c64c-45fa-9803-858b1ca18c29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="colorizer">
+      <UniqueIdentifier>{019c358d-e05a-4107-88f4-4f567d57d1c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="__">
+      <UniqueIdentifier>{13311ee9-59e9-4d07-8d57-2b0c55008ba3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gl">
+      <UniqueIdentifier>{7ee191f0-3685-4a3d-8244-72987bc36411}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cf-resources">
+      <UniqueIdentifier>{11778f55-54aa-43f8-baeb-1be22c665ab9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dialogz">
+      <UniqueIdentifier>{77ca92a1-13c0-4b75-9634-cc69ff278d5a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="reflection\ref.var.inl">
+      <Filter>reflection</Filter>
+    </None>
+    <None Include="reflection\ref.var.list.inl">
+      <Filter>reflection</Filter>
+    </None>
+    <None Include="reflection\ref.var.list.serialization.inl">
+      <Filter>reflection</Filter>
+    </None>
+    <None Include="reflection\ref.var.list.streaming.inl">
+      <Filter>reflection</Filter>
+    </None>
+    <None Include="reflection\ref.var.serialization.inl">
+      <Filter>reflection</Filter>
+    </None>
+    <None Include="reflection\ref.var.streaming.inl">
+      <Filter>reflection</Filter>
+    </None>
+    <None Include="json\AUTHORS">
+      <Filter>json</Filter>
+    </None>
+    <None Include="json\json_internalarray.inl">
+      <Filter>json</Filter>
+    </None>
+    <None Include="json\json_internalmap.inl">
+      <Filter>json</Filter>
+    </None>
+    <None Include="json\json_valueiterator.inl">
+      <Filter>json</Filter>
+    </None>
+    <None Include="json\LICENSE">
+      <Filter>json</Filter>
+    </None>
+    <None Include="json\version">
+      <Filter>json</Filter>
+    </None>
+    <None Include="cf-1.0.def">
+      <Filter>_</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="json\README.txt">
+      <Filter>json</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="cf-resources\cf-res.rc">
+      <Filter>cf-resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="cf-resources\cheks.bmp">
+      <Filter>cf-resources</Filter>
+    </Image>
+    <Image Include="cf-resources\menuimg-pro24.bmp">
+      <Filter>cf-resources</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

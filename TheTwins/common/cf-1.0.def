@@ -1,0 +1,9 @@
+LIBRARY cf-1.0.dll
+EXPORTS
+    crash_report
+    get_last_error_code
+    capture_context
+    sb_zero
+    sb_free
+    describe_last_operation_code
+    describe_callstack
