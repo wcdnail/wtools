@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "dialogz.name.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include "res/resource.h"
 
 namespace Twins

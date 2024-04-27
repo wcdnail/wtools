@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "dialogz.search.text.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <wtl.controls.helpers.h>
 #include "res/resource.h"
 

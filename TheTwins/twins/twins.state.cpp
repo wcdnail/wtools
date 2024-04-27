@@ -20,7 +20,7 @@
 #include <reflection/ref.rect.h>
 #include <rect.putinto.h>
 #include <rect.screen.h>
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <dh.tracing.h>
 #include "res/resource.h"
 
@@ -66,11 +66,11 @@ namespace Obsolete
         ButtonBarIds[6] = Command::Ids::DeleteToTrash;
         ButtonBarIds[7] = Command::Ids::RunTerminal;
 
-        std::auto_ptr<Panel> tempLPanel(new Panel(*this, 0));
-        std::auto_ptr<Panel> tempRPanel(new Panel(*this, 1));
+        std::unique_ptr<Panel> tempLPanel = std::make_unique<Panel>(*this, 0);
+        std::unique_ptr<Panel> tempRPanel = std::make_unique<Panel>(*this, 1);
 
-        LPanel = tempLPanel;
-        RPanel = tempRPanel;
+        LPanel = std::move(tempLPanel);
+        RPanel = std::move(tempRPanel);
 
         FromSettings(Options, LanguageId);
         FromSettings(Options, IsMainframeMaximized);

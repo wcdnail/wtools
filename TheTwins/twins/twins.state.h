@@ -7,12 +7,12 @@
 #include <settings.h>
 #include <history.deque.h>
 #include <shell.imagelist.h>
-#include <string>
-#include <memory>
 #include <boost/noncopyable.hpp>
 #include <atlstr.h>
 #include <atluser.h>
 #include <atlwin.h>
+#include <string>
+#include <memory>
 
 namespace Obsolete
 {
@@ -102,8 +102,8 @@ namespace Obsolete
     private:
         MainFrame& MainFrameRef;
         unsigned LanguageId;
-        std::auto_ptr<Panel> LPanel;
-        std::auto_ptr<Panel> RPanel;
+        std::unique_ptr<Panel> LPanel;
+        std::unique_ptr<Panel> RPanel;
         CIcon Icon;
         bool IsMainframeMaximized;
         CRect MainRect;

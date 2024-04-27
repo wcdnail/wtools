@@ -69,7 +69,7 @@ namespace Ui
         int NextY;
         bool IsNextAnimation;
         ItDeque Deque;
-        boost::mutex DequeMx;
+        std::mutex DequeMx;
 
         // Appearance
         CFont Font;

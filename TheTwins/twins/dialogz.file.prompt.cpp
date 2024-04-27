@@ -2,7 +2,7 @@
 #include "dialogz.file.prompt.h"
 #include "file.list.h"
 #include "tab.bar.item.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <atltypes.h>
 
 namespace Twins

@@ -3,7 +3,7 @@
 #include "twins.state.h"
 #include "file.list.h"
 #include <shell.imagelist.h>
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <dh.tracing.h>
 #include <wtl.controls.helpers.h>
 #include <atldlgs.h>
@@ -494,16 +494,12 @@ namespace Twins
     void FindDialog::ResetResults()
     {
         Cancel();
-
         ResultsCaption.SetWindowText(_T(""));
-
         ResultsTree.LockWindowUpdate(TRUE);
         ResultsTree.DeleteAllItems();
         ResultsTree.LockWindowUpdate(FALSE);
-
-        Choosen.Swap(Fl::Entry());
+        Fl::Entry().Swap(Choosen);
         Files.Clear();
-
         Searcher.Reset(TVI_ROOT);
     }
 
@@ -738,7 +734,7 @@ namespace Twins
         PrepareSearchParams();
         ResetResults();
         ResultsTree.SetFocus();
-        SearchThread = boost::thread(&FindDialog::SearchProc, this);
+        SearchThread = std::thread(&FindDialog::SearchProc, this);
     }
 
     void FindDialog::SearchProc()

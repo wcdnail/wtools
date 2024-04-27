@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "twins.h"
 #include "options.all.pages.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <wtl.controls.helpers.h>
 #include <atlconv.h>
 #include "res/resource.h"
@@ -68,7 +68,7 @@ namespace Twins
         CkShowHidden.Attach(GetDlgItem(IDC_CKSHOWHIDDEN));
         CbLang.Attach(GetDlgItem(IDC_CBLANG));
 
-      //LocalizeControl(m_hWnd, IDC_STLANG);
+      //LocalizeControl(this->m_hWnd, IDC_STLANG);
       //LocalizeControl(CkShowHidden);
 
         LoadLanguages();

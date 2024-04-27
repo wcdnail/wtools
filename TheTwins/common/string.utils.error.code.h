@@ -16,15 +16,13 @@ namespace Str
             StringType result;
 
             HLOCAL local = NULL;
-            DWORD len = ATL::ChTraitsOS<Ct>::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER
-                , NULL, code, LANG_USER_DEFAULT, (RawStringType)&local, 0, NULL);
+            DWORD len = ATL::ChTraitsOS<Ct>::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+                NULL, code, LANG_USER_DEFAULT, (RawStringType)&local, 0, NULL);
 
-            if (len > 2)
-            {
+            if (len > 2) { // CRLF
                 RawStringType message = static_cast<RawStringType>(::LocalLock(local));
-                if (message)
-                {
-                    message[len-2] = 0;
+                if (message) {
+                    message[len-2] = 0; // del CRLF
                     result = message;
                     ::LocalUnlock(local);
                 }

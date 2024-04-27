@@ -5,7 +5,7 @@
 #include "status.ui.h"
 #include "status.bar.ex.h"
 #include "commands.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <info/runtime.information.h>
 #include <dh.tracing.h>
 
@@ -175,7 +175,7 @@ namespace Twins
 #pragma message(_TODO("Configure splitter"))
         vSplitter.m_cxySplitBar = 3; // Thickness
         vSplitter.m_bFullDrag = false;
-        vSplitter.m_bEraseBk = FALSE;
+        //vSplitter.m_bEraseBk = FALSE;
 
         vSplitter.SetSplitterPos();
 

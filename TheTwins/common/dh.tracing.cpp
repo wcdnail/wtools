@@ -6,11 +6,10 @@
 #include <fstream>
 #include <atlstr.h>
 #include <atlconv.h>
-#include <boost/thread/mutex.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/algorithm/string.hpp>
+#include <mutex>
+#include <filesystem>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 
 #ifndef _TRACE_LOG_ENABLED
 #  define _TRACE_LOG_ENABLED true
@@ -31,7 +30,7 @@ namespace Dh
     {
         if (0 == ::_wcsnicmp(name, _MY_MODULE, ::wcslen(_MY_MODULE)))
         {
-            boost::filesystem::path tempath = Runtime::Info().Executable.Filename;
+            std::filesystem::path tempath = Runtime::Info().Executable.Filename;
             Name = boost::to_upper_copy(tempath.filename().replace_extension().wstring());
         }
         else
@@ -60,7 +59,7 @@ namespace Dh
     // WARN: Don't use virtual functions in this.
     struct TracingContext
     {
-        boost::mutex& Mutex() { return MyMx; }
+        std::recursive_mutex& Mutex() { return MyMx; }
 
         template <typename C>
         void Puts(C const* text)
@@ -106,9 +105,9 @@ namespace Dh
             FlushLog();
         }
 
-        static boost::filesystem::path GetLogPath(int n)
+        static std::filesystem::path GetLogPath(int n)
         {
-            boost::filesystem::path result = Runtime::Info().Executable.Directory;
+            std::filesystem::path result = Runtime::Info().Executable.Directory;
 
             result /= Runtime::Info().Executable.Version.ProductName + L".log." 
                     + boost::lexical_cast<std::wstring>(n) + L".txt";
@@ -118,18 +117,18 @@ namespace Dh
 
         static std::string GenLogName()
         {
-            boost::filesystem::path temp;
+            std::filesystem::path temp;
 
             for (int i=2; i>=0; i--)
             {
                 temp = GetLogPath(i);
-                if (boost::filesystem::exists(temp))
+                if (std::filesystem::exists(temp))
                 {
-                    boost::filesystem::path next = GetLogPath(i + 1);
+                    std::filesystem::path next = GetLogPath(i + 1);
 
-                    boost::system::error_code ec;
-                    boost::filesystem::remove(next, ec);
-                    boost::filesystem::rename(temp, next, ec);
+                    std::error_code ec;
+                    std::filesystem::remove(next, ec);
+                    std::filesystem::rename(temp, next, ec);
                 }
             }
 
@@ -154,7 +153,7 @@ namespace Dh
         }
 
     private:
-        boost::mutex MyMx;
+        std::recursive_mutex MyMx;
         bool LogEnabled;
         std::ofstream Log;
     };
@@ -182,7 +181,7 @@ namespace Dh
         va_list ap;
         va_start(ap, format);
         {
-            boost::mutex::scoped_lock lk(TraceContext().Mutex());
+            std::lock_guard lk(TraceContext().Mutex());
             Puts(Str::Elipsis<char>::FormatV(format, ap));
             TraceContext().FlushLog();
         }
@@ -194,7 +193,7 @@ namespace Dh
         va_list ap;
         va_start(ap, format);
         {
-            boost::mutex::scoped_lock lk(TraceContext().Mutex());
+            std::lock_guard lk(TraceContext().Mutex());
             Puts(Str::Elipsis<wchar_t>::FormatV(format, ap));
             TraceContext().FlushLog();
         }
@@ -204,7 +203,7 @@ namespace Dh
     template <typename C>
     static void ThreadPrintfT(C const* format, va_list ap)
     {
-        boost::mutex::scoped_lock lk(TraceContext().Mutex());
+        std::lock_guard lk(TraceContext().Mutex());
         Puts(Str::Elipsis<wchar_t>::Format(L"%0*.8f [%06d] ", 20, _Uptime.Seconds(), ::GetCurrentThreadId()));
         Puts(Str::Elipsis<C>::FormatV(format, ap));
         TraceContext().FlushLog();
@@ -213,7 +212,7 @@ namespace Dh
     template <typename C>
     static void ThreadPrintfT(TraceCategory const& cat, C const* format, va_list ap)
     {
-        boost::mutex::scoped_lock lk(TraceContext().Mutex());
+        std::lock_guard lk(TraceContext().Mutex());
         Puts(Str::Elipsis<wchar_t>::Format(L"%0*.8f [%06d] %8s: ", 20, _Uptime.Seconds(), ::GetCurrentThreadId(), cat.GetName()));
         Puts(Str::Elipsis<C>::FormatV(format, ap));
         TraceContext().FlushLog();

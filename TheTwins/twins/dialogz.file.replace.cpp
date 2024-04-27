@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dialogz.file.replace.h"
 #include "file.entry.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <string.utils.human.size.h>
 #include <generic.div.h>
 #include <atltime.h>

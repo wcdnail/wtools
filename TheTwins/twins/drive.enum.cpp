@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "drive.enum.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <dh.tracing.h>
 #include <dbt.h>
 
@@ -177,7 +177,7 @@ namespace Twins
                 }
 
                 {
-                    boost::mutex::scoped_lock lk(itemsMx_);
+                    std::lock_guard lk(itemsMx_);
                     items_.swap(temp);
 
                     icons_.Destroy();

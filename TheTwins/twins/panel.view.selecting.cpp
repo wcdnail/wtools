@@ -3,7 +3,7 @@
 #include "panel.view.status.h"
 #include "file.list.h"
 #include "dialogz.selunsel.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <dh.tracing.h>
 
 namespace Twins

@@ -3,7 +3,7 @@
 #include "tab.bar.item.h"
 #include "drive.info.h"
 #include "panel.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <windows.gdi.rects.h>
 #include <dh.tracing.h>
 #include <atlstr.h>
@@ -107,12 +107,14 @@ namespace Twins
 
     void DriveBar::Add(Drive::Enumerator::Item const& item)
     {
+        static const CString spacer(_T(" "));
+
         CString driveLeter;
         driveLeter.Format(_T("%c"), item.path[0]);
         
         CString dispName;
         dispName.Format(_T("%s [%s] %s"),
-            (DRIVE_NO_ROOT_DIR == item.type ? _T(" ") : driveLeter), 
+            (DRIVE_NO_ROOT_DIR == item.type ? spacer : driveLeter), 
             Drive::Type::ToString(item.type),
             item.fs.c_str());
 
@@ -215,7 +217,7 @@ namespace Twins
 
     void DriveBar::UpdateInfo(Drive::Enumerator::Item const& item)
     {
-        Hint.SetWindowText(item.ready ? Drive::GetHint(item) : _LS(StrId_Unmounted2));
+        Hint.SetWindowText(item.ready ? Drive::GetHint(item).GetString() : _LS(StrId_Unmounted2));
     }
 
     void DriveBar::InitializeDrives(DriveBar& left, DriveBar& right, Drive::Enumerator::ItemVector const& items)
@@ -311,7 +313,7 @@ namespace Twins
     CString DriveBar::GetDriveName(CPoint const& point) const
     {
         TabBarItem const& di = Disks.GetItem(point);
-        return TabBar::IsValid(di) ? di.name : _T("");
+        return TabBar::IsValid(di) ? di.name.GetString() : _T("");
     }
 
     void DriveBar::Invalidate() const

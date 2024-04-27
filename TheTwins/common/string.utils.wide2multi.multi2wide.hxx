@@ -26,7 +26,7 @@ namespace Str
         if (l > 0)
         {
             ++l;
-            std::unique_ptr<char[]> buffer(new char[l]);
+            std::unique_ptr<char[]> buffer = std::make_unique<char[]>(l);
 #ifdef _WIN32
             ::WideCharToMultiByte(codepage, 0, source.c_str(), (int)l, buffer.get(), (int)l, NULL, NULL);
 #endif
@@ -47,7 +47,7 @@ namespace Str
         if (l > 0)
         {
             ++l;
-            std::unique_ptr<wchar_t[]> buffer(new wchar_t[l]);
+            std::unique_ptr<wchar_t[]> buffer = std::make_unique<wchar_t[]>(l);
 #ifdef _WIN32
             ::MultiByteToWideChar(codepage, 0, source.c_str(), (int)l, buffer.get(), (int)l);
 #endif

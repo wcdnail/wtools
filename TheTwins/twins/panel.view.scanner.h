@@ -3,7 +3,7 @@
 #include "panel.view.item.h"
 #include <dir.manager.h>
 #include <settings.h>
-#include <boost/thread.hpp>
+#include <thread>
 #include <boost/thread/mutex.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/noncopyable.hpp>
@@ -40,7 +40,7 @@ namespace Twins
     private:
         boost::scoped_array<unsigned char> Data;
         volatile bool AbortFetch;
-        boost::thread Thread;
+        std::thread Thread;
 
         static size_t Ds;
         static Conf::Section ClassSettings;

@@ -2,7 +2,7 @@
 #include "panel.view.item.h"
 #include <string.utils.human.size.h>
 #include <rect.putinto.h>
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 #include <shellapi.h>
 
 namespace Twins
@@ -125,7 +125,7 @@ namespace Twins
         COLORREF tcolor = GetItemTextColor(displayTime, curtime);
         dc.SetTextColor(tcolor);
 
-        boost::filesystem::path path(std::wstring(FileName, FileNameLength));
+        std::filesystem::path path(std::wstring(FileName, FileNameLength));
         std::wstring pathString = path.wstring();
         std::wstring name;
         std::wstring ext;
@@ -195,7 +195,7 @@ namespace Twins
         if (columnInUse[3])
         {
             rc = NextRect(rcItem, rc, columnCx[3]);
-            std::wstring dtime = displayTime.Format(L"%H:%M %d.%m.%Y");
+            std::wstring dtime = displayTime.Format(L"%H:%M %d.%m.%Y").GetString();
             dc.DrawText(dtime.c_str(), (int)dtime.length(), rc, DT_RIGHT);
         }
 

@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "runtime.information.h"
-#include "../dh.tracing.h"
-#include "../string.utils.error.code.h"
-#include "../string.utils.env.vars.h"
+#include "dh.tracing.h"
+#include "string.utils.error.code.h"
+#include "string.utils.env.vars.h"
 #include <boost/config.hpp>
 #include <boost/version.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <cstdint>
 
 #ifdef _WIN32
@@ -190,7 +190,7 @@ namespace Runtime
         RequestWin32VersionInfo(startupInfo.lpTitle, exeInfo.Version);
 
         if (exeInfo.Version.ProductName.empty())
-            exeInfo.Version.ProductName = boost::filesystem::path(exeInfo.Filename).filename().replace_extension().wstring();
+            exeInfo.Version.ProductName = std::filesystem::path(exeInfo.Filename).filename().replace_extension().wstring();
 #endif
     }
 

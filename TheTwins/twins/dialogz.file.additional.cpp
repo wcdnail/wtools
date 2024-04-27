@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "dialogz.file.additional.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <atltypes.h>
 #include "res/resource.h"
 

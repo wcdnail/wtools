@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "file.move.h"
 #include "file.list.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 
 namespace Twins
 {

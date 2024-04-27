@@ -55,7 +55,7 @@ namespace Fl
     static Error InitFromNotify(wchar_t const* dirpath, Twins::DirectoryNotify const& ninfo, Entry& target)
     {
         Path path = dirpath;
-        path /= ninfo.Filename;
+        path /= ninfo.Filename.GetString();
 
         return InitFromPath(path, target);
     }

@@ -52,7 +52,7 @@ namespace Ui
         enum { IdCombo = 2000, IdPrompt };
 
         WTL::CStatic Prompt;
-        boost::mutex PromptMx;
+        std::mutex PromptMx;
         CAdvComboBox Combo;
         EnterCallback OnEnter;
         WTL::CFont MyFont;

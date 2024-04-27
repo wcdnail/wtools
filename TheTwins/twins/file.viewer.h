@@ -23,6 +23,8 @@ namespace Twins
         typedef CTabbedChildWindow<CDotNetTabCtrl<CTabViewTabItem> > Super;
         typedef CDotNetTabCtrl<CTabViewTabItem> TabCtrl;
 
+        using ItemType = Super::ItemType;
+
     public:
         typedef std::vector<Fv::Viewer*> ViewerList;
         typedef Fv::ErrorCode ErrorCode;

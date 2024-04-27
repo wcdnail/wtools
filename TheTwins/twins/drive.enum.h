@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <boost/thread.hpp>
+#include <thread>
 #include <boost/function.hpp>
 #include <wtypes.h>
 #include <atluser.h>
@@ -76,9 +76,9 @@ namespace Twins
 
             HANDLE enumerate_;
             HANDLE break_;
-            boost::thread thread_;
+            std::thread thread_;
             ItemVector items_;
-            mutable boost::mutex itemsMx_;
+            mutable std::mutex itemsMx_;
             CImageList icons_;
             EnumDoneCallback onEnumDone_;
 

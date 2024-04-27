@@ -2,9 +2,9 @@
 
 #include "file.viewer.types.h"
 #include <string.hp.h>
-#include <map>
 #include <atlstr.h>
 #include <boost/shared_array.hpp>
+#include <map>
 
 namespace Fv
 {

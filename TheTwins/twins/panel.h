@@ -15,9 +15,9 @@ namespace Twins
 {
     typedef CWinTraits<WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, WS_EX_ACCEPTFILES> Panel0Traits;
 
-    class Panel: boost::noncopyable
-               , ATL::CWindowImpl<Panel, ATL::CWindow, Panel0Traits>
-               , CDialogResize<Panel>
+    class Panel: boost::noncopyable,
+                 ATL::CWindowImpl<Panel, ATL::CWindow, Panel0Traits>,
+                 CDialogResize<Panel>
     {
     private:
         typedef ATL::CWindowImpl<Panel, ATL::CWindow, Panel0Traits> Super;

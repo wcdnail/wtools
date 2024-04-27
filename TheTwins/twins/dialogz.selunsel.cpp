@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "dialogz.selunsel.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 
 namespace Twins
 {

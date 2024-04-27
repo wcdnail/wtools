@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef _UNICODE
+#  error _UNICODE is NOT defined!!!
+#endif
+
 #ifdef _WIN32
 #  define  _CRT_SECURE_NO_WARNINGS
 #  define WIN32_LEAN_AND_MEAN
@@ -56,7 +60,7 @@
 #include <stdexcept>
 #include <boost/cstdint.hpp>
 #include <boost/bind.hpp>
-#include <boost/thread.hpp>
+#include <thread>
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>

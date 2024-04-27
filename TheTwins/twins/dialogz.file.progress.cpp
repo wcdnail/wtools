@@ -4,7 +4,7 @@
 #include "file.operation.base.h"
 #include "tab.bar.item.h"
 #include "file.list.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <string.utils.human.size.h>
 #include "res/resource.h"
 
@@ -105,7 +105,7 @@ namespace Twins
 
         if (nonguiThread)
         {
-            boost::mutex::scoped_lock lk(PauseMx);
+            std::unique_lock lk(PauseMx);
             ::PostMessage(m_hWnd, WmShowFileReplaceDialog, 0, (LPARAM)&params);
             PauseCn.wait(lk);
         }
@@ -161,7 +161,7 @@ namespace Twins
     {
         if (Paused)
         {
-            boost::mutex::scoped_lock lk(PauseMx);
+            std::unique_lock lk(PauseMx);
             PauseCn.wait(lk);
         }
 

@@ -5,7 +5,7 @@
 #include "twins.funcs.h"
 #include "keyboard.h"
 #include <dh.tracing.h>
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <stdexcept>
 #include <sstream>
 

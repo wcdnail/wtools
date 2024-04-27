@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "ref.var.h"
 #include <crash.report/exception.h>
-#include <cerrno>
 #include <sstream>
+#include <cerrno>
 
 namespace Ref
 {

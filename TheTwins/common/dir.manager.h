@@ -2,19 +2,18 @@
 
 #include "wcdafx.api.h"
 #include "history.deque.h"
+#include <boost/noncopyable.hpp>
+#include <filesystem>
 #include <string>
 #include <map>
-#include <boost/noncopyable.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
 
 namespace Cf
 {
     class DirManager: boost::noncopyable
     {
     public:
-        typedef boost::filesystem::path Path;
-        typedef boost::system::error_code Ecode;
+        typedef std::filesystem::path Path;
+        typedef std::error_code Ecode;
 
         WCDAFX_API DirManager();
         WCDAFX_API ~DirManager();

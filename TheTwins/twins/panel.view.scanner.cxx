@@ -35,28 +35,31 @@ namespace Twins
         , DisplayHidden(false)
         , Data()
         , AbortFetch()
-        , Thread(&FScanner::HeavyDutyProc, boost::ref(*this))
+        , Thread()
     {
+        auto threadRoutine = [this] (){
+            this->HeavyDutyProc();
+        };
+
         FromSettings(ClassSettings, Ds);
-
         Data.reset(new unsigned char[Ds]);
-
-        for (size_t i=0; i<FlagCount; i++)
+        for (size_t i=0; i<FlagCount; i++) {
             Flag[i] = ::CreateEventW(NULL, FALSE, FALSE, NULL);
+        }
+
+        std::thread nuThread(threadRoutine);
+        nuThread.swap(Thread);
     }
 
     void FScanner::UpdatePath(std::wstring const& up)
     {
-        if (!up.empty())
-        {
+        if (!up.empty()) {
             Path.SetPath(up);
         }
-        else
-        {
+        else {
             wchar_t drv[MAX_PATH] = {};
             ::GetSystemDirectoryW(drv, _countof(drv));
             drv[3] = 0;
-
             Path.SetPath(drv);
         }
     }
@@ -69,9 +72,9 @@ namespace Twins
 
     void FScanner::Fetch(wchar_t const* path /*= NULL*/)
     {
-        if (InProgress)
+        if (InProgress) {
             Cancel();
-
+        }
         //Progress = 0;
         Items.clear();
         IsError = false;
@@ -79,9 +82,9 @@ namespace Twins
         ErrorCode = 0;
         ErrorText.clear();
 
-        if (NULL != path)
+        if (NULL != path) {
             Path.SetPath(path);
-
+        }
         ::SetEvent(Flag[FlagFetch]);
     }
 
@@ -96,51 +99,39 @@ namespace Twins
         Dh::ScopedThreadLog l(__FUNCTIONW__);
         double elapsed = .0;
 
-        for (;;)
-        {
+        for (;;) {
             DWORD wr = ::WaitForMultipleObjects(FlagCount, Flag, FALSE, INFINITE);
             InProgress = true;
 
-            if ((WAIT_OBJECT_0 + FlagStop) == wr)
+            if ((WAIT_OBJECT_0 + FlagStop) == wr) {
                 break;
-
-            else if ((WAIT_OBJECT_0 + FlagFetch) == wr)
-            {
-                try
-                {
+            }
+            if ((WAIT_OBJECT_0 + FlagFetch) == wr) {
+                try {
                     Dh::Timer tm;
-
                     ReadDir(Path.FullPath().c_str(), Data.get(), Ds);
                     ParseBuffer();
-
                     elapsed = tm.Seconds();
                     Dh::ThreadPrintf(L" SCANNER: %s #%d %2.8f sec. %s\n", Path.FullPath().c_str(), Items.size(), elapsed, (AbortFetch ? L"CANCELED" : L""));
                 }
-                catch (InternalError const& ex)
-                {
+                catch (InternalError const& ex) {
                     IsError = true;
                     ErrorText = ex.Message;
                     ErrorCode = ex.Hr;
 
                     Dh::ThreadPrintf(L" SCANNER: `%s` ERROR - 0x%08x %s\n", Path.FullPath().c_str(), ex.Hr, ex.Message);
                 }
-                catch (std::exception const& ex)
-                {
+                catch (std::exception const& ex) {
                     IsError = true;
                     ErrorText.clear();
                     ErrorCode = ::GetLastError();
-
                     Dh::ThreadPrintf(L" SCANNER: `%s` ERROR - 0x%08x %S\n", Path.FullPath().c_str(), ErrorCode, ex.what());
                 }
-
                 InProgress = false;
 
-
                 // FIXME: upper directory link must be added in error cases
-                if (IsError && Items.empty())
-                {
-                    try
-                    {
+                if (IsError && Items.empty()) {
+                    try {
                         FItemVector temp;
                         temp.push_back(&UpperDirItem);
                         Items.swap(temp);
@@ -148,9 +139,9 @@ namespace Twins
                     catch (...)
                     {}
                 }
-
-                if (OnFetchDone)
+                if (OnFetchDone) {
                     OnFetchDone(elapsed);
+                }
             }
         }
     }
@@ -236,7 +227,7 @@ namespace Twins
         }
         
         {
-            //boost::mutex::scoped_lock lk(Mx);
+            //std::lock_guard lk(Mx);
             Items.swap(temp);
         }
     }

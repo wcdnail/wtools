@@ -4,7 +4,7 @@
 #include "command.ids.h"
 #include "extern.run.h"
 #include "iconoz.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <dh.tracing.h>
 #include <string.utils.env.vars.h>
 #include <rect.putinto.h>

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dialogz.app.about.h"
 #include <info/runtime.information.h>
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include "res/resource.h"
 
 namespace Twins
@@ -41,8 +41,11 @@ namespace Twins
     {
         CStringW text;
         control.GetWindowText(text);
-        filler(std::wstring(text));
-        control.SetWindowText(text);
+
+        std::wstring wText(text.GetBuffer(), text.GetLength());
+        filler(wText);
+
+        control.SetWindowText(wText.c_str());
     }
 
     template <typename Filler>
@@ -50,9 +53,12 @@ namespace Twins
     {
         CStringW text;
         control.GetWindowText(text);
-        filler(std::wstring(text));
+
+        std::wstring wText(text.GetBuffer(), text.GetLength());
+        filler(wText);
+
         control.SetSel(0, -1);
-        control.ReplaceSel(text, FALSE);
+        control.ReplaceSel(wText.c_str(), FALSE);
     }
 
     void InitHeader2(std::wstring& text);
@@ -151,15 +157,15 @@ namespace Twins
     {
         Runtime::InfoStore const& info = Runtime::Info();
 
-        std::ostringstream temp;
-        temp << "\r\n• " << info.Executable.Version.ProductName.c_str() << " " << info.Executable.Version.ProductVersion.c_str() << " " << info.TargetOs
+        std::wostringstream temp;
+        temp << "\r\n• " << info.Executable.Version.ProductName << " " << info.Executable.Version.ProductVersion << " " << info.TargetOs
              << "\r\n  ( " << info.Compiler
              << "\r\n  , " << info.CLib
              << "\r\n  , BOOST " << info.BoostVersion
              << "\r\n  )"
              ;
 
-        text = CA2W(temp.str().c_str());
+        text = temp.str();
     }
 
     static void InitLicense(std::wstring& text)

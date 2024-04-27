@@ -2,7 +2,7 @@
 #include "basic.enumerator.h"
 #include "ntfs.links.h"
 #include "basic.entry.h"
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 namespace Twins
 {
@@ -32,9 +32,9 @@ namespace Twins
     static bool IsDir(WIN32_FIND_DATAW const& data) { return IsDir(data.dwFileAttributes); }
     static bool IsCurrentDir(WIN32_FIND_DATAW const& data) { return IsDir(data) && ((L'.' == data.cFileName[0]) && (L'\0' == data.cFileName[1])); }
     static bool IsUpperDir(WIN32_FIND_DATAW const& data) { return IsDir(data) && ((L'.' == data.cFileName[0]) && (L'.' == data.cFileName[1]) && (L'\0' == data.cFileName[2])); }
-    static bool IsReparsePoint(WIN32_FIND_DATA const& data) { return 0 != (FILE_ATTRIBUTE_REPARSE_POINT & data.dwFileAttributes); }
-    static bool IsSymLink(WIN32_FIND_DATA const& data) { return IsReparsePoint(data) && (0 != (IO_REPARSE_TAG_SYMLINK & data.dwReserved0)); }
-    static bool IsHidden(WIN32_FIND_DATA const& data) { return 0 != (data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN); }
+    static bool IsReparsePoint(WIN32_FIND_DATAW const& data) { return 0 != (FILE_ATTRIBUTE_REPARSE_POINT & data.dwFileAttributes); }
+    static bool IsSymLink(WIN32_FIND_DATAW const& data) { return IsReparsePoint(data) && (0 != (IO_REPARSE_TAG_SYMLINK & data.dwReserved0)); }
+    static bool IsHidden(WIN32_FIND_DATAW const& data) { return 0 != (data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN); }
 
     unsigned Win32FindDataToFlags(WIN32_FIND_DATAW const& fdata)
     {
@@ -74,7 +74,7 @@ namespace Twins
     Enumerator::Ec Enumerator::Load(LoadArgs const& args)
     {
         Ec ec;
-        boost::filesystem::path searchpath = args.Root.c_str();
+        std::filesystem::path searchpath = args.Root.c_str();
         searchpath /= args.Mask.c_str();
 
         WIN32_FIND_DATAW data = {0};
@@ -134,7 +134,7 @@ namespace Twins
 
             if (IsDir(data) && args.Recursive)
             {
-                boost::filesystem::path rpath = args.Root.c_str();
+                std::filesystem::path rpath = args.Root.c_str();
                 rpath /= data.cFileName;
 
                 LoadArgs rargs(rpath.c_str(), args.Mask, args.SkipHidden, args.SkipUpper, args.Recursive);

@@ -39,7 +39,7 @@ namespace Twins
         OperationResult rv(ERROR_BAD_ARGUMENTS, Sy::system_category());
 
         Fl::List files;
-        if (panel.GetSelection(files))
+        if (panel.View.GetSelection(files))
             rv = PerformOperation(files, operation, parent);
 
         return rv;

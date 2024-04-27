@@ -4,7 +4,7 @@
 #include "keyboard.h"
 #include <generic.increment.h>
 #include <dh.tracing.h>
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <win-5-6-7.features.h>
 #include <memory>
 
@@ -62,8 +62,9 @@ namespace Twins
 
         try
         {
-            std::auto_ptr<Fv::Viewer> temp(new Fv::Viewer());
-            error = temp->Create(m_hWnd, CRect(rcDefault));
+            std::unique_ptr<Fv::Viewer> temp = std::make_unique<Fv::Viewer>();
+            CRect rcTemp(rcDefault);
+            error = temp->Create(m_hWnd, rcTemp);
             if (error)
             {
                 Dh::ThreadPrintf("FileView: create view failed - %s (%d)\n"
@@ -83,13 +84,12 @@ namespace Twins
             Views.push_back(view);
 
             int n = AddTabWithIcon(*view, entry.GetFilename().c_str(), view->GetSmallIcon());
-
-            TabCtrl::TItem* item = GetTabCtrl().GetItem(n);
-            if (NULL != item)
+            ItemType* item = GetTabCtrl().GetItem(n);
+            if (NULL != item) {
                 item->SetToolTip(entry.GetPath().c_str());
+            }
         }
-        catch (...)
-        {
+        catch (...) {
             if (NULL != view)
                 view->DestroyWindow();
 

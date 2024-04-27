@@ -4,8 +4,8 @@
 #include "ref.serialization.h"
 #include <string.hp.h>
 #include <typeinfo>
+#include <memory>
 #include <string>
-#include <boost/shared_ptr.hpp>
 
 namespace Ref
 {

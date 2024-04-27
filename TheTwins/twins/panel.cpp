@@ -11,13 +11,13 @@
 #include "file.copy.h"
 #include <dh.timer.h>
 #include <dh.tracing.h>
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <string.utils.error.code.h>
 #include <windows.wtl.message.h>
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <atlconv.h>
 #include <boost/bind.hpp>
-#include <boost/thread.hpp>
+#include <thread>
 
 namespace Twins
 {
@@ -195,10 +195,10 @@ namespace Twins
 #pragma message(_TODO("Implementation"))
         boost::system::error_code ec;
 
-        //boost::filesystem::path newpath = DirMan.FullPath();
+        //std::filesystem::path newpath = DirMan.FullPath();
         //newpath /= newname;
 
-        //boost::filesystem::rename(info.GetPathObj(), newpath, ec);
+        //std::filesystem::rename(info.GetPathObj(), newpath, ec);
         //SetMainframeStatus(ec, NULL, _LS(StrId_Renames), info.GetFilename().c_str());
         //
         //if (!ec)
@@ -292,12 +292,12 @@ namespace Twins
         INT_PTR rv = dlg.DoModal(m_hWnd);
         if (IDOK == rv)
         {
-            boost::filesystem::path newpath = GetDirManager().FullPath();
-            boost::filesystem::path newname = dlg.GetText();
+            std::filesystem::path newpath = GetDirManager().FullPath();
+            std::filesystem::path newname = dlg.GetText();
             newpath /= newname;
 
             boost::system::error_code ec;
-            if (!boost::filesystem::create_directories(newpath, ec))
+            if (!std::filesystem::create_directories(newpath, ec))
                 ec.assign(ERROR_ALREADY_EXISTS, boost::system::system_category());
 
             SetMainframeStatus(ec.value(), NULL, _LS(StrId_Creatingdirectorys), newname.c_str());
@@ -327,7 +327,7 @@ namespace Twins
                 if (::DragQueryFile(dropInfo, i, filename.GetBufferSetLength(len), len))
                 {
                     filename.ReleaseBufferSetLength(len);
-                    files.PushBack(boost::filesystem::path((PCWSTR)filename));
+                    files.PushBack(std::filesystem::path((PCWSTR)filename));
                 }
             }
         }
@@ -356,8 +356,8 @@ namespace Twins
         INT_PTR rv = dlg.DoModal(m_hWnd);
         if (IDOK == rv)
         {
-            boost::filesystem::path newpath = GetDirManager().FullPath();
-            boost::filesystem::path newname = dlg.GetText();
+            std::filesystem::path newpath = GetDirManager().FullPath();
+            std::filesystem::path newname = dlg.GetText();
             newpath /= newname;
         
             HANDLE hnew = ::CreateFile(newpath.c_str(), 0, 0, NULL, CREATE_NEW, 0, NULL);

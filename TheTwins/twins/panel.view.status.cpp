@@ -4,7 +4,7 @@
 #include "panel.view.scanner.h"
 #include "file.list.h"
 #include <dh.tracing.h>
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <string.utils.human.size.h>
 #include <generic.increment.h>
 #include <limits>

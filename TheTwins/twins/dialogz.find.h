@@ -10,7 +10,7 @@
 #include <atltime.h>
 #include <map>
 #include <string>
-#include <boost/thread.hpp>
+#include <thread>
 
 namespace Sh { class Imagelist; }
 
@@ -29,7 +29,7 @@ namespace Twins
         typedef CDialogResize<FindDialog> Resizer;
         
     public:
-        typedef boost::filesystem::path FsPath;
+        typedef std::filesystem::path FsPath;
 
         enum 
         {
@@ -138,7 +138,7 @@ namespace Twins
         WTL::CStatic ResultsCaption;
         WTL::CTreeViewCtrl ResultsTree;
         FindEnumerator Searcher;
-        boost::thread SearchThread;
+        std::thread SearchThread;
         WidecharString PatternRx;
         BOOL CaseSensitive;
         BOOL PatternIsRegExp;

@@ -3,10 +3,13 @@
 #include <dh.tracing.h>
 #include <windows.gui.leaks.h>
 
+#pragma comment(lib, "comctl32.lib")
+#pragma comment(lib, "atls.lib")
+
 namespace
 {
-    const Dh::ScopedThreadLog LiveTimer(L"Ui");
-    const Cf::GUILeaks GuiLeaks;
+    //const Dh::ScopedThreadLog LiveTimer(L"Ui");
+    //const Cf::GUILeaks GuiLeaks;
 }
 
 int APIENTRY _tWinMain(HINSTANCE baseAddress, HINSTANCE, LPTSTR, int showCmd)

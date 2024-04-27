@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dialogz.options.h"
 #include "twins.state.h"
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <dh.tracing.h>
 #include <dialogz.messagebox.h>
 #include <atldlgs.h>

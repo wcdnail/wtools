@@ -11,7 +11,7 @@
 #include <windows.gdi.rects.h>
 #include <windows.wtl.message.h>
 #include <string.utils.error.code.h>
-#include <twins.lang.strings.h>
+#include <twins.langs/twins.lang.strings.h>
 #include <boost/bind.hpp>
 #include <atltime.h>
 
@@ -587,13 +587,11 @@ namespace Twins
 
     void PanelView::OnVScroll(UINT code, UINT pos, CScrollBar bar)
     {
-        if (IsLocked())
+        if (IsLocked()) {
             return ;
-
+        }
         CancelLabelEdit();
-
-        switch (code)
-        {
+        switch (code) {
         case SB_THUMBTRACK:
             iFirst = pos;
             ::InvalidateRect(m_hWnd, NULL, FALSE);
@@ -757,7 +755,7 @@ namespace Twins
         FItem const* it = GetHot();
         if (NULL != it)
         {
-            boost::filesystem::path p = Scanner.Path.FullPath();
+            std::filesystem::path p = Scanner.Path.FullPath();
 
             std::wstring filename(it->FileName, it->FileNameLength);
             p /= filename;

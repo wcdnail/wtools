@@ -22,7 +22,7 @@ namespace Twins
     class PromptDialog;
     
     namespace Sy = boost::system;
-    namespace Fs = boost::filesystem;
+    namespace Fs = std::filesystem;
 
     typedef Sy::error_code OperationResult;
     typedef Fl::List const& FileList;

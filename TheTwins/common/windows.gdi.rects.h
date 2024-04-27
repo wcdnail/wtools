@@ -18,8 +18,22 @@ namespace Cf  // Common framework
     {
         TRIVERTEX vertex[2] = 
         {
-            { rc.left, rc.top,     GetRValue(c0) << 8, GetGValue(c0) << 8, GetBValue(c0) << 8, 0x0000 },
-            { rc.right, rc.bottom, GetRValue(c1) << 8, GetGValue(c1) << 8, GetBValue(c1) << 8, 0x0000 },
+            {
+                rc.left,
+                rc.top,
+                static_cast<COLOR16>(static_cast<USHORT>(GetRValue(c0)) << 8),
+                static_cast<COLOR16>(static_cast<USHORT>(GetGValue(c0)) << 8),
+                static_cast<COLOR16>(static_cast<USHORT>(GetBValue(c0)) << 8),
+                0x0000
+            },
+            {
+                rc.right,
+                rc.bottom,
+                static_cast<COLOR16>(static_cast<USHORT>(GetRValue(c1)) << 8),
+                static_cast<COLOR16>(static_cast<USHORT>(GetGValue(c1)) << 8),
+                static_cast<COLOR16>(static_cast<USHORT>(GetBValue(c1)) << 8),
+                0x0000
+            },
         };
 
         GRADIENT_RECT rect[1] = {{0, 1}};

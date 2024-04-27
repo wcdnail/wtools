@@ -100,13 +100,13 @@ namespace Ui
         NextY = 0;
         IsNextAnimation = false;
 
-        boost::mutex::scoped_lock lk(DequeMx);
+        std::lock_guard lk(DequeMx);
         Deque.clear();
     }
 
     void StatusBar::Add(std::wstring const& text, HICON icon /*= NULL*/, int progress /*= -1*/)
     {
-        boost::mutex::scoped_lock lk(DequeMx);
+        std::lock_guard lk(DequeMx);
         Deque.push_back(It(text, icon, progress));
 
         if (!IsNextAnimation)
@@ -142,7 +142,7 @@ namespace Ui
 
         bool needWaitNext = false;
         {
-            boost::mutex::scoped_lock lk(DequeMx);
+            std::lock_guard lk(DequeMx);
             needWaitNext = !Deque.empty();
         }
 
@@ -167,7 +167,7 @@ namespace Ui
         if (WaitNext == id)
         {
             KillTimer(id);
-            boost::mutex::scoped_lock lk(DequeMx);
+            std::lock_guard lk(DequeMx);
             StartAnimation();
         }
     }

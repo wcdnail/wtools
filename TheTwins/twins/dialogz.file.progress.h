@@ -7,6 +7,8 @@
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
+#include <thread>
+#include <mutex>
 
 namespace Twins
 {
@@ -57,8 +59,8 @@ namespace Twins
         volatile BOOL Canceled;
         volatile bool Paused;
         CString PauseName;
-        mutable boost::mutex PauseMx; 
-        mutable boost::condition PauseCn;
+        mutable std::mutex PauseMx; 
+        mutable std::condition_variable PauseCn;
 
         BOOL OnInitDialog(HWND, LPARAM param);
         void OnCommand(UINT code, int id, HWND);

@@ -1,3 +1,7 @@
+#ifndef _UNICODE
+#  error _UNICODE is NOT defined!!!
+#endif
+
 #include <wtypes.h>
 
 #pragma comment(lib, "atls.lib")

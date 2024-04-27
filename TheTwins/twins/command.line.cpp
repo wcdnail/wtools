@@ -25,18 +25,19 @@ namespace Ui
     {
         CRect rcLine = rc;
         Super::Create(parent, rcLine, NULL, WS_CHILD | WS_VISIBLE, 0, id);
-        return NULL != m_hWnd;
+        return NULL != this->m_hWnd;
     }
 
     int CommandLine::OnCreate(LPCREATESTRUCT cs)
     {
-        Prompt.Create(m_hWnd, rcDefault, _T("")
+        Prompt.Create(this->m_hWnd, rcDefault, _T("")
             , WS_CHILD | WS_VISIBLE 
             | SS_CENTERIMAGE 
             | SS_RIGHT | SS_PATHELLIPSIS
             , 0, IdPrompt);
 
-        Combo.Create(m_hWnd, CRect(0, 0, 0, 600), NULL
+        CRect rcCmb(0, 0, 0, 600);
+        Combo.Create(this->m_hWnd, rcCmb, NULL
             , WS_CHILD | WS_VISIBLE | WS_TABSTOP
             | CBS_DROPDOWN 
             , CBES_EX_NOSIZELIMIT
@@ -45,8 +46,9 @@ namespace Ui
         Prompt.SetFont(MyFont);
         Combo.SetFont(MyFont);
 
-        for (HistoryStore::const_iterator it = History.cbegin(); it != History.cend(); ++it)
-            Combo.InsertItem(CBEIF_TEXT, 0, it->c_str(), 0, 0, 0, 0, NULL);
+        for (HistoryStore::const_iterator it = History.cbegin(); it != History.cend(); ++it) {
+            Combo.InsertItem(CBEIF_TEXT, 0, (LPCTSTR)it->c_str(), 0, 0, 0, 0, NULL);
+        }
 
         Combo.UpdateWindow();
         Combo.Invalidate();
@@ -68,8 +70,10 @@ namespace Ui
         for (int i=0; i<count; i++)
         {
             CString text;
-            if (Combo.GetLBText(i, text) > 0)
-                tempHistory.push_back((PCWSTR)text);
+            if (Combo.GetLBText(i, text) > 0) {
+                std::wstring strText(text.GetString(), text.GetLength());
+                tempHistory.emplace_back(std::move(strText));
+            }
         }
 
         History.swap(tempHistory);
@@ -101,7 +105,7 @@ namespace Ui
 
     void CommandLine::SetPath(std::wstring const& text)
     {
-        boost::mutex::scoped_lock lk(PromptMx);
+        std::lock_guard lk(PromptMx);
         Prompt.SetWindowText((text + L" #>").c_str());
     }
 
