@@ -102,7 +102,7 @@ namespace Cf
         Factory[_class] = Creator<Control<T> >;
 
 #ifdef _DEBUG
-        Dh::ThreadPrintf(L"Colorize: Insert `%s` to factory\n", _class);
+        Dh::ThreadPrintf(L"Colorize: Insert `%s` to factory\n", _class.GetString());
 #endif
     }
 

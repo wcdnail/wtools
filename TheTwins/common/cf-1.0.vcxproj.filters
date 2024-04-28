@@ -140,6 +140,12 @@
     <ClCompile Include="windows.gdi.rects.cpp">
       <Filter>__</Filter>
     </ClCompile>
+    <ClCompile Include="crash.report\exception.cpp">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="string.utils.wide2multi.multi2wide.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">

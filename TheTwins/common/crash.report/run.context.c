@@ -14,6 +14,7 @@
 #endif
 #include <stdint.h>
 #include <assert.h>
+#include <stdlib.h>
 
 struct RUN_CTX
 {
@@ -25,28 +26,36 @@ struct RUN_CTX
     int32_t     skip;     /* For stack walker. */
 };
 
-typedef struct RUN_CTX *RUN_CONTEXT_PTR;
+typedef void (__stdcall *PRTLCAPTURECONTEXT)(PCONTEXT);
 
 int get_last_error_code(void)
 {
     return ((int)GetLastError());
 }
 
-RUN_CONTEXT capture_context(void)
-{
-    DWORD lerr = GetLastError();
-    void (__stdcall *PRtlCaptureContext)(PCONTEXT);
-    RUN_CONTEXT  rc = { 0 };
-    CONTEXT context = { 0 };
+HANDLE   run_context_get_pid(PCRUN_CONTEXT pctx) { return pctx ? pctx->pid : INVALID_HANDLE_VALUE; }
+HANDLE   run_context_get_tid(PCRUN_CONTEXT pctx) { return pctx ? pctx->tid : INVALID_HANDLE_VALUE; }
+PCONTEXT run_context_get_ctx(PCRUN_CONTEXT pctx) { return pctx ? &pctx->context : NULL; }
+int      run_context_get_skp(PCRUN_CONTEXT pctx) { return pctx ? pctx->skip : 0; }
 
-    PRtlCaptureContext = (void (__stdcall *)(PCONTEXT))
-        GetProcAddress(GetModuleHandleW(L"kernel32"), "RtlCaptureContext");
-    if (NULL != PRtlCaptureContext) {
-        ZeroMemory(&context, sizeof(context));
-        PRtlCaptureContext(&context);
+void free_run_context(PRUN_CONTEXT pctx)
+{
+    if (pctx) {
+        free((void*)pctx);
     }
+}
+
+void capture_run_context(PRUN_CONTEXT* ppctx)
+{
+    CONTEXT             context = { 0 };
+    DWORD                  lerr = GetLastError();
+    PRTLCAPTURECONTEXT rtlpcctx = (PRTLCAPTURECONTEXT)GetProcAddress(GetModuleHandleW(L"kernel32"), "RtlCaptureContext");
+    PRUN_CONTEXT             rv = calloc(1, sizeof(struct RUN_CTX));
+    if (!rv || !rtlpcctx) {
+        return ;
+    }
+    rtlpcctx(&context);
 #ifdef _M_IX86
-    else
     {
         _asm    call    x
         _asm x: pop     eax
@@ -55,12 +64,12 @@ RUN_CONTEXT capture_context(void)
         _asm    mov     context.Esp, esp
     }
 #endif // _M_IX86
-    rc.pid      = GetCurrentProcess();
-    rc.tid      = GetCurrentThread();
-    rc.context  = context;
-    rc.skip     = 1;
+    rv->pid      = GetCurrentProcess();
+    rv->tid      = GetCurrentThread();
+    rv->context  = context;
+    rv->skip     = 1;
     SetLastError(lerr);
-    return rc;
+    (*ppctx) = rv;
 }
 
 static void SuspendThreadAndGetContext(HANDLE thread, PCONTEXT context)
@@ -80,7 +89,9 @@ void get_context(HANDLE thread, DWORD threadId, PCONTEXT context, DWORD flags)
         SuspendThreadAndGetContext(thread, context);
     }
     else {
-        RUN_CONTEXT rc = capture_context();
-        memcpy(context, &rc.context, sizeof(*context));
+        PRUN_CONTEXT rc = NULL;
+        capture_run_context(&rc);
+        memcpy(context, &rc->context, sizeof(*context));
+        free_run_context(rc);
     }
 }

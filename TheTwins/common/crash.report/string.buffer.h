@@ -1,11 +1,6 @@
-#ifndef _CR_string_buffer_h__
-#define _CR_string_buffer_h__
+#pragma once
 
-#include <stdlib.h>
 #include <stdarg.h>
-#include <stdio.h>
-#include <malloc.h>
-#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,9 +13,9 @@ extern "C" {
  */
 typedef struct STRING_BUFFER_S
 {
-    char const* string;         /* whole string */
-    size_t      next;           /* next available space */
-    size_t      size;           /* whole string size */
+    char* string;                       /* whole string */
+    size_t  next;                       /* next available space */
+    size_t  size;                       /* whole string size */
 } STRING_BUFFER, *STRING_BUFFER_PTR;
 
 /*
@@ -59,5 +54,3 @@ int sb_format(STRING_BUFFER* buffer, char const* format, ...);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _CR_string_buffer_h__ */

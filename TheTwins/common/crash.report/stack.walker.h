@@ -1,9 +1,12 @@
-#ifndef _UnI_Afx_Core_Windows_Stack_Walker_h__
-#define _UnI_Afx_Core_Windows_Stack_Walker_h__
+#pragma once
 
-#ifdef _WIN32
-#include <windows.h>
-#include <dbghelp.h>
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4668) // 4668: '_WIN32_WINNT_WIN10_TH2' is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
+#endif
+#include <wtypes.h>
+#ifdef _MSC_VER
+#  pragma warning(pop)
 #endif
 
 #ifdef __cplusplus
@@ -11,7 +14,17 @@ extern "C"
 {
 #endif
 
-#ifdef _WIN32
+struct _tagSTACKFRAME64;
+typedef struct _tagSTACKFRAME64* LPSTACKFRAME64;
+
+struct _IMAGEHLP_MODULE64;
+typedef struct _IMAGEHLP_MODULE64* PIMAGEHLP_MODULE64;
+
+struct _IMAGEHLP_LINE64;
+typedef struct _IMAGEHLP_LINE64* PIMAGEHLP_LINE64;
+
+struct _IMAGEHLP_SYMBOL64;
+typedef struct _IMAGEHLP_SYMBOL64* PIMAGEHLP_SYMBOL64;
 
 typedef BOOL (CALLBACK *STACKWALK_CALLBACK)(HANDLE, HANDLE, 
                                             const PCONTEXT, 
@@ -25,10 +38,6 @@ typedef BOOL (CALLBACK *STACKWALK_CALLBACK)(HANDLE, HANDLE,
 int stack_walker(HANDLE process, HANDLE thread, CONTEXT const* scontext, 
                 int skip, STACKWALK_CALLBACK cb, void* arg);
 
-#endif
-
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _UnI_Afx_Core_Windows_Stack_Walker_h__ */

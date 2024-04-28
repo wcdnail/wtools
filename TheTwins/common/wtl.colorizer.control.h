@@ -1,12 +1,11 @@
 #pragma once
 
+#include "wcdafx.api.h"
 #include "wtl.colorizer.h"
 #include "wtl.colorizer.helpers.h"
 #include "wtl.colorizer.control.details.h"
 #include "wtl.colorizer.control.specific.h"
-#include "dh.tracing.h"
-#include "windows.gdi.rects.h"
-#include <dev.assistance/dev.assist.h>
+#include "dev.assistance/dev.assist.h"
 
 namespace Cf
 {
@@ -16,12 +15,12 @@ namespace Cf
     {
         typedef ATL::CWindowImpl<ControlBase> ImplBase;
 
-        ControlBase(HWND hwnd, PCTSTR childClass);
-        virtual ~ControlBase();
-        virtual ImplBase* Impl();
+        WCDAFX_API ControlBase(HWND hwnd, PCTSTR childClass);
+        WCDAFX_API virtual ~ControlBase();
+        WCDAFX_API virtual ImplBase* Impl();
 
     protected:
-        void OnDestroy(HWND hwnd, PCTSTR childClass);
+        WCDAFX_API void OnDestroy(HWND hwnd, PCTSTR childClass);
 
     private:
 #ifdef _DEBUG
@@ -85,12 +84,7 @@ namespace Cf
                 return TRUE;                                                                  \
             }
 
-        static constexpr size_t PaddingAdjust = 
-            //sizeof(Owner) + 
-            //sizeof(SpecificMembers<T>) +
-            3;
-
-        uint8_t reserved[PaddingAdjust];
+        uint8_t align_[4];
 
         BEGIN_MSG_MAP_EX(Control)
             MSG_WM_DESTROY(OnDestroy)

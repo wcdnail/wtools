@@ -6,7 +6,7 @@ namespace Cf
 #pragma region Static specific
 
     template <>
-    void Colorizer::Control<WTL::CStatic>::OnPaint(CDCHandle)
+    WCDAFX_API void Colorizer::Control<WTL::CStatic>::OnPaint(CDCHandle)
     {
         if (Details<WTL::CStatic>::Normal != Details<WTL::CStatic>::GetAppearType(*this)) {
             SetMsgHandled(FALSE);
@@ -26,7 +26,7 @@ namespace Cf
 #pragma region Button specific
 
     template <>
-    void Colorizer::Control<WTL::CButton>::OnPaint(CDCHandle)
+    WCDAFX_API void Colorizer::Control<WTL::CButton>::OnPaint(CDCHandle)
     {
         Details<WTL::CButton>::AppearType type = Details<WTL::CButton>::GetAppearType(*this);
         if ((Details<WTL::CButton>::Ownerdraw == type) || (Details<WTL::CButton>::UserButton == type)) {
@@ -40,35 +40,36 @@ namespace Cf
             Owner->SetTextColor(pc.PaindDC.m_hDC);
 
             switch (type) {
-            case Details<WTL::CButton>::Groupbox:
+            case Details<WTL::CButton>::Groupbox: {
                 Owner->DrawGroupBox(*this, pc.PaindDC.m_hDC, pc.Rect, text);
                 break;
-
+            }
             case Details<WTL::CButton>::PushButton:
             case Details<WTL::CButton>::DefPushButton:
-            case Details<WTL::CButton>::Flat: 
-                Owner->DrawButton(*this, pc.PaindDC.m_hDC, pc.Rect, text
-                    , Details<WTL::CButton>::Flat == type
-                    , Details<WTL::CButton>::DefPushButton == type);
+            case Details<WTL::CButton>::Flat: {
+                Owner->DrawButton(*this, pc.PaindDC.m_hDC, pc.Rect, text,
+                    Details<WTL::CButton>::Flat == type,
+                    Details<WTL::CButton>::DefPushButton == type);
                 break;
-
+            }
             case Details<WTL::CButton>::Checkbox:
             case Details<WTL::CButton>::AutoCheckbox:
             case Details<WTL::CButton>::ThreeState:
-            case Details<WTL::CButton>::Auto3State:
+            case Details<WTL::CButton>::Auto3State: {
                 Owner->DrawCheckBox(*this, pc.PaindDC.m_hDC, pc.Rect, text);
                 break;
-
+            }
             case Details<WTL::CButton>::RadioButton:
-            case Details<WTL::CButton>::AutoRadioButton:
+            case Details<WTL::CButton>::AutoRadioButton: {
                 Owner->DrawRadioButton(*this, pc.PaindDC.m_hDC, pc.Rect, text);
                 break;
-
+            }
             case Details<WTL::CButton>::Pushbox:
             case Details<WTL::CButton>::UserButton:
-            case Details<WTL::CButton>::Ownerdraw:
+            case Details<WTL::CButton>::Ownerdraw: {
                 ::DebugBreak();
                 break;
+            }
             }
         }
     }
@@ -78,7 +79,7 @@ namespace Cf
 #pragma region ListBox specific
 
     template <>
-    void Colorizer::Control<WTL::CListBox>::SpecificPreInit(HWND hwnd)
+    WCDAFX_API void Colorizer::Control<WTL::CListBox>::SpecificPreInit(HWND hwnd)
     {
         UINT ns = static_cast<UINT>(::GetWindowLong(hwnd, GWL_STYLE));
         ns |= LBS_OWNERDRAWVARIABLE | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT;
@@ -86,7 +87,7 @@ namespace Cf
     }
 
     template <>
-    CString Colorizer::Control<WTL::CListBox>::GetItemText(int index) const
+    WCDAFX_API CString Colorizer::Control<WTL::CListBox>::GetItemText(int index) const
     {
         CString result;
         GetText(index, result);
@@ -94,7 +95,7 @@ namespace Cf
     }
 
     template <>
-    BOOL Colorizer::Control<WTL::CListBox>::SpecificMessagesHandler(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD)
+    WCDAFX_API BOOL Colorizer::Control<WTL::CListBox>::SpecificMessagesHandler(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD)
     {
         if (WM_DRAWITEM == uMsg) {
             this->SetMsgHandled(TRUE);
@@ -112,25 +113,25 @@ namespace Cf
 #pragma region ComboBox specific
 
     template <>
-    CString Colorizer::Control<WTL::CComboBox>::GetItemText(int index) const
+    WCDAFX_API CString Colorizer::Control<WTL::CComboBox>::GetItemText(int index) const
     {
         CString result;
         GetLBText(index, result);
         return result;
     }
 
-    template <> void Colorizer::Control<WTL::CComboBox>::OnNcPaint(CRgnHandle rgn) {}
-    template <> BOOL Colorizer::Control<WTL::CComboBox>::OnEraseBkgnd(CDCHandle dc) { return TRUE; }
+    template <> WCDAFX_API void Colorizer::Control<WTL::CComboBox>::OnNcPaint(CRgnHandle rgn) {}
+    template <> WCDAFX_API BOOL Colorizer::Control<WTL::CComboBox>::OnEraseBkgnd(CDCHandle dc) { return TRUE; }
 
     template <>
-    void Colorizer::Control<WTL::CComboBox>::OnPaint(CDCHandle)
+    WCDAFX_API void Colorizer::Control<WTL::CComboBox>::OnPaint(CDCHandle)
     {
         PaintContext pc(*this, GetFont());
         Owner->DrawComboFace<WTL::CComboBox>(*this, pc.PaindDC.m_hDC, pc.Rect);
     }
 
     template <>
-    HBRUSH Colorizer::Control<WTL::CComboBox>::OnCtlColorListBox(CDCHandle dc, HWND hwnd)
+    WCDAFX_API HBRUSH Colorizer::Control<WTL::CComboBox>::OnCtlColorListBox(CDCHandle dc, HWND hwnd)
     {
         if (!Members.Listbox.get() && (m_hWnd != hwnd))
         {
@@ -143,14 +144,14 @@ namespace Cf
     }
 
     template <>
-    HBRUSH Colorizer::Control<WTL::CComboBox>::OnCtlColorEdit(CDCHandle dc, HWND)
+    WCDAFX_API HBRUSH Colorizer::Control<WTL::CComboBox>::OnCtlColorEdit(CDCHandle dc, HWND)
     {
         Owner->SetTextColor(dc);
         return Owner->MyBackBrush[0];
     }
 
     template <>
-    BOOL Colorizer::Control<WTL::CComboBox>::SpecificMessagesHandler(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD)
+    WCDAFX_API BOOL Colorizer::Control<WTL::CComboBox>::SpecificMessagesHandler(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD)
     {
         if (WM_DRAWITEM == uMsg) {
             this->SetMsgHandled(TRUE);
@@ -182,7 +183,7 @@ namespace Cf
 #pragma region ScrollBar specific
 
     template <>
-    BOOL Colorizer::Control<WTL::CScrollBar>::OnEraseBkgnd(CDCHandle)
+    WCDAFX_API BOOL Colorizer::Control<WTL::CScrollBar>::OnEraseBkgnd(CDCHandle)
     {
         SetMsgHandled(FALSE);
         return FALSE;
@@ -193,7 +194,7 @@ namespace Cf
 #pragma region TreeView specific
 
     template <>
-    void Colorizer::Control<WTL::CTreeViewCtrl>::SpecificPreInit(HWND hwnd)
+    WCDAFX_API void Colorizer::Control<WTL::CTreeViewCtrl>::SpecificPreInit(HWND hwnd)
     {
         ::SetWindowLong(hwnd, GWL_EXSTYLE
             , ::GetWindowLong(hwnd, GWL_EXSTYLE) 
@@ -202,7 +203,7 @@ namespace Cf
     }
 
     template <>
-    LRESULT Colorizer::Control<WTL::CTreeViewCtrl>::OnGetDispinfo(LPNMHDR /*header*/)
+    WCDAFX_API LRESULT Colorizer::Control<WTL::CTreeViewCtrl>::OnGetDispinfo(LPNMHDR /*header*/)
     {
         //LPNMTVDISPINFO di = (LPNMTVDISPINFO)header;
         // ##TODO: implemenation of CTreeViewCtrl OnGetDispinfo
@@ -210,7 +211,7 @@ namespace Cf
     }
 
     template <>
-    DWORD Colorizer::Control<WTL::CTreeViewCtrl>::OnPrePaint(int, LPNMCUSTOMDRAW cd) 
+    WCDAFX_API DWORD Colorizer::Control<WTL::CTreeViewCtrl>::OnPrePaint(int, LPNMCUSTOMDRAW cd) 
     {
         CDCHandle dc(cd->hdc);
         dc.FillSolidRect(&cd->rc, Owner->MyBackColor);
@@ -218,7 +219,7 @@ namespace Cf
     }
 
     template <>
-    DWORD Colorizer::Control<WTL::CTreeViewCtrl>::OnItemPrePaint(int, LPNMCUSTOMDRAW cd) 
+    WCDAFX_API DWORD Colorizer::Control<WTL::CTreeViewCtrl>::OnItemPrePaint(int, LPNMCUSTOMDRAW cd) 
     {
         NMTVCUSTOMDRAW* tv = reinterpret_cast<NMTVCUSTOMDRAW*>(cd);
         HTREEITEM     item = reinterpret_cast<HTREEITEM>(cd->dwItemSpec);
@@ -234,7 +235,7 @@ namespace Cf
     }
 
     template <>
-    BOOL Colorizer::Control<WTL::CTreeViewCtrl>::SpecificMessagesHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD)
+    WCDAFX_API BOOL Colorizer::Control<WTL::CTreeViewCtrl>::SpecificMessagesHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD)
     {
         //NOTIFY_CODE_HANDLER_EX(TVN_GETDISPINFO, OnGetDispinfo)
         CHAIN_MSG_MAP(CustomDraw)

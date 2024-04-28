@@ -38,7 +38,7 @@ namespace Cf
 
             STRING_BUFFER lcodetext;
             ::sb_zero(&lcodetext);
-            ::describe_last_operation_code(&lcodetext, lcode);
+            ::describe_operation_code(&lcodetext, lcode);
 
             try
             {

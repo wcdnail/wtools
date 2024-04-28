@@ -15,7 +15,7 @@ void crash_report(char const* reason
                 , char const* source
                 , int line
                 , int errcode
-                , RUN_CONTEXT const* rc
+                , PCRUN_CONTEXT rc
                 , int terminate);
 
 #ifdef __cplusplus

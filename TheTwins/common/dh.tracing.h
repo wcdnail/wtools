@@ -71,7 +71,8 @@ namespace Dh
         {
             size_t llen = min(dlen, slen);
             for (size_t i=0; i<llen; i++) {
-                dest[i] = PrintableChar(source[i]);
+                C ch = PrintableChar(source[i]);
+                dest[i] = ch;
             }
         }
     }

@@ -1,22 +1,31 @@
-#define SECURITY_WIN32
-#define WIN32_LEAN_AND_MEAN
-#define _WIN32_WINNT 0x0501
-
 #include "run.context.info.h"
 #include "stack.walker.h"
+#include <assert.h>
+
+#ifdef _MSC_VER
+#  pragma warning(disable: 4820) // 4820: '_LOADED_IMAGE': '4' bytes padding added after data member 'NumberOfSections'
+#  pragma warning(disable: 4255) // 4255: 'PSYMBOLSERVERGETOPTIONSPROC': no function prototype given: converting '()' to '(void)'
+#  pragma warning(disable: 4191) // 4191: 'type cast': unsafe conversion from 'FARPROC' to 'PGPI'
+                                 // 4191:         Making a function call using the resulting pointer may cause your program to fail
+#  pragma warning(disable: 4996) // 4996: 'GetVersionExW': was declared deprecated
+#  pragma warning(disable: 4090) // 4090: 'function': different 'const' qualifiers
+#  pragma warning(disable: 4710) // 4710: 'HRESULT StringCchPrintfW(STRSAFE_LPWSTR,size_t,STRSAFE_LPCWSTR,...)': function not inlined
+#  pragma warning(disable: 4668) // 4668: '_WIN32_WINNT_WIN10_TH2' is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
+#endif
+
+#define SECURITY_WIN32
+#define WIN32_LEAN_AND_MEAN
+
+#include <SDKDDKVER.h>
 #include <windows.h>
-#include <tchar.h>
 #include <dbghelp.h>
 #include <tlhelp32.h>
 #include <process.h>
-#include <stdio.h>
-#include <assert.h>
 #include <security.h>
 #include <strsafe.h>
-#include "../todo.fixme.etc.h"
+#include <tchar.h>
 
-// ##TODO: Load SECUR32 dynamically"))
-#pragma comment(lib, "SECUR32")
+#pragma comment(lib, "SECUR32") // ##FIXME: Load SECUR32 dynamically
 
 void get_context(HANDLE thread, DWORD threadId, PCONTEXT context, DWORD flags);
 
@@ -28,9 +37,7 @@ void get_context(HANDLE thread, DWORD threadId, PCONTEXT context, DWORD flags);
 char const* exception_code_string(unsigned code)
 {
     #define _caseX_retXToken(C) case C: return #C
-
-    switch(code) 
-    {
+    switch(code) {
     _caseX_retXToken(EXCEPTION_ACCESS_VIOLATION      );
     _caseX_retXToken(EXCEPTION_ARRAY_BOUNDS_EXCEEDED );
     _caseX_retXToken(EXCEPTION_BREAKPOINT            );
@@ -52,50 +59,39 @@ char const* exception_code_string(unsigned code)
     _caseX_retXToken(EXCEPTION_SINGLE_STEP           );
     _caseX_retXToken(EXCEPTION_STACK_OVERFLOW        );
     }
-
     #undef _caseX_retXToken
-
-    if (0xe0 == (code >> 24)) /* Visual C++ */
-        return "MSVC_EXCEPTION";
-
+    if (0xe0 == (code >> 24)) { /* Visual C++ */
+        return "C++EXCEPTION";
+    }
     return "";
 }
 
 static PCSTR to_utf8(PCWSTR string, int len)
 {
-    int len2 = len * 2 + 1;
+    int    len2 = len * 2 + 1;
     PSTR result = (PSTR)calloc(len2, 1);
-    if (NULL != result)
-    {
-        WideCharToMultiByte(CP_UTF8, 0, string, len, 
-            result, len2, NULL, NULL);
+    if (NULL != result) {
+        WideCharToMultiByte(CP_UTF8, 0, string, len, result, len2, NULL, NULL);
     }
     return result;
 }
 
-void describe_last_operation_code(STRING_BUFFER_PTR buffer, int code)
+void describe_operation_code(STRING_BUFFER_PTR buffer, int code)
 {
     PCSTR output = exception_code_string(code);
     
-    if (strlen(output) > 1)
-    {
+    if (strlen(output) > 1) {
         sb_format(buffer, "%s", output);
     }
-    else
-    {
+    else {
         HLOCAL local = NULL;
-        DWORD l = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-            FORMAT_MESSAGE_FROM_SYSTEM,
+        DWORD l = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
             NULL, (DWORD)code, 0, (PWSTR)&local, 0, NULL);
-
-        if (l > 2)
-        {
+        if (l > 2) {
             PWSTR message = (PWSTR)LocalLock(local);
             message[l-2] = L'\0';
-
             output = to_utf8(message, l);
-            if (NULL != output)
-            {
+            if (NULL != output) {
                 sb_format(buffer, "(%d) %s", code, output);
                 free((void*)output);
             }
@@ -431,6 +427,10 @@ static BOOL CALLBACK write_stack_frame_info(HANDLE process, HANDLE thread,
                                             DWORD64 displacement,
                                             STRING_BUFFER_PTR buffer)
 {
+    UNREFERENCED_PARAMETER(process);
+    UNREFERENCED_PARAMETER(thread);
+    UNREFERENCED_PARAMETER(context);
+    UNREFERENCED_PARAMETER(line);
     sb_format(buffer, "\r\n%016I64x %s!%s + 0x%I64x", 
         frame->AddrPC.Offset, 
         module->ModuleName, symbol->Name, 
@@ -439,10 +439,13 @@ static BOOL CALLBACK write_stack_frame_info(HANDLE process, HANDLE thread,
     return TRUE;
 }
 
-void describe_callstack(STRING_BUFFER_PTR buffer, RUN_CONTEXT const* rc)
+void describe_callstack(STRING_BUFFER_PTR buffer, PCRUN_CONTEXT rc)
 {
-    stack_walker(rc->pid, rc->tid, &rc->context, rc->skip,
-        (STACKWALK_CALLBACK)write_stack_frame_info, buffer);
+    HANDLE   pid = run_context_get_pid(rc);
+    HANDLE   tid = run_context_get_tid(rc);
+    PCONTEXT ctx = run_context_get_ctx(rc);
+    int     skip = run_context_get_skp(rc);
+    stack_walker(pid, tid, ctx, skip, (STACKWALK_CALLBACK)write_stack_frame_info, buffer);
 }
 
 /************************************************************************
@@ -542,8 +545,6 @@ static void CALLBACK write_thread_info(size_t num, THREADENTRY32 const* te,
 static unsigned get_threads_list_proc(GET_THREADS_LIST_REQUEST* request)
 {
     HANDLE snapshot;
-    size_t count = 0;
-    char* const* callStack = NULL;
     DWORD processId = GetProcessId(request->process);
     
     snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, processId);
@@ -596,9 +597,9 @@ void describe_threads(STRING_BUFFER_PTR buffer, void* pid, int inSeparateThread)
  *                                                                      *
  ************************************************************************/
 
-void describe_cpu_info(STRING_BUFFER_PTR buffer, RUN_CONTEXT const* rc)
+void describe_cpu_info(STRING_BUFFER_PTR buffer, PCRUN_CONTEXT rc)
 {
-    CONTEXT const* context = &rc->context;
+    PCONTEXT context = run_context_get_ctx(rc);
 
     sb_format(buffer,
 #ifdef _M_IX86

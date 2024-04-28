@@ -11,26 +11,20 @@ namespace Cf
     template <typename T>
     struct Colorizer::SpecificMembers
     {
-        using Super = T;
-
         SpecificMembers(SpecificMembers const&) = delete;
         SpecificMembers& operator = (SpecificMembers const&) = delete;
-
-        ~SpecificMembers()
-        {}
-
-        SpecificMembers()
-        {}
+        ~SpecificMembers() {}
+        SpecificMembers() {}
+    private:
+        uint8_t align_[8];
     };
 
     template <>
     struct Colorizer::SpecificMembers<WTL::CComboBox>
     {
         std::unique_ptr<Control<WTL::CListBox>> Listbox;
-
         SpecificMembers(SpecificMembers const&) = delete;
         SpecificMembers& operator = (SpecificMembers const&) = delete;
-
         ~SpecificMembers();
         SpecificMembers();
     };

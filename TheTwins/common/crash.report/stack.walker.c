@@ -1,10 +1,15 @@
-#define WIN32_LEAN_AND_MEAN
-#define _WIN32_WINNT 0x0500
-
 #include "debug.output.h"
-#include "Stack.Walker.h"
+#include "stack.walker.h"
 #include <assert.h>
 
+#ifdef _MSC_VER
+#  pragma warning(disable: 4820) // 4820: '_LOADED_IMAGE': '4' bytes padding added after data member 'NumberOfSections'
+#  pragma warning(disable: 4255) // 4255: 'PSYMBOLSERVERGETOPTIONSPROC': no function prototype given: converting '()' to '(void)'
+#endif
+#define WIN32_LEAN_AND_MEAN
+#include <SDKDDKVER.h>
+#include <windows.h>
+#include <dbghelp.h>
 #pragma comment(lib, "dbghelp")
 
 static DWORD init_stack_frame(LPSTACKFRAME64 stackFrame, PCONTEXT context)
@@ -74,57 +79,42 @@ int stack_walker(HANDLE process, HANDLE thread, CONTEXT const* scontext, int ski
     PIMAGEHLP_SYMBOL64  symbol   = (PIMAGEHLP_SYMBOL64)symBuffer;
     PIMAGEHLP_LINE64    line     = &lineBuffer;
     PIMAGEHLP_MODULE64  module   = &moduleBuffer;
-
-    if (!SymInitialize(process, NULL, TRUE))
-    {
+    if (!SymInitialize(process, NULL, TRUE)) {
         DEBUGPRINT2(GetLastError(), "SymInitialize failed. ");
         return 0;
     }
-
     assert(NULL != scontext);
     memcpy(context, scontext, sizeof(CONTEXT));
-
     imageType = init_stack_frame(frame, context);
-
-    for (num = 0; ; ++num)
-    {
-        if (!StackWalk64(imageType, 
-            process, thread, 
-            frame, context, 
+    for (num = 0; ; ++num) {
+        if (!StackWalk64(imageType, process, thread, frame, context, 
             read_process_memory_impl, 
             SymFunctionTableAccess64, 
             SymGetModuleBase64, 
-            NULL))
+            NULL)
+            ) {
             break;
-
-        if (num < skip)
+        }
+        if (num < skip) {
             continue;
-
-        if (frame->AddrPC.Offset == frame->AddrReturn.Offset)
-        {
+        }
+        if (frame->AddrPC.Offset == frame->AddrReturn.Offset) {
             DEBUGPRINT("AddrPC == AddrReturn\n");
             break;
         }
-
-        if (frame->AddrPC.Offset)
-        {
+        if (frame->AddrPC.Offset) {
             DWORD64 displacement;
             DWORD displacementLine;
-
             ZeroMemory(symbol, sizeof(symBuffer));
             symbol->SizeOfStruct = sizeof(symBuffer);
             symbol->MaxNameLength = MAX_SYM_LEN;
-
             ZeroMemory(line, sizeof(IMAGEHLP_LINE64));
             line->SizeOfStruct = sizeof(IMAGEHLP_LINE64);
-
             ZeroMemory(module, sizeof(IMAGEHLP_MODULE64));
             module->SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
-
             SymGetSymFromAddr64(process, frame->AddrPC.Offset, &displacement, symbol);
             SymGetLineFromAddr64(process, frame->AddrPC.Offset, &displacementLine, line);
             SymGetModuleInfo64(process, frame->AddrPC.Offset, module);
-
             dbg_printf("%s(%d): @%s!%08x%08x+%08x%08x (%s)\n", 
                 line->FileName, line->LineNumber, 
                 module->ModuleName,
@@ -133,19 +123,15 @@ int stack_walker(HANDLE process, HANDLE thread, CONTEXT const* scontext, int ski
                 (DWORD)(displacement >> 32), 
                 (DWORD)(displacement & 0xffffffff), 
                 symbol->Name);
-
-            if (NULL != cb)
-            {
-                if (!cb(process, thread, context, frame, module, line, symbol, displacement, arg))
+            if (NULL != cb) {
+                if (!cb(process, thread, context, frame, module, line, symbol, displacement, arg)) {
                     break;
+                }
             }
         }
     }
-
-    if (!SymCleanup(process))
-    {
+    if (!SymCleanup(process)) {
         DEBUGPRINT2(GetLastError(), "SymCleanup failed. ");
     }
-
     return 0;
 }

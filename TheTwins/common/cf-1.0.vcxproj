@@ -27,7 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>cf-1.0</ProjectName>
+    <ProjectName>wccf</ProjectName>
     <ProjectGuid>{ADF33881-BA12-46F2-A5FC-1A05F4185917}</ProjectGuid>
     <RootNamespace>unittests</RootNamespace>
     <Keyword>Win32Proj</Keyword>
@@ -387,6 +387,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="crash.report\exception.cpp" />
     <ClCompile Include="crash.report\run.context.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotUsing</PrecompiledHeader>
@@ -467,6 +468,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="string.utils.format.cpp" />
+    <ClCompile Include="string.utils.wide2multi.multi2wide.cpp" />
     <ClCompile Include="wcdafx.api.cpp" />
     <ClCompile Include="win-5-6-7.features.cpp" />
     <ClCompile Include="windows.gdi.base.cpp" />
