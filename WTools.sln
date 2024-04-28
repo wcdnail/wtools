@@ -11,6 +11,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "twins.langs", "twins.langs\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wccf", "common\wccf.vcxproj", "{ADF33881-BA12-46F2-A5FC-1A05F4185917}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{DDEE78CB-01B4-4850-8B8E-ED8E2FD73F37}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UT", "UT\UT.vcxproj", "{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|Win32 = debug|Win32
@@ -57,6 +61,18 @@ Global
 		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.release|Win32.Build.0 = release|Win32
 		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.release|x64.ActiveCfg = release|x64
 		{ADF33881-BA12-46F2-A5FC-1A05F4185917}.release|x64.Build.0 = release|x64
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.debug|Win32.ActiveCfg = debug|Win32
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.debug|Win32.Build.0 = debug|Win32
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.debug|x64.ActiveCfg = debug|x64
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.debug|x64.Build.0 = debug|x64
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.product|Win32.ActiveCfg = product|Win32
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.product|Win32.Build.0 = product|Win32
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.product|x64.ActiveCfg = product|x64
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.product|x64.Build.0 = product|x64
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.release|Win32.ActiveCfg = debug|Win32
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.release|Win32.Build.0 = debug|Win32
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.release|x64.ActiveCfg = product|x64
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0}.release|x64.Build.0 = product|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +80,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8} = {6B24C0A3-C8C6-452E-A4ED-A4B32348F4D5}
 		{ADF33881-BA12-46F2-A5FC-1A05F4185917} = {6B24C0A3-C8C6-452E-A4ED-A4B32348F4D5}
+		{4565FEEA-BDB5-4D86-AE70-C3E333A266D0} = {DDEE78CB-01B4-4850-8B8E-ED8E2FD73F37}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {52EAB33F-CB26-436F-A1A4-74E299706ADD}
