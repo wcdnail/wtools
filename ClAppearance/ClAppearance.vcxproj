@@ -222,8 +222,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ClAppearance.h" />
-    <ClInclude Include="ClAppearance_i.h" />
+    <ClInclude Include="idl\ClAppearance.h" />
+    <ClInclude Include="idl\ClAppearance_i.h" />
     <ClInclude Include="ClAppMainFrame.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
@@ -232,7 +232,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClAppearance.cpp" />
-    <ClCompile Include="ClAppearance_i.c">
+    <ClCompile Include="idl\ClAppearance_i.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
@@ -255,16 +255,18 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ClAppearance.rc" />
+    <ResourceCompile Include="resz\ClAppearance.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClAppearance.rgs" />
+    <None Include="resz\ClAppearance.rgs" />
   </ItemGroup>
   <ItemGroup>
-    <Midl Include="ClAppearance.idl" />
+    <Midl Include="idl\ClAppearance.idl" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="rom.ico" />
+    <Image Include="resz\rom-0.ico" />
+    <Image Include="resz\rom-1.ico" />
+    <Image Include="resz\rom-2.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

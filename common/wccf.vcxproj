@@ -610,7 +610,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClInclude Include="wtl.scrollbar.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cf-1.0.def" />
+    <None Include="wccf.def" />
     <None Include="json\AUTHORS" />
     <None Include="json\json_internalarray.inl" />
     <None Include="json\json_internalmap.inl" />
