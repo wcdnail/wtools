@@ -8,14 +8,11 @@
 
 namespace Twins
 {
-    class CommonDialog: public CDialogImpl<CommonDialog>
-                      , public CF::Colorizer
+    class CommonDialog: public ATL::CDialogImpl<CommonDialog, CF::Colorized::Colorizer>
     {
-    private:
-        typedef CDialogImpl<CommonDialog> Super;
-        friend Super;
-
     public:
+        using Super = ATL::CDialogImpl<CommonDialog, CF::Colorized::Colorizer>;
+
         enum 
         {
             ResultInvalidOperation = -1,
@@ -37,10 +34,12 @@ namespace Twins
         CRect GetRect() const;
 
     protected:
-        UINT IDD;
+        friend Super;
+
+        UINT        IDD;
         CString Caption;
-        TabBar Buttons;
-        int DefaultId;
+        TabBar  Buttons;
+        int   DefaultId;
 
         enum { ID_BUTTONS = 7778 };
 
@@ -53,7 +52,9 @@ namespace Twins
         void OnDestroy();
 
         BEGIN_MSG_MAP_EX(CommonDialog)
-            CHAIN_MSG_MAP(CF::Colorizer)
+            if(ProcessColorizerMessage(hWnd, uMsg, wParam, lParam, lResult)) {
+                return TRUE;
+            }
             MSG_WM_COMMAND(OnCommand)
             MSG_WM_INITDIALOG(OnInitDialog)
             MSG_WM_DESTROY(OnDestroy)

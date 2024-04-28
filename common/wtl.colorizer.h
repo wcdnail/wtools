@@ -116,7 +116,7 @@ namespace CF::Colorized
         WTL::CBrush        MyBackBrush[3];
         WTL::CPen          MyBorderPen[2];
 
-        WCDAFX_API BOOL handleWM(HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD = 0);
+        WCDAFX_API BOOL ProcessColorizerMessage(HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD = 0);
 
         WCDAFX_API void SetTextColor(CDCHandle dc) const;
 

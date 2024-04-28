@@ -110,7 +110,7 @@ namespace CF::Colorized
     BOOL Control<T>::OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
     {
         BOOL bHandled = TRUE;
-        if (m_Master.handleWM(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
+        if (m_Master.ProcessColorizerMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
             return TRUE;
         }
         switch(dwMsgMapID) {

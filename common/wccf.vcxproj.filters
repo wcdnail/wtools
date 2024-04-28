@@ -34,15 +34,6 @@
     <ClCompile Include="reflection\ref.var.list.cpp">
       <Filter>reflection</Filter>
     </ClCompile>
-    <ClCompile Include="json\json_reader.cpp">
-      <Filter>json</Filter>
-    </ClCompile>
-    <ClCompile Include="json\json_value.cpp">
-      <Filter>json</Filter>
-    </ClCompile>
-    <ClCompile Include="json\json_writer.cpp">
-      <Filter>json</Filter>
-    </ClCompile>
     <ClCompile Include="wcdafx.api.cpp">
       <Filter>_</Filter>
     </ClCompile>
@@ -234,33 +225,6 @@
     </ClInclude>
     <ClInclude Include="reflection\ref.var.list.h">
       <Filter>reflection</Filter>
-    </ClInclude>
-    <ClInclude Include="json\autolink.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\config.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\features.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\forwards.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\json.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\json_batchallocator.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\reader.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\value.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\writer.h">
-      <Filter>json</Filter>
     </ClInclude>
     <ClInclude Include="wcdafx.api.h">
       <Filter>_</Filter>
@@ -527,9 +491,6 @@
     <Filter Include="reflection">
       <UniqueIdentifier>{5dc1c8be-6d1e-4941-b332-bf03117f8241}</UniqueIdentifier>
     </Filter>
-    <Filter Include="json">
-      <UniqueIdentifier>{808443d1-a955-464b-92b8-acf2b2164f06}</UniqueIdentifier>
-    </Filter>
     <Filter Include="_">
       <UniqueIdentifier>{2e6204ab-c64c-45fa-9803-858b1ca18c29}</UniqueIdentifier>
     </Filter>
@@ -568,30 +529,7 @@
     <None Include="reflection\ref.var.streaming.inl">
       <Filter>reflection</Filter>
     </None>
-    <None Include="json\AUTHORS">
-      <Filter>json</Filter>
-    </None>
-    <None Include="json\json_internalarray.inl">
-      <Filter>json</Filter>
-    </None>
-    <None Include="json\json_internalmap.inl">
-      <Filter>json</Filter>
-    </None>
-    <None Include="json\json_valueiterator.inl">
-      <Filter>json</Filter>
-    </None>
-    <None Include="json\LICENSE">
-      <Filter>json</Filter>
-    </None>
-    <None Include="json\version">
-      <Filter>json</Filter>
-    </None>
     <None Include="wccf.def" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="json\README.txt">
-      <Filter>json</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="cf-resources\cf-res.rc">

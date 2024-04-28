@@ -127,49 +127,43 @@ namespace Twins
     {
         switch (id)
         {
-        case ResultImport:
-            {
-                WTL::CFileDialog openDlg(TRUE);
-                if (DoImportExport(false, openDlg))
-                    return Super::OnCommandById(id);
-            }
+        case ResultImport: {
+            WTL::CFileDialog openDlg(TRUE);
+            if (DoImportExport(false, openDlg))
+                return Super::OnCommandById(id);
             break;
-
-        case ResultExport:
-            {
-                WTL::CFileDialog saveDlg(FALSE);
-                DoImportExport(true, saveDlg);
-            }
+        }
+        case ResultExport: {
+            WTL::CFileDialog saveDlg(FALSE);
+            DoImportExport(true, saveDlg);
             break;
+        }
 
         case ResultOk:
-        case ResultApply:
+        case ResultApply: {
             ApplyChanges();
-
-            if (IsLanguageChaged())
-            {
+            if (IsLanguageChaged()) {
                 EndDialog(ResultRestartRequired);
                 return ResultRestartRequired;
             }
-
-            if (ResultApply == id)
+            if (ResultApply == id) {
                 break;
-
-        case ResultCancel:
-            if (HaveAnyChangesPendins())
-            {
+            }
+        }
+        case ResultCancel: {
+            if (HaveAnyChangesPendins()) {
                 WString message = _L(StrId_Configurationhaspendingchanges)
                              + L"\r\n" + _L(StrId_Doyoureallywanttoclosethedialog);
 
                 CStringW caption;
                 GetWindowText(caption);
 
-                int dr = CF::UserDialog::Ask(m_hWnd, message.c_str(), caption, MB_YESNO | MB_ICONWARNING);
-                if (CF::DialogResult::Yes != dr)
+                const auto dr = CF::UserDialog::Ask(m_hWnd, message.c_str(), caption, MB_YESNO | MB_ICONWARNING);
+                if (CF::DialogResult::Yes != dr.Code)
                     break;
             }
-
             return Super::OnCommandById(id);
+        }
         }
 
         return id;

@@ -42,7 +42,7 @@ namespace CF
 
     BOOL BasicDialog::OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
     {
-        if (Colorizer::OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
+        if (ProcessColorizerMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
             return TRUE;
         }
         BOOL bHandled = TRUE;

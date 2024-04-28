@@ -1,10 +1,8 @@
 #include "run.context.h"
-
 #ifdef _MSC_VER
 #  pragma warning(disable: 4820) // 4820: 'RUN_CTX': '12' bytes padding added after data member 'skip'
 #  pragma warning(disable: 4191) // 4191: 'type cast': unsafe conversion from 'FARPROC' to 'void (__cdecl *)(PCONTEXT)'
 #endif
-
 #ifdef _WIN32
 #  define  _CRT_SECURE_NO_WARNINGS
 #  define WIN32_LEAN_AND_MEAN
@@ -33,10 +31,10 @@ int get_last_error_code(void)
     return ((int)GetLastError());
 }
 
-HANDLE   run_context_get_pid(PCRUN_CONTEXT pctx) { return pctx ? pctx->pid : INVALID_HANDLE_VALUE; }
-HANDLE   run_context_get_tid(PCRUN_CONTEXT pctx) { return pctx ? pctx->tid : INVALID_HANDLE_VALUE; }
-PCONTEXT run_context_get_ctx(PCRUN_CONTEXT pctx) { return pctx ? &pctx->context : NULL; }
-int      run_context_get_skp(PCRUN_CONTEXT pctx) { return pctx ? pctx->skip : 0; }
+HANDLE    run_context_get_pid(PCRUN_CONTEXT pctx) { return pctx ? pctx->pid : INVALID_HANDLE_VALUE; }
+HANDLE    run_context_get_tid(PCRUN_CONTEXT pctx) { return pctx ? pctx->tid : INVALID_HANDLE_VALUE; }
+CPCONTEXT run_context_get_ctx(PCRUN_CONTEXT pctx) { return pctx ? &pctx->context : NULL; }
+int       run_context_get_skp(PCRUN_CONTEXT pctx) { return pctx ? pctx->skip : 0; }
 
 void free_run_context(PRUN_CONTEXT pctx)
 {

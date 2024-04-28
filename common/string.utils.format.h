@@ -1,5 +1,6 @@
 #pragma once
 
+#include "wcdafx.api.h"
 #include <atlstr.h>
 
 namespace Str
@@ -9,7 +10,7 @@ namespace Str
     {
         using String = CStringT<C, StrTraitATL<C, ChTraitsCRT<C>>>;
 
-        static String FormatV(C const* format, va_list ap);
-        static String Format(C const* format, ...);
+        WCDAFX_API static String FormatV(C const* format, va_list ap);
+        WCDAFX_API static String Format(C const* format, ...);
     };
 }

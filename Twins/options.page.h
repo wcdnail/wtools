@@ -11,13 +11,11 @@ namespace Twins
     void LocalizeControl(HWND hwnd);
     void LocalizeControl(HWND owenr, UINT id);
 
-    class OptionPage: ATL::CDialogImpl<OptionPage>,
-                      CF::Colorizer
+    class OptionPage: ATL::CDialogImpl<OptionPage, CF::Colorized::Colorizer>
     {
-        typedef ATL::CDialogImpl<OptionPage> Super;
-
     public:
-        typedef std::function<void(OptionPage const&, bool, UINT, HTREEITEM)> SomethingChangedCallback;
+        using Super = ATL::CDialogImpl<OptionPage, CF::Colorized::Colorizer>;
+        using SomethingChangedCallback = std::function<void(OptionPage const&, bool, UINT, HTREEITEM)>;
 
         virtual void Init() = 0;
         virtual void Destroy();
@@ -55,7 +53,9 @@ namespace Twins
         virtual bool HaveChanges() const;
 
         BEGIN_MSG_MAP_EX(OptionPage)
-            CHAIN_MSG_MAP(CF::Colorizer)
+            if (ProcessColorizerMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
+                return TRUE;
+            }
             MSG_WM_INITDIALOG(OnInitDialog)
             MSG_WM_DESTROY(OnDestroy)
             MSG_WM_NOTIFY(OnNotify)

@@ -108,7 +108,7 @@ namespace CF::Colorized
 #pragma endregion 
 #pragma region Windows messages handler
 
-    BOOL Colorizer::handleWM(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID/* = 0*/)
+    BOOL Colorizer::ProcessColorizerMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID/* = 0*/)
     {
         bool prevMsgHandled = IsMsgHandled();
         BOOL rv = OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
