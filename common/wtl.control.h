@@ -28,16 +28,17 @@ namespace CF
 
         WCDAFX_API virtual ~ControlBase();
         WCDAFX_API ControlBase();
+        WCDAFX_API ControlBase(HWND hWnd);
         
         WCDAFX_API BOOL IsMsgHandled() const;
         WCDAFX_API void SetMsgHandled(BOOL bHandled);
 
-    protected:
-        uint64_t                      m_Flags;
-        DEBUG_FIELD_DECL(CString, m_prevClass);
-
         WCDAFX_API void OnContruct(PCTSTR thisClass);
         WCDAFX_API void OnDestroy(PCTSTR thisClass);
         WCDAFX_API virtual BOOL OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
+
+    protected:
+        uint64_t                      m_Flags;
+        DEBUG_FIELD_DECL(CString, m_prevClass);
     };
 }

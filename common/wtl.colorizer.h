@@ -84,24 +84,11 @@ namespace CF::Colorized
         WCDAFX_API Colorizer();
 
     protected:
-
-        ControlMap            Controls;
-        COLORREF           MyTextColor;
-        COLORREF           MyBackColor;
-        COLORREF        MyHotTextColor;
-        COLORREF        MyHotBackColor;
-        WTL::CPen                MyPen;
-        WTL::CPen           MyFocusPen;
-        WTL::CPen       MyThickEdgePen;
-        COLORREF     MyButtonBackColor[2];
-        WTL::CBrush        MyBackBrush[3];
-        WTL::CPen          MyBorderPen[2];
+        ControlMap Controls;
 
         WCDAFX_API BOOL OnWindowMessage(HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD) override;
 
     private:
-        BOOL handleWM(HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD = 0);
-
         static void PerformInitStatix();
 
         int OnCreate(LPCREATESTRUCT);
@@ -117,34 +104,42 @@ namespace CF::Colorized
         int DoInitialization(bool isDialog);
         static BOOL CALLBACK InitChild(HWND hwnd, Colorizer& self);
 
-        void SetTextColor(CDCHandle dc) const;
+    public:
+        COLORREF           MyTextColor;
+        COLORREF           MyBackColor;
+        COLORREF        MyHotTextColor;
+        COLORREF        MyHotBackColor;
+        WTL::CPen                MyPen;
+        WTL::CPen           MyFocusPen;
+        WTL::CPen       MyThickEdgePen;
+        COLORREF     MyButtonBackColor[2];
+        WTL::CBrush        MyBackBrush[3];
+        WTL::CPen          MyBorderPen[2];
 
-        static BorderFlags GetBorderType(HWND hwnd, LONG& style, LONG& estyle);
-        void DrawControlBorder(CDCHandle dc, CRect const& rcPaint, BorderFlags border) const;
+        WCDAFX_API BOOL handleWM(HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD = 0);
 
-        void OnEraseBackground(CDCHandle dc, CRect const& rc);
-        void DrawGroupBox(CDCHandle dc, CRect const& rc, CString const& text, LONG style /* = citem.GetWindowLong(GWL_STYLE) & 0xf00 */) const;
-        void DrawCheckBox(CDCHandle dc, CRect const& rc, CString const& text, UINT tformat, LONG style, LONG estyle, UINT state) const;
-        void DrawRadioButton(CDCHandle dc, CRect const& rc, CString const& text, UINT tformat, LONG style, LONG estyle, UINT state) const;
-        void DrawComboFace(CDCHandle dc, CRect const& rc, int iid, CStringW const& text, CImageList const& ilist, int iindex) const;
+        WCDAFX_API void SetTextColor(CDCHandle dc) const;
 
-        static void PutText(CDCHandle             dc,
-                            const CRect&          rc,
-                            const CString&      text,
-                            UINT             tformat /* = Details<T>::GetDrawTextFormat(citem)*/,
-                            bool             deflate = false,
-                            int                   dx = 0,
-                            int                   dy = 0);
+        WCDAFX_API static BorderFlags GetBorderType(HWND hwnd, LONG& style, LONG& estyle);
+        WCDAFX_API void DrawControlBorder(CDCHandle dc, CRect const& rcPaint, BorderFlags border) const;
 
-        void DrawButton(CDCHandle            dc,
+        WCDAFX_API void OnEraseBackground(CDCHandle dc, CRect const& rc);
+        WCDAFX_API void DrawGroupBox(CDCHandle dc, CRect const& rc, CString const& text, LONG style) const;
+        WCDAFX_API void DrawCheckBox(CDCHandle dc, CRect const& rc, CString const& text, UINT tformat, LONG style, LONG estyle, UINT state) const;
+        WCDAFX_API void DrawRadioButton(CDCHandle dc, CRect const& rc, CString const& text, UINT tformat, LONG style, LONG estyle, UINT state) const;
+        WCDAFX_API void DrawComboFace(CDCHandle dc, CRect const& rc, int iid, CStringW const& text, CImageList const& ilist, int iindex) const;
+
+        WCDAFX_API static void PutText(CDCHandle dc, const CRect& rc, const CString& text, UINT tformat, bool deflate = false, int dx = 0, int dy = 0);
+
+        WCDAFX_API void DrawButton(CDCHandle dc,
                         const CRect&         rc,
                         const CString&     text,
                         UINT            tformat /* = Details<T>::GetDrawTextFormat(citem)*/,
-                        UINT              state /* = citem.GetState() */,
+                        UINT              state,
                         bool               flat,
                         bool           _default) const;
 
-        void DrawItem(LPDRAWITEMSTRUCT  di,
+        WCDAFX_API void DrawItem(LPDRAWITEMSTRUCT  di,
                       const CString&  text /* citem.GetItemText(di->itemID) */,
                       CImageList     ilist /* citem.GetImageList()*/,
                       int           iindex /* citem.GetImageIndex(di->itemID)  */,

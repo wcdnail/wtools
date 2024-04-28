@@ -20,7 +20,7 @@ namespace CF::Colorized
     //
 
     template <typename T>
-    struct Control: ATL::CWindowImpl<Control<T>, T>
+    struct Control: public ATL::CWindowImpl<Control<T>, T>
     {
         using Super = ATL::CWindowImpl<Control<T>, T>;
 
@@ -42,9 +42,10 @@ namespace CF::Colorized
         Colorizer&  m_Master;
         SpecImpl<T>   m_Spec;
 
+        void Init(HWND hwnd);
         void InitSpec(HWND hwnd);
 
-        void OnDestroy();
+        void OnDestroyThiz();
         void OnNcPaint(CRgnHandle);
         void OnPaint(CDCHandle);
         BOOL OnEraseBkgnd(CDCHandle dc);

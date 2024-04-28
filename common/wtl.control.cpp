@@ -16,6 +16,12 @@ namespace CF
     {
     }
 
+    ControlBase::ControlBase(HWND hWnd)
+        : ControlBase()
+    {
+        UNREFERENCED_ARG(hWnd);
+    }
+
     BOOL ControlBase::IsMsgHandled() const
     {
         return (0 != (m_Flags & MESSAGE_HANDLED));

@@ -22,6 +22,12 @@ namespace CF::Colorized
         :    Super()
         , m_Master(master)
     {
+        Init(hwnd);
+    }
+
+    template <typename T>
+    void Control<T>::Init(HWND hwnd)
+    {
         InitSpec(hwnd);
         this->SubclassWindow(hwnd);
         Super::OnContruct(this->GetWndClassName());
@@ -34,9 +40,9 @@ namespace CF::Colorized
     }
 
     template <typename T>
-    void Control<T>::OnDestroy()
+    void Control<T>::OnDestroyThiz()
     {
-        ControlBase::OnDestroy(this->GetWndClassName());
+        this->OnDestroy(this->GetWndClassName());
         this->SetMsgHandled(false);
     }
 
@@ -104,12 +110,12 @@ namespace CF::Colorized
     BOOL Control<T>::OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
     {
         BOOL bHandled = TRUE;
-        if (ControlBase::OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
+        if (m_Master.handleWM(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
             return TRUE;
         }
         switch(dwMsgMapID) {
         case 0:
-            MSG_WM_DESTROY(OnDestroy)
+            MSG_WM_DESTROY(OnDestroyThiz)
             MSG_WM_PAINT(OnPaint)
             MSG_WM_NCPAINT(OnNcPaint)
             MSG_WM_ERASEBKGND(OnEraseBkgnd)
@@ -288,7 +294,10 @@ namespace CF::Colorized
         }
         else {
             PaintContext pc(this->m_hWnd, this->GetFont());
-            const UINT textFormat = Details<WTL::CButton>::GetDrawTextFormat(this->m_hWnd);
+            const UINT tformat = Details<WTL::CButton>::GetDrawTextFormat(this->m_hWnd);
+            const LONG   style = GetWindowLongW(GWL_STYLE); // ##TODO: check mask -> & 0xf00
+            const LONG  estyle = GetWindowLongW(GWL_EXSTYLE);
+            const UINT   state = GetState();
 
             CString text;
             this->GetWindowText(text);
@@ -296,13 +305,13 @@ namespace CF::Colorized
 
             switch (type) {
             case Details<WTL::CButton>::Groupbox: {
-                m_Master.DrawGroupBox(*this, pc.PaindDC.m_hDC, pc.Rect, text);
+                m_Master.DrawGroupBox(pc.PaindDC.m_hDC, pc.Rect, text, style);
                 break;
             }
             case Details<WTL::CButton>::PushButton:
             case Details<WTL::CButton>::DefPushButton:
             case Details<WTL::CButton>::Flat: {
-                m_Master.DrawButton(*this, pc.PaindDC.m_hDC, pc.Rect, text, textFormat,
+                m_Master.DrawButton(pc.PaindDC.m_hDC, pc.Rect, text, tformat, state,
                                    Details<WTL::CButton>::Flat == type,
                                    Details<WTL::CButton>::DefPushButton == type);
                 break;
@@ -311,12 +320,12 @@ namespace CF::Colorized
             case Details<WTL::CButton>::AutoCheckbox:
             case Details<WTL::CButton>::ThreeState:
             case Details<WTL::CButton>::Auto3State: {
-                m_Master.DrawCheckBox(*this, pc.PaindDC.m_hDC, pc.Rect, text, textFormat);
+                m_Master.DrawCheckBox(pc.PaindDC.m_hDC, pc.Rect, text, tformat, style, estyle, state);
                 break;
             }
             case Details<WTL::CButton>::RadioButton:
             case Details<WTL::CButton>::AutoRadioButton: {
-                m_Master.DrawRadioButton(*this, pc.PaindDC.m_hDC, pc.Rect, text, textFormat);
+                m_Master.DrawRadioButton(pc.PaindDC.m_hDC, pc.Rect, text, tformat, style, estyle, state);
                 break;
             }
             case Details<WTL::CButton>::Pushbox:
@@ -334,7 +343,7 @@ namespace CF::Colorized
 #pragma region ListBox specific
 
     template <>
-    void Control<WTL::CListBox>::InitSpec(HWND hwnd)
+    void Control<ZListBox>::InitSpec(HWND hwnd)
     {
         UINT ns = static_cast<UINT>(::GetWindowLong(hwnd, GWL_STYLE));
         ns |= LBS_OWNERDRAWVARIABLE | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT;
@@ -342,7 +351,7 @@ namespace CF::Colorized
     }
 
     template <>
-    CString Control<WTL::CListBox>::GetItemText(int index) const
+    CString Control<ZListBox>::GetItemText(int index) const
     {
         CString result;
         this->GetText(index, result);
@@ -350,7 +359,7 @@ namespace CF::Colorized
     }
 
     template <>
-    LRESULT Control<WTL::CListBox>::OnCustomDraw(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
+    LRESULT Control<ZListBox>::OnCustomDraw(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
     {
         SetMsgHandled(true);
         OnDrawItem(idCtrl, reinterpret_cast<LPDRAWITEMSTRUCT>(pnmh));
@@ -363,32 +372,38 @@ namespace CF::Colorized
 #pragma region ComboBox specific
 
     template <>
-    CString Control<WTL::CComboBox>::GetItemText(int index) const
+    CString Control<ZComboBox>::GetItemText(int index) const
     {
         CString result;
         this->GetLBText(index, result);
         return result;
     }
 
-    template <> void Control<WTL::CComboBox>::OnNcPaint(CRgnHandle rgn) {}
-    template <> BOOL Control<WTL::CComboBox>::OnEraseBkgnd(CDCHandle dc) { return TRUE; }
+    template <> void Control<ZComboBox>::OnNcPaint(CRgnHandle rgn) {}
+    template <> BOOL Control<ZComboBox>::OnEraseBkgnd(CDCHandle dc) { return TRUE; }
 
     template <>
     void Control<ZComboBox>::OnPaint(CDCHandle)
     {
         PaintContext pc(this->m_hWnd, this->GetFont());
-        m_Master.DrawComboFace(*this, pc.PaindDC.m_hDC, pc.Rect);
+
+        int          iid = GetCurSel();
+        CStringW    text = GetItemText(iid);
+        CImageList ilist = GetImageList();
+        int       iindex = GetImageIndex(iid);
+
+        m_Master.DrawComboFace(pc.PaindDC.m_hDC, pc.Rect, iid, text, ilist, iindex);
     }
 
     template <>
     HBRUSH Control<ZComboBox>::OnCtlColorListBox(CDCHandle dc, HWND hwnd)
     {
-        //if (!m_Spec.m_ListBox.m_hWnd) {
-        //    CRect rc;
-        //    this->GetClientRect(rc);
-        //    m_Master.OnEraseBackground(dc, rc);
-        //    m_Spec.m_ListBox.Attach(hwnd);
-        //}
+        if (!m_Spec.m_ListBox.m_hWnd) {
+            CRect rc;
+            this->GetClientRect(rc);
+            m_Master.OnEraseBackground(dc, rc);
+            m_Spec.m_ListBox.Attach(hwnd);
+        }
 
         m_Master.SetTextColor(dc);
         return m_Master.MyBackBrush[0];

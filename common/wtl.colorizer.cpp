@@ -601,9 +601,9 @@ namespace CF::Colorized
     void Colorizer::DrawComboFace(CDCHandle            dc,
                                   CRect         const& rc,
                                   int                 iid /* = citem.GetCurSel() */,
-                                  CStringW const&    text /* = citem.GetItemText(di.itemID) */,
+                                  CStringW const&    text /* = citem.GetItemText(iid) */,
                                   CImageList const& ilist /* = citem.GetImageList() */,
-                                  int              iindex /*= citem.GetImageIndex(di.itemID)*/) const 
+                                  int              iindex /*= citem.GetImageIndex(iid)*/) const 
     {
         CF::GradRect(dc, rc, MyButtonBackColor);
         CF::FrameRect(dc, rc);
