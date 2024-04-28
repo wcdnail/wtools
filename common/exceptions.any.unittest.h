@@ -8,7 +8,7 @@
 #include "exceptions.any.h"
 #include "dh.tracing.h"
 
-namespace Cf
+namespace CF
 {
     namespace ExceptionAny
     {
@@ -28,7 +28,7 @@ namespace Cf
             }
             catch (...)
             {
-                Cf::HandleAnyException(OnException);
+                CF::HandleAnyException(OnException);
             }
 
             try
@@ -37,7 +37,7 @@ namespace Cf
             }
             catch (...)
             {
-                Cf::HandleAnyException(OnException);
+                CF::HandleAnyException(OnException);
             }
         }
     }

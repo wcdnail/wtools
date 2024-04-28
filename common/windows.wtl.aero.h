@@ -6,7 +6,7 @@
 #define _WTL_NO_THEME_DELAYLOAD
 #include <atltheme.h>
 
-namespace Cf
+namespace CF
 {
     static inline bool IsSupported() 
     {
@@ -47,7 +47,7 @@ namespace Cf
         template <class U>
         BOOL Subclass(U& control, UINT id)
         {
-            return Cf::Subclass<U>(control, static_cast<T*>(this)->GetDlgItem(id));
+            return CF::Subclass<U>(control, static_cast<T*>(this)->GetDlgItem(id));
         }
 
 #if 0

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "windows.gdi.base.h"
 
-namespace Cf  // Common framework
+namespace CF  // Common framework
 {
     BitmapDC::BitmapDC()
         : dc_()

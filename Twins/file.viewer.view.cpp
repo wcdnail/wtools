@@ -264,7 +264,7 @@ namespace Fv
         CRect rcStatusText(rcStatus);
         rcStatusText.DeflateRect(4, 2);
 
-        WidecharString status;
+        WString status;
         if (!InputStatus.empty())
         {
             wchar_t buffer[256] = {0};
@@ -496,7 +496,7 @@ namespace Fv
     void Viewer::DisplayTextLine(CDCHandle dc, CRect const& rc, DisplayState& s, Colors const& c)
     {
         SizeType end = s.InBuffer.GetLineEnd(s.DisplayOffset, s.WrappedLineWidth);
-        WidecharString line = s.InBuffer.GetTextLine(s.DisplayOffset, end, s.CodePage, s.ShowSpecChars);
+        WString line = s.InBuffer.GetTextLine(s.DisplayOffset, end, s.CodePage, s.ShowSpecChars);
         s.DisplayOffset = end;
 
         CRect rcLine = rc;
@@ -534,7 +534,7 @@ namespace Fv
     void Viewer::DisplayBinaryLine(CDCHandle dc, CRect const& rc, DisplayState& s, Colors const& c)
     {
         SizeType end = s.InBuffer.GetFixedLineEnd(s.DisplayOffset, s.FixedLineWidth);
-        WidecharString line = s.InBuffer.GetTextLine(s.DisplayOffset, end, s.CodePage, s.ShowSpecChars);
+        WString line = s.InBuffer.GetTextLine(s.DisplayOffset, end, s.CodePage, s.ShowSpecChars);
         s.DisplayOffset = end;
         
         CRect rcLine = rc;
@@ -585,14 +585,14 @@ namespace Fv
 
         const int aveSymbolWidth = s.TextMetric.tmAveCharWidth;
 
-        WidecharString offsetText;
+        WString offsetText;
         wchar_t buffer[32] = {0};
         ::_snwprintf_s(buffer, _countof(buffer)-1, L"%016x", beg);
         offsetText = buffer;
 
         SizeType end = s.InBuffer.GetFixedLineEnd(beg, s.HexLineWidth);
-        WidecharString hex = s.InBuffer.GetHexLine(beg, end);
-        WidecharString text = s.InBuffer.GetTextLine(beg, end, s.CodePage, true);
+        WString hex = s.InBuffer.GetHexLine(beg, end);
+        WString text = s.InBuffer.GetTextLine(beg, end, s.CodePage, true);
         s.DisplayOffset = end;
 
         COLORREF lcol = dc.SetTextColor(c.TextHexOffset);

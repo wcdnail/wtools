@@ -1,41 +1,26 @@
 #pragma once
 
-#include "wcdafx.api.h"
-#include "wtl.colorizer.h"
-
-namespace Cf
+namespace CF::Colorized
 {
-    #pragma region General
+    enum BorderFlags : UINT;
+
+#pragma region General
 
     template <typename U>
-    struct Colorizer::Details 
+    struct Details 
     {
         enum AppearType : UINT { Normal = 0 };
 
-        static AppearType GetAppearType(HWND) 
-        { 
-            AppearType result = Normal;
-            return result; 
-        }
-
-        static BorderFlags GetBorderType(HWND hwnd) 
-        {
-            LONG style = 0, estyle = 0;
-            return Colorizer::GetBorderType(hwnd, style, estyle); 
-        }
-
-        static UINT GetDrawTextFormat(HWND) 
-        { 
-            return DT_CENTER | DT_VCENTER | DT_SINGLELINE; 
-        }
+        static AppearType GetAppearType(HWND);
+        static BorderFlags GetBorderType(HWND hwnd);
+        static UINT GetDrawTextFormat(HWND);
     };
 
-    #pragma endregion 
-
-    #pragma region Static details
+#pragma endregion 
+#pragma region Static details
 
     template <>
-    struct Colorizer::Details<WTL::CStatic> 
+    struct Details<WTL::CStatic> 
     {
         enum AppearType: UINT
         {
@@ -62,11 +47,10 @@ namespace Cf
     };
 
 #pragma endregion 
-
-    #pragma region Button details
+#pragma region Button details
 
     template <>
-    struct Colorizer::Details<WTL::CButton> 
+    struct Details<WTL::CButton> 
     {
         enum AppearType : UINT
         {
@@ -91,12 +75,11 @@ namespace Cf
         static UINT GetDrawTextFormat(HWND hwnd);
     };
 
-    #pragma endregion 
-
-    #pragma region Combo details
+#pragma endregion 
+#pragma region Combo details
 
     template <>
-    struct Colorizer::Details<WTL::CComboBox>
+    struct Details<WTL::CComboBox>
     {
         enum AppearType: UINT
         {
@@ -111,5 +94,5 @@ namespace Cf
         static UINT GetDrawTextFormat(HWND);
     };
 
-    #pragma endregion 
+#pragma endregion 
 }

@@ -59,7 +59,7 @@ namespace Twins
         //    EndDialog(id);
 
         //else
-        //    SetMsgHandled(FALSE);
+        //    setWMHandled(FALSE);
     }
 
     int CommonDialog::GetButtonsCy() const

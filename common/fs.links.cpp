@@ -2,7 +2,7 @@
 #include "fs.links.h"
 #include <winioctl.h>
 
-namespace Cf
+namespace CF
 {
     enum
     {

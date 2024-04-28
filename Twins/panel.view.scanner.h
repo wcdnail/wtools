@@ -28,7 +28,7 @@ namespace Twins
         void Fetch(PCWSTR path = nullptr);
         void UpdatePath(std::wstring const& line);
 
-        Cf::DirManager            Path;
+        CF::DirManager            Path;
         std::wstring              Mask;
         FItemVector              Items;
         Callback           OnFetchDone;

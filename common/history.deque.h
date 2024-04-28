@@ -1,7 +1,7 @@
 #pragma once
 
 #include <reflection/ref.std.h>
-#include <string.hp.h>
+#include "strint.h"
 #include <boost/noncopyable.hpp>
 #include <deque>
 #include <algorithm>
@@ -12,7 +12,7 @@
 
 struct HistoryDeque: boost::noncopyable
 {
-    typedef WidecharString String;
+    typedef WString String;
     typedef std::deque<String> Deque;
     typedef Ref::Container<Deque> Reflection;
     typedef Deque::iterator iterator;

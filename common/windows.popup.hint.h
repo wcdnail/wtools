@@ -5,7 +5,7 @@
 #include <atlstr.h>
 #include <atlwin.h>
 
-namespace Cf  // Common framework
+namespace CF  // Common framework
 {
     class PopupHint
     {

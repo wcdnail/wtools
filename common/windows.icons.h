@@ -5,7 +5,7 @@
 #include <wingdi.h>
 #include <atltypes.h>
 
-namespace Cf
+namespace CF
 {
     inline CSize GetIconSize(HICON icon)
     {

@@ -3,7 +3,7 @@
 
 #include <gl/gl.h>
 
-namespace Cf
+namespace CF
 {
     inline void Setup3DView(int cx, int cy, double fovy = 60.0, double zNear = 1.0, double zFar = 200.0)
     {

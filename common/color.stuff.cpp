@@ -2,7 +2,7 @@
 #include "color.stuff.h"
 #include <wingdi.h>
 
-namespace Cf
+namespace CF
 {
     WCDAFX_API COLORREF ReduceColor(COLORREF color, COLORREF R, COLORREF G, COLORREF B)
     {

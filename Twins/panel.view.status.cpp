@@ -44,9 +44,9 @@ namespace Twins
     {
 // ##TODO: Configure human size units"))
 
-        //WidecharString sizeUnit = _L(StrId_Kb);
-        //WidecharString selectedSizeStr = Str::HumanSize(Str::InKils(SelSize));
-        //WidecharString totalSizeStr = Str::HumanSize(Str::InKils(entries.SumSize()));
+        //WString sizeUnit = _L(StrId_Kb);
+        //WString selectedSizeStr = Str::HumanSize(Str::InKils(SelSize));
+        //WString totalSizeStr = Str::HumanSize(Str::InKils(entries.SumSize()));
         //
         //wchar_t buffer[256] = {0};
         //::_snwprintf_s(buffer, _countof(buffer)-1, _LS(StrId_Ssfromssfilesdfromddirsdfromd)

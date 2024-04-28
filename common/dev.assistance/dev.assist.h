@@ -1,8 +1,10 @@
 #pragma once
 
 #include "wcdafx.api.h"
-#include <string.hp.h>
+#include "strint.h"
 #include <cstdint>
+
+#include "strint.h"
 
 namespace Dh
 {
@@ -35,12 +37,12 @@ namespace Dh
     WCDAFX_API PCWSTR WM_NC_C2SW(UINT, HWND);
 
     // List view styles constants to string...
-    WCDAFX_API CharString LvStyleStringA(DWORD);
-    WCDAFX_API CharString LvStyleExStringA(DWORD);
-    WCDAFX_API WidecharString LvStyleStringW(DWORD);
-    WCDAFX_API WidecharString LvStyleExStringW(DWORD);
+    WCDAFX_API LString LvStyleStringA(DWORD);
+    WCDAFX_API LString LvStyleExStringA(DWORD);
+    WCDAFX_API WString LvStyleStringW(DWORD);
+    WCDAFX_API WString LvStyleExStringW(DWORD);
 
-    WCDAFX_API WidecharString MessageToStrignW(MSG const* message);
+    WCDAFX_API WString MessageToStrignW(MSG const* message);
 }
 
 #ifndef __PRETTY_FUNCTION__

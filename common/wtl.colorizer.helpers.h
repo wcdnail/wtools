@@ -1,13 +1,12 @@
 #pragma once
 
-#include "dh.tracing.h"
 #include "wtl.colorizer.h"
 #include <atltypes.h>
 #include <atlgdi.h>
 
-namespace Cf
+namespace CF::Colorized
 {
-    struct Colorizer::PaintContext
+    struct PaintContext
     {
         ~PaintContext();
         PaintContext(HWND hwnd, HFONT font);
@@ -17,7 +16,7 @@ namespace Cf
         HFONT        PrevFont;
     };
 
-    struct Colorizer::NcPainContext
+    struct NcPainContext
     {
         ~NcPainContext();
         NcPainContext(HWND hwnd, CRgnHandle rgn);

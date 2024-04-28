@@ -117,7 +117,7 @@ namespace Twins
         //        , ex.what()
         //        );
         //
-        //    Cf::UserDialog::Ask(GetActiveWindow(), message, _LS(StrId_Error), MB_ICONSTOP);
+        //    CF::UserDialog::Ask(GetActiveWindow(), message, _LS(StrId_Error), MB_ICONSTOP);
         //}
 
         return false;
@@ -158,14 +158,14 @@ namespace Twins
         case ResultCancel:
             if (HaveAnyChangesPendins())
             {
-                WidecharString message = _L(StrId_Configurationhaspendingchanges)
+                WString message = _L(StrId_Configurationhaspendingchanges)
                              + L"\r\n" + _L(StrId_Doyoureallywanttoclosethedialog);
 
                 CStringW caption;
                 GetWindowText(caption);
 
-                int dr = Cf::UserDialog::Ask(m_hWnd, message.c_str(), caption, MB_YESNO | MB_ICONWARNING);
-                if (Cf::DialogResult::Yes != dr)
+                int dr = CF::UserDialog::Ask(m_hWnd, message.c_str(), caption, MB_YESNO | MB_ICONWARNING);
+                if (CF::DialogResult::Yes != dr)
                     break;
             }
 
@@ -180,7 +180,7 @@ namespace Twins
 
     struct Category
     {
-        Category(OptionPagePtr page, int icon, WidecharString const& caption, Category const* sub = NULL, size_t subcount = 0)
+        Category(OptionPagePtr page, int icon, WString const& caption, Category const* sub = NULL, size_t subcount = 0)
             : Page(page)
             , Icon(icon)
             , Caption(caption.c_str())
@@ -205,7 +205,7 @@ namespace Twins
     private:
         OptionPagePtr Page;
         int Icon;
-        WidecharString Caption;
+        WString Caption;
         mutable HTREEITEM Root;
         Category const* Sub;
         size_t SubCount;

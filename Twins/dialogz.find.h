@@ -139,7 +139,7 @@ namespace Twins
         WTL::CTreeViewCtrl ResultsTree;
         FindEnumerator Searcher;
         std::thread SearchThread;
-        WidecharString PatternRx;
+        WString PatternRx;
         BOOL CaseSensitive;
         BOOL PatternIsRegExp;
         BOOL UseNameOnly;

@@ -157,7 +157,7 @@ namespace Twins
             if ((INVALID_FILE_ATTRIBUTES != attr) && (0 != (FILE_ATTRIBUTE_REPARSE_POINT & attr))) {
                 Dh::ThreadPrintf(L" SCANNER: `%s` ERROR - 0x%08x, try follow link %s\n", path, hr, FileAttributesToString(attr).c_str());
                 std::error_code ec;
-                std::wstring linkpath = Cf::QueryLinkTarget(path, ec);
+                std::wstring linkpath = CF::QueryLinkTarget(path, ec);
                 if (ec) {
                     return InternalError { ec.value(), L"QueryLinkTarget failed" };
                 }

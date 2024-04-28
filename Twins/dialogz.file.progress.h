@@ -18,7 +18,7 @@ namespace Twins
         typedef std::function<void(void)> WorkerFunction;
 
     public:
-        typedef Cf::LargeProgress<FileSize> FileProgress;
+        typedef CF::LargeProgress<FileSize> FileProgress;
         enum  { WmShowFileReplaceDialog = WM_USER + 1, };
 
         FileProgressDialog(PCWSTR caption);

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cf
+namespace CF
 {
     template <class T>
     inline T SafeDiv(T value, T divisor)

@@ -3,7 +3,7 @@
 #include "wcdafx.api.h"
 #include <windef.h>
 
-namespace Cf
+namespace CF
 {
     WCDAFX_API COLORREF ReduceColor(COLORREF color, COLORREF R, COLORREF G, COLORREF B);
     WCDAFX_API COLORREF IncreaseColor(COLORREF color, COLORREF R, COLORREF G, COLORREF B);

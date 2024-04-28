@@ -2,7 +2,7 @@
 #include "windows.popup.hint.h"
 #include "todo.fixme.etc.h"
 
-namespace Cf
+namespace CF
 {
     enum 
     {

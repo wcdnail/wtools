@@ -157,7 +157,7 @@ namespace Fv
         return error;
     }
 
-    void FileBuffer::GetStatus(WidecharString& text) const
+    void FileBuffer::GetStatus(WString& text) const
     {
         if (!Filepath.empty())
         {
@@ -215,9 +215,9 @@ namespace Fv
         return sym;
     }
 
-    WidecharString FileBuffer::GetTextLine(SizeType beg, SizeType end, unsigned cp, bool showspec) const
+    WString FileBuffer::GetTextLine(SizeType beg, SizeType end, unsigned cp, bool showspec) const
     {
-        WidecharString rv;
+        WString rv;
 
         if ((end > beg) && (end <= FileSize))
         {
@@ -282,9 +282,9 @@ namespace Fv
         offset = offset > limit ? limit : offset;
     }
 
-    WidecharString FileBuffer::GetHexLine(SizeType beg, SizeType end) const
+    WString FileBuffer::GetHexLine(SizeType beg, SizeType end) const
     {
-        WidecharString rv;        
+        WString rv;        
 
         if ((end > beg) && (end <= FileSize))
         {

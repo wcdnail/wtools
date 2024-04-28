@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "windows.gdi.rects.h"
 
-namespace Cf
+namespace CF
 {
     void FrameRect(HDC curDc, CRect const& rc)
     {

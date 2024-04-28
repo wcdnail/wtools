@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "wtl.colorizer.helpers.h"
 
-namespace Cf
+namespace CF::Colorized
 {
-    Colorizer::PaintContext::~PaintContext()
+    PaintContext::~PaintContext()
     {
         PaindDC.SelectFont(PrevFont);
     }
 
-    Colorizer::PaintContext::PaintContext(HWND hwnd, HFONT font)
+    PaintContext::PaintContext(HWND hwnd, HFONT font)
         : PaindDC(hwnd)
         , Rect()
         , PrevFont(PaindDC.SelectFont(font))
@@ -16,12 +16,12 @@ namespace Cf
         ::GetClientRect(hwnd, Rect);
     }
 
-    Colorizer::NcPainContext::~NcPainContext()
+    NcPainContext::~NcPainContext()
     {
         ::ReleaseDC(hCtrl, Dc);
     }
 
-    Colorizer::NcPainContext::NcPainContext(HWND hwnd, CRgnHandle rgn)
+    NcPainContext::NcPainContext(HWND hwnd, CRgnHandle rgn)
         : Dc(::GetWindowDC(hwnd))
         , Rect()
         , Rgn(rgn)

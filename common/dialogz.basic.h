@@ -3,43 +3,45 @@
 #include "wcdafx.api.h"
 #include "wtl.colorizer.h"
 #include "dialogz.types.h"
-#include "string.hp.h"
+#include "strint.h"
 #include "rect.alloc.h"
 #include "cf-resources/resource.h"
 #include <atltypes.h>
 #include <atlwin.h>
 
-namespace Cf
+namespace CF
 {
-    class BasicDialog: ATL::CDialogImpl<BasicDialog>,
-                       Colorizer
+    class BasicDialog: public ATL::CDialogImpl<BasicDialog, CF::Colorized::Colorizer>
     {
     public:
+        using Super = ATL::CDialogImpl<BasicDialog, CF::Colorized::Colorizer>;
+
         enum { IDD = IDD_BASIC };
 
+        BasicDialog(BasicDialog const&) = delete;
+        BasicDialog& operator = (BasicDialog const&) = delete;
+
+        WCDAFX_API ~BasicDialog() override;
         WCDAFX_API BasicDialog(unsigned flags);
-        WCDAFX_API BasicDialog(WidecharString const& message, WidecharString const& title, unsigned flags);
-        WCDAFX_API virtual ~BasicDialog();
+        WCDAFX_API BasicDialog(WStrView message, WStrView title, unsigned flags);
+        
         WCDAFX_API bool Show(HWND parent, Rect const& rc);
         WCDAFX_API void ShowModal(HWND parent);
 
-        DialogResult Result() const { return Rv; }
+        WCDAFX_API DialogResult Result() const;
 
         WCDAFX_API static unsigned GetCompatFlags(unsigned flags);
 
     protected:
-        typedef ATL::CDialogImpl<BasicDialog> Super;
+        friend Super;
 
-        friend class Super;
-        using Super::SetMsgHandled;
-
-        DialogResult         Rv;
-        unsigned          Flags;
-        WidecharString    Title;
-        WidecharString TextBody;
-        CIcon              Icon;
-        CFont            UiFont;
-        CFont           MsgFont;
+        DialogResult m_result;
+        unsigned      m_attrs;
+        WString       m_title;
+        WString        m_text;
+        CIcon          m_icon;
+        CFont          m_font;
+        CFont      m_textFont;
 
         enum ControlIds
         {
@@ -59,21 +61,15 @@ namespace Cf
 
         CRect SetupIcon(RectzAllocator<LONG>& rcAlloc);
 
+        WCDAFX_API BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
+        WCDAFX_API BOOL OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID) override;
+
     private:
-        void CreateButtons(Cf::RectzAllocator<LONG>& btnAlloc);
+        void CreateButtons(CF::RectzAllocator<LONG>& btnAlloc) const;
         int OnCreate(LPCREATESTRUCT cs);
         BOOL OnInitDialog(HWND focusedWindow, LPARAM param);
         void OnDestroy();
         void OnKeyDown(UINT key, UINT rep, UINT flags);
         void OnCommand(UINT code, int id, HWND control);
-
-        BEGIN_MSG_MAP_EX(BasicDialog)
-            MSG_WM_CREATE(OnCreate)
-            MSG_WM_INITDIALOG(OnInitDialog)
-            CHAIN_MSG_MAP(Colorizer)
-            MSG_WM_DESTROY(OnDestroy)
-            MSG_WM_KEYDOWN(OnKeyDown)
-            MSG_WM_COMMAND(OnCommand)
-        END_MSG_MAP()
     };
 }

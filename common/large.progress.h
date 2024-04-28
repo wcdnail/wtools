@@ -3,7 +3,7 @@
 #include "generic.div.h"
 #include <atlctrls.h>
 
-namespace Cf
+namespace CF
 {
     template <class T>
     class LargeProgress

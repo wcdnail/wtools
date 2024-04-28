@@ -1,12 +1,32 @@
 #include "stdafx.h"
 #include "wtl.colorizer.control.details.h"
+#include "wtl.colorizer.h"
 
-namespace Cf
+namespace CF::Colorized
 {
-    Colorizer::Details<WTL::CStatic>::AppearType Colorizer::Details<WTL::CStatic>::GetAppearType(HWND hwnd)
+    template <typename U>
+    typename Details<U>::AppearType Details<U>::GetAppearType(HWND)
+    { 
+        return AppearType::Normal;
+    }
+
+    template <typename U>
+    BorderFlags Details<U>::GetBorderType(HWND hwnd)
+    {
+        LONG style = 0, estyle = 0;
+        return Colorizer::GetBorderType(hwnd, style, estyle); 
+    }
+
+    template <typename U>
+    UINT Details<U>::GetDrawTextFormat(HWND)
+    { 
+        return DT_CENTER | DT_VCENTER | DT_SINGLELINE; 
+    }
+
+    Details<WTL::CStatic>::AppearType Details<WTL::CStatic>::GetAppearType(HWND hwnd)
     {
         UINT result = Normal;
-        UINT   type = static_cast<UINT>(::GetWindowLongW(hwnd, GWL_STYLE)) & SS_TYPEMASK;
+        UINT   type = static_cast<UINT>(GetWindowLongW(hwnd, GWL_STYLE)) & SS_TYPEMASK;
         if (type >= SS_ICON && type <= SS_USERITEM) {
             result = Icon + (type - SS_ICON);
         }
@@ -16,7 +36,7 @@ namespace Cf
         return (AppearType)result;
     }
 
-    Colorizer::BorderFlags Colorizer::Details<WTL::CStatic>::GetBorderType(HWND hwnd)
+    BorderFlags Details<WTL::CStatic>::GetBorderType(HWND hwnd)
     {
         LONG style = 0, estyle = 0;
         BorderFlags result = Colorizer::GetBorderType(hwnd, style, estyle);
@@ -26,12 +46,10 @@ namespace Cf
         return result;
     }
 
-    UINT Colorizer::Details<WTL::CStatic>::GetDrawTextFormat(HWND hwnd)
+    UINT Details<WTL::CStatic>::GetDrawTextFormat(HWND hwnd)
     {
         UINT  style = static_cast<UINT>(::GetWindowLong(hwnd, GWL_STYLE));
-        UINT result = style & 3 |
-                      DT_EXPANDTABS // TODO: check it
-                      ;
+        UINT result = style & 3 | DT_EXPANDTABS;
         return result
                 | (style & SS_CENTERIMAGE ? DT_VCENTER | DT_SINGLELINE : 0)
                 | (style & SS_ENDELLIPSIS ? DT_END_ELLIPSIS : 0)
@@ -40,7 +58,7 @@ namespace Cf
                 ;
     }
 
-    Colorizer::Details<WTL::CButton>::AppearType Colorizer::Details<WTL::CButton>::GetAppearType(HWND hwnd)
+    Details<WTL::CButton>::AppearType Details<WTL::CButton>::GetAppearType(HWND hwnd)
     {
         UINT style = static_cast<UINT>(::GetWindowLong(hwnd, GWL_STYLE));
         AppearType result = static_cast<AppearType>(style & BS_TYPEMASK);
@@ -53,13 +71,13 @@ namespace Cf
         return result; 
     }
 
-    Colorizer::BorderFlags Colorizer::Details<WTL::CButton>::GetBorderType(HWND hwnd)
+    BorderFlags Details<WTL::CButton>::GetBorderType(HWND hwnd)
     {
         LONG style = 0, estyle = 0;
         return Colorizer::GetBorderType(hwnd, style, estyle); 
     }
 
-    UINT Colorizer::Details<WTL::CButton>::GetDrawTextFormat(HWND hwnd)
+    UINT Details<WTL::CButton>::GetDrawTextFormat(HWND hwnd)
     {
         UINT style = static_cast<UINT>(::GetWindowLong(hwnd, GWL_STYLE));
         UINT type = style & BS_TYPEMASK;
@@ -75,19 +93,19 @@ namespace Cf
                 ;
     }
 
-    Colorizer::Details<WTL::CComboBox>::AppearType Colorizer::Details<WTL::CComboBox>::GetAppearType(HWND hwnd)
+    Details<WTL::CComboBox>::AppearType Details<WTL::CComboBox>::GetAppearType(HWND hwnd)
     {
         AppearType result = static_cast<AppearType>(::GetWindowLong(hwnd, GWL_STYLE) & 3 - 1);
         return result; 
     }
 
-    Colorizer::BorderFlags Colorizer::Details<WTL::CComboBox>::GetBorderType(HWND hwnd)
+    BorderFlags Details<WTL::CComboBox>::GetBorderType(HWND hwnd)
     {
         LONG style = 0, estyle = 0;
         return Colorizer::GetBorderType(hwnd, style, estyle); 
     }
 
-    UINT Colorizer::Details<WTL::CComboBox>::GetDrawTextFormat(HWND)
+    UINT Details<WTL::CComboBox>::GetDrawTextFormat(HWND)
     { 
         return DT_CENTER | DT_VCENTER | DT_SINGLELINE; 
     }

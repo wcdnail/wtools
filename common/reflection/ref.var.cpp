@@ -8,7 +8,7 @@ namespace Ref
 {
     Var::Int::~Int() {}
 
-    Var::Int::Int(CharString const& name, std::type_info const& type)
+    Var::Int::Int(LString const& name, std::type_info const& type)
         : name_(name)
         , type_(type)
     {
@@ -32,11 +32,11 @@ namespace Ref
         return *this;
     }
 
-    void Var::SetName(CharString const& name) { ref_->SetName(name); }
-    CharString const& Var::GetName() const { return ref_->GetName(); }
+    void Var::SetName(LString const& name) { ref_->SetName(name); }
+    LString const& Var::GetName() const { return ref_->GetName(); }
     std::type_info const& Var::GetType() const { return ref_->Type(); }
 
-    void Var::CheckType(CharString const& name, std::type_info const& target, std::type_info const& source)
+    void Var::CheckType(LString const& name, std::type_info const& target, std::type_info const& source)
     {
         if (target != source)
         {

@@ -115,7 +115,7 @@ void CAdvScrollBar::OnPaint(CDCHandle)
     //dc.SelectBrush(MyScrollBrush);
     //dc.Rectangle(rcScroll);
     
-    Cf::GradRect(dc, rcScroll, MyScrollerColor);
+    CF::GradRect(dc, rcScroll, MyScrollerColor);
 
     //dc.SelectPen(lp);
 }

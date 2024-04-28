@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dir.manager.h"
 
-namespace Cf
+namespace CF
 {
     DirManager::~DirManager()
     {

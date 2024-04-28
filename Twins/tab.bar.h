@@ -11,7 +11,7 @@ namespace Twins
     typedef CWinTraits< WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0> PanelTabTraits;
 
     class TabBar: ATL::CWindowImpl<TabBar, ATL::CWindow, PanelTabTraits>
-                , Cf::DoubleBuffered
+                , CF::DoubleBuffered
     {
     public:
         typedef ATL::CWindowImpl<TabBar, ATL::CWindow, PanelTabTraits> Super;
@@ -128,7 +128,7 @@ namespace Twins
             MSG_WM_GETDLGCODE(OnGetDlgCode)
             MSG_WM_SETFOCUS(OnSetFocus)
             MSG_WM_KILLFOCUS(OnKillFocus)
-            CHAIN_MSG_MAP(Cf::DoubleBuffered)
+            CHAIN_MSG_MAP(CF::DoubleBuffered)
         END_MSG_MAP()
     };
 }

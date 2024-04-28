@@ -187,8 +187,8 @@ void CAdvComboBox::EditCtrl::OnPaint(CDCHandle)
     CDCHandle dc(dcMem);
     dc.SelectFont(Owner.GetFont());
 
-    Cf::GradRect(dc, rc, Owner.MyButtonBackColor);
-    Cf::FrameRect(dc, rc);
+    CF::GradRect(dc, rc, Owner.MyButtonBackColor);
+    CF::FrameRect(dc, rc);
 
     CRect rcItem(rc);
     rcItem.DeflateRect(3, 3);
@@ -203,7 +203,7 @@ void CAdvComboBox::EditCtrl::OnPaint(CDCHandle)
     Owner.OnDrawItem(-1, &di);
 
     dc.SelectPen(Owner.MyPen);
-    Cf::FrameRect(dc, rcItem);
+    CF::FrameRect(dc, rcItem);
 
     CRect rcArrow = rc;
     rcArrow.left = rcItem.right;
@@ -227,6 +227,6 @@ void CAdvComboBox::EditCtrl::OnKeyUp(UINT code, UINT, UINT flags)
         nmh.idFrom = ::GetDlgCtrlID(parent);
         nmh.hwndFrom = parent;
 
-        ::SendMessageW(root, WM_NOTIFY, nmh.idFrom, (LPARAM)&nmh);
+        ::SendMessageW(root, WM_NOTIFY, nmh.idFrom, reinterpret_cast<LPARAM>(&nmh));
     }
 }

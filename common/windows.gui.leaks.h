@@ -4,7 +4,7 @@
 #include <winuser.h>
 #include <boost/noncopyable.hpp>
 
-namespace Cf
+namespace CF
 {
     class GUILeaks
     {

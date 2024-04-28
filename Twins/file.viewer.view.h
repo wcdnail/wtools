@@ -2,7 +2,7 @@
 
 #include "file.viewer.types.h"
 #include "file.viewer.buffer.h"
-#include <string.hp.h>
+#include "strint.h"
 #include <atlwin.h>
 #include <atltypes.h>
 #include <atlstr.h>
@@ -126,9 +126,9 @@ namespace Fv
         int DisplayMode;
         bool ShowStatusBar;
         int MiceScrollAmount;
-        WidecharString InputStatus;
-        WidecharString MemoryStatus;
-        mutable WidecharString DebugStatus;
+        WString InputStatus;
+        WString MemoryStatus;
+        mutable WString DebugStatus;
         mutable CRect StatusRect;
         CScrollBar VScroller;
         CIcon IconBig;

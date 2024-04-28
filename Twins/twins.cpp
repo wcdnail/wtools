@@ -24,7 +24,7 @@ namespace Twins
 
     Application::Application()
         :            LiveTimer(std::make_unique<Dh::ScopedThreadLog>(L"UI"))
-        ,              UILeaks(std::make_unique<Cf::GUILeaks>())
+        ,              UILeaks(std::make_unique<CF::GUILeaks>())
         ,            AtlModule()
         ,           LanguageId(MAKELANGID(LANG_RUSSIAN, SUBLANG_DEFAULT))
         ,                 Icon()

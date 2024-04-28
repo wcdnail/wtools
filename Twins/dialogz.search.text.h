@@ -26,7 +26,7 @@ namespace Twins
     private:
         friend WinDdx;
 
-        WidecharString Text;
+        WString Text;
         CComboBox TextCombo;
         BOOL IsRegexp;
         BOOL IsCasesens;

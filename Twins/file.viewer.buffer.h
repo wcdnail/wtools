@@ -1,7 +1,7 @@
 #pragma once
 
 #include "file.viewer.types.h"
-#include <string.hp.h>
+#include "strint.h"
 #include <atlstr.h>
 #include <boost/shared_array.hpp>
 #include <map>
@@ -18,16 +18,16 @@ namespace Fv
 
         bool Ok() const;
         ErrorCode Open(Path const& path, SizeType bs = 65536);
-        void GetStatus(WidecharString& text) const;
+        void GetStatus(WString& text) const;
         SizeType GetFileSize() const;
         SizeType GetLineEnd(SizeType offset, SizeType maxlen) const;
-        WidecharString GetTextLine(SizeType beg, SizeType end, unsigned cp, bool showspec) const;
+        WString GetTextLine(SizeType beg, SizeType end, unsigned cp, bool showspec) const;
         SizeType FindNextLine(int count, SizeType offset, SizeType maxlen) const;
         SizeType FindPrevLine(int count, SizeType offset) const;
         SizeType FindPrevLineFromEnd(int count) const;
         SizeType GetFixedLineEnd(SizeType offset, int count) const;
         void CheckFileLimit(SizeType& offset, SizeType displayCount) const;
-        WidecharString GetHexLine(SizeType beg, SizeType end) const;
+        WString GetHexLine(SizeType beg, SizeType end) const;
         Path const& GetPath() const;
         bool IsBinary() const;
 

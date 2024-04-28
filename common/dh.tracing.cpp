@@ -45,7 +45,7 @@ namespace Dh
     TraceCategory::~TraceCategory()
     {}
 
-    WidecharString const& TraceCategory::GetName() const
+    WString const& TraceCategory::GetName() const
     {
         return Name;
     }

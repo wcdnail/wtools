@@ -1,5 +1,5 @@
 #pragma once
 
-namespace Cf
+namespace CF::Colorized
 {
 }

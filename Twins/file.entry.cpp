@@ -242,7 +242,7 @@ namespace Fl
         return icon;
     }
 
-    WidecharString Entry::GetShellType() const
+    WString Entry::GetShellType() const
     {
         SHFILEINFO info = {};
 

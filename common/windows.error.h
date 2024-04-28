@@ -4,7 +4,7 @@
 #include <atlstr.h>
 #include <winerror.h>
 
-namespace Cf // Common framework
+namespace CF // Common framework
 {
     class ErrorDesc
     {

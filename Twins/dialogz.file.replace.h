@@ -30,7 +30,7 @@ namespace Twins
         CIcon DestIcon;
         unsigned Result;
 
-        static Cf::PopupMenu Popup;
+        static CF::PopupMenu Popup;
 
         enum
         {

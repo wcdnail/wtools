@@ -87,16 +87,16 @@ namespace Dh
         result += #mask; \
     }
 
-    CharString WCDAFX_API LvStyleStringA(DWORD style)
+    LString WCDAFX_API LvStyleStringA(DWORD style)
     {
-        CharString result;
+        LString result;
 #include "list.view.styles.h"
         return result;
     }
 
-    CharString WCDAFX_API LvStyleExStringA(DWORD style)
+    LString WCDAFX_API LvStyleExStringA(DWORD style)
     {
-        CharString result;
+        LString result;
 #include "list.view.exstyles.h"
         return result;
     }
@@ -146,23 +146,23 @@ namespace Dh
         result += L#mask; \
     }
 
-    WidecharString WCDAFX_API LvStyleStringW(DWORD style)
+    WString WCDAFX_API LvStyleStringW(DWORD style)
     {
-        WidecharString result;
+        WString result;
 #include "list.view.styles.h"
         return result;
     }
 
-    WidecharString WCDAFX_API LvStyleExStringW(DWORD style)
+    WString WCDAFX_API LvStyleExStringW(DWORD style)
     {
-        WidecharString result;
+        WString result;
 #include "list.view.exstyles.h"
         return result;
     }
 
 #undef _ON_BITMASK
 
-    WidecharString MessageToStrignW(MSG const* message)
+    WString MessageToStrignW(MSG const* message)
     {
         wchar_t buffer[512] = {0};
         _snwprintf_s(buffer, _countof(buffer),

@@ -3,7 +3,7 @@
 
 #include <gl/gl.h>
 
-namespace Cf
+namespace CF
 {
     inline void RenderCube()
     {

@@ -23,7 +23,7 @@ namespace Twins
     //    , backgroundBrush       (::CreateSolidBrush(backgroundColor))
     //{
     //    background[0] = backgroundColor;
-    //    background[1] = Cf::ReduceColor(background[0], 8, 8, 5);
+    //    background[1] = CF::ReduceColor(background[0], 8, 8, 5);
     //}
 
     static bool _IsValidId(int id) { return id >= 0 && id < PanelColumns::MaxCount; }
@@ -234,18 +234,18 @@ namespace Twins
 //        COLORREF tcolor = GetItemColor(currentTime, CFileTime(info.GetTime()), colors);
 //
 //        if (selected)
-//            tcolor = Cf::IncreaseColor(Cf::ReduceColor(tcolor, 0, 100, 100), 80, 0, 0);
+//            tcolor = CF::IncreaseColor(CF::ReduceColor(tcolor, 0, 100, 100), 80, 0, 0);
 //
 //// ##TODO: Configure dark or light theme"))
 //        if (info.IsHidden()) 
-//            tcolor = Cf::ReduceColor(tcolor, 63, 63, 63); 
+//            tcolor = CF::ReduceColor(tcolor, 63, 63, 63); 
 //
 //        int bi = (index % 2) & 1;
 //        COLORREF bcolor = colors.background[bi];
 //
 //// ##TODO: Configure dark or light theme"))
 //        if (hot)
-//            bcolor = panelActive ? colors.hotItemBackgroundColor : Cf::ReduceColor(colors.hotItemBackgroundColor, 31, 31, 31);
+//            bcolor = panelActive ? colors.hotItemBackgroundColor : CF::ReduceColor(colors.hotItemBackgroundColor, 31, 31, 31);
 //                                                                   
 //
 //        dc.FillSolidRect(rc, bcolor);
@@ -299,7 +299,7 @@ namespace Twins
     //    CRect rcIcon(rc.left + 2, rc.top, rc.right + 2, rc.bottom);
     //    DrawEntryIcon(dc, rcIcon, info, sz);
     //
-    //    WidecharString text;
+    //    WString text;
     //    if (info.IsDir())
     //        text = L"[" + info.GetFilename() + L"]";
     //
@@ -342,7 +342,7 @@ namespace Twins
     //    if (info.IsDir() && (info.GetSize() < 1))
     //        return ;
     //
-    //    WidecharString text = Str::HumanSize(info.GetSize());
+    //    WString text = Str::HumanSize(info.GetSize());
     //
     //    CRect rcSize(rc.left + 1, rc.top, rc.right - 6, rc.bottom);
     //    TextDraw(dc, rcSize, text.c_str(), DT_RIGHT | DT_END_ELLIPSIS | DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE);
@@ -350,7 +350,7 @@ namespace Twins
 
     //static void DateDrawer(CDC& dc, CRect const& rc, Fl::Entry const& info, CSize const& sz) 
     //{
-    //    WidecharString text = CTime(CFileTime(info.GetTime())).Format(_LS(StrId_HMmdY));
+    //    WString text = CTime(CFileTime(info.GetTime())).Format(_LS(StrId_HMmdY));
     //    TextDraw(dc, rc, text, DT_LEFT | DT_END_ELLIPSIS | DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE);
     //}
 

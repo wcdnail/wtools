@@ -11,7 +11,7 @@
 namespace Twins
 {
     TabBar::TabBar(int flags /*= Normal*/)
-        : Cf::DoubleBuffered(0xf8e0ca, true) // CONF: panel tabs double buffering
+        : CF::DoubleBuffered(0xf8e0ca, true) // CONF: panel tabs double buffering
         , Items()
         , ClickFunctor()
         , IconSize(16, 16)
@@ -113,7 +113,7 @@ namespace Twins
     void TabBar::OnPaint(CDCHandle senderDc)
     {
         WTL::CPaintDC paintDc(m_hWnd);
-        Cf::BufferedPaint bufferedPaint(paintDc, GetSecondDc(), IsDoubleBuffered(), m_hWnd);
+        CF::BufferedPaint bufferedPaint(paintDc, GetSecondDc(), IsDoubleBuffered(), m_hWnd);
         CDC& curDc = bufferedPaint.GetCurrentDc();
         if (!curDc.m_hDC)
         {
@@ -124,7 +124,7 @@ namespace Twins
         CRect rc;
         GetClientRect(rc);
         HFONT lastFont = curDc.SelectFont(MyFont);
-        Cf::GradRect(curDc, rc, MyBackColor);
+        CF::GradRect(curDc, rc, MyBackColor);
 
         curDc.SetBkMode(TRANSPARENT);
         
@@ -150,12 +150,12 @@ namespace Twins
             if (IsHot(cur))
             {
                 textColor = MyHotTextColor;
-                Cf::GradRect(curDc, rcItem, MyBackHotColor);
+                CF::GradRect(curDc, rcItem, MyBackHotColor);
             }
             else if (IsSelected(cur))
             {
                 textColor = MySelTextColor;
-                Cf::GradRect(curDc, rcItem, MyBackSelColor);
+                CF::GradRect(curDc, rcItem, MyBackSelColor);
             }
 
 #if _DEBUG_TAB_BAR
@@ -184,7 +184,7 @@ namespace Twins
         CRect rcEdge = rc;
         --rcEdge.right;
         --rcEdge.bottom;
-        Cf::FrameRect(curDc, rcEdge);
+        CF::FrameRect(curDc, rcEdge);
 
         curDc.SelectFont(lastFont);
     }

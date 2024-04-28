@@ -2,7 +2,7 @@
 #include "dialogz.messagebox.h"
 #include "dialogz.basic.h"
 
-namespace Cf
+namespace CF
 {
     DialogResult UserDialog::Ask(HWND parent, wchar_t const* what, wchar_t const* title, unsigned flags)
     {

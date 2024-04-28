@@ -1,7 +1,7 @@
 #pragma once
 
 #include <boost/noncopyable.hpp>
-#include <string.hp.h>
+#include "strint.h"
 #include <atlctrls.h>
 
 namespace Fl
@@ -35,7 +35,7 @@ namespace Twins
     private:
         friend class SelectHelper;
 
-        WidecharString Text;
+        WString Text;
         int SelFiles;
         int SelDirs;
         SizeType SelSize;

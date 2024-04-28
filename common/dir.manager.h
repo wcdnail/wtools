@@ -7,7 +7,7 @@
 #include <string>
 #include <map>
 
-namespace Cf
+namespace CF
 {
     class DirManager: boost::noncopyable
     {

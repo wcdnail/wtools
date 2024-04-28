@@ -36,14 +36,14 @@ namespace Helpers
         return cb.GetCheck() ? true : false;
     }
 
-    inline WidecharString GetCurrentValueAsString(WTL::CComboBox& combo)
+    inline WString GetCurrentValueAsString(WTL::CComboBox& combo)
     {
         CStringW text;
 
         int n = combo.GetCurSel();
         combo.GetLBText(n, text);
 
-        return WidecharString(text.GetString());
+        return WString(text.GetString());
     }
 
     template <typename Return>

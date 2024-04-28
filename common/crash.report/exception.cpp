@@ -10,7 +10,7 @@ namespace Crash
         ::free_run_context(RunContext);
     }
 
-    Exception::Exception(CharString const& message, char const* file, int line, int ec)
+    Exception::Exception(LString const& message, char const* file, int line, int ec)
         : Super(message.c_str())
         , File(file)
         , Line(line)
@@ -20,7 +20,7 @@ namespace Crash
         ::capture_run_context(&RunContext);
     }
 
-    Exception::Exception(WidecharString const& message, char const* file, int line, int ec)
+    Exception::Exception(WString const& message, char const* file, int line, int ec)
         : Super(CW2A(message.c_str()).m_psz)
         , File(file)
         , Line(line)

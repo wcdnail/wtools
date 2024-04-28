@@ -3,7 +3,7 @@
 #include "wcdafx.api.h"
 #include "dialogz.types.h"
 
-namespace Cf
+namespace CF
 {
     struct UserDialog
     {

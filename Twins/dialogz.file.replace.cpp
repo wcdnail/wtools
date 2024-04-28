@@ -31,7 +31,7 @@ namespace Twins
         , Result(SpecFlags::None)
     {}
 
-    Cf::PopupMenu FileReplaceDialog::Popup(0);
+    CF::PopupMenu FileReplaceDialog::Popup(0);
 
     BOOL FileReplaceDialog::OnInitDialog(HWND hwnd, LPARAM param)
     {
@@ -123,7 +123,7 @@ namespace Twins
             CRect rc;
             Buttons.GetWindowRect(rc);
 
-            CPoint p(rc.right - Cf::SafeDiv(rc.Width(), Buttons.Count()), rc.bottom);
+            CPoint p(rc.right - CF::SafeDiv(rc.Width(), Buttons.Count()), rc.bottom);
             int mr = Popup.Show(p, m_hWnd, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD);
 
             if (!mr)

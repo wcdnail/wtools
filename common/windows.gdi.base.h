@@ -4,7 +4,7 @@
 #include "trect.h"
 #include <atlgdi.h>
 
-namespace Cf  // Common framework
+namespace CF  // Common framework
 {
     class BitmapDC
     {

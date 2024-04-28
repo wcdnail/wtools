@@ -1,22 +1,275 @@
 #include "stdafx.h"
+#ifdef _MSC_VER
+#  pragma warning(disable: 4820) // 4820: 'WTL::tagCBRPOPUPMENU': '4' bytes padding added after data member 'WTL::tagCBRPOPUPMENU::cbSize'
+#  pragma warning(disable: 4365) // 4365: 'argument': conversion from 'unsigned int' to 'int', signed/unsigned mismatch
+#endif
 #include "wtl.colorizer.control.h"
+#include "wtl.colorizer.control.details.h"
+#include "wtl.colorizer.helpers.h"
+#include "wtl.colorizer.h"
 
-namespace Cf
+namespace CF::Colorized
 {
+#pragma region Generic implementation
+
+    template <typename T>
+    Control<T>::~Control()
+    {
+    }
+
+    template <typename T>
+    Control<T>::Control(HWND hwnd, Colorizer& master)
+        :    Super()
+        , m_Master(master)
+    {
+        InitSpec(hwnd);
+        this->SubclassWindow(hwnd);
+        Super::OnContruct(this->GetWndClassName());
+    }
+
+    template <typename T>
+    void Control<T>::InitSpec(HWND hwnd)
+    {
+        UNREFERENCED_ARG(hwnd);
+    }
+
+    template <typename T>
+    void Control<T>::OnDestroy()
+    {
+        ControlBase::OnDestroy(this->GetWndClassName());
+        this->SetMsgHandled(false);
+    }
+
+    template <typename T>
+    void Control<T>::OnPaint(CDCHandle)
+    {
+        this->SetMsgHandled(false);
+    }
+
+    template <typename T>
+    void Control<T>::OnNcPaint(CRgnHandle rgn)
+    {
+        BorderFlags bt = Details<T>::GetBorderType(*this);
+        if (BorderNone != bt) {
+            NcPainContext nc(*this, rgn);
+            m_Master.DrawControlBorder(nc.Dc.m_hDC, nc.Rect, bt);
+        }
+    }
+
+    template <typename T>
+    BOOL Control<T>::OnEraseBkgnd(CDCHandle dc)
+    {
+        CRect rc;
+        this->GetClientRect(rc);
+        m_Master.OnEraseBackground(dc, rc);
+        return TRUE;
+    }
+
+    template <typename T>
+    DWORD Control<T>::OnPrePaint(int id, LPNMCUSTOMDRAW cd)
+    {
+        UNREFERENCED_ARG(id);
+        UNREFERENCED_ARG(cd);
+        this->SetMsgHandled(false);
+        return CDRF_DODEFAULT;
+    }
+
+    template <typename T>
+    DWORD Control<T>::OnItemPrePaint(int id, LPNMCUSTOMDRAW cd)
+    {
+        UNREFERENCED_ARG(id);
+        UNREFERENCED_ARG(cd);
+        this->SetMsgHandled(false);
+        return CDRF_DODEFAULT;
+    }
+
+    template <typename T>
+    LRESULT Control<T>::OnGetDispinfo(LPNMHDR header)
+    {
+        UNREFERENCED_ARG(header);
+        this->SetMsgHandled(false);
+        return 0;
+    }
+
+    template <typename T>
+    BOOL Control<T>::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
+    {
+        bool bOld = this->IsMsgHandled();
+        BOOL bRet = OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
+        this->SetMsgHandled(bOld);
+        return bRet;
+    }
+
+    template <typename T>
+    BOOL Control<T>::OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
+    {
+        BOOL bHandled = TRUE;
+        if (ControlBase::OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
+            return TRUE;
+        }
+        switch(dwMsgMapID) {
+        case 0:
+            MSG_WM_DESTROY(OnDestroy)
+            MSG_WM_PAINT(OnPaint)
+            MSG_WM_NCPAINT(OnNcPaint)
+            MSG_WM_ERASEBKGND(OnEraseBkgnd)
+            MSG_WM_CTLCOLORLISTBOX(OnCtlColorListBox)
+            MSG_WM_CTLCOLOREDIT(OnCtlColorEdit)
+            if (WM_NOTIFY == uMsg) {
+                bHandled    = TRUE;
+                LPNMHDR hdr = reinterpret_cast<LPNMHDR>(lParam);
+                int  idCtrl = static_cast<int>(wParam);
+                switch (hdr->code) {
+                case NM_CUSTOMDRAW:  //WTL::CCustomDraw<>
+                    lResult = OnCustomDraw(idCtrl, hdr, bHandled);
+                    break;
+                }
+                if (bHandled) {
+                    return TRUE;
+                }
+            }
+            break;
+        case 1:
+            REFLECTED_NOTIFY_CODE_HANDLER(NM_CUSTOMDRAW, OnCustomDraw)
+        default:
+            ATLTRACE(static_cast<int>(ATL::atlTraceWindowing), 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
+            ATLASSERT(FALSE);
+            break;
+        }
+        return FALSE;
+    }
+
+    template <typename T>
+    LRESULT Control<T>::OnCustomDraw(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
+    {
+        UNREFERENCED_ARG(idCtrl);
+        UNREFERENCED_ARG(pnmh);
+        bHandled = FALSE;
+        return 0;
+    }
+
+#if 0
+    template <typename T>
+    LRESULT Control<T>::OnCustomDraw(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
+    {
+        T* pT = static_cast<T*>(this);
+        pT->SetMsgHandled(true);
+        auto lpNMCustomDraw = reinterpret_cast<LPNMCUSTOMDRAW>(pnmh);
+        DWORD dwRet = 0;
+        switch (lpNMCustomDraw->dwDrawStage) {
+        case CDDS_PREPAINT:
+            dwRet = pT->OnPrePaint(idCtrl, lpNMCustomDraw);
+            break;
+        case CDDS_POSTPAINT:
+            dwRet = pT->OnPostPaint(idCtrl, lpNMCustomDraw);
+            break;
+        case CDDS_PREERASE:
+            dwRet = pT->OnPreErase(idCtrl, lpNMCustomDraw);
+            break;
+        case CDDS_POSTERASE:
+            dwRet = pT->OnPostErase(idCtrl, lpNMCustomDraw);
+            break;
+        case CDDS_ITEMPREPAINT:
+            dwRet = pT->OnItemPrePaint(idCtrl, lpNMCustomDraw);
+            break;
+        case CDDS_ITEMPOSTPAINT:
+            dwRet = pT->OnItemPostPaint(idCtrl, lpNMCustomDraw);
+            break;
+        case CDDS_ITEMPREERASE:
+            dwRet = pT->OnItemPreErase(idCtrl, lpNMCustomDraw);
+            break;
+        case CDDS_ITEMPOSTERASE:
+            dwRet = pT->OnItemPostErase(idCtrl, lpNMCustomDraw);
+            break;
+        case (CDDS_ITEMPREPAINT | CDDS_SUBITEM):
+            dwRet = pT->OnSubItemPrePaint(idCtrl, lpNMCustomDraw);
+            break;
+        default:
+            pT->SetMsgHandled(FALSE);
+            break;
+        }
+        bHandled = pT->IsMsgHandled();
+        return dwRet;
+    }
+#endif
+
+    template <typename T>
+    CString Control<T>::GetItemText(int index) const
+    {
+        UNREFERENCED_ARG(index);
+        return _T("");
+    }
+
+    template <typename T>
+    int Control<T>::GetImageIndex(int index) const
+    {
+        UNREFERENCED_ARG(index);
+        return -1;
+    }
+
+    template <typename T>
+    HIMAGELIST Control<T>::GetImageList() const
+    {
+        return nullptr;
+    }
+
+    template <typename T>
+    void Control<T>::OnDrawItem(int id, LPDRAWITEMSTRUCT di)
+    {
+        const CString&    text = GetItemText(di->itemID);
+        const CImageList ilist = GetImageList();
+        const int       iindex = GetImageIndex(di->itemID);
+        m_Master.DrawItem(di, text, ilist, iindex);
+    }
+
+    template <typename T>
+    HBRUSH Control<T>::OnCtlColorStatic(CDCHandle dc, HWND hwnd)
+    {
+        UNREFERENCED_ARG(hwnd);
+        m_Master.SetTextColor(dc);
+        return m_Master.MyBackBrush[0];
+    }
+
+    template <typename T>
+    HBRUSH Control<T>::OnCtlColorListBox(CDCHandle dc, HWND hwnd)
+    {
+        UNREFERENCED_ARG(hwnd);
+        m_Master.SetTextColor(dc);
+        return m_Master.MyBackBrush[0];
+    }
+
+    template <typename T>
+    HBRUSH Control<T>::OnCtlColorEdit(CDCHandle dc, HWND hwnd)
+    {
+        UNREFERENCED_ARG(hwnd);
+        m_Master.SetTextColor(dc);
+        return m_Master.MyBackBrush[0];
+    }
+
+    template <typename T>
+    HBRUSH Control<T>::OnCtlColorScrollBar(CDCHandle dc, HWND hwnd)
+    {
+        UNREFERENCED_ARG(hwnd);
+        m_Master.SetTextColor(dc);
+        return m_Master.MyBackBrush[0];
+    }
+
+#pragma endregion
 #pragma region Static specific
 
     template <>
-    WCDAFX_API void Colorizer::Control<WTL::CStatic>::OnPaint(CDCHandle)
+    void Control<ZStatic>::OnPaint(CDCHandle dc)
     {
-        if (Details<WTL::CStatic>::Normal != Details<WTL::CStatic>::GetAppearType(*this)) {
-            SetMsgHandled(FALSE);
+        UNREFERENCED_ARG(dc);
+        if (Details<WTL::CStatic>::Normal != Details<WTL::CStatic>::GetAppearType(this->m_hWnd)) {
+            SetMsgHandled(false);
         }
         else {
-            PaintContext pc(*this, GetFont());
+            PaintContext pc(this->m_hWnd, this->GetFont());
             CString text;
-            if (GetWindowText(text)) {
-                Owner->SetTextColor(pc.PaindDC.m_hDC);
-                pc.PaindDC.DrawText(text, text.GetLength(), pc.Rect, Details<WTL::CStatic>::GetDrawTextFormat(*this));
+            if (this->GetWindowText(text)) {
+                m_Master.SetTextColor(pc.PaindDC.m_hDC);
+                pc.PaindDC.DrawText(text, text.GetLength(), pc.Rect, Details<WTL::CStatic>::GetDrawTextFormat(this->m_hWnd));
             }
         }
     }
@@ -26,42 +279,44 @@ namespace Cf
 #pragma region Button specific
 
     template <>
-    WCDAFX_API void Colorizer::Control<WTL::CButton>::OnPaint(CDCHandle)
+    void Control<ZButton>::OnPaint(CDCHandle dc)
     {
-        Details<WTL::CButton>::AppearType type = Details<WTL::CButton>::GetAppearType(*this);
+        UNREFERENCED_ARG(dc);
+        Details<WTL::CButton>::AppearType type = Details<WTL::CButton>::GetAppearType(this->m_hWnd);
         if ((Details<WTL::CButton>::Ownerdraw == type) || (Details<WTL::CButton>::UserButton == type)) {
-            SetMsgHandled(FALSE);
+            SetMsgHandled(false);
         }
         else {
-            PaintContext pc(*this, GetFont());
+            PaintContext pc(this->m_hWnd, this->GetFont());
+            const UINT textFormat = Details<WTL::CButton>::GetDrawTextFormat(this->m_hWnd);
 
             CString text;
-            GetWindowText(text);
-            Owner->SetTextColor(pc.PaindDC.m_hDC);
+            this->GetWindowText(text);
+            m_Master.SetTextColor(pc.PaindDC.m_hDC);
 
             switch (type) {
             case Details<WTL::CButton>::Groupbox: {
-                Owner->DrawGroupBox(*this, pc.PaindDC.m_hDC, pc.Rect, text);
+                m_Master.DrawGroupBox(*this, pc.PaindDC.m_hDC, pc.Rect, text);
                 break;
             }
             case Details<WTL::CButton>::PushButton:
             case Details<WTL::CButton>::DefPushButton:
             case Details<WTL::CButton>::Flat: {
-                Owner->DrawButton(*this, pc.PaindDC.m_hDC, pc.Rect, text,
-                    Details<WTL::CButton>::Flat == type,
-                    Details<WTL::CButton>::DefPushButton == type);
+                m_Master.DrawButton(*this, pc.PaindDC.m_hDC, pc.Rect, text, textFormat,
+                                   Details<WTL::CButton>::Flat == type,
+                                   Details<WTL::CButton>::DefPushButton == type);
                 break;
             }
             case Details<WTL::CButton>::Checkbox:
             case Details<WTL::CButton>::AutoCheckbox:
             case Details<WTL::CButton>::ThreeState:
             case Details<WTL::CButton>::Auto3State: {
-                Owner->DrawCheckBox(*this, pc.PaindDC.m_hDC, pc.Rect, text);
+                m_Master.DrawCheckBox(*this, pc.PaindDC.m_hDC, pc.Rect, text, textFormat);
                 break;
             }
             case Details<WTL::CButton>::RadioButton:
             case Details<WTL::CButton>::AutoRadioButton: {
-                Owner->DrawRadioButton(*this, pc.PaindDC.m_hDC, pc.Rect, text);
+                m_Master.DrawRadioButton(*this, pc.PaindDC.m_hDC, pc.Rect, text, textFormat);
                 break;
             }
             case Details<WTL::CButton>::Pushbox:
@@ -79,7 +334,7 @@ namespace Cf
 #pragma region ListBox specific
 
     template <>
-    WCDAFX_API void Colorizer::Control<WTL::CListBox>::SpecificPreInit(HWND hwnd)
+    void Control<WTL::CListBox>::InitSpec(HWND hwnd)
     {
         UINT ns = static_cast<UINT>(::GetWindowLong(hwnd, GWL_STYLE));
         ns |= LBS_OWNERDRAWVARIABLE | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT;
@@ -87,25 +342,20 @@ namespace Cf
     }
 
     template <>
-    WCDAFX_API CString Colorizer::Control<WTL::CListBox>::GetItemText(int index) const
+    CString Control<WTL::CListBox>::GetItemText(int index) const
     {
         CString result;
-        GetText(index, result);
+        this->GetText(index, result);
         return result;
     }
 
     template <>
-    WCDAFX_API BOOL Colorizer::Control<WTL::CListBox>::SpecificMessagesHandler(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD)
+    LRESULT Control<WTL::CListBox>::OnCustomDraw(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
     {
-        if (WM_DRAWITEM == uMsg) {
-            this->SetMsgHandled(TRUE);
-            OnDrawItem(static_cast<int>(wParam), reinterpret_cast<LPDRAWITEMSTRUCT>(lParam));
-            lResult = TRUE;
-            if(this->IsMsgHandled()) {
-                return TRUE;
-            }
-        }
-        return FALSE;
+        SetMsgHandled(true);
+        OnDrawItem(idCtrl, reinterpret_cast<LPDRAWITEMSTRUCT>(pnmh));
+        bHandled = IsMsgHandled();
+        return 0;
     }
 
 #pragma endregion
@@ -113,69 +363,51 @@ namespace Cf
 #pragma region ComboBox specific
 
     template <>
-    WCDAFX_API CString Colorizer::Control<WTL::CComboBox>::GetItemText(int index) const
+    CString Control<WTL::CComboBox>::GetItemText(int index) const
     {
         CString result;
-        GetLBText(index, result);
+        this->GetLBText(index, result);
         return result;
     }
 
-    template <> WCDAFX_API void Colorizer::Control<WTL::CComboBox>::OnNcPaint(CRgnHandle rgn) {}
-    template <> WCDAFX_API BOOL Colorizer::Control<WTL::CComboBox>::OnEraseBkgnd(CDCHandle dc) { return TRUE; }
+    template <> void Control<WTL::CComboBox>::OnNcPaint(CRgnHandle rgn) {}
+    template <> BOOL Control<WTL::CComboBox>::OnEraseBkgnd(CDCHandle dc) { return TRUE; }
 
     template <>
-    WCDAFX_API void Colorizer::Control<WTL::CComboBox>::OnPaint(CDCHandle)
+    void Control<ZComboBox>::OnPaint(CDCHandle)
     {
-        PaintContext pc(*this, GetFont());
-        Owner->DrawComboFace<WTL::CComboBox>(*this, pc.PaindDC.m_hDC, pc.Rect);
+        PaintContext pc(this->m_hWnd, this->GetFont());
+        m_Master.DrawComboFace(*this, pc.PaindDC.m_hDC, pc.Rect);
     }
 
     template <>
-    WCDAFX_API HBRUSH Colorizer::Control<WTL::CComboBox>::OnCtlColorListBox(CDCHandle dc, HWND hwnd)
+    HBRUSH Control<ZComboBox>::OnCtlColorListBox(CDCHandle dc, HWND hwnd)
     {
-        if (!Members.Listbox.get() && (m_hWnd != hwnd))
-        {
-            Owner->OnEraseBackground(*this, dc);
-            Members.Listbox.reset(new Control<WTL::CListBox>(hwnd, Owner));
-        }
+        //if (!m_Spec.m_ListBox.m_hWnd) {
+        //    CRect rc;
+        //    this->GetClientRect(rc);
+        //    m_Master.OnEraseBackground(dc, rc);
+        //    m_Spec.m_ListBox.Attach(hwnd);
+        //}
 
-        Owner->SetTextColor(dc);
-        return Owner->MyBackBrush[0];
+        m_Master.SetTextColor(dc);
+        return m_Master.MyBackBrush[0];
     }
 
     template <>
-    WCDAFX_API HBRUSH Colorizer::Control<WTL::CComboBox>::OnCtlColorEdit(CDCHandle dc, HWND)
+    HBRUSH Control<ZComboBox>::OnCtlColorEdit(CDCHandle dc, HWND)
     {
-        Owner->SetTextColor(dc);
-        return Owner->MyBackBrush[0];
+        m_Master.SetTextColor(dc);
+        return m_Master.MyBackBrush[0];
     }
 
     template <>
-    WCDAFX_API BOOL Colorizer::Control<WTL::CComboBox>::SpecificMessagesHandler(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD)
+    LRESULT Control<ZComboBox>::OnCustomDraw(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
     {
-        if (WM_DRAWITEM == uMsg) {
-            this->SetMsgHandled(TRUE);
-            OnDrawItem(static_cast<int>(wParam), reinterpret_cast<LPDRAWITEMSTRUCT>(lParam));
-            lResult = TRUE;
-            if(this->IsMsgHandled()) {
-                return TRUE;
-            }
-        }
-        else if (uMsg == WM_CTLCOLORLISTBOX) {
-            this->SetMsgHandled(TRUE);
-            lResult = reinterpret_cast<LRESULT>(OnCtlColorListBox(reinterpret_cast<HDC>(wParam), reinterpret_cast<HWND>(lParam)));
-            if(this->IsMsgHandled()) {
-                return TRUE;
-            }
-        }
-        else if (uMsg == WM_CTLCOLOREDIT) {
-            this->SetMsgHandled(TRUE);
-            lResult = reinterpret_cast<LRESULT>(OnCtlColorEdit(reinterpret_cast<HDC>(wParam), reinterpret_cast<HWND>(lParam)));
-            if(this->IsMsgHandled()) {
-                return TRUE;
-            }
-        }
-        return FALSE;
+        SetMsgHandled(true);
+        OnDrawItem(idCtrl, reinterpret_cast<LPDRAWITEMSTRUCT>(pnmh));
+        bHandled = IsMsgHandled();
+        return 0;
     }
 
 #pragma endregion
@@ -183,9 +415,9 @@ namespace Cf
 #pragma region ScrollBar specific
 
     template <>
-    WCDAFX_API BOOL Colorizer::Control<WTL::CScrollBar>::OnEraseBkgnd(CDCHandle)
+    BOOL Control<ZScrollBar>::OnEraseBkgnd(CDCHandle)
     {
-        SetMsgHandled(FALSE);
+        this->SetMsgHandled(false);
         return FALSE;
     }
 
@@ -194,16 +426,13 @@ namespace Cf
 #pragma region TreeView specific
 
     template <>
-    WCDAFX_API void Colorizer::Control<WTL::CTreeViewCtrl>::SpecificPreInit(HWND hwnd)
+    void Control<ZTreeViewCtrl>::InitSpec(HWND hwnd)
     {
-        ::SetWindowLong(hwnd, GWL_EXSTYLE
-            , ::GetWindowLong(hwnd, GWL_EXSTYLE) 
-            | 0x0004 /*TVS_EX_DOUBLEBUFFER*/
-            );
+        ::SetWindowLongW(hwnd, GWL_EXSTYLE, ::GetWindowLongW(hwnd, GWL_EXSTYLE) | 0x0004 /* TVS_EX_DOUBLEBUFFER */);
     }
 
     template <>
-    WCDAFX_API LRESULT Colorizer::Control<WTL::CTreeViewCtrl>::OnGetDispinfo(LPNMHDR /*header*/)
+    LRESULT Control<ZTreeViewCtrl>::OnGetDispinfo(LPNMHDR /*header*/)
     {
         //LPNMTVDISPINFO di = (LPNMTVDISPINFO)header;
         // ##TODO: implemenation of CTreeViewCtrl OnGetDispinfo
@@ -211,36 +440,49 @@ namespace Cf
     }
 
     template <>
-    WCDAFX_API DWORD Colorizer::Control<WTL::CTreeViewCtrl>::OnPrePaint(int, LPNMCUSTOMDRAW cd) 
+    DWORD Control<ZTreeViewCtrl>::OnPrePaint(int, LPNMCUSTOMDRAW cd) 
     {
         CDCHandle dc(cd->hdc);
-        dc.FillSolidRect(&cd->rc, Owner->MyBackColor);
+        dc.FillSolidRect(&cd->rc, m_Master.MyBackColor);
         return CDRF_NOTIFYPOSTPAINT | CDRF_NOTIFYITEMDRAW;
     }
 
     template <>
-    WCDAFX_API DWORD Colorizer::Control<WTL::CTreeViewCtrl>::OnItemPrePaint(int, LPNMCUSTOMDRAW cd) 
+    DWORD Control<ZTreeViewCtrl>::OnItemPrePaint(int, LPNMCUSTOMDRAW cd) 
     {
         NMTVCUSTOMDRAW* tv = reinterpret_cast<NMTVCUSTOMDRAW*>(cd);
         HTREEITEM     item = reinterpret_cast<HTREEITEM>(cd->dwItemSpec);
-        if (GetItemState(item, TVIS_SELECTED | TVIS_DROPHILITED) & (TVIS_SELECTED | TVIS_DROPHILITED)) {
-            tv->clrText = Owner->MyHotTextColor;
-            tv->clrTextBk = Owner->MyHotBackColor;
+        if (this->GetItemState(item, TVIS_SELECTED | TVIS_DROPHILITED) & (TVIS_SELECTED | TVIS_DROPHILITED)) {
+            tv->clrText = m_Master.MyHotTextColor;
+            tv->clrTextBk = m_Master.MyHotBackColor;
         }
         else {
-            tv->clrText = Owner->MyTextColor;
-            tv->clrTextBk = Owner->MyBackColor;
+            tv->clrText = m_Master.MyTextColor;
+            tv->clrTextBk = m_Master.MyBackColor;
         }
         return CDRF_DODEFAULT;
     }
 
-    template <>
-    WCDAFX_API BOOL Colorizer::Control<WTL::CTreeViewCtrl>::SpecificMessagesHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD)
-    {
-        //NOTIFY_CODE_HANDLER_EX(TVN_GETDISPINFO, OnGetDispinfo)
-        CHAIN_MSG_MAP(CustomDraw)
-        return FALSE;
-    }
-
 #pragma endregion
+
+    template struct Control<ZStatic>;
+    template struct Control<ZButton>;
+    template struct Control<ZScrollBar>;
+    template struct Control<ZComboBox>;
+    template struct Control<ZEdit>;
+    template struct Control<ZListBox>;
+    template struct Control<ZHeaderCtrl>;
+    template struct Control<ZLinkCtrl>;
+    template struct Control<ZListViewCtrl>;
+    template struct Control<ZTreeViewCtrl>;
+    template struct Control<ZComboBoxEx>;
+    template struct Control<ZTabCtrl>;
+    template struct Control<ZIPAddressCtrl>;
+    template struct Control<ZPagerCtrl>;
+    template struct Control<ZProgressBarCtrl>;
+    template struct Control<ZTrackBarCtrl>;
+    template struct Control<ZUpDownCtrl>;
+    template struct Control<ZDateTimePickerCtrl>;
+    template struct Control<ZMonthCalendarCtrl>;
+    template struct Control<ZRichEditCtrl>;
 }

@@ -23,19 +23,19 @@ namespace Ref
 
     private:
         friend class List;
-        Accessor(List& list, CharString const& varName)
+        Accessor(List& list, LString const& varName)
             : list_(list)
             , varName_(varName)
         {}
 
         List& list_;
-        CharString const& varName_;
+        LString const& varName_;
     };
 
     template <class T>
-    inline Var& List::Assign(CharString const& varName, T& object)
+    inline Var& List::Assign(LString const& varName, T& object)
     {
-        auto rv = list_.emplace(std::make_pair<CharString, Var>(GetVarName(varName), Var(varName, object)));
+        auto rv = list_.emplace(std::make_pair<LString, Var>(GetVarName(varName), Var(varName, object)));
         return rv.first->second;
     }
 }

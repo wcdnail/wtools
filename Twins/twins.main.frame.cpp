@@ -196,7 +196,7 @@ namespace Twins
         UINT dflags = DT_CENTER | DT_SINGLELINE | DT_VCENTER;
         for (size_t i=0; i<_countof(App().ButtonBarId); i++) {
             Command::Definition const& def = Commands().GetCommand(App().ButtonBarId[i]);
-            WidecharString name = def.GetKeyIdName() + L" " + def.Name.c_str();
+            WString name = def.GetKeyIdName() + L" " + def.Name.c_str();
             ButtonBar.Add(name.c_str(), dflags, nullptr, App().ButtonBarId[i]);
         }
 

@@ -4,7 +4,7 @@
 #include <cmath>
 #include <gl/gl.h>
 
-namespace Cf
+namespace CF
 {
     inline void RenderTorus(int maj, int min, float majRadius, float minRadius, bool shaded = true)
     {

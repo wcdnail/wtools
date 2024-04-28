@@ -2,7 +2,7 @@
 
 #ifdef __cplusplus
 #include "wcdafx.api.h"
-#include "string.hp.h"
+#include "strint.h"
 #include <stdexcept>
 
 struct RUN_CTX;
@@ -17,8 +17,8 @@ namespace Crash
         using Super = std::runtime_error;
 
         WCDAFX_API ~Exception() override;
-        WCDAFX_API Exception(CharString const& message, char const* file, int line, int ec = errno);
-        WCDAFX_API Exception(WidecharString const& message, char const* file, int line, int ec = errno);
+        WCDAFX_API Exception(LString const& message, char const* file, int line, int ec = errno);
+        WCDAFX_API Exception(WString const& message, char const* file, int line, int ec = errno);
 
         WCDAFX_API char const* GetSource() const;
         WCDAFX_API int GetLine() const;

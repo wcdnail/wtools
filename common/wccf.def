@@ -1,9 +1,2 @@
 LIBRARY wccf.dll
 EXPORTS
-    crash_report
-    get_last_error_code
-    capture_context
-    sb_zero
-    sb_free
-    describe_operation_code
-    describe_callstack

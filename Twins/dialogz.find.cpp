@@ -504,7 +504,7 @@ namespace Twins
         Searcher.Reset(TVI_ROOT);
     }
 
-    static void EscapeRegex(WidecharString& pattern)
+    static void EscapeRegex(WString& pattern)
     {
         boost::replace_all(pattern, L"\\", L"\\\\");
         boost::replace_all(pattern, L"^",  L"\\^");
@@ -521,9 +521,9 @@ namespace Twins
         boost::replace_all(pattern, L"/",  L"\\/");
     }
 
-    static WidecharString RxFromWildcards(std::wstring const& pattern)
+    static WString RxFromWildcards(std::wstring const& pattern)
     {
-        WidecharString rx = pattern;
+        WString rx = pattern;
 
         EscapeRegex(rx);
 
@@ -639,7 +639,7 @@ namespace Twins
     {
         PatternRx.clear();
         if (PatternIsRegExp)
-            PatternRx = WidecharString(PatternString);
+            PatternRx = WString(PatternString);
 
         else if (ContainWildcards(PatternString))
             PatternRx = RxFromWildcards(PatternString);
@@ -755,7 +755,7 @@ namespace Twins
         Pattern.SetFocus();
     }
 
-    static int GetShellIconIndex(WidecharString const& path, UINT flags)
+    static int GetShellIconIndex(WString const& path, UINT flags)
     {
         SHFILEINFO info = {0};
         ::SHGetFileInfoW(path.c_str(), -1, &info, sizeof(info), SHGFI_LINKOVERLAY | SHGFI_SYSICONINDEX | flags);
@@ -972,7 +972,7 @@ namespace Twins
 
         if (!result)
         {
-            WidecharString name = SelectName(entryPath, entry, UseNameOnly);
+            WString name = SelectName(entryPath, entry, UseNameOnly);
             result = MatchByPattern(name);
         }
 

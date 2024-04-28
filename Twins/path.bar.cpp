@@ -160,7 +160,7 @@ namespace Twins
             static CString _Concat(HistoryDeque::value_type const& p) { return p.c_str(); }
         };
 
-        Cf::PopupMenu menu;
+        CF::PopupMenu menu;
         int count = menu.Load(1, Owner.GetDirManager().GetHistory(), Helper::_Concat);
         int n = menu.Show(byKey ? Path.m_hWnd : History.m_hWnd, *this, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD);
         if ((n >= 1) && (n <= count))
@@ -208,8 +208,8 @@ namespace Twins
 
         OnCtlColor(dc, di->hwndItem);
 
-        Cf::GradRect(dc, rc, MyButtonBackColor);
-        Cf::FrameRect(dc, rc);
+        CF::GradRect(dc, rc, MyButtonBackColor);
+        CF::FrameRect(dc, rc);
 
         CWindow temp(di->hwndItem);
         int textLen = temp.GetWindowTextLength();

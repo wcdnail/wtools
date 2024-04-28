@@ -11,8 +11,8 @@ namespace Ref
     class Var::Int
     {
     public:
-        void SetName(CharString const& name) { name_ = name; }
-        CharString const& GetName() const { return name_; }
+        void SetName(LString const& name) { name_ = name; }
+        LString const& GetName() const { return name_; }
 
         std::type_info const& Type() const { return type_; }
 
@@ -24,10 +24,10 @@ namespace Ref
         virtual void Serialize(std::wostream& ar) = 0;
 
     protected:
-        WCDAFX_API Int(CharString const& name, std::type_info const& type);
+        WCDAFX_API Int(LString const& name, std::type_info const& type);
         WCDAFX_API virtual ~Int() = 0;
 
-        CharString name_;
+        LString name_;
         std::type_info const& type_;
     };
 
@@ -35,7 +35,7 @@ namespace Ref
     class Var::Impl: public Var::Int
     {
     public:
-        Impl(CharString const& name, T& object)
+        Impl(LString const& name, T& object)
             : Int(name, typeid(T))
             , ref_(object)
         {}
@@ -59,7 +59,7 @@ namespace Ref
     };
 
     template <class T>
-    inline Var::Var(CharString const& name, T& object)
+    inline Var::Var(LString const& name, T& object)
         : ref_(new Impl<T>(name, object))
     {
     }

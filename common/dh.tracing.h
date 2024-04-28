@@ -6,7 +6,7 @@
 
 #include "wcdafx.api.h"
 #include "dh.timer.h"
-#include "string.hp.h"
+#include "strint.h"
 #include <string>
 
 namespace Dh
@@ -18,10 +18,10 @@ namespace Dh
     public:
         WCDAFX_API TraceCategory(wchar_t const* name);
         WCDAFX_API ~TraceCategory();
-        WidecharString const& GetName() const;
+        WString const& GetName() const;
 
     private:
-        WidecharString Name;
+        WString Name;
     };
 
     struct ScopedThreadLog
@@ -69,10 +69,12 @@ namespace Dh
         template <typename C>
         inline void CopyCharsForPrinting(C* dest, size_t dlen, C const* source, size_t slen)
         {
-            size_t llen = min(dlen, slen);
-            for (size_t i=0; i<llen; i++) {
-                C ch = PrintableChar(source[i]);
-                dest[i] = ch;
+            size_t left = min(dlen, slen);
+            while (left > 0) {
+                *dest = PrintableChar(*source);
+                ++source;
+                ++dest;
+                --left;
             }
         }
     }

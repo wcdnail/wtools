@@ -7,7 +7,7 @@
 #include <atlgdi.h>
 #include <atlcrack.h>
 
-namespace Cf  // Common framework
+namespace CF  // Common framework
 {
     class BufferedPaint
     {

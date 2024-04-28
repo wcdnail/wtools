@@ -13,7 +13,7 @@
 #include <boost/exception/all.hpp>
 #include <stdexcept>
 
-namespace Cf
+namespace CF
 {
     namespace AnyException
     {

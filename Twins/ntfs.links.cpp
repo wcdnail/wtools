@@ -99,9 +99,9 @@ namespace Ntfs
         return br ? (ReparseBuffer.ReparseTag == IO_REPARSE_TAG_MOUNT_POINT) : false;
     }
 
-    WidecharString QueryLinkTarget(WidecharString const& dirpath, std::error_code& ec)
+    WString QueryLinkTarget(WString const& dirpath, std::error_code& ec)
     {
-        WidecharString result;
+        WString result;
         HANDLE dir = OpenDirectory(dirpath.c_str(), false);
 
         if (INVALID_HANDLE_VALUE == dir) 

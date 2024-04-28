@@ -36,8 +36,8 @@ namespace Twins
         using Super::operator HWND;
 
         void Invalidate() const;
-        Cf::DirManager const& GetDirManager() const;
-        Cf::DirManager& GetDirManager();
+        CF::DirManager const& GetDirManager() const;
+        CF::DirManager& GetDirManager();
         PCWSTR GetCurrentPath() const;
         void Reload();
         void ChangeDir(FItem const* it);
@@ -103,7 +103,7 @@ namespace Twins
     };
 
     inline PCWSTR Panel::GetCurrentPath() const { return GetDirManager().FullPath().wstring().c_str(); }
-    inline Cf::DirManager const& Panel::GetDirManager() const { return View.Scanner.Path; }
-    inline Cf::DirManager& Panel::GetDirManager() { return View.Scanner.Path; }
+    inline CF::DirManager const& Panel::GetDirManager() const { return View.Scanner.Path; }
+    inline CF::DirManager& Panel::GetDirManager() { return View.Scanner.Path; }
     inline void Panel::Reload() { FetchContent(nullptr); }
 }

@@ -341,8 +341,8 @@ namespace Twins
 
         OnCtlColor(dc, di->hwndItem);
 
-        Cf::GradRect(dc, rc, MyButtonBackColor);
-        Cf::FrameRect(dc, rc);
+        CF::GradRect(dc, rc, MyButtonBackColor);
+        CF::FrameRect(dc, rc);
 
         CWindow temp(di->hwndItem);
         int textLen = temp.GetWindowTextLength();

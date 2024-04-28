@@ -19,7 +19,7 @@ namespace Twins
 
         PCWSTR Type::ToString(UINT type)
         {
-            static const WidecharString strings[] = 
+            static const WString strings[] = 
             {
               _L(StrId_Unknown)
             , _L(StrId_Unmounted)

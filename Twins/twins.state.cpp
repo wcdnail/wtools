@@ -195,7 +195,7 @@ namespace Obsolete
         for (size_t i=0; i<_countof(ButtonBarIds); i++)
         {
             Command::Definition const& def = Commands().GetCommand(ButtonBarIds[i]);
-            WidecharString name = def.GetKeyIdName() + L" " + def.Name.c_str();
+            WString name = def.GetKeyIdName() + L" " + def.Name.c_str();
             bbar.Add(name.c_str(), dflags, NULL, ButtonBarIds[i]);
         }
 

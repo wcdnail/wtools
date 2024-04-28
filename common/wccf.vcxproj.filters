@@ -124,7 +124,6 @@
     <ClCompile Include="null.pointee.cpp">
       <Filter>__</Filter>
     </ClCompile>
-    <ClCompile Include="string.utils.format.cpp" />
     <ClCompile Include="wtl.colorizer.control.details.cpp">
       <Filter>colorizer</Filter>
     </ClCompile>
@@ -146,6 +145,13 @@
     <ClCompile Include="string.utils.wide2multi.multi2wide.cpp">
       <Filter>__</Filter>
     </ClCompile>
+    <ClCompile Include="string.utils.format.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="strint.cpp" />
+    <ClCompile Include="wtl.control.cpp" />
+    <ClCompile Include="rectz.cpp" />
+    <ClCompile Include="rect.alloc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -503,6 +509,10 @@
       <Filter>__</Filter>
     </ClInclude>
     <ClInclude Include="brute_cast.h" />
+    <ClInclude Include="strint.h" />
+    <ClInclude Include="wtl.control.h" />
+    <ClInclude Include="rectz.h" />
+    <ClInclude Include="rect.alloc.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">
@@ -576,9 +586,7 @@
     <None Include="json\version">
       <Filter>json</Filter>
     </None>
-    <None Include="cf-1.0.def">
-      <Filter>_</Filter>
-    </None>
+    <None Include="wccf.def" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="json\README.txt">

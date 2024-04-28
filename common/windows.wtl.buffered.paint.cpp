@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "windows.wtl.buffered.paint.h"
 
-namespace Cf  // Common framework
+namespace CF  // Common framework
 {
     BufferedPaint::BufferedPaint(WTL::CDC& destDc, CDC& secondDc, bool doubleBuffering, HWND ownerWindow)
         : destDc_(destDc)

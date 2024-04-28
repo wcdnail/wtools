@@ -9,7 +9,7 @@
 namespace Twins
 {
     class CommonDialog: public CDialogImpl<CommonDialog>
-                      , public Cf::Colorizer
+                      , public CF::Colorizer
     {
     private:
         typedef CDialogImpl<CommonDialog> Super;
@@ -53,7 +53,7 @@ namespace Twins
         void OnDestroy();
 
         BEGIN_MSG_MAP_EX(CommonDialog)
-            CHAIN_MSG_MAP(Cf::Colorizer)
+            CHAIN_MSG_MAP(CF::Colorizer)
             MSG_WM_COMMAND(OnCommand)
             MSG_WM_INITDIALOG(OnInitDialog)
             MSG_WM_DESTROY(OnDestroy)
