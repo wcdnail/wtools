@@ -1,5 +1,7 @@
 #pragma once
 
+#include "wtl.colorizer.control.specific.h"
+
 namespace CF::Colorized
 {
     enum BorderFlags : UINT;
@@ -20,7 +22,7 @@ namespace CF::Colorized
 #pragma region Static details
 
     template <>
-    struct Details<WTL::CStatic> 
+    struct Details<ZStatic> 
     {
         enum AppearType: UINT
         {
@@ -50,7 +52,7 @@ namespace CF::Colorized
 #pragma region Button details
 
     template <>
-    struct Details<WTL::CButton> 
+    struct Details<ZButton> 
     {
         enum AppearType : UINT
         {
@@ -79,7 +81,7 @@ namespace CF::Colorized
 #pragma region Combo details
 
     template <>
-    struct Details<WTL::CComboBox>
+    struct Details<ZComboBox>
     {
         enum AppearType: UINT
         {

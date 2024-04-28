@@ -267,7 +267,7 @@ namespace CF::Colorized
     void Control<ZStatic>::OnPaint(CDCHandle dc)
     {
         UNREFERENCED_ARG(dc);
-        if (Details<WTL::CStatic>::Normal != Details<WTL::CStatic>::GetAppearType(this->m_hWnd)) {
+        if (Details<ZStatic>::Normal != Details<ZStatic>::GetAppearType(this->m_hWnd)) {
             SetMsgHandled(false);
         }
         else {
@@ -275,7 +275,7 @@ namespace CF::Colorized
             CString text;
             if (this->GetWindowText(text)) {
                 m_Master.SetTextColor(pc.PaindDC.m_hDC);
-                pc.PaindDC.DrawText(text, text.GetLength(), pc.Rect, Details<WTL::CStatic>::GetDrawTextFormat(this->m_hWnd));
+                pc.PaindDC.DrawText(text, text.GetLength(), pc.Rect, Details<ZStatic>::GetDrawTextFormat(this->m_hWnd));
             }
         }
     }
@@ -288,13 +288,13 @@ namespace CF::Colorized
     void Control<ZButton>::OnPaint(CDCHandle dc)
     {
         UNREFERENCED_ARG(dc);
-        Details<WTL::CButton>::AppearType type = Details<WTL::CButton>::GetAppearType(this->m_hWnd);
-        if ((Details<WTL::CButton>::Ownerdraw == type) || (Details<WTL::CButton>::UserButton == type)) {
+        Details<ZButton>::AppearType type = Details<ZButton>::GetAppearType(this->m_hWnd);
+        if ((Details<ZButton>::Ownerdraw == type) || (Details<ZButton>::UserButton == type)) {
             SetMsgHandled(false);
         }
         else {
             PaintContext pc(this->m_hWnd, this->GetFont());
-            const UINT tformat = Details<WTL::CButton>::GetDrawTextFormat(this->m_hWnd);
+            const UINT tformat = Details<ZButton>::GetDrawTextFormat(this->m_hWnd);
             const LONG   style = GetWindowLongW(GWL_STYLE); // ##TODO: check mask -> & 0xf00
             const LONG  estyle = GetWindowLongW(GWL_EXSTYLE);
             const UINT   state = GetState();
@@ -304,33 +304,33 @@ namespace CF::Colorized
             m_Master.SetTextColor(pc.PaindDC.m_hDC);
 
             switch (type) {
-            case Details<WTL::CButton>::Groupbox: {
+            case Details<ZButton>::Groupbox: {
                 m_Master.DrawGroupBox(pc.PaindDC.m_hDC, pc.Rect, text, style);
                 break;
             }
-            case Details<WTL::CButton>::PushButton:
-            case Details<WTL::CButton>::DefPushButton:
-            case Details<WTL::CButton>::Flat: {
+            case Details<ZButton>::PushButton:
+            case Details<ZButton>::DefPushButton:
+            case Details<ZButton>::Flat: {
                 m_Master.DrawButton(pc.PaindDC.m_hDC, pc.Rect, text, tformat, state,
-                                   Details<WTL::CButton>::Flat == type,
-                                   Details<WTL::CButton>::DefPushButton == type);
+                                   Details<ZButton>::Flat == type,
+                                   Details<ZButton>::DefPushButton == type);
                 break;
             }
-            case Details<WTL::CButton>::Checkbox:
-            case Details<WTL::CButton>::AutoCheckbox:
-            case Details<WTL::CButton>::ThreeState:
-            case Details<WTL::CButton>::Auto3State: {
+            case Details<ZButton>::Checkbox:
+            case Details<ZButton>::AutoCheckbox:
+            case Details<ZButton>::ThreeState:
+            case Details<ZButton>::Auto3State: {
                 m_Master.DrawCheckBox(pc.PaindDC.m_hDC, pc.Rect, text, tformat, style, estyle, state);
                 break;
             }
-            case Details<WTL::CButton>::RadioButton:
-            case Details<WTL::CButton>::AutoRadioButton: {
+            case Details<ZButton>::RadioButton:
+            case Details<ZButton>::AutoRadioButton: {
                 m_Master.DrawRadioButton(pc.PaindDC.m_hDC, pc.Rect, text, tformat, style, estyle, state);
                 break;
             }
-            case Details<WTL::CButton>::Pushbox:
-            case Details<WTL::CButton>::UserButton:
-            case Details<WTL::CButton>::Ownerdraw: {
+            case Details<ZButton>::Pushbox:
+            case Details<ZButton>::UserButton:
+            case Details<ZButton>::Ownerdraw: {
                 ::DebugBreak();
                 break;
             }

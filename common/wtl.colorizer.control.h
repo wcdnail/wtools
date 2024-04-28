@@ -8,15 +8,15 @@ namespace CF::Colorized
     class Colorizer;
 
     //
-    // CWindowImplRoot<TBase>: -> TBase, -> CMessageMap
-    //   |
-    //   -- CWindowImplRoot<TBase>
-    //          |
-    //          -- CWindowImplBaseT<TBase, TWinTraits>
-    //                 |
-    //                 -- CWindowImpl<T, TBase, TWinTraits>
-    //                                |
-    //                                -- This class
+    //    CWindowImplRoot<TBase>: -> TBase, -> CMessageMap
+    //      |
+    //      -- CWindowImplRoot<TBase>
+    //             |
+    //             -- CWindowImplBaseT<TBase, TWinTraits>
+    //                    |
+    //                    -- CWindowImpl<T, TBase, TWinTraits>
+    //                                   |
+    //                                   -- This class
     //
 
     template <typename T>

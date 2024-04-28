@@ -23,7 +23,7 @@ namespace CF::Colorized
         return DT_CENTER | DT_VCENTER | DT_SINGLELINE; 
     }
 
-    Details<WTL::CStatic>::AppearType Details<WTL::CStatic>::GetAppearType(HWND hwnd)
+    Details<ZStatic>::AppearType Details<ZStatic>::GetAppearType(HWND hwnd)
     {
         UINT result = Normal;
         UINT   type = static_cast<UINT>(GetWindowLongW(hwnd, GWL_STYLE)) & SS_TYPEMASK;
@@ -36,7 +36,7 @@ namespace CF::Colorized
         return (AppearType)result;
     }
 
-    BorderFlags Details<WTL::CStatic>::GetBorderType(HWND hwnd)
+    BorderFlags Details<ZStatic>::GetBorderType(HWND hwnd)
     {
         LONG style = 0, estyle = 0;
         BorderFlags result = Colorizer::GetBorderType(hwnd, style, estyle);
@@ -46,7 +46,7 @@ namespace CF::Colorized
         return result;
     }
 
-    UINT Details<WTL::CStatic>::GetDrawTextFormat(HWND hwnd)
+    UINT Details<ZStatic>::GetDrawTextFormat(HWND hwnd)
     {
         UINT  style = static_cast<UINT>(::GetWindowLong(hwnd, GWL_STYLE));
         UINT result = style & 3 | DT_EXPANDTABS;
@@ -58,7 +58,7 @@ namespace CF::Colorized
                 ;
     }
 
-    Details<WTL::CButton>::AppearType Details<WTL::CButton>::GetAppearType(HWND hwnd)
+    Details<ZButton>::AppearType Details<ZButton>::GetAppearType(HWND hwnd)
     {
         UINT style = static_cast<UINT>(::GetWindowLong(hwnd, GWL_STYLE));
         AppearType result = static_cast<AppearType>(style & BS_TYPEMASK);
@@ -71,13 +71,13 @@ namespace CF::Colorized
         return result; 
     }
 
-    BorderFlags Details<WTL::CButton>::GetBorderType(HWND hwnd)
+    BorderFlags Details<ZButton>::GetBorderType(HWND hwnd)
     {
         LONG style = 0, estyle = 0;
         return Colorizer::GetBorderType(hwnd, style, estyle); 
     }
 
-    UINT Details<WTL::CButton>::GetDrawTextFormat(HWND hwnd)
+    UINT Details<ZButton>::GetDrawTextFormat(HWND hwnd)
     {
         UINT style = static_cast<UINT>(::GetWindowLong(hwnd, GWL_STYLE));
         UINT type = style & BS_TYPEMASK;
@@ -93,20 +93,41 @@ namespace CF::Colorized
                 ;
     }
 
-    Details<WTL::CComboBox>::AppearType Details<WTL::CComboBox>::GetAppearType(HWND hwnd)
+    Details<ZComboBox>::AppearType Details<ZComboBox>::GetAppearType(HWND hwnd)
     {
         AppearType result = static_cast<AppearType>(::GetWindowLong(hwnd, GWL_STYLE) & 3 - 1);
         return result; 
     }
 
-    BorderFlags Details<WTL::CComboBox>::GetBorderType(HWND hwnd)
+    BorderFlags Details<ZComboBox>::GetBorderType(HWND hwnd)
     {
         LONG style = 0, estyle = 0;
         return Colorizer::GetBorderType(hwnd, style, estyle); 
     }
 
-    UINT Details<WTL::CComboBox>::GetDrawTextFormat(HWND)
+    UINT Details<ZComboBox>::GetDrawTextFormat(HWND)
     { 
         return DT_CENTER | DT_VCENTER | DT_SINGLELINE; 
     }
+
+    template struct Details<ZStatic>;
+    template struct Details<ZButton>;
+    template struct Details<ZScrollBar>;
+    template struct Details<ZComboBox>;
+    template struct Details<ZEdit>;
+    template struct Details<ZListBox>;
+    template struct Details<ZHeaderCtrl>;
+    template struct Details<ZLinkCtrl>;
+    template struct Details<ZListViewCtrl>;
+    template struct Details<ZTreeViewCtrl>;
+    template struct Details<ZComboBoxEx>;
+    template struct Details<ZTabCtrl>;
+    template struct Details<ZIPAddressCtrl>;
+    template struct Details<ZPagerCtrl>;
+    template struct Details<ZProgressBarCtrl>;
+    template struct Details<ZTrackBarCtrl>;
+    template struct Details<ZUpDownCtrl>;
+    template struct Details<ZDateTimePickerCtrl>;
+    template struct Details<ZMonthCalendarCtrl>;
+    template struct Details<ZRichEditCtrl>;
 }
