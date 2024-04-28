@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "twins", "twins\twins12.vcxproj", "{66A45253-10FB-4433-949F-B21B33998F96}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Twins", "Twins\twins12.vcxproj", "{66A45253-10FB-4433-949F-B21B33998F96}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6B24C0A3-C8C6-452E-A4ED-A4B32348F4D5}"
 EndProject
@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "twins.langs", "twins.langs\twins.langs.vcxproj", "{9883394F-9E09-414C-9B1A-CCF3FBF5E5C8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cf-1.0", "common\cf-1.0.vcxproj", "{ADF33881-BA12-46F2-A5FC-1A05F4185917}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wccf", "common\wccf.vcxproj", "{ADF33881-BA12-46F2-A5FC-1A05F4185917}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
