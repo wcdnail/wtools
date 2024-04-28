@@ -22,8 +22,13 @@ namespace CF
         WCDAFX_API ~BasicDialog() override;
         WCDAFX_API BasicDialog(UINT idd = IDD_BASIC, unsigned flags = 0);
         WCDAFX_API BasicDialog(WStrView message, WStrView title, unsigned flags);
-        
-        WCDAFX_API bool Show(HWND parent, Rect const& rc, LPARAM param = 0);
+
+        /**
+         *  hResInst == nullptr, load from _AtlBaseModule.GetResourceInstance()
+         *  Check GetLastError if failure
+         */
+        WCDAFX_API bool Create(HINSTANCE hResInst, HWND hWndParent = ::GetActiveWindow(), LPARAM dwInitParam = 0);
+        WCDAFX_API bool Create(Rect const& rc, HWND hWndParent = ::GetActiveWindow(), HINSTANCE hResInst = nullptr, LPARAM param = 0);
 
         /**
          *  hResInst == nullptr, load from _AtlBaseModule.GetResourceInstance()

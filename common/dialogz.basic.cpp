@@ -87,14 +87,38 @@ namespace CF
         return rv;
     }
 
-    bool BasicDialog::Show(HWND parent, Rect const& rc, LPARAM param)
+    bool BasicDialog::Create(HINSTANCE hResInst, HWND hWndParent, LPARAM dwInitParam)
+    {
+        ATLASSUME(this->m_hWnd == NULL);
+        BOOL rv = this->m_thunk.Init(nullptr, nullptr);
+        if (!rv) {
+            SetLastError(ERROR_OUTOFMEMORY);
+            return false;
+        }
+        _AtlWinModule.AddCreateWndData(&this->m_thunk.cd, (void*)this);
+#ifdef _DEBUG
+        m_bModal = false;
+#endif
+        HWND hWnd = ::CreateDialogParamW(
+            (hResInst ? hResInst : _AtlBaseModule.GetResourceInstance()),
+            MAKEINTRESOURCE(IDD),
+            hWndParent,
+            BasicDialog::StartDialogProc,
+            dwInitParam
+        );
+        ATLASSUME(this->m_hWnd == hWnd);
+        return true;
+    }
+
+    bool BasicDialog::Create(Rect const& rc, HWND parent, HINSTANCE hResInst, LPARAM param)
     {
         bool ok = true;
         if (nullptr == m_hWnd) {
-            CRect rc2 = ToCRect(rc);
-            ok = (nullptr != Super::Create(parent, rc2, param));
+            ok = Create(hResInst, parent, param);
         }
         if (ok) {
+            CRect rc2 = ToCRect(rc);
+            MoveWindow(rc2);
             ShowWindow(SW_SHOW);
         }
         return ok;
