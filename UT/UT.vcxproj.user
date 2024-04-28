@@ -14,10 +14,12 @@ $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <LocalDebuggerEnvironment>PATH=$(VCPKG_ROOT)\installed\x64-windows\bin;$(PATH)
 $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>--gtest_filter=TestBasics.Dialogs</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='product|x64'">
     <LocalDebuggerEnvironment>PATH=$(VCPKG_ROOT)\installed\x64-windows\bin;$(PATH)
 $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>--gtest_filter=TestBasics.Dialogs</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

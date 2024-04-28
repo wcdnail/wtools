@@ -12,25 +12,22 @@ namespace CF
     {
     }
 
-    BasicDialog::BasicDialog(unsigned flags) 
-        : m_result()
-        , m_attrs(flags)
-        , m_title()
-        , m_text()
-        , m_icon()
-        , m_font(static_cast<HFONT>(::GetStockObject(DEFAULT_GUI_FONT)))
+    BasicDialog::BasicDialog(UINT idd, unsigned flags) 
+        :        IDD(idd)
+        ,   m_result()
+        ,    m_attrs(flags)
+        ,    m_title()
+        ,     m_text()
+        ,     m_icon()
+        ,     m_font(static_cast<HFONT>(::GetStockObject(DEFAULT_GUI_FONT)))
         , m_textFont(::CreateFont(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Consolas")))
-    {}
+    {
+    }
 
     BasicDialog::BasicDialog(WStrView message, WStrView title, unsigned flags) 
-        : m_result()
-        , m_attrs(flags)
-        , m_title(title)
-        , m_text(message)
-        , m_icon()
-        , m_font(static_cast<HFONT>(::GetStockObject(DEFAULT_GUI_FONT)))
-        , m_textFont(::CreateFont(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Consolas")))
-    {}
+        : BasicDialog(IDD_BASIC, flags)
+    {
+    }
 
     BOOL BasicDialog::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
     {
@@ -90,12 +87,12 @@ namespace CF
         return rv;
     }
 
-    bool BasicDialog::Show(HWND parent, Rect const& rc)
+    bool BasicDialog::Show(HWND parent, Rect const& rc, LPARAM param)
     {
         bool ok = true;
         if (nullptr == m_hWnd) {
             CRect rc2 = ToCRect(rc);
-            ok = (nullptr != Super::Create(parent, rc2));
+            ok = (nullptr != Super::Create(parent, rc2, param));
         }
         if (ok) {
             ShowWindow(SW_SHOW);
@@ -103,9 +100,32 @@ namespace CF
         return ok;
     }
 
-    void BasicDialog::ShowModal(HWND parent)
+    bool BasicDialog::ShowModal(HINSTANCE hResInst, HWND hWndParent /*= ::GetActiveWindow()*/, LPARAM dwInitParam /*= 0*/)
     {
-        m_result.Code = static_cast<int>(DoModal(parent));
+        ATLASSUME(this->m_hWnd == nullptr);
+        BOOL rv = this->m_thunk.Init(nullptr, nullptr);
+        if (!rv) {
+            SetLastError(ERROR_OUTOFMEMORY);
+            return false;
+        }
+        _AtlWinModule.AddCreateWndData(&this->m_thunk.cd, (void*)this);
+#ifdef _DEBUG
+        m_bModal = true;
+#endif
+        INT_PTR intPtr = ::DialogBoxParamW(
+            (hResInst ? hResInst : _AtlBaseModule.GetResourceInstance()),
+            MAKEINTRESOURCE(IDD),
+            hWndParent,
+            BasicDialog::StartDialogProc,
+            dwInitParam
+        );
+        m_result.Code = static_cast<int>(intPtr);
+        return true;
+    }
+
+    bool BasicDialog::ShowModal(HWND hWndParent, LPARAM dwInitParam)
+    {
+        return ShowModal(nullptr, hWndParent, dwInitParam);
     }
 
     DialogResult BasicDialog::Result() const

@@ -16,17 +16,22 @@ namespace CF
     public:
         using Super = ATL::CDialogImpl<BasicDialog, CF::Colorized::Colorizer>;
 
-        enum { IDD = IDD_BASIC };
-
         BasicDialog(BasicDialog const&) = delete;
         BasicDialog& operator = (BasicDialog const&) = delete;
 
         WCDAFX_API ~BasicDialog() override;
-        WCDAFX_API BasicDialog(unsigned flags);
+        WCDAFX_API BasicDialog(UINT idd = IDD_BASIC, unsigned flags = 0);
         WCDAFX_API BasicDialog(WStrView message, WStrView title, unsigned flags);
         
-        WCDAFX_API bool Show(HWND parent, Rect const& rc);
-        WCDAFX_API void ShowModal(HWND parent);
+        WCDAFX_API bool Show(HWND parent, Rect const& rc, LPARAM param = 0);
+
+        /**
+         *  hResInst == nullptr, load from _AtlBaseModule.GetResourceInstance()
+         *  Check GetLastError if failure
+         */
+        WCDAFX_API bool ShowModal(HINSTANCE hResInst, HWND hWndParent = ::GetActiveWindow(), LPARAM dwInitParam = 0);
+        WCDAFX_API bool ShowModal(HWND hWndParent = ::GetActiveWindow(), LPARAM dwInitParam = 0);
+
 
         WCDAFX_API DialogResult Result() const;
 
@@ -35,6 +40,7 @@ namespace CF
     protected:
         friend Super;
 
+        UINT              IDD;
         DialogResult m_result;
         unsigned      m_attrs;
         WString       m_title;

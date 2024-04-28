@@ -4,7 +4,7 @@
 #include "strint.h"
 #include <atltypes.h>
 #include <atlstr.h>
-#include <atlgdi.h>
+#include <atlctrls.h>
 #include <memory>
 #include <unordered_map>
 #include <map>
@@ -86,7 +86,7 @@ namespace CF::Colorized
     protected:
         ControlMap Controls;
 
-        WCDAFX_API BOOL OnWindowMessage(HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD) override;
+        WCDAFX_API BOOL OnColorizerMessage(HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD);
 
     private:
         static void PerformInitStatix();

@@ -115,12 +115,12 @@ namespace Twins
 
         HRESULT hr = Twins::Extern::Run(it, pwd, L"");
 
-// ##TODO: Configure `Run in terminal` if `ERROR_FILE_NOT_FOUND == hr`"))
+        // ##TODO: Configure `Run in terminal` if `ERROR_FILE_NOT_FOUND == hr`"))
         if (ERROR_FILE_NOT_FOUND == hr)
         {
             Extern::Item cmd(L"CMD", L"%COMSPEC%");
 
-// ##TODO: Configure `/C` instead `/K`"))
+            // ##TODO: Configure `/C` instead `/K`"))
             std::wstring args = L"/D /T:F8 /C \"" + commandLine + L"\"";
             hr = Twins::Extern::Run(cmd, pwd, args);
         }

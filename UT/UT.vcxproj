@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="basic.win.tests.cpp" />
+    <ClCompile Include="generic.cpp" />
     <ClCompile Include="pch.cxx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Create</PrecompiledHeader>
@@ -29,6 +31,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.hxx" />
+    <ClInclude Include="rez\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\wccf.vcxproj">
+      <Project>{adf33881-ba12-46f2-a5fc-1a05f4185917}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\twins.langs\twins.langs.vcxproj">
+      <Project>{9883394f-9e09-414c-9b1a-ccf3fbf5e5c8}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="rez\UTres.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>UT</ProjectName>
@@ -135,6 +149,7 @@
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <PrecompiledHeaderFile>pch.hxx</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -169,6 +184,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <PrecompiledHeaderFile>pch.hxx</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -204,6 +220,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <PrecompiledHeaderFile>pch.hxx</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -240,6 +257,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <PrecompiledHeaderFile>pch.hxx</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

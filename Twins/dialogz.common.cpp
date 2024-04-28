@@ -29,12 +29,10 @@ namespace Twins
 
     int CommonDialog::OnCommandById(int id)
     {
-        switch (id)
-        {
+        switch (id) {
         case ResultOk:
             EndDialog(DefaultId);
             break;
-
         case ResultCancel:
         case ResultYes:
         case ResultNo:
@@ -44,20 +42,16 @@ namespace Twins
             EndDialog(id);
             break;
         }
-
         return id;
     }
 
     void CommonDialog::OnCommand(UINT code, int id, HWND control)
     {
         OnCommandById(id);
-
         //if (IDOK == id)
         //    EndDialog(DefaultId);
-
         //else if (IDCANCEL == id)
         //    EndDialog(id);
-
         //else
         //    setWMHandled(FALSE);
     }

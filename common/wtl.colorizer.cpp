@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "wtl.colorizer.h"
 #include "wtl.colorizer.control.h"
-#include "wtl.colorizer.control.details.h"
 #include "wtl.colorizer.control.specific.h"
 #include "wtl.colorizer.helpers.h"
 #include "cf-resources/resource.h"
@@ -17,6 +16,9 @@
 
 namespace CF::Colorized
 {
+    using ControlCreator = ControlPtr (*)(HWND, Colorizer&);
+    using     FactoryMap = std::unordered_map<CStringW, ControlCreator>;
+
     Colorizer::~Colorizer()
     {
     }
@@ -51,9 +53,6 @@ namespace CF::Colorized
         return imList;
     }
 
-    using ControlCreator = ControlPtr (*)(HWND, Colorizer&);
-    using     FactoryMap = std::unordered_map<CStringW, ControlCreator>;
-
     FactoryMap& CtrlFactory()
     {
         static FactoryMap facMap;
@@ -68,37 +67,37 @@ namespace CF::Colorized
     }
 
     template <typename T>
-    static void Colorizer_InsertToFactory()
+    static void Colorizer_FactoryAdd()
     {
         CStringW _class = T::GetWndClassName();
         _class.MakeUpper();
         CtrlFactory()[_class] = &Colorizer_Creator<Control<T>>;
-        DebugThreadPrintf(L"Colorize: Insert `%s` to factory\n", _class.GetString());
+        DebugThreadPrintf(L"%s: class == '%s'\n", _T(__FUNCTION__), _class.GetString());
     }
 
     void Colorizer::PerformInitStatix()
     {
         if (CtrlFactory().empty()) {
-            Colorizer_InsertToFactory<ZStatic>();
-            Colorizer_InsertToFactory<ZButton>();
-            Colorizer_InsertToFactory<ZScrollBar>();
-            Colorizer_InsertToFactory<ZComboBox>();
-            Colorizer_InsertToFactory<ZEdit>();
-            Colorizer_InsertToFactory<ZListBox>();
-            Colorizer_InsertToFactory<ZHeaderCtrl>();
-            Colorizer_InsertToFactory<ZLinkCtrl>();
-            Colorizer_InsertToFactory<ZListViewCtrl>();
-            Colorizer_InsertToFactory<ZTreeViewCtrl>();
-            Colorizer_InsertToFactory<ZComboBoxEx>();
-            Colorizer_InsertToFactory<ZTabCtrl>();
-            Colorizer_InsertToFactory<ZIPAddressCtrl>();
-            Colorizer_InsertToFactory<ZPagerCtrl>();
-            Colorizer_InsertToFactory<ZProgressBarCtrl>();
-            Colorizer_InsertToFactory<ZTrackBarCtrl>();
-            Colorizer_InsertToFactory<ZUpDownCtrl>();
-            Colorizer_InsertToFactory<ZDateTimePickerCtrl>();
-            Colorizer_InsertToFactory<ZMonthCalendarCtrl>();
-            Colorizer_InsertToFactory<ZRichEditCtrl>();
+            Colorizer_FactoryAdd<ZStatic>();
+            Colorizer_FactoryAdd<ZButton>();
+            Colorizer_FactoryAdd<ZScrollBar>();
+            Colorizer_FactoryAdd<ZComboBox>();
+            Colorizer_FactoryAdd<ZEdit>();
+            Colorizer_FactoryAdd<ZListBox>();
+            Colorizer_FactoryAdd<ZHeaderCtrl>();
+            Colorizer_FactoryAdd<ZLinkCtrl>();
+            Colorizer_FactoryAdd<ZListViewCtrl>();
+            Colorizer_FactoryAdd<ZTreeViewCtrl>();
+            Colorizer_FactoryAdd<ZComboBoxEx>();
+            Colorizer_FactoryAdd<ZTabCtrl>();
+            Colorizer_FactoryAdd<ZIPAddressCtrl>();
+            Colorizer_FactoryAdd<ZPagerCtrl>();
+            Colorizer_FactoryAdd<ZProgressBarCtrl>();
+            Colorizer_FactoryAdd<ZTrackBarCtrl>();
+            Colorizer_FactoryAdd<ZUpDownCtrl>();
+            Colorizer_FactoryAdd<ZDateTimePickerCtrl>();
+            Colorizer_FactoryAdd<ZMonthCalendarCtrl>();
+            Colorizer_FactoryAdd<ZRichEditCtrl>();
         }
         if (!SpecGxf().m_hImageList) {
             SpecGxf().Create(IDB_SPECGFX, 9, 1, 0xff00ff);
@@ -111,12 +110,15 @@ namespace CF::Colorized
     BOOL Colorizer::ProcessColorizerMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID/* = 0*/)
     {
         bool prevMsgHandled = IsMsgHandled();
-        BOOL rv = OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
+        BOOL rv = ControlBase::OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
+        if (!rv) {
+            rv = OnColorizerMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
+        }
         SetMsgHandled(prevMsgHandled);
         return rv;
     }
 
-    BOOL Colorizer::OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
+    BOOL Colorizer::OnColorizerMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
     {
         BOOL bHandled = TRUE;
         UNREFERENCED_ARG(hWnd);
