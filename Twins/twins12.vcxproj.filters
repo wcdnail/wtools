@@ -58,6 +58,9 @@
     <Filter Include="texts">
       <UniqueIdentifier>{69f2e35a-28ce-4d82-b0fc-d6fa74f93362}</UniqueIdentifier>
     </Filter>
+    <Filter Include="obsolete">
+      <UniqueIdentifier>{9ff5d206-cdb4-478e-82e7-823d039b2865}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\main.frame.toolbar.bmp">
@@ -138,7 +141,6 @@
       <Filter>filemanager\hard%27n%27soft</Filter>
     </ClInclude>
     <ClInclude Include="twins.main.frame.h" />
-    <ClInclude Include="twins.state.h" />
     <ClInclude Include="command.h">
       <Filter>filemanager\commands</Filter>
     </ClInclude>
@@ -333,6 +335,9 @@
       <Filter>filemanager\shell</Filter>
     </ClInclude>
     <ClInclude Include="twins.funcs.h" />
+    <ClInclude Include="twins.state.h">
+      <Filter>obsolete</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="res\twins.exe.manifest">
@@ -361,7 +366,6 @@
       <Filter>filemanager\hard%27n%27soft</Filter>
     </ClCompile>
     <ClCompile Include="twins.main.frame.cpp" />
-    <ClCompile Include="twins.state.cpp" />
     <ClCompile Include="command.cpp">
       <Filter>filemanager\commands</Filter>
     </ClCompile>
@@ -542,6 +546,9 @@
       <Filter>filemanager\shell</Filter>
     </ClCompile>
     <ClCompile Include="twins.funcs.cpp" />
+    <ClCompile Include="twins.state.cpp">
+      <Filter>obsolete</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\icons\stock-cdrom.ico">

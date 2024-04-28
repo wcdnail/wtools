@@ -1,3 +1,7 @@
+//
+// OBSOLETE !!!
+//
+
 #include "stdafx.h"
 #include "twins.state.h"
 #include "commands.h"
