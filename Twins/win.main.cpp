@@ -11,7 +11,7 @@ int APIENTRY _tWinMain(HINSTANCE baseAddress, HINSTANCE, LPTSTR, int showCmd)
     SetErrorMode(SetErrorMode(0) | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
     DefWindowProc(NULL, 0, 0, 0L);
 
-    Dh::PrintLogHeader();
+    DH::PrintLogHeader();
 
     HRESULT rv = Twins::App().Run(baseAddress, showCmd);
     return static_cast<int>(rv);

@@ -2,13 +2,15 @@
 
 #include "wcdafx.api.h"
 
-namespace Dh
+namespace DH
 {
     class Timer
     {
     public:
         WCDAFX_API Timer();
         WCDAFX_API ~Timer();
+
+        DECL_COPY_MOVE_OF(Timer);
 
         WCDAFX_API double Seconds() const;
 

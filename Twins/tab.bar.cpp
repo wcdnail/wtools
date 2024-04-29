@@ -364,7 +364,7 @@ namespace Twins
 
     UINT TabBar::OnGetDlgCode(LPMSG message)
     {
-        //Dh::ThreadPrintf(L"DialogCd: %s\n", message ? Dh::MessageToStrignW(message) : L"--None");
+        //DH::ThreadPrintf(L"DialogCd: %s\n", message ? DH::MessageToStrignW(message) : L"--None");
 
         if (NULL != message)
         {

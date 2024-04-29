@@ -69,9 +69,6 @@ namespace Runtime
                 return NULL != temp;
             }
 
-            #define InitProcAddress(N) \
-                GetAddress(BOOST_STRINGIZE(N), N)
-
         private:
             HMODULE lib_;
         };
@@ -100,88 +97,98 @@ namespace Runtime
         };
     }
 
-    static void RequestWin32VersionInfo(PCWSTR pathName, InfoStore::ExecutableInfo::VersionInfo& Version)
+    static bool RequestWin32VersionInfo(PCWSTR pathName, InfoStore::ExecutableInfo::VersionInfo& Version)
     {
+        struct LangInfo
+        {
+            WORD lang;
+            WORD   cp;
+        };
+        struct VarDef
+        {
+            PCWSTR                   varName;
+            InfoStore::String* destStringPtr;
+        };
+
         typedef DWORD (APIENTRY *GetFileVersionInfoSizeWPtr)(PCWSTR, LPDWORD);
         typedef BOOL (APIENTRY *GetFileVersionInfoWPtr)(PCWSTR, DWORD, DWORD, LPVOID);
         typedef BOOL (APIENTRY *VerQueryValueWPtr)(LPCVOID, PCWSTR, LPVOID*, PUINT);
 
-        GetFileVersionInfoSizeWPtr GetFileVersionInfoSizeW = NULL;
-        GetFileVersionInfoWPtr GetFileVersionInfoW = NULL;
-        VerQueryValueWPtr VerQueryValueW = NULL;
+        GetFileVersionInfoSizeWPtr pGetFileVersionInfoSizeW = nullptr;
+        GetFileVersionInfoWPtr         pGetFileVersionInfoW = nullptr;
+        VerQueryValueWPtr                   pVerQueryValueW = nullptr;
+        PSTR                                         lpData = nullptr;
+        LangInfo*                                  langInfo = nullptr;
+        DWORD                                         dwLen = 0;
+        UINT                                          uSize = 0;
+        DWORD                                    lpdwHandle = 0;
+
 
         AutoLibraryHandle version(::LoadLibrary(_T("version")));
-
-        if (!(version &&
-              version.InitProcAddress(GetFileVersionInfoSizeW) && 
-              version.InitProcAddress(GetFileVersionInfoW) && 
-              version.InitProcAddress(VerQueryValueW)
-            ))
-        {
-            return ;
+        if (!(version
+           && version.GetAddress("GetFileVersionInfoSizeW", pGetFileVersionInfoSizeW)
+           && version.GetAddress("GetFileVersionInfoW", pGetFileVersionInfoW)
+           && version.GetAddress("VerQueryValueW", pVerQueryValueW)
+           )) {
+            return false;
         }
 
-        DWORD hnd = 0;
-        DWORD cb = GetFileVersionInfoSizeW(pathName, &hnd);
-        if (cb)
+        dwLen = pGetFileVersionInfoSizeW(pathName, &lpdwHandle);
+        if (dwLen < 1) {
+            return false;
+        }
+        AutoGlobalPtr heap(dwLen);
+        lpData = heap.Lock<PSTR>();
+        if (!pGetFileVersionInfoW(pathName, lpdwHandle, dwLen, lpData)) {
+            return false;
+        }
+        if (!pVerQueryValueW(lpData, L"\\VarFileInfo\\Translation", reinterpret_cast<PVOID*>(&langInfo), &uSize)) {
+            return false;
+        }
+
+        VarDef varDef[] =
         {
-            AutoGlobalPtr heap(cb);
-            PSTR info = heap.Lock<PSTR>();
-            if (GetFileVersionInfoW(pathName, hnd, cb, info))
-            {
-                struct LangInfo
-                {
-                    WORD lang;
-                    WORD cp;
-                };
+            { L"ProductName"         , &Version.ProductName          },
+            { L"ProductVersion"      , &Version.ProductVersion       },
+            { L"FileDescription"     , &Version.FileDescription      },
+            { L"FileVersion"         , &Version.FileVersion          },
+            { L"Comments"            , &Version.Comments             },
+            { L"InternalName"        , &Version.InternalName         },
+            { L"CompanyName"         , &Version.CompanyName          },
+            { L"LegalCopyright"      , &Version.LegalCopyright       },
+            { L"LegalTrademarks"     , &Version.LegalTrademarks      },
+            { L"PrivateBuild"        , &Version.PrivateBuild         },
+            { L"OriginalFilename"    , &Version.OriginalFilename     },
+            { L"SpecialBuild"        , &Version.SpecialBuild         },
+        };
 
-                UINT size = 0;
-                LangInfo* li = NULL;
-                if (VerQueryValueW(info, L"\\VarFileInfo\\Translation", (PVOID*)&li, &size)) {
-                    struct VarDef
-                    {
-                        PCWSTR varName;
-                        InfoStore::String* destStringPtr;
-                    };
-
-                    VarDef varDef[] = 
-                    {
-                        { L"ProductName"         , &Version.ProductName          },
-                        { L"ProductVersion"      , &Version.ProductVersion       },
-                        { L"FileDescription"     , &Version.FileDescription      },
-                        { L"FileVersion"         , &Version.FileVersion          },
-                        { L"Comments"            , &Version.Comments             },
-                        { L"InternalName"        , &Version.InternalName         },
-                        { L"CompanyName"         , &Version.CompanyName          },
-                        { L"LegalCopyright"      , &Version.LegalCopyright       },
-                        { L"LegalTrademarks"     , &Version.LegalTrademarks      },
-                        { L"PrivateBuild"        , &Version.PrivateBuild         },
-                        { L"OriginalFilename"    , &Version.OriginalFilename     },
-                        { L"SpecialBuild"        , &Version.SpecialBuild         },
-                    };
-
-                    for (auto& it: varDef) {
-                        wchar_t section[64] = {0};
-                        int rv = ::swprintf_s(section, L"\\StringFileInfo\\%04x%04x\\%s", li->lang, li->cp, it.varName);
-                        if (rv > 0) {
-                            PWSTR value = nullptr;
-                            if (VerQueryValueW(info, section, reinterpret_cast<PVOID*>(&value), &size)) {
-                                *(it.destStringPtr) = value;
-                            }
-                        }
-                    }
+        for (auto& it: varDef) {
+            wchar_t section[64] = { 0 };
+            int rv = swprintf_s(section, L"\\StringFileInfo\\%04x%04x\\%s", langInfo->lang, langInfo->cp, it.varName);
+            if (rv > 0) {
+                PWSTR value = nullptr;
+                if (pVerQueryValueW(lpData, section, reinterpret_cast<PVOID*>(&value), &uSize)) {
+                    *(it.destStringPtr) = value;
                 }
+#ifdef _DEBUG
+                else {
+                    wchar_t traceMsg[128] = { 0 };
+                    swprintf_s(traceMsg, L"\t>>>> VerQueryValue fails with '%s' '%s'\n", it.varName, section);
+                    OutputDebugStringW(traceMsg);
+                }
+#endif
             }
         }
+        return true;
     }
 #endif
 
     static void RequestExeInfo(InfoStore::ExecutableInfo& exeInfo)
     {
 #ifdef _WIN32
-        ::STARTUPINFOW startupInfo = {0};
+        STARTUPINFOW startupInfo = {0};
         startupInfo.cb = sizeof(startupInfo);
-        ::GetStartupInfoW(&startupInfo);
+        GetStartupInfoW(&startupInfo);
 
         InfoStore::String temp = startupInfo.lpTitle;
         InfoStore::String::size_type n = temp.rfind(L'\\');
@@ -192,9 +199,7 @@ namespace Runtime
         exeInfo.Directory = tempDir;
         exeInfo.Filename = tempName;
 
-        RequestWin32VersionInfo(startupInfo.lpTitle, exeInfo.Version);
-
-        if (exeInfo.Version.ProductName.empty()) {
+        if (!RequestWin32VersionInfo(startupInfo.lpTitle, exeInfo.Version)) {
             exeInfo.Version.ProductName = std::filesystem::path(exeInfo.Filename).filename().replace_extension().wstring();
         }
 #endif
@@ -224,7 +229,7 @@ namespace Runtime
                 DWORD size = _countof(buffer);
                 BOOL rv = ::GetComputerNameEx((COMPUTER_NAME_FORMAT)cnf, buffer, &size);
 
-                Dh::ThreadPrintf(_T("CompName: `%s` (%s)\n")
+                DH::ThreadPrintf(_T("CompName: `%s` (%s)\n")
                     , (!rv ? (PCTSTR)Str::ErrorCode<>::SystemMessage(GetLastError()) : buffer)
                     , cmDescription[cnf]
                     );
@@ -305,21 +310,22 @@ namespace Runtime
         static wchar_t const* const es[] = { L"Unknown", L"LittleEndian", L"BigEndian" };
         return es[(int)(GetEndian()) + 1];
     }
-    
+
     InfoStore::ExecutableInfo::VersionInfo::VersionInfo()
-        : ProductName(L"DefaultApp")
-        , ProductVersion(L"3.0") 
+        : ProductName()
+        , ProductVersion()
         , FileDescription()
-        , FileVersion(L"3.0") 
-        , Comments() 
+        , FileVersion()
+        , Comments()
         , InternalName()
-        , CompanyName(L"Independed Developer") 
-        , LegalCopyright(L"Copyrights © Nikonov Michael, Independed Developer. 2013") 
-        , LegalTrademarks() 
-        , PrivateBuild(L"0") 
-        , OriginalFilename() 
-        , SpecialBuild(L"0")
-    {}
+        , CompanyName()
+        , LegalCopyright()
+        , LegalTrademarks()
+        , PrivateBuild()
+        , OriginalFilename()
+        , SpecialBuild()
+    {
+    }
 
     InfoStore::ExecutableInfo::VersionInfo::~VersionInfo()
     {}
@@ -578,7 +584,7 @@ namespace Runtime
         if (!::GetVersionExW((LPOSVERSIONINFOW)&vi)) {
             hr = static_cast<HRESULT>(::GetLastError());
             const auto errText = Str::ErrorCode<>::SystemMessage(hr);
-            Dh::ThreadPrintf(L"OSVRSION: init failed %d `%s`\n", hr, errText.GetString());
+            DH::ThreadPrintf(L"OSVRSION: init failed %d `%s`\n", hr, errText.GetString());
         }
         this->Version.Major = vi.dwMajorVersion;
         this->Version.Minor = vi.dwMinorVersion;

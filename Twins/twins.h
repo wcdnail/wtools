@@ -18,7 +18,7 @@ namespace Twins
 
     struct Application: boost::noncopyable
     {
-        using ScopedTLPtr = std::unique_ptr<Dh::ScopedThreadLog>;
+        using ScopedTLPtr = std::unique_ptr<DH::ScopedThreadLog>;
         using GuiLeaksPtr = std::unique_ptr<CF::GUILeaks>;
 
         ScopedTLPtr          LiveTimer;

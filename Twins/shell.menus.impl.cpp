@@ -24,7 +24,7 @@ namespace Twins
                 va_end(ap);
 
                 message.AppendFormat(L" %08x (%s)", hr, Str::ErrorCode<wchar_t>::SystemMessage(hr));
-                Dh::ThreadPrintf(L"%s\n", message);
+                DH::ThreadPrintf(L"%s\n", message);
 
                 throw _com_error(hr);
             }

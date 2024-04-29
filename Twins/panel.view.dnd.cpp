@@ -37,7 +37,7 @@ namespace Twins
 
         HRESULT hr = ::RegisterDragDrop(Owner, dtarget);
 
-        Dh::ThreadPrintf(L"DRAGDROP: registering - 0x%x `%s`\n", hr, Str::ErrorCode<wchar_t>::SystemMessage(hr));
+        DH::ThreadPrintf(L"DRAGDROP: registering - 0x%x `%s`\n", hr, Str::ErrorCode<wchar_t>::SystemMessage(hr));
 
         if (SUCCEEDED(hr))
         {
@@ -104,7 +104,7 @@ namespace Twins
         //
         //Selection.Swap(selection);
 
-        Dh::ThreadPrintf(L"DRAGDROP: beg %s\n", IsMultipleSelection() ? L"multiple" : L"single");
+        DH::ThreadPrintf(L"DRAGDROP: beg %s\n", IsMultipleSelection() ? L"multiple" : L"single");
 
         //Cursor.Current = IsMultipleSelection() ? Cursor.DropMultiple : Cursor.DropSingle;
         //::SetCursor(Cursor.DropNo);
@@ -114,7 +114,7 @@ namespace Twins
 
     void DragnDropHelper::OnStop(CPoint const& pt, STGMEDIUM& medium, FORMATETC* format, DWORD* effect)
     {
-        Dh::ThreadPrintf(L"DRAGDROP: end \n");
+        DH::ThreadPrintf(L"DRAGDROP: end \n");
         //::SetCursor(Owner.GetDefaultCursor());
     }
 
@@ -212,7 +212,7 @@ namespace Twins
 
         FORMATETC format = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL }; 
         HRESULT hr = object->SetData(&format, &medium, TRUE);
-        Dh::ThreadPrintf(_T("DragDrop: Data 0x%x\n"), hr);
+        DH::ThreadPrintf(_T("DragDrop: Data 0x%x\n"), hr);
         if (SUCCEEDED(hr))
         {
 #if 0
@@ -225,13 +225,13 @@ namespace Twins
                 //Owner.ClientToScreen(&pn);
                 //hr = helper->InitializeFromWindow(Owner, &pn, object);
                 //hr = InitializeHelper(helper, NULL, pt, )
-                //Dh::ThreadPrintf(_T("DragDrop: Help 0x%x\n"), hr);
+                //DH::ThreadPrintf(_T("DragDrop: Help 0x%x\n"), hr);
             }
 #endif
 
             DWORD dwEffect = 0;
             hr = ::DoDragDrop(object, source, DROPEFFECT_COPY, &dwEffect);
-            Dh::ThreadPrintf(_T("DragDrop: DoDD 0x%x\n"), hr);
+            DH::ThreadPrintf(_T("DragDrop: DoDD 0x%x\n"), hr);
         }
         else
         {

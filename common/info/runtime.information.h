@@ -62,16 +62,16 @@ namespace Runtime
             struct VersionInfo
             {
                 String ProductName;
-                String ProductVersion; 
+                String ProductVersion;
                 String FileDescription;
-                String FileVersion; 
-                String Comments; 
-                String InternalName;  
-                String CompanyName; 
-                String LegalCopyright; 
-                String LegalTrademarks; 
-                String PrivateBuild; 
-                String OriginalFilename; 
+                String FileVersion;
+                String Comments;
+                String InternalName;
+                String CompanyName;
+                String LegalCopyright;
+                String LegalTrademarks;
+                String PrivateBuild;
+                String OriginalFilename;
                 String SpecialBuild;
 
             private:

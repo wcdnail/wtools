@@ -12,11 +12,12 @@
 namespace Twins
 {
     MainFrame::MainFrame()
-        : Super()
+        :     Super()
         , vSplitter()
-        , ToolBar(TabBar::ReleaseSelection)
+        ,   ToolBar(TabBar::ReleaseSelection)
         , ButtonBar(TabBar::AutoWidth)
-    {}
+    {
+    }
 
     MainFrame::SplitterCtrl::SplitterCtrl() 
         : Super()
@@ -24,36 +25,35 @@ namespace Twins
         m_bFullDrag = FALSE;
     }
 
-    MainFrame::SplitterCtrl::~SplitterCtrl() 
-    {}
+    MainFrame::SplitterCtrl::~SplitterCtrl()
+    {
+    }
 
     MainFrame::~MainFrame()
-    {}
+    {
+    }
 
     void MainFrame::SetupCaption()
     {
         Runtime::InfoStore const& info = Runtime::Info();
-
         CStringW text;
-        text.Format(L"%S %s"
-            , info.Executable.Version.ProductName.c_str()
-// ##TODO: Remove TESTING... mark in production"))
-            , _LS(StrId_OnlyforTESTing)
-// ##TODO: Append registration info etc..."))
-// ##TODO: Twins instance counter..."))
+        text.Format(L"%s %s",
+            info.Executable.Version.ProductName.c_str(),
+            // ##TODO: remove TESTING... mark in production
+            _LS(StrId_OnlyforTESTing)
+            // ##TODO: is need registration info etc...
+            // ##TODO: application running instance counter...
             );
-
-        SetWindowText(text);
+        SetWindowTextW(text);
     }
 
     BOOL MainFrame::PreTranslateMessage(MSG* message)
     {
-        if (NULL != m_hAccel && ::TranslateAccelerator(m_hWnd, m_hAccel, message))
-        {
-            ::SendMessage(m_hWnd, message->message, message->wParam, message->lParam);
+        if (NULL != m_hAccel && ::TranslateAccelerator(m_hWnd, m_hAccel, message)) {
+            SendMessageW(m_hWnd, message->message, message->wParam, message->lParam);
+            // ##TODO: check SendMessageW return code
             return TRUE;
         }
-
         return FALSE;
     }
 
@@ -213,7 +213,7 @@ namespace Twins
 
     int MainFrame::OnButtonCommand(TabBar& buttons, int id, PCTSTR text)
     {
-        Dh::ThreadPrintf(L"PnButton: %2d `%s`\n", id, text);
+        DH::ThreadPrintf(L"PnButton: %2d `%s`\n", id, text);
         buttons.ClearHot();
         Commands().GetCommand(id).Callback();
         return id;
@@ -223,7 +223,7 @@ namespace Twins
     {
         if (0 == code)
         {
-            Dh::ThreadPrintf(L"Mainframe: OnCommand %d %d\n", code, id);
+            DH::ThreadPrintf(L"Mainframe: OnCommand %d %d\n", code, id);
 
             Command::Definition const& def = Command::Manager::Instance().GetCommand(id);
             def.Callback();

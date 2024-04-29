@@ -127,17 +127,17 @@ namespace CF::Colorized
 
     LRESULT Colorizer::OnDrawItem(UINT message, WPARAM wParam, LPARAM lParam)
     {
-        LPDRAWITEMSTRUCT di = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
-        HWND childHwnd = ::GetDlgItem(this->m_hWnd, static_cast<int>(di->CtlID));
-        LRESULT rv = ::SendMessage(childHwnd, message, wParam, lParam);
+        const auto drawItemSt = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+        const auto hWndItem = ::GetDlgItem(this->m_hWnd, static_cast<int>(drawItemSt->CtlID));
+        LRESULT rv = ::SendMessage(hWndItem, message, wParam, lParam);
         SetMsgHandled(TRUE);
         return rv;
     }
     
     LRESULT Colorizer::OnNotify(UINT message, WPARAM wParam, LPARAM lParam)
     {
-        LRESULT     rv = 0;
-        LPNMHDR header = reinterpret_cast<LPNMHDR>(lParam);
+        LRESULT  rv = 0;
+        auto header = reinterpret_cast<LPNMHDR>(lParam);
         SetMsgHandled(FALSE);
         switch (header->code) {
         case NM_CUSTOMDRAW:
@@ -167,20 +167,6 @@ namespace CF::Colorized
     {
         SetMsgHandled(FALSE);
         SuperclassForEachChild(m_hWnd);
-#ifdef _DEBUG222
-        WTL::CListBox lbTemp(::GetDlgItem(MyHwnd, 1313));
-        if (lbTemp.m_hWnd)
-        {
-            for (int i=0; i<64; i++)
-            {
-                lbTemp.AddString(_T("Line #0 f##434#$@ck!"));
-                lbTemp.AddString(_T("Line #1"));
-                lbTemp.AddString(_T("Line #2 do something $$% sdkjfklsdkjafks;fakjds;afkj;ldfsakjdsk"));
-                lbTemp.AddString(_T("Line #3"));
-                lbTemp.AddString(_T("Line #4 with thiz"));
-            }
-        }
-#endif
         return isDialog ? TRUE : 0;
     }
 
@@ -189,7 +175,7 @@ namespace CF::Colorized
 #ifdef _DEBUG
         CStringW text;
         GetWindowTextW(text);
-        Dh::ThreadPrintf(L"Colorize: - %p %s...\n", m_hWnd, text.GetString());
+        DH::ThreadPrintf(L"Colorize: - %p %s...\n", m_hWnd, text.GetString());
 #endif
 
         SetMsgHandled(FALSE);
@@ -200,7 +186,7 @@ namespace CF::Colorized
 #ifdef _DEBUG
         CStringW text;
         GetWindowTextW(text);
-        Dh::ThreadPrintf(L"Colorize: + %p %s...\n", hwnd, text.GetString());
+        DH::ThreadPrintf(L"Colorize: + %p %s...\n", hwnd, text.GetString());
 #endif
         EnumChildWindows(hwnd, reinterpret_cast<WNDENUMPROC>(InitChild), reinterpret_cast<LPARAM>(this));
     }

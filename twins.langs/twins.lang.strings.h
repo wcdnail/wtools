@@ -7,7 +7,7 @@
 #include <boost/noncopyable.hpp>
 
 #ifdef _WIN32
-#include <tchar.h>
+#  include <tchar.h>
 #endif
 
 namespace Twins
@@ -64,6 +64,6 @@ namespace Twins
 #define _LSA(Id)    _LA(Id).c_str()
 
 #ifdef _WIN32
-#define _LT(Id)     Twins::_GetString<TCHAR>(Id)
-#define _LTS(Id)    _LT(Id).c_str()
+#  define _LT(Id)   Twins::_GetString<TCHAR>(Id)
+#  define _LTS(Id)  _LT(Id).c_str()
 #endif

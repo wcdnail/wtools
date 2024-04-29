@@ -25,6 +25,9 @@ struct TestBasicDlg: CF::BasicDialog
     TestBasicDlg();
 
 private:
+    WTL::CComboBox  m_Combo;
+    WTL::CListBox m_ListBox;
+
     DECL_OVERRIDE_MSG_MAP_EX(TestBasicDlg);
 
     BOOL OnInitDialog(HWND, LPARAM);
@@ -37,6 +40,34 @@ END_MSG_MAP()
 
 BOOL TestBasicDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
+    static const PCWSTR wtlControlClasses[] = {
+        L"CStatic",
+        L"CButton",
+        L"CScrollBar",
+        L"CComboBox",
+        L"CEdit",
+        L"CListBox",
+        L"CHeaderCtrl",
+        L"CLinkCtrl",
+        L"CListViewCtrl",
+        L"CTreeViewCtrl",
+        L"CComboBoxEx",
+        L"CTabCtrl",
+        L"CIPAddressCtrl",
+        L"CPagerCtrl",
+        L"CProgressBarCtrl",
+        L"CTrackBarCtrl",
+        L"CUpDownCtrl",
+        L"CDateTimePickerCtrl",
+        L"CMonthCalendarCtrl",
+        L"CRichEditCtrl",
+
+    };
+
+    m_Combo.Attach(GetDlgItem(IDC_COMBO1));
+    for (const auto clsName: wtlControlClasses) {
+        m_Combo.AddString(clsName);
+    }
     return TRUE;
 }
 

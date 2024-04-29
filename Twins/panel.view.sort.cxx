@@ -130,7 +130,7 @@ namespace Twins
 
     void FSort::CreateIndex(int column, bool ascending, FItemVector const& items)
     {
-        Dh::Timer tm;
+        DH::Timer tm;
 
         size_t count = items.size();
         IndexVector temp;
@@ -147,12 +147,12 @@ namespace Twins
         std::sort(beg, end, Sort::Helper(items, column, ascending));
         Index.swap(temp);
 
-        Dh::ThreadPrintf(L" SORTING: %d %2.8f sec.\n", (int)count, tm.Seconds());
+        DH::ThreadPrintf(L" SORTING: %d %2.8f sec.\n", (int)count, tm.Seconds());
     }
 
     int FSort::FindIndexByName(FItemVector const& items, std::wstring const& name) const
     {
-        Dh::Timer tm;
+        DH::Timer tm;
 
         struct pred
         {
@@ -174,7 +174,7 @@ namespace Twins
         IndexVector::const_iterator it = std::find_if(Index.begin(), Index.end(), pred(items, name));
         int rv = (it == Index.end() ? -1 : (int)std::distance(Index.begin(), it));
 
-        Dh::ThreadPrintf(L"FINDBYNM: %d %2.8f sec.\n", (int)items.size(), tm.Seconds());
+        DH::ThreadPrintf(L"FINDBYNM: %d %2.8f sec.\n", (int)items.size(), tm.Seconds());
 
         return rv;
     }

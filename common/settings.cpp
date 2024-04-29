@@ -193,7 +193,7 @@ namespace Conf
     std::wstring const& VarBase::GetName() const { return DymmuString; }
     bool VarBase::Get(StoragePtr const&) const { return false; }
     bool VarBase::Set(StoragePtr const&) const { return false; }
-    bool VarBase::Eq(StoragePtr const&) const { return false; }
+    bool VarBase::IsEqual(StoragePtr const&) const { return false; }
 
     void VarBase::SetupStream(std::wstringstream& stream)
     {
@@ -301,7 +301,7 @@ namespace Conf
             if (!Store->ValueExists(vp->GetName())) {
                 OnParamDelete(vp);
             }
-            else if (!vp->Eq(Store)) {
+            else if (!vp->IsEqual(Store)) {
                 OnParamChange(vp);
             }
         }
@@ -309,13 +309,13 @@ namespace Conf
 
     void Section::OnParamChange(VarPtr const& vr) const
     {
-        Dh::ThreadPrintf(L"SETTINGS: [%s] %s changed\n", Store->GetName().data(), vr->GetName().c_str());
+        DH::ThreadPrintf(L"SETTINGS: [%s] %s changed\n", Store->GetName().data(), vr->GetName().c_str());
         vr->Get(Store);
     }
 
     void Section::OnParamDelete(VarPtr const& vr) const
     {
-        Dh::ThreadPrintf(L"SETTINGS: [%s] %s deleted\n", Store->GetName().c_str(), vr->GetName().c_str());
+        DH::ThreadPrintf(L"SETTINGS: [%s] %s deleted\n", Store->GetName().c_str(), vr->GetName().c_str());
     }
 
     //
@@ -346,7 +346,7 @@ namespace Conf
 #ifdef _WIN32
     void WatchDog::WatchProc() 
     {
-        Dh::ScopedThreadLog l(__FUNCTIONW__);
+        DH::ScopedThreadLog l(__FUNCTIONW__);
 
         std::vector<HANDLE> event;
         Section::SectionVec section;

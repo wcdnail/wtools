@@ -20,7 +20,7 @@ ResultType Win567Impl::LoadProcAddress(PCWSTR dllName, PCSTR procName)
         if (nullptr == dll) {
             HRESULT hr = static_cast<HRESULT>(::GetLastError());
             auto err = Str::ErrorCode<>::SystemMessage(hr);
-            Dh::ThreadPrintf(L"567Feats: Can't load `%s` - %d `%s`\n", dllName, hr, err.GetString());
+            DH::ThreadPrintf(L"567Feats: Can't load `%s` - %d `%s`\n", dllName, hr, err.GetString());
             return nullptr;
         }
     }
@@ -29,10 +29,10 @@ ResultType Win567Impl::LoadProcAddress(PCWSTR dllName, PCSTR procName)
     if (nullptr == rv) {
         HRESULT hr = static_cast<HRESULT>(::GetLastError());
         auto err = Str::ErrorCode<>::SystemMessage(hr);
-        Dh::ThreadPrintf(L"567Feats: `%S`@`%s` - %d `%s`\n", procName, dllName, hr, err.GetString());
+        DH::ThreadPrintf(L"567Feats: `%S`@`%s` - %d `%s`\n", procName, dllName, hr, err.GetString());
         return nullptr;
     }
-    Dh::ThreadPrintf(L"567Feats: `%S`@`%s` OK\n", procName, dllName);
+    DH::ThreadPrintf(L"567Feats: `%S`@`%s` OK\n", procName, dllName);
     return cast_ptr_to_ptr<ResultType>(rv);
 }
 

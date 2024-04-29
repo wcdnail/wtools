@@ -11,10 +11,14 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE, PTSTR lpCmdLine, int nShowC
 #endif
 int _tmain(int argc, TCHAR* argv[])
 {
-    SetConsoleCP(CP_UTF8);
-    SetConsoleOutputCP(CP_UTF8);
+    DH::InitDebugHelpers(DH::LOG_MUTEX_GUARD
+                       | DH::DEBUG_EXTRA_INFO
+                       | DH::DEBUG_WIN32_OUT
+                       | DH::LOG_ENABLED
+                       | DH::LOG_TO_STDIO
+                       );
 
-    Dh::ScopedThreadLog liveTimer(L"UnitTests");
+    DH::ScopedThreadLog liveTimer(L"UnitTests");
     CF::GUILeaks          uiLeaks;
 
     SetErrorMode(SetErrorMode(0) | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);

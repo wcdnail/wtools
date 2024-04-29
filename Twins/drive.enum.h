@@ -37,21 +37,18 @@ namespace Twins
         public:
             struct Item
             {
-                int num;                // number
-                DWORD bitnum;           // bit number (0..31)
-                std::wstring path;      // `c:\` etc...
-                std::wstring label;     // volume label
-                std::wstring fs;        // file system name
-                UINT type;              // drive type
-                DWORD serial;           // drive media
-                DWORD length;           // maximal file name length
-                DWORD flags;            // file system flags
-                mutable bool ready;     // steady flag
-                CIconHandle icon;
-                int iconIndex;
-
-                Item();
-                ~Item();
+                int            num = -1;    // number
+                DWORD       bitnum = 0;     // bit number (0..31)
+                UINT          type = 0;     // drive type
+                DWORD       serial = 0;     // drive media
+                DWORD       length = 0;     // maximal file name length
+                DWORD        flags = 0;     // file system flags
+                mutable bool ready = false; // steady flag
+                int      iconIndex = 0;
+                CIconHandle   icon;
+                std::wstring  path;         // `c:\` etc...
+                std::wstring label;         // volume label
+                std::wstring    fs;         // file system name
             };
 
             typedef std::vector<Item> ItemVector;

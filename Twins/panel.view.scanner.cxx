@@ -91,7 +91,7 @@ namespace Twins
 
     void FScanner::HeavyDutyProc()
     {
-        Dh::ScopedThreadLog l(__FUNCTIONW__);
+        DH::ScopedThreadLog l(__FUNCTIONW__);
         double elapsed = .0;
 
         for (;;) {
@@ -103,11 +103,11 @@ namespace Twins
                 InProgress = true;
                 {
                     std::wstring path = Path.FullPath().native();
-                    Dh::Timer timer;
+                    DH::Timer timer;
                     try {
                         InternalError err = ReadDir(path.c_str(), Data.get(), infoCacheSize_);
                         if (IsError = FAILED(err.Hr)) {
-                            Dh::ThreadPrintf(L" SCANNER: `%s` ERROR - 0x%08x %s\n", path.c_str(), err.Hr, err.Message);
+                            DH::ThreadPrintf(L" SCANNER: `%s` ERROR - 0x%08x %s\n", path.c_str(), err.Hr, err.Message);
                         }
                         else {
                             ParseBuffer();
@@ -117,10 +117,10 @@ namespace Twins
                         IsError = true;
                         ErrorText.clear();
                         ErrorCode = ::GetLastError();
-                        Dh::ThreadPrintf(L" SCANNER: `%s` ERROR - 0x%08x %S\n", path.c_str(), ErrorCode, ex.what());
+                        DH::ThreadPrintf(L" SCANNER: `%s` ERROR - 0x%08x %S\n", path.c_str(), ErrorCode, ex.what());
                     }
                     elapsed = timer.Seconds();
-                    Dh::ThreadPrintf(L" SCANNER: %s #%d %2.8f sec. %s\n", path.c_str(), Items.size(), elapsed, (AbortFetch ? L"CANCELED" : L""));
+                    DH::ThreadPrintf(L" SCANNER: %s #%d %2.8f sec. %s\n", path.c_str(), Items.size(), elapsed, (AbortFetch ? L"CANCELED" : L""));
                 }
                 InProgress = false;
 
@@ -155,13 +155,13 @@ namespace Twins
         if (INVALID_HANDLE_VALUE == h) {
             DWORD attr = ::GetFileAttributesW(path);
             if ((INVALID_FILE_ATTRIBUTES != attr) && (0 != (FILE_ATTRIBUTE_REPARSE_POINT & attr))) {
-                Dh::ThreadPrintf(L" SCANNER: `%s` ERROR - 0x%08x, try follow link %s\n", path, hr, FileAttributesToString(attr).c_str());
+                DH::ThreadPrintf(L" SCANNER: `%s` ERROR - 0x%08x, try follow link %s\n", path, hr, FileAttributesToString(attr).c_str());
                 std::error_code ec;
                 std::wstring linkpath = CF::QueryLinkTarget(path, ec);
                 if (ec) {
                     return InternalError { ec.value(), L"QueryLinkTarget failed" };
                 }
-                Dh::ThreadPrintf(L" SCANNER: `%s` ==> `%s`\n", path, linkpath.c_str());
+                DH::ThreadPrintf(L" SCANNER: `%s` ==> `%s`\n", path, linkpath.c_str());
                 return ReadDir(linkpath.c_str(), buffer, bsize);
             }
             return InternalError { hr, L"CreateFileW return INVALID_HANDLE_VALUE" };

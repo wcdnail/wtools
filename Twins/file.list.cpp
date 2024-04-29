@@ -179,7 +179,7 @@ namespace Fl
 
     double List::Sort(LESSFN pf, bool ascending)
     {
-        Dh::Timer timer;
+        DH::Timer timer;
 
         struct SP
         {

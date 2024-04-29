@@ -1,6 +1,6 @@
 #pragma once
 
-#include <windows.wtl.buffered.paint.h>
+#include "windows.wtl.buffered.paint.h"
 #include <atlctrls.h>
 #include <atltypes.h>
 
@@ -8,10 +8,10 @@ namespace Twins
 {
     struct TabBarItem;
 
-    typedef CWinTraits< WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0> PanelTabTraits;
+    typedef CWinTraits<WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0> PanelTabTraits;
 
-    class TabBar: ATL::CWindowImpl<TabBar, ATL::CWindow, PanelTabTraits>
-                , CF::DoubleBuffered
+    class TabBar: ATL::CWindowImpl<TabBar, ATL::CWindow, PanelTabTraits>,
+                  CF::DoubleBuffered
     {
     public:
         typedef ATL::CWindowImpl<TabBar, ATL::CWindow, PanelTabTraits> Super;

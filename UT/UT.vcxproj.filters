@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="pch.cxx" />
+    <ClCompile Include="basic.win.tests.cpp" />
+    <ClCompile Include="generic.cpp" />
+    <ClCompile Include="UT.entry.cxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.hxx" />
+    <ClInclude Include="rez\resource.h">
+      <Filter>res</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{87c6e9d6-3d99-425b-a671-2b10a9f4c13d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="rez\UT.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

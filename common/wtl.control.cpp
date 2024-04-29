@@ -46,14 +46,14 @@ namespace CF
         GetWindowTextW(text);
 
         CStringW dispText;
-        Dh::Impl::CopyCharsForPrinting(dispText.GetBufferSetLength(text.GetLength() + 1),
+        DH::Impl::CopyCharsForPrinting(dispText.GetBufferSetLength(text.GetLength() + 1),
                                        static_cast<size_t>(text.GetLength() + 1),
                                        text.GetString(),
                                        static_cast<size_t>(text.GetLength())
                                        );
         dispText.ReleaseBuffer(text.GetLength());
 
-        Dh::ThreadPrintf(_T("Colorize: \t\t++ %p [%s] `%s` ==> `%s`\n"), m_hWnd,
+        DH::ThreadPrintf(_T("Colorize: \t\t++ %p [%s] `%s` ==> `%s`\n"), m_hWnd,
             dispText.GetString(), m_prevClass.GetString(), thisClass);
 #endif
     }
@@ -65,14 +65,14 @@ namespace CF
         GetWindowTextW(text);
 
         CStringW dispText;
-        Dh::Impl::CopyCharsForPrinting(dispText.GetBufferSetLength(text.GetLength() + 1),
+        DH::Impl::CopyCharsForPrinting(dispText.GetBufferSetLength(text.GetLength() + 1),
                                        static_cast<size_t>(text.GetLength() + 1),
                                        text.GetString(),
                                        static_cast<size_t>(text.GetLength())
                                        );
         dispText.ReleaseBuffer(text.GetLength());
 
-        Dh::ThreadPrintf(L"Colorize: \t\t-- %p [%s] `%s` <== `%s`\n", m_hWnd,
+        DH::ThreadPrintf(L"Colorize: \t\t-- %p [%s] `%s` <== `%s`\n", m_hWnd,
             dispText.GetString(), m_prevClass.GetString(), thisClass);
 #endif
     }

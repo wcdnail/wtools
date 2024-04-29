@@ -673,7 +673,7 @@ namespace Twins
             ATL::CTime minTime = GetTimeFrom(BegDate, BegTime);
             ATL::CTime maxTime = GetTimeFrom(EndDate, EndTime);
 
-            Dh::ThreadPrintf(L"Searchin: Datetime range in [%s .. %s]\n"
+            DH::ThreadPrintf(L"Searchin: Datetime range in [%s .. %s]\n"
                 , minTime.Format(L"%d.%m.%Y %H:%M:%S")
                 , maxTime.Format(L"%d.%m.%Y %H:%M:%S")
                 );
@@ -699,7 +699,7 @@ namespace Twins
             case NotOlderSeconds: span = CTimeSpan(0, 0, 0, value); break;
             }
             NotOlderTime = CTime::GetCurrentTime() - span;
-            Dh::ThreadPrintf(L"Searchin: NotOlderTime %s\n", NotOlderTime.Format(L"%d.%m.%Y %H:%M:%S"));
+            DH::ThreadPrintf(L"Searchin: NotOlderTime %s\n", NotOlderTime.Format(L"%d.%m.%Y %H:%M:%S"));
         }
     }
 
@@ -735,7 +735,7 @@ namespace Twins
 
     void FindDialog::SearchProc()
     {
-        Dh::ScopedThreadLog lg(0, L"Searchin: %s", __FUNCTIONW__);
+        DH::ScopedThreadLog lg(0, L"Searchin: %s", __FUNCTIONW__);
 
         ToggleAllControls(FALSE);
 
@@ -789,7 +789,7 @@ namespace Twins
 
         try
         {
-            Dh::Timer timer;
+            DH::Timer timer;
             Enumerator::LoadArgs params(path, mask, false, true, false);
             searcher.Reset(rootItem);
             error = searcher.Load(params);
@@ -816,7 +816,7 @@ namespace Twins
         }
           
         if (error)
-            Dh::ThreadPrintf(L"Searchin: %d -> `%s` (%S)\n", error.value(), path.c_str(), error.message().c_str());
+            DH::ThreadPrintf(L"Searchin: %d -> `%s` (%S)\n", error.value(), path.c_str(), error.message().c_str());
     }
 
     HTREEITEM FindDialog::AppendToTree(HTREEITEM rootItem, HTREEITEM insertAfter, std::wstring const& name, int iconIndex)
@@ -1012,7 +1012,7 @@ namespace Twins
                 result = boost::regex_search(line, what, rx);
                 if (result)
                 {
-                    //Dh::ThreadPrintf("Searchin: `%s` at %d:%d `%s`\n"
+                    //DH::ThreadPrintf("Searchin: `%s` at %d:%d `%s`\n"
                     //    , TextSearchRxPattern.c_str(), linenum, what.position(), line.c_str());
                     break;
                 }

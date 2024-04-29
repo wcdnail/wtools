@@ -29,7 +29,7 @@ namespace Twins
 
     void OperationBase::Process(FileList files, Params& p) const
     {
-        Dh::ScopedThreadLog lg(ThreadName.c_str());
+        DH::ScopedThreadLog lg(ThreadName.c_str());
 
         TotalCount = files.Count();
         TotalSize = files.SumSize();
@@ -106,7 +106,7 @@ namespace Twins
 
         ProcessEntry(source, destpath, p);
 
-        Dh::ThreadPrintf(L"PrcEntry: (%s) - %d\n", source.GetPath().c_str(), p.Error.value());
+        DH::ThreadPrintf(L"PrcEntry: (%s) - %d\n", source.GetPath().c_str(), p.Error.value());
         return ((p.Error && p.Flags.Check(SpecFlags::SkipError)) ? true : !p.Error);
     }
 
@@ -161,7 +161,7 @@ namespace Twins
 
     bool OperationBase::OnDirectory(Fl::Entry const& source, Fs::path const& destpath, Params& p) const
     {
-        Dh::ThreadPrintf(L"PrcFoldr: (%s) BEGIN\n", source.GetPath().c_str());
+        DH::ThreadPrintf(L"PrcFoldr: (%s) BEGIN\n", source.GetPath().c_str());
 
         if (OnParseDirectoryStart(source, destpath, p))
         {
@@ -176,7 +176,7 @@ namespace Twins
             OnParseDirectoryDone(source, destpath, p);
         }
 
-        Dh::ThreadPrintf(L"PrcFoldr: (%s) END\n", source.GetPath().c_str());
+        DH::ThreadPrintf(L"PrcFoldr: (%s) END\n", source.GetPath().c_str());
         return ((p.Error && p.Flags.Check(SpecFlags::SkipError)) ? true : !p.Error);
     }
 

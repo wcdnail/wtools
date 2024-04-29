@@ -16,7 +16,7 @@ namespace CF
         {
             inline void OnException(char const* caption, char const* what, char const* codetext, char const* callstack)
             {
-                Dh::ThreadPrintf(Dh::Category::Exception "%s:\n%s\n%s\n%s\n", caption, what, codetext, callstack);
+                DH::ThreadPrintf(DH::Category::Exception "%s:\n%s\n%s\n%s\n", caption, what, codetext, callstack);
             }
         }
 

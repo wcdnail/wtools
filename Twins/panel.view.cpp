@@ -724,7 +724,7 @@ namespace Twins
         //
         //    ::ShellExecuteExW(&senfo);
         //    HRESULT hr = ::GetLastError();
-        //    Dh::ThreadPrintf(_T("ShowProp: `%s` %x %s\n"), senfo.lpFile
+        //    DH::ThreadPrintf(_T("ShowProp: `%s` %x %s\n"), senfo.lpFile
         //        , hr, Str::ErrorCode<>::SystemMessage(hr));
         //}
     }

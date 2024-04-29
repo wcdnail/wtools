@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dev.assist.h"
 
-namespace Dh
+namespace DH
 {
     uint64_t GetWindowType(HWND winHandle)
     {

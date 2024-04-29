@@ -43,9 +43,9 @@ namespace Twins
         void ResetColumnsToDefault();
         static void ResetWidthsToDefault();
 
-        int iHot;
-        bool Ascending[MaxCount];
-        bool Used[MaxCount];
+        int                    iHot;
+        bool    Ascending[MaxCount];
+        bool         Used[MaxCount];
 
         static int Widths[MaxCount];
 

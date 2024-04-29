@@ -39,24 +39,6 @@ namespace Twins
             return L"---";
         }
 
-        Enumerator::Item::Item()
-            : num(-1)
-            , bitnum(0)
-            , path()
-            , label()
-            , fs()
-            , type(0)
-            , serial(0)
-            , length(0)
-            , flags(0)
-            , ready(false)
-            , icon()
-            , iconIndex()
-        {}
-
-        Enumerator::Item::~Item()
-        {}
-
         Enumerator& Enum()
         {
             static Enumerator inst;
@@ -64,14 +46,15 @@ namespace Twins
         }
 
         Enumerator::Enumerator()
-            : enumerate_(::CreateEvent(NULL, FALSE, FALSE, NULL))
-            , break_(::CreateEvent(NULL, FALSE, FALSE, NULL))
-            , thread_(&Enumerator::ThreadProc, this)
-            , items_()
-            , itemsMx_()
-            , icons_()
+            :  enumerate_(::CreateEvent(NULL, FALSE, FALSE, NULL))
+            ,      break_(::CreateEvent(NULL, FALSE, FALSE, NULL))
+            ,     thread_(&Enumerator::ThreadProc, this)
+            ,      items_()
+            ,    itemsMx_()
+            ,      icons_()
             , onEnumDone_()
-        {}
+        {
+        }
 
         Enumerator::~Enumerator()
         {
@@ -96,7 +79,7 @@ namespace Twins
 
         void Enumerator::ThreadProc()
         {
-            Dh::ScopedThreadLog lg(L"DRIVENUM:");
+            DH::ScopedThreadLog lg(L"DRIVENUM:");
             HANDLE events[] = { enumerate_, break_ };
             for (;;) {
                 DWORD eventId = ::WaitForMultipleObjects(_countof(events), events, FALSE, INFINITE);
@@ -112,60 +95,53 @@ namespace Twins
         bool Enumerator::EnumProc() 
         {
             const DWORD mask = ::GetLogicalDrives();
-            if (!mask)
+            if (!mask) {
                 return false;
-
-            try
-            {
-// ##TODO: Get maximal drive number from anywhere..."))
+            }
+            try {
+                // ##TODO: Get maximal drive number from anywhere...
                 enum { MaximalDriveNum = sizeof(DWORD) * 8 }; 
 
                 ItemVector temp;
                 temp.reserve(MaximalDriveNum);
 
-// ##TODO: configure drive icons size and type..."))
+                // ##TODO: configure drive icons size and type...
                 CImageList tempIcons;
                 tempIcons.Create(16, 16, ILC_COLOR32, 1, 1);
 
                 int count = 0;
                 for (DWORD n=0; n<MaximalDriveNum; n++) {
                     if (0 != (mask & (1 << n))) {
-                        TCHAR path[] = {_T('a') + (TCHAR)n, _T(':'), _T('\\'), 0};
-                        TCHAR label[MAX_PATH + 1] = {0};
-                        TCHAR fs[MAX_PATH + 1] = {0};
-                        UINT type = ::GetDriveType(path);
-                        DWORD serial = 0;
-                        DWORD length = 0; // maximal filename length
-                        DWORD flags = 0; // FILE_CASE_PRESERVED_NAMES ...
+                        DWORD              serial = 0;
+                        DWORD              length = 0; // maximal filename length
+                        DWORD               flags = 0; // FILE_CASE_PRESERVED_NAMES ...
+                        DWORD           drvLetter = _T('A') + (n & 0xff);
+                        TCHAR label[MAX_PATH + 1] = { 0 };
+                        TCHAR    fs[MAX_PATH + 1] = { 0 };
+                        TCHAR             path[4] = { static_cast<TCHAR>(drvLetter), _T(':'), _T('\\'), 0 };
 
-                        switch (type)
-                        {
+                        const UINT type = ::GetDriveType(path);
+                        switch (type) {
                         case DRIVE_UNKNOWN     /*0*/:
                         case DRIVE_NO_ROOT_DIR /*1*/: 
-// ##TODO: Unmounted"))
+                            // ##TODO: Unmounted
                             continue;
-
                         case DRIVE_REMOVABLE   /*2*/: 
                             break;  
-// ##TODO: Determine floppy drive"))
-
+                            // ##TODO: Determine floppy drive
                         case DRIVE_FIXED       /*3*/:
                         case DRIVE_CDROM       /*5*/:
                         case DRIVE_RAMDISK     /*6*/:
                             ::GetVolumeInformation(path, label, _countof(label)-1, &serial, &length, &flags, fs, _countof(fs));
                             break;
-
                         case DRIVE_REMOTE      /*4*/: 
-        // ##TODO: ::GetVolumeInformation to slow"))
+                            // ##TODO: ::GetVolumeInformation to slow
                             break;
-
                         default:
                             continue;
                         }
-
-                        Dh::ThreadPrintf(_T("DRIVENUM: %d %s [%s] (0x%08x %s(%d) 0x%08x)\n")
-                            , type, path, label, serial, fs, length, flags);
-
+                        DH::ThreadPrintf(_T("DRIVENUM: %d %s [%s] (0x%08x %s(%d) 0x%08x)\n"),
+                            type, path, label, serial, fs, length, flags);
                         Item info;
                         info.num = count++;
                         info.bitnum = n;
@@ -176,17 +152,14 @@ namespace Twins
                         info.serial = serial;
                         info.length = length;
                         info.flags = flags;
-
                         LoadAndStoreIcon(info, tempIcons);
-
-                        temp.push_back(info);
+                        temp.emplace_back(std::move(info));
                     }
                 }
 
                 {
                     std::lock_guard lk(itemsMx_);
                     items_.swap(temp);
-
                     icons_.Destroy();
                     icons_.Attach(tempIcons.Detach());
                 }
@@ -198,11 +171,11 @@ namespace Twins
             }
             catch (std::exception const& ex)
             {
-                Dh::ThreadPrintf("DRIVENUM: ERROR <%s>\n", ex.what());
+                DH::ThreadPrintf("DRIVENUM: ERROR <%s>\n", ex.what());
             }
             catch (...)
             {
-                Dh::ThreadPrintf("DRIVENUM: UNKNOWN ERROR\n");
+                DH::ThreadPrintf("DRIVENUM: UNKNOWN ERROR\n");
             }
 
             return false;

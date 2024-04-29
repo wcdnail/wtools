@@ -67,7 +67,7 @@ namespace Twins
             error = temp->Create(m_hWnd, rcTemp);
             if (error)
             {
-                Dh::ThreadPrintf("FileView: create view failed - %s (%d)\n"
+                DH::ThreadPrintf("FileView: create view failed - %s (%d)\n"
                     , error.value(), error.message().c_str());
 
                 return error;
@@ -344,7 +344,7 @@ namespace Twins
         if (pnmh && (pnmh->hwndFrom == GetTabCtrl()))
         {
             NMCTCITEM* nmh = (NMCTCITEM*)pnmh;
-            Dh::ThreadPrintf(L"FileView: OnClosePage %d\n", nmh->iItem);
+            DH::ThreadPrintf(L"FileView: OnClosePage %d\n", nmh->iItem);
 
             CloseTab(nmh->iItem);
             ExitIfEmpty();

@@ -6,7 +6,7 @@
 
 #include "strint.h"
 
-namespace Dh
+namespace DH
 {
     enum WindowTypes: uint64_t
     {

@@ -135,7 +135,7 @@ namespace Twins
         }
         catch (std::exception const& ex)
         {
-            Dh::ThreadPrintf("RegExSel: std::exception - %s\n", ex.what());
+            DH::ThreadPrintf("RegExSel: std::exception - %s\n", ex.what());
         }
     }
 

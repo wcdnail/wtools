@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "dh.timer.h"
 
-namespace Dh
+namespace DH
 {
+    IMPL_DEFAULT_COPY_MOVE_OF(Timer);
+
     Timer::Timer()
         : start_(.0)
     {

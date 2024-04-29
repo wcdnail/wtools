@@ -33,7 +33,7 @@ namespace Conf
     //
     // Configuration storage interface.
     // Under MS Windows - it's a registry.
-    // Under *nix it's a usual text file.
+    // Under *nix it's mau be a usual text file.
     //
     class Storage: boost::noncopyable
     {
@@ -64,7 +64,7 @@ namespace Conf
         virtual std::wstring const& GetName() const = 0;
         virtual bool Get(StoragePtr const& conf) const = 0;
         virtual bool Set(StoragePtr const& conf) const = 0;
-        virtual bool Eq(StoragePtr const& conf) const = 0;
+        virtual bool IsEqual(StoragePtr const& conf) const = 0;
 
     protected:
         WCDAFX_API VarBase();
@@ -86,7 +86,7 @@ namespace Conf
         std::wstring const& GetName() const override { return Name; }
         bool Get(StoragePtr const&) const override;
         bool Set(StoragePtr const&) const override;
-        bool Eq(StoragePtr const&) const override;
+        bool IsEqual(StoragePtr const&) const override;
     private:
         std::wstring Name;
         T*        Pointee;
@@ -101,7 +101,7 @@ namespace Conf
     }
 
     template <> 
-    inline bool VarT<int>::Eq(StoragePtr const& store) const 
+    inline bool VarT<int>::IsEqual(StoragePtr const& store) const 
     {
         int y = store->GetInt(Name); 
         return *Pointee == y; 
@@ -121,7 +121,7 @@ namespace Conf
     }
 
     template <> 
-    inline bool VarT<std::wstring>::Eq(StoragePtr const& store) const 
+    inline bool VarT<std::wstring>::IsEqual(StoragePtr const& store) const 
     {
         return *Pointee == store->GetString(Name); 
     }
@@ -148,14 +148,13 @@ namespace Conf
     }
 
     template <typename T> 
-    inline bool VarT<T>::Eq(StoragePtr const& store) const 
+    inline bool VarT<T>::IsEqual(StoragePtr const& store) const 
     { 
         T temp;
         VarT<T> tv(temp, { Name.c_str(), Name.length() });
-
-        if (!tv.Get(store))
+        if (!tv.Get(store)) {
             return true;
-
+        }
         return *Pointee == temp;
     }
 

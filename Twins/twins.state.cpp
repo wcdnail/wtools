@@ -208,7 +208,7 @@ namespace Obsolete
 
     int AppState::OnButtonsCommand(TabBar& buttons, int id, PCTSTR text)
     {
-        Dh::ThreadPrintf(L"PnButton: %2d `%s`\n", id, text);
+        DH::ThreadPrintf(L"PnButton: %2d `%s`\n", id, text);
         buttons.ClearHot();
         Commands().GetCommand(id).Callback();
         return id;

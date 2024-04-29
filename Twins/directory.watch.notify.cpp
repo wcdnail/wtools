@@ -7,7 +7,7 @@ namespace Twins
     static void DebugDump(DirectoryNotify& dn)
     {
 #ifdef _DEBUG2
-        Dh::ThreadPrintf(L"DwNotify: %s\n", dn.ToString());
+        DH::ThreadPrintf(L"DwNotify: %s\n", dn.ToString());
 #endif
     }
 
