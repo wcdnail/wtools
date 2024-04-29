@@ -45,6 +45,24 @@ namespace CF::Colorized
         PerformInitStatix();
     }
 
+    IMPL_MSG_MAP_DISP_INH(Colorizer, 
+                          ProcessColorizerMessage,
+                          OnColorizerMessage,
+                          ControlBase::OnWindowMessage
+                         );
+
+    IMPL_MSG_MAP_BEG(Colorizer, OnColorizerMessage)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_INITDIALOG(OnInitDialog)
+        MSG_WM_ERASEBKGND(OnEraseMyBkgnd)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
+        MSG_WM_CTLCOLOREDIT(OnCtlColorStatic)
+      //MSG_WM_NCPAINT(OnNcPaint)
+        MESSAGE_HANDLER_EX(WM_DRAWITEM, OnDrawItem)
+        MESSAGE_HANDLER_EX(WM_NOTIFY, OnNotify)
+    END_MSG_MAP()
+
 #pragma region Controls factory
 
     WTL::CImageList& SpecGxf()
@@ -107,38 +125,6 @@ namespace CF::Colorized
 #pragma endregion 
 #pragma region Windows messages handler
 
-    BOOL Colorizer::ProcessColorizerMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID/* = 0*/)
-    {
-        bool prevMsgHandled = IsMsgHandled();
-        BOOL rv = ControlBase::OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
-        if (!rv) {
-            rv = OnColorizerMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
-        }
-        SetMsgHandled(prevMsgHandled);
-        return rv;
-    }
-
-    BOOL Colorizer::OnColorizerMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
-    {
-        BOOL bHandled = TRUE;
-        UNREFERENCED_ARG(hWnd);
-        UNREFERENCED_ARG(bHandled);
-        switch (dwMsgMapID) {
-        case 0:
-            MSG_WM_CREATE(OnCreate)
-            MSG_WM_INITDIALOG(OnInitDialog)
-            MSG_WM_ERASEBKGND(OnEraseMyBkgnd)
-            MSG_WM_DESTROY(OnDestroy)
-            MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
-            MSG_WM_CTLCOLOREDIT(OnCtlColorStatic)
-          //MSG_WM_NCPAINT(OnNcPaint)
-            MESSAGE_HANDLER_EX(WM_DRAWITEM, OnDrawItem)
-            MESSAGE_HANDLER_EX(WM_NOTIFY, OnNotify)
-            break;
-        }
-        return FALSE;
-    }
-
     LRESULT Colorizer::OnDrawItem(UINT message, WPARAM wParam, LPARAM lParam)
     {
         LPDRAWITEMSTRUCT di = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
@@ -175,7 +161,6 @@ namespace CF::Colorized
     }
 
 #pragma endregion 
-
 #pragma region Initialization
 
     int Colorizer::DoInitialization(bool isDialog)
@@ -447,7 +432,6 @@ namespace CF::Colorized
     }
 
 #pragma endregion
-
 #pragma region CheckBox
 
     void Colorizer::DrawCheckBox(CDCHandle        dc,
@@ -509,7 +493,6 @@ namespace CF::Colorized
     }
 
 #pragma endregion 
-
 #pragma region RadioButton
 
     void Colorizer::DrawRadioButton(CDCHandle dc, CRect const& rc, CString const& text, UINT tformat, LONG style, LONG estyle, UINT state) const 
@@ -556,7 +539,6 @@ namespace CF::Colorized
     }
 
 #pragma endregion
-
 #pragma region Combo & list boxes
 
     void Colorizer::DrawItem(LPDRAWITEMSTRUCT  di,

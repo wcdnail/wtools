@@ -85,8 +85,6 @@ namespace CF::Colorized
     protected:
         ControlMap Controls;
 
-        WCDAFX_API BOOL OnColorizerMessage(HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD);
-
     private:
         static void PerformInitStatix();
 
@@ -103,6 +101,8 @@ namespace CF::Colorized
         int DoInitialization(bool isDialog);
         static BOOL CALLBACK InitChild(HWND hwnd, Colorizer& self);
 
+        DECL_MSG_MAP_PROC(OnColorizerMessage);
+
     public:
         COLORREF           MyTextColor;
         COLORREF           MyBackColor;
@@ -115,7 +115,7 @@ namespace CF::Colorized
         WTL::CBrush        MyBackBrush[3];
         WTL::CPen          MyBorderPen[2];
 
-        WCDAFX_API BOOL ProcessColorizerMessage(HWND, UINT, WPARAM, LPARAM, LRESULT&, DWORD = 0);
+        WCDAFX_API DECL_MSG_MAP_PROC(ProcessColorizerMessage);
 
         WCDAFX_API void SetTextColor(CDCHandle dc) const;
 

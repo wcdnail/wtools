@@ -14,7 +14,8 @@ namespace CF
     class BasicDialog: public ATL::CDialogImpl<BasicDialog, CF::Colorized::Colorizer>
     {
     public:
-        using Super = ATL::CDialogImpl<BasicDialog, CF::Colorized::Colorizer>;
+        using     Super = ATL::CDialogImpl<BasicDialog, CF::Colorized::Colorizer>;
+        using Colorizer = CF::Colorized::Colorizer;
 
         BasicDialog(BasicDialog const&) = delete;
         BasicDialog& operator = (BasicDialog const&) = delete;
@@ -72,8 +73,7 @@ namespace CF
 
         CRect SetupIcon(RectzAllocator<LONG>& rcAlloc);
 
-        WCDAFX_API BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
-        WCDAFX_API BOOL OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID) override;
+        WCDAFX_API DECL_MSG_MAP_EX_CTL_INHERITED(BasicDialog);
 
     private:
         void CreateButtons(CF::RectzAllocator<LONG>& btnAlloc) const;

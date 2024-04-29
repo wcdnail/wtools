@@ -92,13 +92,13 @@
       <Filter>__</Filter>
     </ClCompile>
     <ClCompile Include="wtl.colorizer.cpp">
-      <Filter>colorizer</Filter>
+      <Filter>wtl.controls\colorizer</Filter>
     </ClCompile>
     <ClCompile Include="dialogz.basic.cpp">
-      <Filter>dialogz</Filter>
+      <Filter>wtl.controls\dialogz</Filter>
     </ClCompile>
     <ClCompile Include="dialogz.messagebox.cpp">
-      <Filter>dialogz</Filter>
+      <Filter>wtl.controls\dialogz</Filter>
     </ClCompile>
     <ClCompile Include="boost.assertion_failed.cpp">
       <Filter>__</Filter>
@@ -116,16 +116,16 @@
       <Filter>__</Filter>
     </ClCompile>
     <ClCompile Include="wtl.colorizer.control.details.cpp">
-      <Filter>colorizer</Filter>
+      <Filter>wtl.controls\colorizer</Filter>
     </ClCompile>
     <ClCompile Include="wtl.colorizer.control.cpp">
-      <Filter>colorizer</Filter>
+      <Filter>wtl.controls\colorizer</Filter>
     </ClCompile>
     <ClCompile Include="wtl.colorizer.control.specific.cpp">
-      <Filter>colorizer</Filter>
+      <Filter>wtl.controls\colorizer</Filter>
     </ClCompile>
     <ClCompile Include="wtl.colorizer.helpers.cpp">
-      <Filter>colorizer</Filter>
+      <Filter>wtl.controls\colorizer</Filter>
     </ClCompile>
     <ClCompile Include="windows.gdi.rects.cpp">
       <Filter>__</Filter>
@@ -143,7 +143,7 @@
     <ClCompile Include="rectz.cpp" />
     <ClCompile Include="rect.alloc.cpp" />
     <ClCompile Include="wtl.control.cpp">
-      <Filter>ctrls</Filter>
+      <Filter>wtl.controls</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -409,16 +409,16 @@
       <Filter>__</Filter>
     </ClInclude>
     <ClInclude Include="wtl.colorizer.control.h">
-      <Filter>colorizer</Filter>
+      <Filter>wtl.controls\colorizer</Filter>
     </ClInclude>
     <ClInclude Include="wtl.colorizer.h">
-      <Filter>colorizer</Filter>
+      <Filter>wtl.controls\colorizer</Filter>
     </ClInclude>
     <ClInclude Include="wtl.colorizer.helpers.h">
-      <Filter>colorizer</Filter>
+      <Filter>wtl.controls\colorizer</Filter>
     </ClInclude>
     <ClInclude Include="wtl.colorizer.control.details.h">
-      <Filter>colorizer</Filter>
+      <Filter>wtl.controls\colorizer</Filter>
     </ClInclude>
     <ClInclude Include="gl.cube.h">
       <Filter>gl</Filter>
@@ -430,25 +430,25 @@
       <Filter>gl</Filter>
     </ClInclude>
     <ClInclude Include="wtl.colorizer.inline.h">
-      <Filter>colorizer</Filter>
+      <Filter>wtl.controls\colorizer</Filter>
     </ClInclude>
     <ClInclude Include="cf-resources\resource.h">
       <Filter>cf-resources</Filter>
     </ClInclude>
     <ClInclude Include="wtl.colorizer.control.specific.h">
-      <Filter>colorizer</Filter>
+      <Filter>wtl.controls\colorizer</Filter>
     </ClInclude>
     <ClInclude Include="cf.windef.target.h">
       <Filter>__</Filter>
     </ClInclude>
     <ClInclude Include="dialogz.basic.h">
-      <Filter>dialogz</Filter>
+      <Filter>wtl.controls\dialogz</Filter>
     </ClInclude>
     <ClInclude Include="dialogz.types.h">
-      <Filter>dialogz</Filter>
+      <Filter>wtl.controls\dialogz</Filter>
     </ClInclude>
     <ClInclude Include="dialogz.messagebox.h">
-      <Filter>dialogz</Filter>
+      <Filter>wtl.controls\dialogz</Filter>
     </ClInclude>
     <ClInclude Include="windows.icons.h">
       <Filter>__</Filter>
@@ -476,13 +476,13 @@
     <ClInclude Include="rectz.h" />
     <ClInclude Include="rect.alloc.h" />
     <ClInclude Include="wtl.controls.helpers.h">
-      <Filter>ctrls</Filter>
+      <Filter>wtl.controls</Filter>
     </ClInclude>
     <ClInclude Include="wtl.control.h">
-      <Filter>ctrls</Filter>
+      <Filter>wtl.controls</Filter>
     </ClInclude>
     <ClInclude Include="wtl.control.defs.h">
-      <Filter>ctrls</Filter>
+      <Filter>wtl.controls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -501,9 +501,6 @@
     <Filter Include="_">
       <UniqueIdentifier>{2e6204ab-c64c-45fa-9803-858b1ca18c29}</UniqueIdentifier>
     </Filter>
-    <Filter Include="colorizer">
-      <UniqueIdentifier>{019c358d-e05a-4107-88f4-4f567d57d1c9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="__">
       <UniqueIdentifier>{13311ee9-59e9-4d07-8d57-2b0c55008ba3}</UniqueIdentifier>
     </Filter>
@@ -513,11 +510,14 @@
     <Filter Include="cf-resources">
       <UniqueIdentifier>{11778f55-54aa-43f8-baeb-1be22c665ab9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dialogz">
-      <UniqueIdentifier>{77ca92a1-13c0-4b75-9634-cc69ff278d5a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ctrls">
+    <Filter Include="wtl.controls">
       <UniqueIdentifier>{f27c1042-4f74-41cf-9e0f-103ae2ae94b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="wtl.controls\colorizer">
+      <UniqueIdentifier>{019c358d-e05a-4107-88f4-4f567d57d1c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="wtl.controls\dialogz">
+      <UniqueIdentifier>{77ca92a1-13c0-4b75-9634-cc69ff278d5a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

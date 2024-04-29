@@ -29,37 +29,14 @@ namespace CF
     {
     }
 
-    BOOL BasicDialog::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
-    {
-        bool bOldMsgHandled = IsMsgHandled();
-        BOOL bRet = OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
-        SetMsgHandled(bOldMsgHandled);
-        return bRet;
-    }
-
-    BOOL BasicDialog::OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
-    {
-        if (ProcessColorizerMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
-            return TRUE;
-        }
-        BOOL bHandled = TRUE;
-        UNREFERENCED_ARG(bHandled);
-        switch(dwMsgMapID) {
-        case 0: {
-            MSG_WM_CREATE(OnCreate)
-            MSG_WM_INITDIALOG(OnInitDialog)
-            MSG_WM_DESTROY(OnDestroy)
-            MSG_WM_KEYDOWN(OnKeyDown)
-            MSG_WM_COMMAND(OnCommand)
-            break;
-        }
-        default:
-            ATLTRACE(static_cast<int>(ATL::atlTraceWindowing), 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
-            ATLASSERT(FALSE);
-            break;
-        }
-        return FALSE;
-    }
+    IMPL_MSG_MAP_EX(BasicDialog)
+        CHAIN_MSG_MAP_CUST(Colorizer::ProcessColorizerMessage);
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_INITDIALOG(OnInitDialog)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_COMMAND(OnCommand)
+    END_MSG_MAP()
 
     unsigned BasicDialog::GetCompatFlags(unsigned flags)
     {

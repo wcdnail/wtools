@@ -3,7 +3,6 @@
 #include "wcdafx.api.h"
 #include "wtl.control.defs.h"
 #include <atlwin.h>
-#include <atlcrack.h>
 
 namespace CF
 {
