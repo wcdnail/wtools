@@ -53,7 +53,7 @@ namespace CF
                                        );
         dispText.ReleaseBuffer(text.GetLength());
 
-        DH::ThreadPrintf(_T("Colorize: \t\t++ %p [%s] `%s` ==> `%s`\n"), m_hWnd,
+        DebugThreadPrintf(_T("       Control|    ++ %p [%s] '%s' ==> '%s'\n"), m_hWnd,
             dispText.GetString(), m_prevClass.GetString(), thisClass);
 #endif
     }
@@ -72,7 +72,7 @@ namespace CF
                                        );
         dispText.ReleaseBuffer(text.GetLength());
 
-        DH::ThreadPrintf(L"Colorize: \t\t-- %p [%s] `%s` <== `%s`\n", m_hWnd,
+        DebugThreadPrintf(L"       Control|    -- %p [%s] '%s' <== '%s'\n", m_hWnd,
             dispText.GetString(), m_prevClass.GetString(), thisClass);
 #endif
     }

@@ -23,6 +23,7 @@ namespace CF
             IconQuestion          = 0x02000000,
             IconExclamation       = 0x04000000,
             IconAsterix           = 0x08000000,
+            IconCustom            = 0x10000000,
 
             /* Buttons */
             OkCancel              = Ok | Cancel,
@@ -34,7 +35,7 @@ namespace CF
 
             /* Masks */
             HasButtons            = Ok | Cancel | Abort | Retry | Ignore | Yes | No | Close | Help,
-            HasIcons              = IconStop | IconQuestion | IconExclamation | IconAsterix,
+            HasIcons              = IconStop | IconQuestion | IconExclamation | IconAsterix | IconCustom,
         };
     };
 

@@ -71,9 +71,11 @@ namespace CF
             IdLast
         };
 
+        virtual HICON LoadCustomIcon();
         CRect SetupIcon(RectzAllocator<LONG>& rcAlloc);
 
         WCDAFX_API DECL_MSG_MAP_EX_CTL_INHERITED(BasicDialog);
+        WCDAFX_API virtual void OnButtonClick(int id, UINT code);
 
     private:
         void CreateButtons(CF::RectzAllocator<LONG>& btnAlloc) const;

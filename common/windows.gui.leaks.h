@@ -2,7 +2,6 @@
 
 #include "dh.tracing.h"
 #include <winuser.h>
-#include <boost/noncopyable.hpp>
 
 namespace CF
 {
@@ -36,14 +35,14 @@ namespace CF
 
     inline void GUILeaks::Load(DWORD& gdi, DWORD& usr)
     {
-        gdi = ::GetGuiResources(::GetCurrentProcess(), GR_GDIOBJECTS);
-        usr = ::GetGuiResources(::GetCurrentProcess(), GR_USEROBJECTS);
+        gdi = GetGuiResources(GetCurrentProcess(), GR_GDIOBJECTS);
+        usr = GetGuiResources(GetCurrentProcess(), GR_USEROBJECTS);
     }
 
     inline void GUILeaks::StartCount()
     {
         Load(gdiCount_, usrCount_);
-        DH::ThreadPrintf(_T("GuiLeaks: At beg - GDI %4d, USER %4d\n"), gdiCount_, usrCount_);
+        DH::ThreadPrintfc(DH::Category::Module(), _T("GuiLeaks: At beg - GDI %4d, USER %4d\n"), gdiCount_, usrCount_);
     }
 
     inline void GUILeaks::PrintCurrentState()
@@ -52,8 +51,8 @@ namespace CF
         DWORD usrCount = 0;
         Load(gdiCount, usrCount);
 
-        DH::ThreadPrintf(_T("GuiLeaks: At end - GDI %4d, USER %4d\n"), gdiCount, usrCount);
-        DH::ThreadPrintf(_T("GuiLeaks: Leaks  - GDI %4d, USER %4d\n"), gdiCount - gdiCount_, usrCount - usrCount_);
+        DH::ThreadPrintfc(DH::Category::Module(), _T("GuiLeaks: At end - GDI %4d, USER %4d\n"), gdiCount, usrCount);
+        DH::ThreadPrintfc(DH::Category::Module(), _T("GuiLeaks: Leaks  - GDI %4d, USER %4d\n"), gdiCount - gdiCount_, usrCount - usrCount_);
     }
 }
 

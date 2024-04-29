@@ -1,4 +1,5 @@
 #include "pch.hxx"
+#include "dh.tracing.h"
 #include "dialogz.basic.h"
 #include "string.utils.error.code.h"
 #include "rez/resource.h"
@@ -25,21 +26,43 @@ struct TestBasicDlg: CF::BasicDialog
     TestBasicDlg();
 
 private:
+    CIcon            m_icon;
     WTL::CComboBox  m_Combo;
     WTL::CListBox m_ListBox;
 
     DECL_OVERRIDE_MSG_MAP_EX(TestBasicDlg);
-
+    HICON LoadCustomIcon() override;
+    void OnButtonClick(int id, UINT code) override;
     BOOL OnInitDialog(HWND, LPARAM);
 };
+
+TestBasicDlg::~TestBasicDlg()
+{
+}
+
+TestBasicDlg::TestBasicDlg()
+    : BasicDialog(IDD_TEST_BASICS_DLG0, CF::DialogAttrs::IconCustom)
+{
+}
 
 IMPL_OVERRIDE_MSG_MAP_EX(TestBasicDlg)
     HANDLE_SUPER_MSG_MAP_EX(Super)
     MSG_WM_INITDIALOG(OnInitDialog)
 END_MSG_MAP()
 
+HICON TestBasicDlg::LoadCustomIcon()
+{
+    CIconHandle icon;
+    icon.LoadIconW(MAKEINTRESOURCEW(IDI_ALL_OK), 128, 128, LR_LOADTRANSPARENT | LR_VGACOLOR);
+    return icon.m_hIcon;
+}
+
 BOOL TestBasicDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
+    m_icon.LoadIconW(MAKEINTRESOURCEW(IDI_WTL));
+    SetIcon(m_icon, TRUE);
+    SetIcon(m_icon, FALSE);
+
     static const PCWSTR wtlControlClasses[] = {
         L"CStatic",
         L"CButton",
@@ -71,13 +94,9 @@ BOOL TestBasicDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     return TRUE;
 }
 
-TestBasicDlg::~TestBasicDlg()
+void TestBasicDlg::OnButtonClick(int id, UINT code)
 {
-}
-
-TestBasicDlg::TestBasicDlg()
-    : BasicDialog(IDD_TEST_BASICS_DLG0, 0)
-{
+    //BasicDialog::OnButtonClick(id, code);
 }
 
 TEST_F(TestBasics, Dialogs)
@@ -90,4 +109,5 @@ TEST_F(TestBasics, Dialogs)
         PrintLastError();
         ASSERT_TRUE(false);
     }
+    DH::ThreadPrintf(L"DLG result: %d\n", dlg.Result().Code);
 }

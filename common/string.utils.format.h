@@ -5,6 +5,11 @@
 
 namespace Str
 {
+    template <class C> struct Elipsis;
+
+    using ElipsisA = Elipsis<char>;
+    using ElipsisW = Elipsis<wchar_t>;
+
     template <class C>
     struct Elipsis
     {

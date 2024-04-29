@@ -44,6 +44,14 @@
   <ItemGroup>
     <ResourceCompile Include="rez\UT.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="icons\imCompareItemFailed.ico" />
+    <Image Include="icons\imCompareItemPassed.ico" />
+    <Image Include="icons\wsl.ico" />
+    <Image Include="rez\icons\imCompareItemFailed.ico" />
+    <Image Include="rez\icons\imCompareItemPassed.ico" />
+    <Image Include="rez\icons\wsl.ico" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>UT</ProjectName>
     <Keyword>Win32Proj</Keyword>

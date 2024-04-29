@@ -76,7 +76,7 @@ namespace CF
 #ifdef _DEBUG
         m_bModal = false;
 #endif
-        HWND hWnd = ::CreateDialogParamW(
+        HWND hWnd = CreateDialogParamW(
             (hResInst ? hResInst : _AtlBaseModule.GetResourceInstance()),
             MAKEINTRESOURCE(IDD),
             hWndParent,
@@ -113,14 +113,13 @@ namespace CF
 #ifdef _DEBUG
         m_bModal = true;
 #endif
-        INT_PTR intPtr = ::DialogBoxParamW(
+        INT_PTR intPtr = DialogBoxParamW(
             (hResInst ? hResInst : _AtlBaseModule.GetResourceInstance()),
             MAKEINTRESOURCE(IDD),
             hWndParent,
             BasicDialog::StartDialogProc,
             dwInitParam
         );
-        m_result.Code = static_cast<int>(intPtr);
         return true;
     }
 
@@ -148,6 +147,14 @@ namespace CF
         }
     }
 
+    void BasicDialog::OnButtonClick(int id, UINT code)
+    {
+        if ((id >= IdOk) && (id <=IdHelp)) {
+            m_result.Code = DialogResult::Ok + (id - IdOk);
+            EndDialog(id);
+        }
+    }
+
     void BasicDialog::OnCommand(UINT code, int id, HWND control)
     {
         UNREFERENCED_ARG(control);
@@ -155,11 +162,8 @@ namespace CF
             m_result.Code = DialogResult::Cancel;
             EndDialog(id);
         }
-        else if ((id >= IdOk) && (id <=IdHelp)) {
-            if ((BN_CLICKED == code) || (BN_PUSHED == code)) {
-                m_result.Code = DialogResult::Ok + (id - IdOk);
-                EndDialog(id);
-            }
+        else if ((BN_CLICKED == code) || (BN_PUSHED == code)) {
+            OnButtonClick(id, code);
         }
         else {
             SetMsgHandled(false);
@@ -221,45 +225,47 @@ namespace CF
         }
     }
 
+    HICON BasicDialog::LoadCustomIcon()
+    {
+        return nullptr;
+    }
+
     CRect BasicDialog::SetupIcon(CF::RectzAllocator<LONG>& rcAlloc)
     {
-        if (m_attrs & DialogAttrs::HasIcons)
-        {
-            PCTSTR iconId = nullptr;
-
-            switch (m_attrs & 0x0f000000)
-            {
-            case DialogAttrs::IconStop: iconId = IDI_HAND; break;
-            case DialogAttrs::IconQuestion: iconId = IDI_QUESTION; break;
-            case DialogAttrs::IconExclamation: iconId = IDI_EXCLAMATION; break;
-            case DialogAttrs::IconAsterix: iconId = IDI_ASTERISK; break;
-            }
-
-            if (iconId)
-            {
-                HICON tempIcon = ::LoadIcon(nullptr, iconId);
-                if (tempIcon)
-                {
-                    m_icon.Attach(tempIcon);
-
-                    CSize sz = CF::GetIconSize(m_icon);
-                    return ToCRect<LONG>(rcAlloc.Next(sz.cx + 8, sz.cy));
-                }
-            }
+        if (!(m_attrs & DialogAttrs::HasIcons)) {
+            return {};
         }
-
-        return CRect();
+        PCTSTR  iconId = nullptr;
+        HICON tempIcon = nullptr;
+        switch (m_attrs & DialogAttrs::HasIcons) {
+        case        DialogAttrs::IconStop: iconId = IDI_HAND; break;
+        case    DialogAttrs::IconQuestion: iconId = IDI_QUESTION; break;
+        case DialogAttrs::IconExclamation: iconId = IDI_EXCLAMATION; break;
+        case     DialogAttrs::IconAsterix: iconId = IDI_ASTERISK; break;
+        default:
+            tempIcon = LoadCustomIcon();
+            break;
+        }
+        if (!tempIcon && iconId) {
+            tempIcon = ::LoadIcon(nullptr, iconId);
+        }
+        if (!tempIcon) {
+            return {};
+        }
+        m_icon.Attach(tempIcon);
+        CSize sz = CF::GetIconSize(m_icon);
+        return ToCRect<LONG>(rcAlloc.Next(sz.cx + 8, sz.cy));
     }
 
     BOOL BasicDialog::OnInitDialog(HWND focusedWindow, LPARAM param)
     {
         UNREFERENCED_ARG(focusedWindow);
         UNREFERENCED_ARG(param);
-        ::SetWindowTextW(m_hWnd, m_title.c_str());
+        SetWindowTextW(m_title.c_str());
 
         CRect rc;
         GetClientRect(rc);
-        rc.DeflateRect(8, 10);
+        rc.DeflateRect(10, 10);
 
         CF::RectzAllocator<LONG> rcAlloc(FromCRect<LONG>(rc));
         CRect rcIcon = SetupIcon(rcAlloc);

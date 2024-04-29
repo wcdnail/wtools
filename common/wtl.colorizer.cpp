@@ -90,7 +90,7 @@ namespace CF::Colorized
         CStringW _class = T::GetWndClassName();
         _class.MakeUpper();
         CtrlFactory()[_class] = &Colorizer_Creator<Control<T>>;
-        DebugThreadPrintf(L"%s: class == '%s'\n", _T(__FUNCTION__), _class.GetString());
+        DebugThreadPrintf(L"  ClrzrFactory| << '%s'\n", _class.GetString());
     }
 
     void Colorizer::PerformInitStatix()
@@ -175,9 +175,8 @@ namespace CF::Colorized
 #ifdef _DEBUG
         CStringW text;
         GetWindowTextW(text);
-        DH::ThreadPrintf(L"Colorize: - %p %s...\n", m_hWnd, text.GetString());
+        DebugThreadPrintf(L"        Colorize| - %p %s...\n", m_hWnd, text.GetString());
 #endif
-
         SetMsgHandled(FALSE);
     }
 
@@ -186,7 +185,7 @@ namespace CF::Colorized
 #ifdef _DEBUG
         CStringW text;
         GetWindowTextW(text);
-        DH::ThreadPrintf(L"Colorize: + %p %s...\n", hwnd, text.GetString());
+        DebugThreadPrintf(L"      Colorize| + %p %s...\n", hwnd, text.GetString());
 #endif
         EnumChildWindows(hwnd, reinterpret_cast<WNDENUMPROC>(InitChild), reinterpret_cast<LPARAM>(this));
     }
@@ -204,7 +203,7 @@ namespace CF::Colorized
         const auto fact = CtrlFactory().find(_class);
         bool      exist = fact != CtrlFactory().end();
         if (!exist) {
-            DebugThreadPrintf(L"Colorize: \t\t!! %p `%s`\n", hwnd, _class.GetString());
+            DebugThreadPrintf(L"      Colorize| >> %p '%s' not EXIST <<\n", hwnd, _class.GetString());
         }
         if (exist && !already) {
             ::ShowWindow(hwnd, SW_HIDE);
