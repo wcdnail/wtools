@@ -61,6 +61,8 @@
 #  include <atlgdi.h>
 #  include <atluser.h>
 #  include <atlctrlx.h>
+#  include <atlctrlw.h>
+#  include <atltheme.h>
 #endif
 
 #include <boost/config.hpp>

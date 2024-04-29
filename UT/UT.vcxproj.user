@@ -4,22 +4,24 @@
     <LocalDebuggerEnvironment>PATH=$(VCPKG_ROOT)\installed\x64-windows\debug\bin;$(PATH)
 $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>--gtest_filter=TestDialogs.Customizabe</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
     <LocalDebuggerEnvironment>PATH=$(VCPKG_ROOT)\installed\x64-windows\debug\bin;$(PATH)
 $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>--gtest_filter=TestDialogs.Customizabe</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='product|Win32'">
     <LocalDebuggerEnvironment>PATH=$(VCPKG_ROOT)\installed\x64-windows\bin;$(PATH)
 $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>--gtest_filter=TestBasics.Dialogs</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--gtest_filter=TestDialogs.Customizabe</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='product|x64'">
     <LocalDebuggerEnvironment>PATH=$(VCPKG_ROOT)\installed\x64-windows\bin;$(PATH)
 $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>--gtest_filter=TestBasics.Dialogs</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--gtest_filter=TestDialogs.Customizabe</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

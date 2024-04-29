@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="basic.win.tests.cpp" />
     <ClCompile Include="generic.cpp" />
     <ClCompile Include="pch.cxx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">Create</PrecompiledHeader>
@@ -27,11 +26,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="test.dlgz.cpp" />
     <ClCompile Include="UT.entry.cxx" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="err.printer.h" />
     <ClInclude Include="pch.hxx" />
     <ClInclude Include="rez\resource.h" />
+    <ClInclude Include="wtl.aero.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\common\wccf.vcxproj">

@@ -319,8 +319,8 @@ namespace DH
 
     template <typename CharType>
                 struct TTTraits {};
-    template <> struct TTTraits<char>    { static inline const  PCSTR Header =  "%0*.8f|[%06d]|"; static inline const  PCSTR Category =  "%14s| "; };
-    template <> struct TTTraits<wchar_t> { static inline const PCWSTR Header = L"%0*.8f|[%06d]|"; static inline const PCWSTR Category = L"%14s| "; };
+    template <> struct TTTraits<char>    { static inline const  PCSTR Header =  "%0*.8f [%06d] "; static inline const  PCSTR Category =  "%14s| "; };
+    template <> struct TTTraits<wchar_t> { static inline const PCWSTR Header = L"%0*.8f [%06d] "; static inline const PCWSTR Category = L"%14s| "; };
 
     template <typename CharType>
     static void ThreadPrintfT(CharType const* format, va_list ap)
