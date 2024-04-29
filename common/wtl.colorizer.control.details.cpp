@@ -41,7 +41,7 @@ namespace CF::Colorized
     template <typename U>
     UINT Details<U>::GetDrawTextFormat(HWND)
     { 
-        return DT_CENTER | DT_VCENTER | DT_SINGLELINE; 
+        return DT_CENTER | DT_VCENTER | DT_SINGLELINE;
     }
 
     Details<ZStatic>::AppearType Details<ZStatic>::GetAppearType(HWND hwnd)

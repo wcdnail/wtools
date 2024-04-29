@@ -7,14 +7,14 @@
 
 #pragma comment (lib, "dwmapi.lib")
 
-struct TestDialogs: ::testing::Test
+struct TestAeroDialogs: ::testing::Test
 {
 };
 
-class CTestDlg : public CAeroDialogImpl<CTestDlg>
+class CTestAeroDlg : public CAeroDialogImpl<CTestAeroDlg>
 {
 public:
-    using Super = CAeroDialogImpl<CTestDlg>;
+    using Super = CAeroDialogImpl<CTestAeroDlg>;
 
     enum { IDD = IDD_TEST_GENERIC };
 
@@ -48,9 +48,9 @@ public:
 };
 
 
-TEST_F(TestDialogs, Customizabe)
+TEST_F(TestAeroDialogs, Customizabe)
 {
-    CTestDlg dlg;
+    CTestAeroDlg dlg;
     auto rv = dlg.DoModal();
     if (rv <= 0) {
         PrintLastError();

@@ -1,12 +1,12 @@
 #include "pch.hxx"
 #include "dh.tracing.h"
-#include "rez/resource.h"
 #include "err.printer.h"
+#include "wtl.control.h"
+#include "rez/resource.h"
+#include "dev.assistance/dev.assist.h"
 #include <gtest/gtest.h>
 #include <memory>
 #include <map>
-
-#include "dev.assistance/dev.assist.h"
 
 struct TestDialogs: ::testing::Test
 {
@@ -189,7 +189,8 @@ struct CTestDlg : public CDialogImpl<CTestDlg, CWindow>
         return reinterpret_cast<LRESULT>(WND_BK_BRUSH);
     }
 
-    void DrawItem(HWND hWnd, HDC hdc, PAINTSTRUCT const* ps);
+    bool NcDrawItem(CItem const& item, HDC hdc);
+    bool DrawItem(CItem const& item, HDC hdc, PAINTSTRUCT* ps);
 };
 
 //
@@ -204,7 +205,7 @@ struct CTestDlg : public CDialogImpl<CTestDlg, CWindow>
 //                                   -- This class
 //
 
-struct CItem: ATL::CWindowImpl<CItem, CWindow>
+struct CItem: ATL::CWindowImpl<CItem, CF::ControlBase>
 {
     ~CItem() override
     {}
@@ -214,12 +215,13 @@ struct CItem: ATL::CWindowImpl<CItem, CWindow>
         , m_class(-1)
     {}
 
-    void Init()
-    {
-        m_class = DetermineWndClass(m_hWnd);
-    }
+    void Init() { m_class = DetermineWndClass(m_hWnd); }
+    int ClassId() const { return m_class; }
 
     BEGIN_MSG_MAP(CItem)
+        if (CF::ControlBase::OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
+            return TRUE;
+        }
         MESSAGE_HANDLER(WM_CREATE, OnCreate)
         MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
         MESSAGE_HANDLER(WM_NCPAINT, OnNcPaint)
@@ -240,18 +242,24 @@ struct CItem: ATL::CWindowImpl<CItem, CWindow>
         return 0;
     }
 
-    LRESULT OnNcPaint(UINT, WPARAM, LPARAM, BOOL&)
+    LRESULT OnNcPaint(UINT, WPARAM wParam, LPARAM, BOOL& bHandled)
     {
+        HRGN hRgn = (HRGN)wParam;
+        CDC dc(GetDCEx(hRgn, DCX_WINDOW | DCX_INTERSECTRGN));
+        if (!m_master.NcDrawItem(*this, dc.m_hDC)) {
+            bHandled = false;
+        }
         return 0;
     }
 
-    LRESULT OnPaint(UINT, WPARAM, LPARAM, BOOL&)
+    LRESULT OnPaint(UINT, WPARAM, LPARAM, BOOL& bHandled)
     {
-        PAINTSTRUCT ps;
-        CPaintDC paintDc(m_hWnd);
-        //FillRect(hdc, &ps.rcPaint, (HBRUSH) (COLOR_WINDOW+1));
-        m_master.DrawItem(m_hWnd, paintDc.m_hDC, &paintDc.m_ps);
-        EndPaint(&ps);
+        CPaintDC dc(m_hWnd);
+        dc.SelectFont(GetFont());
+      //FillRect(dc.m_hDC, &dc.m_ps.rcPaint, WND_BK_BRUSH);
+        if (!m_master.DrawItem(*this, dc.m_hDC, &dc.m_ps)) {
+            bHandled = false;
+        }
         return 0;
     }
 
@@ -284,8 +292,86 @@ LRESULT CTestDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
     return TRUE;
 }
 
-void CTestDlg::DrawItem(HWND hWnd, HDC hdc, PAINTSTRUCT const* ps)
+bool CTestDlg::NcDrawItem(CItem const& item, HDC hdc)
 {
+    return true;
+}
+
+bool CTestDlg::DrawItem(CItem const& item, HDC hdc, PAINTSTRUCT* ps)
+{
+    if (WClass::Unknown == item.ClassId()) {
+        return false;
+    }
+    UINT  tflags = DT_CENTER | DT_VCENTER | DT_SINGLELINE;
+    ULONG  style = static_cast<ULONG>(::GetWindowLongW(item.m_hWnd, GWL_STYLE));
+    ULONG estyle = static_cast<ULONG>(::GetWindowLongW(item.m_hWnd, GWL_EXSTYLE));
+    ULONG   type = 0;
+    switch (item.ClassId()) {
+    case WClass::Static: {
+        // style == SS_SUNKEN
+        type  = style & SS_TYPEMASK; // SS_ICON...SS_USERITEM
+        // SS_OWNERDRAW...SS_ETCHEDFRAME
+        tflags = style & 3 | DT_EXPANDTABS;
+        tflags |= (style & SS_CENTERIMAGE ? DT_VCENTER | DT_SINGLELINE : 0)
+                | (style & SS_ENDELLIPSIS ? DT_END_ELLIPSIS : 0)
+                | (style & SS_PATHELLIPSIS ? DT_PATH_ELLIPSIS : 0)
+                | (style & SS_WORDELLIPSIS ? DT_WORD_ELLIPSIS : 0)
+                ;
+        break;
+    }
+    case WClass::Button: {
+        type = style & BS_TYPEMASK;
+        UINT ha = BS_CENTER & style;
+        UINT va = BS_VCENTER & style;
+        UINT defaultHa = static_cast<UINT>((type < BS_CHECKBOX) || (BS_FLAT == type) ? DT_CENTER : DT_LEFT);
+        tflags = (style & BS_MULTILINE ? 0 : DT_SINGLELINE)
+                | (!ha ? defaultHa : (BS_CENTER == ha ? DT_CENTER : (BS_RIGHT == ha ? DT_RIGHT : DT_LEFT)))
+                | (!va ? DT_VCENTER : (BS_VCENTER == va ? DT_VCENTER : (BS_BOTTOM == va ? DT_BOTTOM : DT_TOP)))
+                ;
+        break;
+    }
+    case WClass::ScrollBar:          break;
+    case WClass::ComboBox:           break;
+    case WClass::Edit:               break;
+    case WClass::ListBox:            break;
+    case WClass::HeaderCtrl:         break;
+    case WClass::LinkCtrl:           break;
+    case WClass::ListViewCtrl:       break;
+    case WClass::TreeViewCtrl:       break;
+    case WClass::ComboBoxEx:         break;
+    case WClass::TabCtrl:            break;
+    case WClass::IPAddressCtrl:      break;
+    case WClass::PagerCtrl:          break;
+    case WClass::ProgressBarCtrl:    break;
+    case WClass::TrackBarCtrl:       break;
+    case WClass::UpDownCtrl:         break;
+    case WClass::DateTimePickerCtrl: break;
+    case WClass::MonthCalendarCtrl:  break;
+    case WClass::RichEditCtrl:       break;
+    default:
+        return false;
+    }
+
+    CStringW text;
+    CRect  rcItem;
+    PRECT   rcTrg = &rcItem;
+
+    item.GetWindowTextW(text);
+    if (nullptr != ps) {
+        rcTrg = &ps->rcPaint;
+    }
+    else {
+        item.GetClientRect(rcTrg);
+    }
+
+    ::SetBkColor(hdc, WND_BK_COLOR);
+    ::SetTextColor(hdc, WND_TXT_COLOR);
+
+    if (text.GetLength() > 0) {
+        ::SetTextColor(hdc, WND_TXT_COLOR);
+        ::DrawTextW(hdc, text, text.GetLength(), rcTrg, tflags);
+    }
+    return true;
 }
 
 TEST_F(TestDialogs, Customizabe)

@@ -1,7 +1,7 @@
 #include "pch.hxx"
 #include "dh.tracing.h"
+#include "err.printer.h"
 #include "dialogz.basic.h"
-#include "string.utils.error.code.h"
 #include "dialogz.messagebox.h"
 #include "rez/resource.h"
 #include <gtest/gtest.h>
@@ -9,13 +9,6 @@
 
 struct TestBasics: ::testing::Test
 {
-    static void PrintLastError()
-    {
-        HRESULT   hr = static_cast<HRESULT>(GetLastError());
-        CStringW msg = Str::ErrorCode<wchar_t>::SystemMessage(hr);
-        CW2AEX<512> conv(msg.GetString(), CP_UTF8);
-        fprintf_s(stderr, "DLG: Show failure %08x '%s'\n", hr, conv.m_psz);
-    }
 };
 
 struct TestBasicDlg: CF::BasicDialog
@@ -32,6 +25,7 @@ private:
     WTL::CListBox m_ListBox;
 
     DECL_OVERRIDE_MSG_MAP_EX(TestBasicDlg);
+
     HICON LoadCustomIcon() override;
     void OnButtonClick(int id, UINT code) override;
     BOOL OnInitDialog(HWND, LPARAM);
@@ -47,7 +41,10 @@ TestBasicDlg::TestBasicDlg()
 }
 
 IMPL_OVERRIDE_MSG_MAP_EX(TestBasicDlg)
-    HANDLE_SUPER_MSG_MAP_EX(Super)
+    //HANDLE_SUPER_MSG_MAP_EX(Super)
+    //if (Super::OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
+    //    return TRUE;
+    //}
     MSG_WM_INITDIALOG(OnInitDialog)
 END_MSG_MAP()
 

@@ -8,66 +8,6 @@
 
 namespace CF
 {
-    DLGPROC BasicDialog::GetDialogProc()
-    {
-        return Super::GetDialogProc(); // MyDlProc
-    }
-
-    INT_PTR CALLBACK BasicDialog::MyDlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-    {
-        auto pThis = reinterpret_cast<CDialogImplBaseT<CF::Colorized::Colorizer>*>(hWnd);
-        // set a ptr to this message and save the old value
-        _ATL_MSG msg(pThis->m_hWnd, uMsg, wParam, lParam);
-        const _ATL_MSG* pOldMsg = pThis->m_pCurrentMsg;
-        pThis->m_pCurrentMsg = &msg;
-        // pass to the message map to process
-        LRESULT lRes = 0;
-        BOOL    bRet = pThis->ProcessWindowMessage(pThis->m_hWnd, uMsg, wParam, lParam, lRes, 0);
-        // restore saved value for the current message
-        ATLASSERT(pThis->m_pCurrentMsg == &msg);
-        pThis->m_pCurrentMsg = pOldMsg;
-        // set result if message was handled
-        if(bRet) {
-            switch (uMsg) {
-            case WM_COMPAREITEM:
-            case WM_VKEYTOITEM:
-            case WM_CHARTOITEM:
-            case WM_INITDIALOG:
-            case WM_QUERYDRAGICON:
-            case WM_CTLCOLORMSGBOX:
-            case WM_CTLCOLOREDIT:
-            case WM_CTLCOLORLISTBOX:
-            case WM_CTLCOLORBTN:
-            case WM_CTLCOLORDLG:
-            case WM_CTLCOLORSCROLLBAR:
-            case WM_CTLCOLORSTATIC:
-                // return directly
-                bRet = (BOOL)lRes;
-                break;
-            default:
-                // return in DWL_MSGRESULT
-                //Make sure the window was not destroyed before setting attributes.
-                if((pThis->m_dwState & CWindowImplRoot<CF::Colorized::Colorizer>::WINSTATE_DESTROYED) == 0) {
-                    ::SetWindowLongPtr(pThis->m_hWnd, DWLP_MSGRESULT, lRes);
-                }
-                break;
-            }
-        }
-        else if(uMsg == WM_NCDESTROY) {
-            // mark dialog as destroyed
-            pThis->m_dwState |= CWindowImplRoot<CF::Colorized::Colorizer>::WINSTATE_DESTROYED;
-        }
-        if((pThis->m_dwState & CWindowImplRoot<CF::Colorized::Colorizer>::WINSTATE_DESTROYED) && pThis->m_pCurrentMsg == nullptr) {
-            // clear out window handle
-            HWND hWndThis = pThis->m_hWnd;
-            pThis->m_hWnd = nullptr;
-            pThis->m_dwState &= ~CWindowImplRoot<CF::Colorized::Colorizer>::WINSTATE_DESTROYED;
-            // clean up after dialog is destroyed
-            pThis->OnFinalMessage(hWndThis);
-        }
-        return lRes;
-    }
-
     BasicDialog::~BasicDialog()
     {
     }
@@ -95,12 +35,12 @@ namespace CF
     }
 
     IMPL_MSG_MAP_EX(BasicDialog)
-        CHAIN_MSG_MAP_CUST(Colorizer::ProcessColorizerMessage);
         MSG_WM_CREATE(OnCreate)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_KEYDOWN(OnKeyDown)
         MSG_WM_COMMAND(OnCommand)
+        CHAIN_MSG_MAP_CUST(Colorizer::ProcessColorizerMessage);
     END_MSG_MAP()
 
     unsigned BasicDialog::GetCompatFlags(unsigned flags)

@@ -85,8 +85,5 @@ namespace CF
         void OnDestroy();
         void OnKeyDown(UINT key, UINT rep, UINT flags);
         void OnCommand(UINT code, int id, HWND control);
-
-        WCDAFX_API DLGPROC GetDialogProc() override;
-        static INT_PTR MyDlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     };
 }
