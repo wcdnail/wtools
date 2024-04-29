@@ -100,7 +100,7 @@ namespace CF::Colorized
       
         void SuperclassForEachChild(HWND hwnd);
         int DoInitialization(bool isDialog);
-        static BOOL CALLBACK InitChild(HWND hwnd, Colorizer& self);
+        static BOOL CALLBACK InitItem(HWND hwnd, Colorizer& self);
 
         DECL_MSG_MAP_PROC(OnColorizerMessage);
 
@@ -115,6 +115,8 @@ namespace CF::Colorized
         COLORREF     MyButtonBackColor[2];
         WTL::CBrush        MyBackBrush[3];
         WTL::CPen          MyBorderPen[2];
+
+        WCDAFX_API bool ColorizerAdd(HWND hwnd);
 
         WCDAFX_API DECL_MSG_MAP_PROC(ProcessColorizerMessage);
 

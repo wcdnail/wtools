@@ -45,11 +45,11 @@ namespace CF::Colorized
         PerformInitStatix();
     }
 
-    IMPL_MSG_MAP_DISP_INH(Colorizer, 
+    IMPL_MSG_MAP_DISP_INH(Colorizer,
                           ProcessColorizerMessage,
                           OnColorizerMessage,
                           ControlBase::OnWindowMessage
-                         );
+            );
 
     IMPL_MSG_MAP_BEG(Colorizer, OnColorizerMessage)
         MSG_WM_CREATE(OnCreate)
@@ -58,7 +58,7 @@ namespace CF::Colorized
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
         MSG_WM_CTLCOLOREDIT(OnCtlColorStatic)
-        //MSG_WM_CTLCOLORBTN(OnCtlColorBtn)
+        MSG_WM_CTLCOLORBTN(OnCtlColorBtn)
         //MSG_WM_CTLCOLORLISTBOX(OnCtlColorStatic)
         //MSG_WM_CTLCOLORSCROLLBAR(OnCtlColorStatic)
         //MSG_WM_NCPAINT(OnNcPaint)
@@ -83,8 +83,7 @@ namespace CF::Colorized
     template <typename T>
     static ControlPtr Colorizer_Creator(HWND hwnd, Colorizer& owner)
     {
-        auto res = std::make_unique<T>(hwnd, owner);
-        return res;
+        return std::make_unique<T>(hwnd, owner);
     }
 
     template <typename T>
@@ -106,7 +105,7 @@ namespace CF::Colorized
             Colorizer_FactoryAdd<ZEdit>();
             Colorizer_FactoryAdd<ZListBox>();
             Colorizer_FactoryAdd<ZHeaderCtrl>();
-            Colorizer_FactoryAdd<ZLinkCtrl>();
+          //Colorizer_FactoryAdd<ZLinkCtrl>();
             Colorizer_FactoryAdd<ZListViewCtrl>();
             Colorizer_FactoryAdd<ZTreeViewCtrl>();
             Colorizer_FactoryAdd<ZComboBoxEx>();
@@ -191,10 +190,10 @@ namespace CF::Colorized
         GetWindowTextW(text);
         DebugThreadPrintf(LTH_COLORIZER L" + %p %s...\n", hwnd, text.GetString());
 #endif
-        EnumChildWindows(hwnd, reinterpret_cast<WNDENUMPROC>(InitChild), reinterpret_cast<LPARAM>(this));
+        EnumChildWindows(hwnd, reinterpret_cast<WNDENUMPROC>(InitItem), reinterpret_cast<LPARAM>(this));
     }
 
-    BOOL CALLBACK Colorizer::InitChild(HWND hwnd, Colorizer& self)
+    BOOL CALLBACK Colorizer::InitItem(HWND hwnd, Colorizer& self)
     {
         const auto ci = self.Controls.find(hwnd);
         bool  already = ci != self.Controls.end();
@@ -218,6 +217,11 @@ namespace CF::Colorized
         }
 
         return TRUE;
+    }
+
+    bool Colorizer::ColorizerAdd(HWND hwnd)
+    {
+        return 0 != InitItem(hwnd, *this);
     }
 
 #pragma endregion 

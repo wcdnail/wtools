@@ -79,11 +79,14 @@ namespace CF
         WCDAFX_API virtual void OnButtonClick(int id, UINT code);
 
     private:
-        void CreateButtons(CF::RectzAllocator<LONG>& btnAlloc) const;
+        void CreateButtons(CF::RectzAllocator<LONG>& btnAlloc);
         int OnCreate(LPCREATESTRUCT cs);
         BOOL OnInitDialog(HWND focusedWindow, LPARAM param);
         void OnDestroy();
         void OnKeyDown(UINT key, UINT rep, UINT flags);
         void OnCommand(UINT code, int id, HWND control);
+
+        WCDAFX_API DLGPROC GetDialogProc() override;
+        static INT_PTR MyDlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     };
 }

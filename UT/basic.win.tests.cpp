@@ -42,13 +42,13 @@ TestBasicDlg::~TestBasicDlg()
 }
 
 TestBasicDlg::TestBasicDlg()
-    : BasicDialog(IDD_TEST_BASICS_DLG0, CF::DialogAttrs::IconCustom)
+    : BasicDialog(IDD_TEST_BASICS_DLG0, L"Some text", L"Some title", CF::DialogAttrs::IconCustom | CF::DialogAttrs::YesNoCancel, nullptr)
 {
 }
 
 IMPL_OVERRIDE_MSG_MAP_EX(TestBasicDlg)
-    MSG_WM_INITDIALOG(OnInitDialog)
     HANDLE_SUPER_MSG_MAP_EX(Super)
+    MSG_WM_INITDIALOG(OnInitDialog)
 END_MSG_MAP()
 
 HICON TestBasicDlg::LoadCustomIcon()
@@ -63,37 +63,36 @@ BOOL TestBasicDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     m_icon.LoadIconW(MAKEINTRESOURCEW(IDI_WTL));
     SetIcon(m_icon, TRUE);
     SetIcon(m_icon, FALSE);
+    if (0) {
+        static const PCWSTR wtlControlClasses[] = {
+            L"CStatic",
+            L"CButton",
+            L"CScrollBar",
+            L"CComboBox",
+            L"CEdit",
+            L"CListBox",
+            L"CHeaderCtrl",
+            L"CLinkCtrl",
+            L"CListViewCtrl",
+            L"CTreeViewCtrl",
+            L"CComboBoxEx",
+            L"CTabCtrl",
+            L"CIPAddressCtrl",
+            L"CPagerCtrl",
+            L"CProgressBarCtrl",
+            L"CTrackBarCtrl",
+            L"CUpDownCtrl",
+            L"CDateTimePickerCtrl",
+            L"CMonthCalendarCtrl",
+            L"CRichEditCtrl",
 
-    static const PCWSTR wtlControlClasses[] = {
-        L"CStatic",
-        L"CButton",
-        L"CScrollBar",
-        L"CComboBox",
-        L"CEdit",
-        L"CListBox",
-        L"CHeaderCtrl",
-        L"CLinkCtrl",
-        L"CListViewCtrl",
-        L"CTreeViewCtrl",
-        L"CComboBoxEx",
-        L"CTabCtrl",
-        L"CIPAddressCtrl",
-        L"CPagerCtrl",
-        L"CProgressBarCtrl",
-        L"CTrackBarCtrl",
-        L"CUpDownCtrl",
-        L"CDateTimePickerCtrl",
-        L"CMonthCalendarCtrl",
-        L"CRichEditCtrl",
+        };
 
-    };
-
-    m_Combo.Attach(GetDlgItem(IDC_COMBO1));
-    for (const auto clsName: wtlControlClasses) {
-        m_Combo.AddString(clsName);
+        m_Combo.Attach(GetDlgItem(IDC_COMBO1));
+        for (const auto clsName: wtlControlClasses) {
+            m_Combo.AddString(clsName);
+        }
     }
-
-    SetMsgHandled(FALSE);
     return TRUE;
 }
 

@@ -79,7 +79,7 @@ namespace CF
         UNREFERENCED_ARG(lResult);
         UNREFERENCED_ARG(dwMsgMapID);
 #ifdef _DEBUG
-        if (0) {
+        if (1) {
             MSG msg;
             msg.hwnd = hWnd;
             msg.message = uMsg;

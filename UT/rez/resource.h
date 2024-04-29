@@ -4,14 +4,12 @@
 //
 #define IDD_TEST_BASICS_DLG0            101
 #define IDI_WTL                         103
-#define IDI_ICON1                       104
 #define IDI_ALL_FAIL                    104
 #define IDI_ALL_OK                      105
 #define IDC_TREE1                       1001
 #define IDC_COMBO1                      1002
 #define IDB_TEST                        1003
 #define IDB_TEST2                       1004
-#define IDC_TEST2                       1004
 #define IDC_TEST3                       1005
 
 // Next default values for new objects
