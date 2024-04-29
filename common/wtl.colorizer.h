@@ -90,10 +90,11 @@ namespace CF::Colorized
 
         int OnCreate(LPCREATESTRUCT);
         BOOL OnInitDialog(HWND, LPARAM);
-        BOOL OnEraseMyBkgnd(CDCHandle dc);
+        LRESULT OnEraseMyBkgnd(CDCHandle dc);
         void OnNcPaint(CRgnHandle rgn);
         void OnDestroy();
         HBRUSH OnCtlColorStatic(CDCHandle dc, HWND);
+        HBRUSH OnCtlColorBtn(CDCHandle dc, HWND);
         LRESULT OnDrawItem(UINT message, WPARAM wParam, LPARAM lParam);
         LRESULT OnNotify(UINT message, WPARAM wParam, LPARAM lParam);
       
@@ -122,7 +123,7 @@ namespace CF::Colorized
         WCDAFX_API static BorderFlags GetBorderType(HWND hwnd, LONG& style, LONG& estyle);
         WCDAFX_API void DrawControlBorder(CDCHandle dc, CRect const& rcPaint, BorderFlags border) const;
 
-        WCDAFX_API void OnEraseBackground(CDCHandle dc, CRect const& rc);
+        WCDAFX_API LRESULT OnEraseBackground(CDCHandle dc, CRect const& rc);
         WCDAFX_API void DrawGroupBox(CDCHandle dc, CRect const& rc, CString const& text, LONG style) const;
         WCDAFX_API void DrawCheckBox(CDCHandle dc, CRect const& rc, CString const& text, UINT tformat, LONG style, LONG estyle, UINT state) const;
         WCDAFX_API void DrawRadioButton(CDCHandle dc, CRect const& rc, CString const& text, UINT tformat, LONG style, LONG estyle, UINT state) const;
@@ -138,10 +139,10 @@ namespace CF::Colorized
                         bool               flat,
                         bool           _default) const;
 
-        WCDAFX_API void DrawItem(LPDRAWITEMSTRUCT  di,
-                      const CString&  text /* citem.GetItemText(di->itemID) */,
-                      CImageList     ilist /* citem.GetImageList()*/,
-                      int           iindex /* citem.GetImageIndex(di->itemID)  */,
-                      bool       eraseback = true) const;
+        WCDAFX_API LRESULT DrawItem(LPDRAWITEMSTRUCT  di,
+                                    const CString&  text /* citem.GetItemText(di->itemID) */,
+                                    CImageList     ilist /* citem.GetImageList()*/,
+                                    int           iindex /* citem.GetImageIndex(di->itemID)  */,
+                                    bool       eraseback = true) const;
     };
 }

@@ -158,7 +158,7 @@ namespace Twins
                 CStringW caption;
                 GetWindowText(caption);
 
-                const auto dr = CF::UserDialog::Ask(m_hWnd, message.c_str(), caption, MB_YESNO | MB_ICONWARNING);
+                const auto dr = CF::UserDialog::Ask(m_hWnd, message.c_str(), caption.GetString(), MB_YESNO | MB_ICONWARNING);
                 if (CF::DialogResult::Yes != dr.Code)
                     break;
             }

@@ -4,7 +4,7 @@
 
 namespace CF
 {
-    DialogResult UserDialog::Ask(HWND parent, wchar_t const* what, wchar_t const* title, unsigned flags)
+    DialogResult UserDialog::Ask(HWND parent, WStrView what, WStrView title, unsigned flags)
     {
         BasicDialog dlg(what, title, BasicDialog::GetCompatFlags(flags));
         dlg.ShowModal(parent);

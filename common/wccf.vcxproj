@@ -433,22 +433,6 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClCompile Include="null.pointee.cpp" />
     <ClCompile Include="rect.alloc.cpp" />
     <ClCompile Include="rectz.cpp" />
-    <ClCompile Include="reflection\ref.var.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='product|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='product|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="reflection\ref.var.list.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='product|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='product|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="shell.imagelist.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -503,6 +487,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClInclude Include="dev.assistance\virtual.keys.consts.h" />
     <ClInclude Include="dev.assistance\window.messages.consts.h" />
     <ClInclude Include="dh.timer.h" />
+    <ClInclude Include="dh.tracing.defs.h" />
     <ClInclude Include="dh.tracing.h" />
     <ClInclude Include="dialogz.basic.h" />
     <ClInclude Include="dialogz.messagebox.h" />
@@ -532,17 +517,6 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClInclude Include="rect.putinto.h" />
     <ClInclude Include="rect.screen.h" />
     <ClInclude Include="rectz.h" />
-    <ClInclude Include="reflection\ref.brush.h" />
-    <ClInclude Include="reflection\ref.logfont.h" />
-    <ClInclude Include="reflection\ref.object.h" />
-    <ClInclude Include="reflection\ref.pen.h" />
-    <ClInclude Include="reflection\ref.pod.array.h" />
-    <ClInclude Include="reflection\ref.rect.h" />
-    <ClInclude Include="reflection\ref.serialization.h" />
-    <ClInclude Include="reflection\ref.std.h" />
-    <ClInclude Include="reflection\ref.std.streaming.h" />
-    <ClInclude Include="reflection\ref.var.h" />
-    <ClInclude Include="reflection\ref.var.list.h" />
     <ClInclude Include="render.conveyor.h" />
     <ClInclude Include="render.element.h" />
     <ClInclude Include="rubbish.heap.h" />
@@ -601,12 +575,6 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
   </ItemGroup>
   <ItemGroup>
     <None Include="wccf.def" />
-    <None Include="reflection\ref.var.inl" />
-    <None Include="reflection\ref.var.list.inl" />
-    <None Include="reflection\ref.var.list.serialization.inl" />
-    <None Include="reflection\ref.var.list.streaming.inl" />
-    <None Include="reflection\ref.var.serialization.inl" />
-    <None Include="reflection\ref.var.streaming.inl" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="cf-resources\cf-res.rc" />

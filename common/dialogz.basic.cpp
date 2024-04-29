@@ -12,30 +12,35 @@ namespace CF
     {
     }
 
-    BasicDialog::BasicDialog(UINT idd, unsigned flags) 
+    BasicDialog::BasicDialog(UINT idd, WStrView message, WStrView title, unsigned flags, HICON icon) 
         :        IDD(idd)
         ,   m_result()
         ,    m_attrs(flags)
-        ,    m_title()
-        ,     m_text()
-        ,     m_icon()
+        ,    m_title(title)
+        ,     m_text(message)
+        ,     m_icon(icon)
         ,     m_font(static_cast<HFONT>(::GetStockObject(DEFAULT_GUI_FONT)))
         , m_textFont(::CreateFont(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, 6, 0, _T("Consolas")))
     {
     }
 
-    BasicDialog::BasicDialog(WStrView message, WStrView title, unsigned flags) 
-        : BasicDialog(IDD_BASIC, flags)
+    BasicDialog::BasicDialog(WStrView message, WStrView title, unsigned flags)
+        : BasicDialog(IDD_BASIC, message, title, flags, nullptr)
+    {
+    }
+
+    BasicDialog::BasicDialog(UINT idd, unsigned flags)
+        : BasicDialog(idd, {}, {}, flags, nullptr)
     {
     }
 
     IMPL_MSG_MAP_EX(BasicDialog)
-        CHAIN_MSG_MAP_CUST(Colorizer::ProcessColorizerMessage);
         MSG_WM_CREATE(OnCreate)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_KEYDOWN(OnKeyDown)
         MSG_WM_COMMAND(OnCommand)
+        CHAIN_MSG_MAP_CUST(Colorizer::ProcessColorizerMessage);
     END_MSG_MAP()
 
     unsigned BasicDialog::GetCompatFlags(unsigned flags)
@@ -113,14 +118,14 @@ namespace CF
 #ifdef _DEBUG
         m_bModal = true;
 #endif
-        INT_PTR intPtr = DialogBoxParamW(
+        INT_PTR irv = DialogBoxParamW(
             (hResInst ? hResInst : _AtlBaseModule.GetResourceInstance()),
             MAKEINTRESOURCE(IDD),
             hWndParent,
             BasicDialog::StartDialogProc,
             dwInitParam
         );
-        return true;
+        return irv > 0;
     }
 
     bool BasicDialog::ShowModal(HWND hWndParent, LPARAM dwInitParam)
@@ -334,7 +339,7 @@ namespace CF
         CreateButtons(btnAlloc);
 
         CenterWindow(GetParent());
-        SetMsgHandled(false);
+        SetMsgHandled(FALSE);
         return TRUE;
     }
 

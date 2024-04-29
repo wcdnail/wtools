@@ -51,8 +51,8 @@ namespace Twins
     private:
         friend Application& App();
 
-        Application();
         ~Application();
+        Application();
                 
         Conf::Section Options;
     };

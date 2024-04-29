@@ -254,7 +254,7 @@ namespace DH
 
         DH::TraceCategory const& Exception()
         {
-            static const TraceCategory inst(L"EXCPTION");
+            static const TraceCategory inst(L"EXCEPTION");
             return inst;
         }
     }

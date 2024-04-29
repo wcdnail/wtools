@@ -8,6 +8,7 @@
 #include "wtl.colorizer.control.specific.h"
 #include "wtl.colorizer.helpers.h"
 #include "wtl.colorizer.h"
+#include "dh.tracing.defs.h"
 
 namespace CF::Colorized
 {
@@ -44,13 +45,13 @@ namespace CF::Colorized
     void Control<T>::OnDestroyThiz()
     {
         this->OnDestroy(this->GetWndClassName());
-        this->SetMsgHandled(false);
+        this->SetMsgHandled(FALSE);
     }
 
     template <typename T>
     void Control<T>::OnPaint(CDCHandle)
     {
-        this->SetMsgHandled(false);
+        //this->SetMsgHandled(FALSE);
     }
 
     template <typename T>
@@ -64,12 +65,12 @@ namespace CF::Colorized
     }
 
     template <typename T>
-    BOOL Control<T>::OnEraseBkgnd(CDCHandle dc)
+    LRESULT Control<T>::OnEraseBkgnd(CDCHandle dc)
     {
         CRect rc;
         this->GetClientRect(rc);
-        m_Master.OnEraseBackground(dc, rc);
-        return TRUE;
+        return m_Master.OnEraseBackground(dc, rc);
+        // MSDN: An application should return nonzero if it erases the background; otherwise, it should return zero.
     }
 
     template <typename T>
@@ -77,7 +78,7 @@ namespace CF::Colorized
     {
         UNREFERENCED_ARG(id);
         UNREFERENCED_ARG(cd);
-        this->SetMsgHandled(false);
+        //this->SetMsgHandled(FALSE);
         return CDRF_DODEFAULT;
     }
 
@@ -86,7 +87,7 @@ namespace CF::Colorized
     {
         UNREFERENCED_ARG(id);
         UNREFERENCED_ARG(cd);
-        this->SetMsgHandled(false);
+        //this->SetMsgHandled(FALSE);
         return CDRF_DODEFAULT;
     }
 
@@ -94,7 +95,7 @@ namespace CF::Colorized
     LRESULT Control<T>::OnGetDispinfo(LPNMHDR header)
     {
         UNREFERENCED_ARG(header);
-        this->SetMsgHandled(false);
+        //this->SetMsgHandled(FALSE);
         return 0;
     }
 
@@ -122,22 +123,16 @@ namespace CF::Colorized
             MSG_WM_ERASEBKGND(OnEraseBkgnd)
             MSG_WM_CTLCOLORLISTBOX(OnCtlColorListBox)
             MSG_WM_CTLCOLOREDIT(OnCtlColorEdit)
-            if (WM_NOTIFY == uMsg) {
-                bHandled    = TRUE;
-                LPNMHDR hdr = reinterpret_cast<LPNMHDR>(lParam);
-                int  idCtrl = static_cast<int>(wParam);
-                switch (hdr->code) {
-                case NM_CUSTOMDRAW:  //WTL::CCustomDraw<>
-                    lResult = OnCustomDraw(idCtrl, hdr, bHandled);
-                    break;
-                }
-                if (bHandled) {
+            MSG_WM_NOTIFY(OnNotify)
+            DEFAULT_REFLECTION_HANDLER()
+            break;
+        case 1:
+            if((OCM_NOTIFY == uMsg) && (NM_CUSTOMDRAW == ((LPNMHDR)lParam)->code)) {
+                lResult = OnCustomDraw(static_cast<int>(wParam), reinterpret_cast<LPNMHDR>(lParam));
+                if (lResult) {
                     return TRUE;
                 }
             }
-            break;
-        case 1:
-            REFLECTED_NOTIFY_CODE_HANDLER(NM_CUSTOMDRAW, OnCustomDraw)
         default:
             ATLTRACE(static_cast<int>(ATL::atlTraceWindowing), 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
             ATLASSERT(FALSE);
@@ -147,12 +142,20 @@ namespace CF::Colorized
     }
 
     template <typename T>
-    LRESULT Control<T>::OnCustomDraw(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
+    LRESULT Control<T>::OnNotify(int idCtrl, LPNMHDR nmhdr)
     {
-        UNREFERENCED_ARG(idCtrl);
-        UNREFERENCED_ARG(pnmh);
-        bHandled = FALSE;
+        switch (nmhdr->code) {
+        case NM_CUSTOMDRAW:  //WTL::CCustomDraw<>
+            //DebugThreadPrintf(LTH_COLORIZED_CTRL L" << CUSTOMDRAW %d\n", idCtrl);
+            return OnCustomDraw(idCtrl, nmhdr);
+        }
         return 0;
+    }
+
+    template <typename T>
+    LRESULT Control<T>::OnCustomDraw(int idCtrl, LPNMHDR pnmh)
+    {
+        return OnDrawItem(idCtrl, reinterpret_cast<LPDRAWITEMSTRUCT>(pnmh));
     }
 
 #if 0
@@ -221,12 +224,13 @@ namespace CF::Colorized
     }
 
     template <typename T>
-    void Control<T>::OnDrawItem(int id, LPDRAWITEMSTRUCT di)
+    LRESULT Control<T>::OnDrawItem(int id, LPDRAWITEMSTRUCT di)
     {
+        // https://learn.microsoft.com/en-us/windows/win32/controls/nm-customdraw
         const CString&    text = GetItemText(di->itemID);
         const CImageList ilist = GetImageList();
         const int       iindex = GetImageIndex(di->itemID);
-        m_Master.DrawItem(di, text, ilist, iindex);
+        return m_Master.DrawItem(di, text, ilist, iindex);
     }
 
     template <typename T>
@@ -269,7 +273,7 @@ namespace CF::Colorized
     {
         UNREFERENCED_ARG(dc);
         if (Details<ZStatic>::Normal != Details<ZStatic>::GetAppearType(this->m_hWnd)) {
-            SetMsgHandled(false);
+            //SetMsgHandled(FALSE);
         }
         else {
             PaintContext pc(this->m_hWnd, this->GetFont());
@@ -282,7 +286,6 @@ namespace CF::Colorized
     }
 
 #pragma endregion
-
 #pragma region Button specific
 
     template <>
@@ -290,8 +293,8 @@ namespace CF::Colorized
     {
         UNREFERENCED_ARG(dc);
         Details<ZButton>::AppearType type = Details<ZButton>::GetAppearType(this->m_hWnd);
-        if ((Details<ZButton>::Ownerdraw == type) || (Details<ZButton>::UserButton == type)) {
-            SetMsgHandled(false);
+        if ((Details<ZButton>::UserButton == type)) { // (Details<ZButton>::Ownerdraw == type) || 
+            //SetMsgHandled(FALSE);
         }
         else {
             PaintContext pc(this->m_hWnd, this->GetFont());
@@ -311,6 +314,7 @@ namespace CF::Colorized
             }
             case Details<ZButton>::PushButton:
             case Details<ZButton>::DefPushButton:
+            case Details<ZButton>::Ownerdraw:
             case Details<ZButton>::Flat: {
                 m_Master.DrawButton(pc.PaindDC.m_hDC, pc.Rect, text, tformat, state,
                                    Details<ZButton>::Flat == type,
@@ -330,8 +334,7 @@ namespace CF::Colorized
                 break;
             }
             case Details<ZButton>::Pushbox:
-            case Details<ZButton>::UserButton:
-            case Details<ZButton>::Ownerdraw: {
+            case Details<ZButton>::UserButton: {
                 ::DebugBreak();
                 break;
             }
@@ -359,15 +362,6 @@ namespace CF::Colorized
         return result;
     }
 
-    template <>
-    LRESULT Control<ZListBox>::OnCustomDraw(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
-    {
-        SetMsgHandled(true);
-        OnDrawItem(idCtrl, reinterpret_cast<LPDRAWITEMSTRUCT>(pnmh));
-        bHandled = IsMsgHandled();
-        return 0;
-    }
-
 #pragma endregion
 
 #pragma region ComboBox specific
@@ -381,7 +375,8 @@ namespace CF::Colorized
     }
 
     template <> void Control<ZComboBox>::OnNcPaint(CRgnHandle rgn) {}
-    template <> BOOL Control<ZComboBox>::OnEraseBkgnd(CDCHandle dc) { return TRUE; }
+    template <>
+    LRESULT Control<ZComboBox>::OnEraseBkgnd(CDCHandle dc) { return TRUE; }
 
     template <>
     void Control<ZComboBox>::OnPaint(CDCHandle)
@@ -418,25 +413,16 @@ namespace CF::Colorized
         return m_Master.MyBackBrush[0];
     }
 
-    template <>
-    LRESULT Control<ZComboBox>::OnCustomDraw(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
-    {
-        SetMsgHandled(true);
-        OnDrawItem(idCtrl, reinterpret_cast<LPDRAWITEMSTRUCT>(pnmh));
-        bHandled = IsMsgHandled();
-        return 0;
-    }
-
 #pragma endregion
 
 #pragma region ScrollBar specific
 
-    template <>
-    BOOL Control<ZScrollBar>::OnEraseBkgnd(CDCHandle)
-    {
-        this->SetMsgHandled(false);
-        return FALSE;
-    }
+    //template <>
+    //LRESULT Control<ZScrollBar>::OnEraseBkgnd(CDCHandle)
+    //{
+    //    //this->SetMsgHandled(FALSE);
+    //    return FALSE;
+    //}
 
 #pragma endregion
 

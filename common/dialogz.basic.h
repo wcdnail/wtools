@@ -21,8 +21,9 @@ namespace CF
         BasicDialog& operator = (BasicDialog const&) = delete;
 
         WCDAFX_API ~BasicDialog() override;
-        WCDAFX_API BasicDialog(UINT idd = IDD_BASIC, unsigned flags = 0);
+        WCDAFX_API BasicDialog(UINT idd, WStrView message, WStrView title, unsigned flags, HICON icon);
         WCDAFX_API BasicDialog(WStrView message, WStrView title, unsigned flags);
+        WCDAFX_API BasicDialog(UINT idd, unsigned flags);
 
         /**
          *  hResInst == nullptr, load from _AtlBaseModule.GetResourceInstance()

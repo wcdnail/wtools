@@ -2,6 +2,7 @@
 #include "dh.tracing.h"
 #include "dialogz.basic.h"
 #include "string.utils.error.code.h"
+#include "dialogz.messagebox.h"
 #include "rez/resource.h"
 #include <gtest/gtest.h>
 #include <atlconv.h>
@@ -46,8 +47,8 @@ TestBasicDlg::TestBasicDlg()
 }
 
 IMPL_OVERRIDE_MSG_MAP_EX(TestBasicDlg)
-    HANDLE_SUPER_MSG_MAP_EX(Super)
     MSG_WM_INITDIALOG(OnInitDialog)
+    HANDLE_SUPER_MSG_MAP_EX(Super)
 END_MSG_MAP()
 
 HICON TestBasicDlg::LoadCustomIcon()
@@ -91,6 +92,8 @@ BOOL TestBasicDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     for (const auto clsName: wtlControlClasses) {
         m_Combo.AddString(clsName);
     }
+
+    SetMsgHandled(FALSE);
     return TRUE;
 }
 
@@ -103,6 +106,9 @@ TEST_F(TestBasics, Dialogs)
 {
     HINSTANCE hUT = GetModuleHandleW(nullptr);
 
+    //CF::UserDialog::Ask(nullptr, L"WHAT???", L"Что это за слово???", MB_YESNO | MB_ICONWARNING);
+
+    /**/
     //Rect rc(10, 10, 800, 600);
     TestBasicDlg dlg;
     if (!dlg.ShowModal(hUT)) {
@@ -110,4 +116,5 @@ TEST_F(TestBasics, Dialogs)
         ASSERT_TRUE(false);
     }
     DH::ThreadPrintf(L"DLG result: %d\n", dlg.Result().Code);
+    /**/
 }

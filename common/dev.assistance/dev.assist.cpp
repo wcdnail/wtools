@@ -166,12 +166,12 @@ namespace DH
     {
         wchar_t buffer[512] = {0};
         _snwprintf_s(buffer, _countof(buffer),
-            L"%08x %08x %08x%08x `%s`",
-            message->message,
+            L"%p %08x %08x%08x %32s %04x",
+            message->hwnd,
             static_cast<uint32_t>(message->wParam),
             static_cast<uint32_t>(message->lParam >> 32),
             static_cast<uint32_t>(message->lParam & 0xffffffff),
-            WM_C2SW(message->message)
+            WM_C2SW(message->message), message->message
         );
         return buffer;
     }

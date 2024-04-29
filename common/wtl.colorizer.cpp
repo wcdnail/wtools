@@ -6,8 +6,8 @@
 #include "cf-resources/resource.h"
 #include "win-5-6-7.features.h"
 #include "windows.gdi.rects.h"
+#include "dh.tracing.defs.h"
 #include "rect.putinto.h"
-#include "dh.tracing.h"
 
 #ifdef _MSC_VER
 #  pragma warning(disable: 4191) // 4191: 'reinterpret_cast': unsafe conversion from 'BOOL (__cdecl *)(HWND,CF::Colorizer *)' to 'WNDENUMPROC'
@@ -58,7 +58,10 @@ namespace CF::Colorized
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
         MSG_WM_CTLCOLOREDIT(OnCtlColorStatic)
-      //MSG_WM_NCPAINT(OnNcPaint)
+        //MSG_WM_CTLCOLORBTN(OnCtlColorBtn)
+        //MSG_WM_CTLCOLORLISTBOX(OnCtlColorStatic)
+        //MSG_WM_CTLCOLORSCROLLBAR(OnCtlColorStatic)
+        //MSG_WM_NCPAINT(OnNcPaint)
         MESSAGE_HANDLER_EX(WM_DRAWITEM, OnDrawItem)
         MESSAGE_HANDLER_EX(WM_NOTIFY, OnNotify)
     END_MSG_MAP()
@@ -143,6 +146,7 @@ namespace CF::Colorized
         case NM_CUSTOMDRAW:
       //case TVN_GETDISPINFOW:
       //case TVN_GETDISPINFOA:
+            //DebugThreadPrintf(LTH_COLORIZER L" >> CUSTOMDRAW %d (%d)\n", header->idFrom, static_cast<int>(wParam));
             rv = ::SendMessageW(header->hwndFrom, message, wParam, lParam);
             SetMsgHandled(TRUE);
             break;
@@ -175,7 +179,7 @@ namespace CF::Colorized
 #ifdef _DEBUG
         CStringW text;
         GetWindowTextW(text);
-        DebugThreadPrintf(L"        Colorize| - %p %s...\n", m_hWnd, text.GetString());
+        DebugThreadPrintf(LTH_COLORIZER L" - %p %s...\n", m_hWnd, text.GetString());
 #endif
         SetMsgHandled(FALSE);
     }
@@ -185,7 +189,7 @@ namespace CF::Colorized
 #ifdef _DEBUG
         CStringW text;
         GetWindowTextW(text);
-        DebugThreadPrintf(L"      Colorize| + %p %s...\n", hwnd, text.GetString());
+        DebugThreadPrintf(LTH_COLORIZER L" + %p %s...\n", hwnd, text.GetString());
 #endif
         EnumChildWindows(hwnd, reinterpret_cast<WNDENUMPROC>(InitChild), reinterpret_cast<LPARAM>(this));
     }
@@ -203,7 +207,7 @@ namespace CF::Colorized
         const auto fact = CtrlFactory().find(_class);
         bool      exist = fact != CtrlFactory().end();
         if (!exist) {
-            DebugThreadPrintf(L"      Colorize| >> %p '%s' not EXIST <<\n", hwnd, _class.GetString());
+            DebugThreadPrintf(LTH_COLORIZER L" >> %p '%s' not EXIST <<\n", hwnd, _class.GetString());
         }
         if (exist && !already) {
             ::ShowWindow(hwnd, SW_HIDE);
@@ -226,19 +230,22 @@ namespace CF::Colorized
         dc.SetBkColor(MyBackColor);
     }
 
-    void Colorizer::OnEraseBackground(CDCHandle dc, CRect const& rc)
+    LRESULT Colorizer::OnEraseBackground(CDCHandle dc, CRect const& rc)
     {
         dc.FillSolidRect(rc, MyBackColor);
         SetTextColor(dc);
+        return 0;
+        // MSDN: An application should return nonzero if it erases the background; otherwise, it should return zero.
     }
 
-    BOOL Colorizer::OnEraseMyBkgnd(CDCHandle dc)
+    LRESULT Colorizer::OnEraseMyBkgnd(CDCHandle dc)
     {
         CRect rc;
         GetClientRect(rc);
         dc.FillSolidRect(rc, MyBackColor);
         SetTextColor(dc);
-        return TRUE;
+        return 0;
+        // MSDN: An application should return nonzero if it erases the background; otherwise, it should return zero.
     }
 
     void Colorizer::OnNcPaint(CRgnHandle rgn)
@@ -268,6 +275,14 @@ namespace CF::Colorized
         dc.SetTextColor(MyTextColor);
         dc.SetBkColor(MyBackColor);
         return MyBackBrush[0];
+    }
+
+    HBRUSH Colorizer::OnCtlColorBtn(CDCHandle dc, HWND)
+    {
+        dc.SetBkMode(TRANSPARENT);
+        dc.SetTextColor(MyTextColor);
+        dc.SetBkColor(MyBackColor);
+        return MyBackBrush[1];
     }
 
 #pragma endregion 
@@ -526,11 +541,11 @@ namespace CF::Colorized
 #pragma endregion
 #pragma region Combo & list boxes
 
-    void Colorizer::DrawItem(LPDRAWITEMSTRUCT  di,
-                             const CString&  text /* citem.GetItemText(di->itemID) */,
-                             CImageList     ilist /* citem.GetImageList()*/,
-                             int           iindex /* citem.GetImageIndex(di->itemID)  */,
-                             bool       eraseback) const
+    LRESULT Colorizer::DrawItem(LPDRAWITEMSTRUCT  di,
+                                const CString&  text /* citem.GetItemText(di->itemID) */,
+                                CImageList     ilist /* citem.GetImageList()*/,
+                                int           iindex /* citem.GetImageIndex(di->itemID)  */,
+                                bool       eraseback) const
     {
         CDCHandle dc(di->hDC);
         CRect rc(di->rcItem);
@@ -539,7 +554,7 @@ namespace CF::Colorized
         }
         dc.SetBkMode(TRANSPARENT);
         if (-1 == di->itemID) {
-            return;
+            return CDRF_DOERASE;
         }
         if (di->itemState & ODS_SELECTED) {
             dc.FillSolidRect(rc, MyHotBackColor);
@@ -565,6 +580,7 @@ namespace CF::Colorized
         if (drawIcon) {
             ImageList_Draw(ilist.m_hImageList, iindex, dc, rc.left + 2, rc.top + 2, 0);
         }
+        return CDRF_DODEFAULT;
     }
 
     void Colorizer::DrawComboFace(CDCHandle            dc,

@@ -22,6 +22,10 @@ namespace Twins
         return inst;
     }
 
+    Application::~Application()
+    {
+    }
+
     Application::Application()
         :            LiveTimer(std::make_unique<DH::ScopedThreadLog>(L"UI"))
         ,              UILeaks(std::make_unique<CF::GUILeaks>())
@@ -68,9 +72,6 @@ namespace Twins
         Strings::Instance().Select(LanguageId);
     }
 
-    Application::~Application()
-    {}
-
     HRESULT Application::Run(HINSTANCE baseAddress, int showCmd)
     {
         HRESULT rv = 0;
@@ -79,18 +80,15 @@ namespace Twins
         Initialize::CommonControls ccontrols(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
         Initialize::RichEdit richedit;
 
-        rv = AtlModule.Init(NULL, baseAddress);
+        rv = AtlModule.Init(nullptr, baseAddress);
         if (FAILED(rv))
             throw std::runtime_error("CAppModule::Init failed!");
 
         AtlModule.AddMessageLoop(&MessageLoop);
-
-        if (NULL == AppFrame.CreateEx())
-        {
+        if (nullptr == AppFrame.CreateEx()) {
             rv = GetLastError();
             throw std::runtime_error("Main window creation failed!");
         }
-
         AppFrame.ShowWindow(showCmd);
 
         rv = MessageLoop.Run();

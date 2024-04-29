@@ -50,8 +50,8 @@ namespace CF::Colorized
         void OnDestroyThiz();
         void OnNcPaint(CRgnHandle);
         void OnPaint(CDCHandle);
-        BOOL OnEraseBkgnd(CDCHandle dc);
-        void OnDrawItem(int id, LPDRAWITEMSTRUCT di);
+        LRESULT OnEraseBkgnd(CDCHandle dc);
+        LRESULT OnDrawItem(int id, LPDRAWITEMSTRUCT di);
         HBRUSH OnCtlColorStatic(CDCHandle dc, HWND hwnd);
         HBRUSH OnCtlColorListBox(CDCHandle dc, HWND hwnd);
         HBRUSH OnCtlColorEdit(CDCHandle dc, HWND hwnd);
@@ -59,10 +59,11 @@ namespace CF::Colorized
         DWORD OnPrePaint(int id, LPNMCUSTOMDRAW cd);
         DWORD OnItemPrePaint(int id, LPNMCUSTOMDRAW cd);
         LRESULT OnGetDispinfo(LPNMHDR header);
+        LRESULT OnNotify(int w_param, LPNMHDR nmhdr);
+        LRESULT OnCustomDraw(int idCtrl, LPNMHDR pnmh);
 
         BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
         BOOL OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
-        LRESULT OnCustomDraw(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
     };
 
 #pragma endregion

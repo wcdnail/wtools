@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "wtl.control.h"
-#include "dh.tracing.h"
+#include "dh.tracing.defs.h"
+#include "dev.assistance/dev.assist.h"
 
 namespace CF
 {
@@ -35,46 +36,38 @@ namespace CF
         }
     }
 
+#ifdef _DEBUG
+    static void traceCtrl(HWND hWnd, CString& prevClass, PCWSTR thisClass, PCWSTR format)
+    {
+        CStringW      caption;
+        int                id = GetDlgCtrlID(hWnd);
+        wchar_t     text[256] = {0};
+        wchar_t dispText[256] = {0};
+        wchar_t   _class[256] = {0};
+        int clen = GetClassNameW(hWnd, _class, _countof(_class)-1);
+        prevClass = CString(_class, clen);
+        int textLen = GetWindowTextW(hWnd, text, _countof(text)-1);
+        if (textLen > 0) {
+            DH::MakePrintable(dispText, text, static_cast<size_t>(textLen));
+            caption.Format(L"%d '%s'", id, dispText);
+        }
+        else {
+            caption.Format(L"%d", id);
+        }
+        DebugThreadPrintf(format, hWnd, caption.GetString(), prevClass.GetString(), thisClass);
+    }
+#else
+#  define traceCtrl(...)
+#endif
+
     void ControlBase::OnContruct(PCTSTR thisClass)
     {
-#ifdef _DEBUG
-        wchar_t _class[256] = {0};
-        int clen = GetClassNameW(m_hWnd, _class, _countof(_class)-1);
-        m_prevClass = CString(_class, clen);
-
-        CStringW text;
-        GetWindowTextW(text);
-
-        CStringW dispText;
-        DH::Impl::CopyCharsForPrinting(dispText.GetBufferSetLength(text.GetLength() + 1),
-                                       static_cast<size_t>(text.GetLength() + 1),
-                                       text.GetString(),
-                                       static_cast<size_t>(text.GetLength())
-                                       );
-        dispText.ReleaseBuffer(text.GetLength());
-
-        DebugThreadPrintf(_T("       Control|    ++ %p [%s] '%s' ==> '%s'\n"), m_hWnd,
-            dispText.GetString(), m_prevClass.GetString(), thisClass);
-#endif
+        traceCtrl(m_hWnd, m_prevClass, thisClass, LTH_CONTROL L"  ++ %p [%s] '%s' ==> '%s'\n");
     }
 
     void ControlBase::OnDestroy(PCTSTR thisClass)
     {
-#ifdef _DEBUG
-        CStringW text;
-        GetWindowTextW(text);
-
-        CStringW dispText;
-        DH::Impl::CopyCharsForPrinting(dispText.GetBufferSetLength(text.GetLength() + 1),
-                                       static_cast<size_t>(text.GetLength() + 1),
-                                       text.GetString(),
-                                       static_cast<size_t>(text.GetLength())
-                                       );
-        dispText.ReleaseBuffer(text.GetLength());
-
-        DebugThreadPrintf(L"       Control|    -- %p [%s] '%s' <== '%s'\n", m_hWnd,
-            dispText.GetString(), m_prevClass.GetString(), thisClass);
-#endif
+        traceCtrl(m_hWnd, m_prevClass, thisClass, LTH_CONTROL L"  -- %p [%s] '%s' <== '%s'\n");
     }
 
     BOOL ControlBase::OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
@@ -85,6 +78,18 @@ namespace CF
         UNREFERENCED_ARG(lParam);
         UNREFERENCED_ARG(lResult);
         UNREFERENCED_ARG(dwMsgMapID);
+#ifdef _DEBUG
+        if (0) {
+            MSG msg;
+            msg.hwnd = hWnd;
+            msg.message = uMsg;
+            msg.wParam = wParam;
+            msg.lParam = lParam;
+            auto msgStr = DH::MessageToStrignW(&msg);
+            DebugThreadPrintf(LTH_CONTROL L" -WM- [[ %s ]]\n", msgStr.c_str());
+        }
+#endif
+        SetMsgHandled(FALSE);
         return FALSE;
     }
 }

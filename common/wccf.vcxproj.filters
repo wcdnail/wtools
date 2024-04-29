@@ -28,12 +28,6 @@
     <ClCompile Include="dev.assistance\dev.assist.cpp">
       <Filter>dev.assistance</Filter>
     </ClCompile>
-    <ClCompile Include="reflection\ref.var.cpp">
-      <Filter>reflection</Filter>
-    </ClCompile>
-    <ClCompile Include="reflection\ref.var.list.cpp">
-      <Filter>reflection</Filter>
-    </ClCompile>
     <ClCompile Include="wcdafx.api.cpp">
       <Filter>_</Filter>
     </ClCompile>
@@ -194,39 +188,6 @@
     </ClInclude>
     <ClInclude Include="dev.assistance\window.messages.consts.h">
       <Filter>dev.assistance</Filter>
-    </ClInclude>
-    <ClInclude Include="reflection\ref.brush.h">
-      <Filter>reflection</Filter>
-    </ClInclude>
-    <ClInclude Include="reflection\ref.logfont.h">
-      <Filter>reflection</Filter>
-    </ClInclude>
-    <ClInclude Include="reflection\ref.object.h">
-      <Filter>reflection</Filter>
-    </ClInclude>
-    <ClInclude Include="reflection\ref.pen.h">
-      <Filter>reflection</Filter>
-    </ClInclude>
-    <ClInclude Include="reflection\ref.pod.array.h">
-      <Filter>reflection</Filter>
-    </ClInclude>
-    <ClInclude Include="reflection\ref.rect.h">
-      <Filter>reflection</Filter>
-    </ClInclude>
-    <ClInclude Include="reflection\ref.serialization.h">
-      <Filter>reflection</Filter>
-    </ClInclude>
-    <ClInclude Include="reflection\ref.std.h">
-      <Filter>reflection</Filter>
-    </ClInclude>
-    <ClInclude Include="reflection\ref.std.streaming.h">
-      <Filter>reflection</Filter>
-    </ClInclude>
-    <ClInclude Include="reflection\ref.var.h">
-      <Filter>reflection</Filter>
-    </ClInclude>
-    <ClInclude Include="reflection\ref.var.list.h">
-      <Filter>reflection</Filter>
     </ClInclude>
     <ClInclude Include="wcdafx.api.h">
       <Filter>_</Filter>
@@ -484,6 +445,9 @@
     <ClInclude Include="wtl.control.defs.h">
       <Filter>wtl.controls</Filter>
     </ClInclude>
+    <ClInclude Include="dh.tracing.defs.h">
+      <Filter>__</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">
@@ -494,9 +458,6 @@
     </Filter>
     <Filter Include="dev.assistance">
       <UniqueIdentifier>{8ad889d7-ef24-43c9-a865-5fa28d489224}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="reflection">
-      <UniqueIdentifier>{5dc1c8be-6d1e-4941-b332-bf03117f8241}</UniqueIdentifier>
     </Filter>
     <Filter Include="_">
       <UniqueIdentifier>{2e6204ab-c64c-45fa-9803-858b1ca18c29}</UniqueIdentifier>
@@ -521,24 +482,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="reflection\ref.var.inl">
-      <Filter>reflection</Filter>
-    </None>
-    <None Include="reflection\ref.var.list.inl">
-      <Filter>reflection</Filter>
-    </None>
-    <None Include="reflection\ref.var.list.serialization.inl">
-      <Filter>reflection</Filter>
-    </None>
-    <None Include="reflection\ref.var.list.streaming.inl">
-      <Filter>reflection</Filter>
-    </None>
-    <None Include="reflection\ref.var.serialization.inl">
-      <Filter>reflection</Filter>
-    </None>
-    <None Include="reflection\ref.var.streaming.inl">
-      <Filter>reflection</Filter>
-    </None>
     <None Include="wccf.def" />
   </ItemGroup>
   <ItemGroup>
