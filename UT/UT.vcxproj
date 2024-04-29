@@ -31,7 +31,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.hxx" />
-    <ClInclude Include="rez\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\common\wccf.vcxproj">
@@ -40,9 +39,6 @@
     <ProjectReference Include="..\twins.langs\twins.langs.vcxproj">
       <Project>{9883394f-9e09-414c-9b1a-ccf3fbf5e5c8}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="rez\UTres.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>UT</ProjectName>
