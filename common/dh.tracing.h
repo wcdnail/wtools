@@ -55,6 +55,7 @@ namespace DH
     {
         WCDAFX_API DH::TraceCategory const& Module();
         WCDAFX_API DH::TraceCategory const& Exception();
+        WCDAFX_API DH::TraceCategory const& WTL();
     }
 
     WCDAFX_API void Printf(char const* format, ...);

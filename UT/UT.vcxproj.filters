@@ -11,6 +11,8 @@
       <Filter>infrastructure</Filter>
     </ClCompile>
     <ClCompile Include="test.dlgz.cpp" />
+    <ClCompile Include="test.aero.dlgz.cpp" />
+    <ClCompile Include="basic.win.tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rez\resource.h">

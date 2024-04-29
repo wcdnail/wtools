@@ -246,6 +246,12 @@ namespace DH
 
     namespace Category
     {
+        DH::TraceCategory const& WTL()
+        {
+            static const TraceCategory inst(L"WTL");
+            return inst;
+        }
+
         DH::TraceCategory const& Module()
         {
             static const TraceCategory inst(LOG_MODULE_NPH);
