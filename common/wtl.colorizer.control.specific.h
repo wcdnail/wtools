@@ -1,6 +1,6 @@
 #pragma once
 
-#include "wtl.control.h"
+#include "wtl.colorizer.control.h"
 #include <atlwin.h>
 #include <atlframe.h>
 #include <atlctrls.h>
@@ -40,10 +40,21 @@ namespace CF::Colorized
         SpecImpl();
     };
 
+    template <typename T>
+    inline SpecImpl<T>::~SpecImpl()
+    {
+    }
+
+    template <typename T>
+    inline SpecImpl<T>::SpecImpl()
+    {
+    }
+
     template <>
     struct SpecImpl<ZComboBox>
     {
-        WTL::CListBox m_ListBox;
+        //Control<ZListBox> m_ListBox;
+        ControlPtr m_ListBoxPtr;
 
         SpecImpl(SpecImpl const&) = delete;
         SpecImpl& operator = (SpecImpl const&) = delete;
@@ -51,4 +62,13 @@ namespace CF::Colorized
         ~SpecImpl();
         SpecImpl();
     };
+
+    inline SpecImpl<ZComboBox>::~SpecImpl()
+    {
+    }
+
+    inline SpecImpl<ZComboBox>::SpecImpl()
+        : m_ListBoxPtr()
+    {
+    }
 }

@@ -140,9 +140,11 @@
       <Filter>__</Filter>
     </ClCompile>
     <ClCompile Include="strint.cpp" />
-    <ClCompile Include="wtl.control.cpp" />
     <ClCompile Include="rectz.cpp" />
     <ClCompile Include="rect.alloc.cpp" />
+    <ClCompile Include="wtl.control.cpp">
+      <Filter>ctrls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -400,9 +402,6 @@
     <ClInclude Include="wtl.combobox.h">
       <Filter>__</Filter>
     </ClInclude>
-    <ClInclude Include="wtl.controls.helpers.h">
-      <Filter>__</Filter>
-    </ClInclude>
     <ClInclude Include="wtl.cool.menu.bar.h">
       <Filter>__</Filter>
     </ClInclude>
@@ -474,9 +473,17 @@
     </ClInclude>
     <ClInclude Include="brute_cast.h" />
     <ClInclude Include="strint.h" />
-    <ClInclude Include="wtl.control.h" />
     <ClInclude Include="rectz.h" />
     <ClInclude Include="rect.alloc.h" />
+    <ClInclude Include="wtl.controls.helpers.h">
+      <Filter>ctrls</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.control.h">
+      <Filter>ctrls</Filter>
+    </ClInclude>
+    <ClInclude Include="wtl.control.defs.h">
+      <Filter>ctrls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">
@@ -508,6 +515,9 @@
     </Filter>
     <Filter Include="dialogz">
       <UniqueIdentifier>{77ca92a1-13c0-4b75-9634-cc69ff278d5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ctrls">
+      <UniqueIdentifier>{f27c1042-4f74-41cf-9e0f-103ae2ae94b5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

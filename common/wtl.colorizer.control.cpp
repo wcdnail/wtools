@@ -5,6 +5,7 @@
 #endif
 #include "wtl.colorizer.control.h"
 #include "wtl.colorizer.control.details.h"
+#include "wtl.colorizer.control.specific.h"
 #include "wtl.colorizer.helpers.h"
 #include "wtl.colorizer.h"
 
@@ -110,7 +111,7 @@ namespace CF::Colorized
     BOOL Control<T>::OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
     {
         BOOL bHandled = TRUE;
-        if (m_Master.ProcessColorizerMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
+        if (ControlBase::OnWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)) {
             return TRUE;
         }
         switch(dwMsgMapID) {
@@ -398,11 +399,12 @@ namespace CF::Colorized
     template <>
     HBRUSH Control<ZComboBox>::OnCtlColorListBox(CDCHandle dc, HWND hwnd)
     {
-        if (!m_Spec.m_ListBox.m_hWnd) {
+        if (!m_Spec.m_ListBoxPtr) {
+            ControlPtr newListBox = std::make_unique<Control<ZListBox>>(hwnd, m_Master);
             CRect rc;
-            this->GetClientRect(rc);
+            newListBox->GetClientRect(rc);
             m_Master.OnEraseBackground(dc, rc);
-            m_Spec.m_ListBox.Attach(hwnd);
+            m_Spec.m_ListBoxPtr.swap(newListBox);
         }
 
         m_Master.SetTextColor(dc);

@@ -4,6 +4,27 @@
 
 namespace CF::Colorized
 {
+    template struct Details<ZStatic>;
+    template struct Details<ZButton>;
+    template struct Details<ZScrollBar>;
+    template struct Details<ZComboBox>;
+    template struct Details<ZEdit>;
+    template struct Details<ZListBox>;
+    template struct Details<ZHeaderCtrl>;
+    template struct Details<ZLinkCtrl>;
+    template struct Details<ZListViewCtrl>;
+    template struct Details<ZTreeViewCtrl>;
+    template struct Details<ZComboBoxEx>;
+    template struct Details<ZTabCtrl>;
+    template struct Details<ZIPAddressCtrl>;
+    template struct Details<ZPagerCtrl>;
+    template struct Details<ZProgressBarCtrl>;
+    template struct Details<ZTrackBarCtrl>;
+    template struct Details<ZUpDownCtrl>;
+    template struct Details<ZDateTimePickerCtrl>;
+    template struct Details<ZMonthCalendarCtrl>;
+    template struct Details<ZRichEditCtrl>;
+
     template <typename U>
     typename Details<U>::AppearType Details<U>::GetAppearType(HWND)
     { 
@@ -109,25 +130,4 @@ namespace CF::Colorized
     { 
         return DT_CENTER | DT_VCENTER | DT_SINGLELINE; 
     }
-
-    template struct Details<ZStatic>;
-    template struct Details<ZButton>;
-    template struct Details<ZScrollBar>;
-    template struct Details<ZComboBox>;
-    template struct Details<ZEdit>;
-    template struct Details<ZListBox>;
-    template struct Details<ZHeaderCtrl>;
-    template struct Details<ZLinkCtrl>;
-    template struct Details<ZListViewCtrl>;
-    template struct Details<ZTreeViewCtrl>;
-    template struct Details<ZComboBoxEx>;
-    template struct Details<ZTabCtrl>;
-    template struct Details<ZIPAddressCtrl>;
-    template struct Details<ZPagerCtrl>;
-    template struct Details<ZProgressBarCtrl>;
-    template struct Details<ZTrackBarCtrl>;
-    template struct Details<ZUpDownCtrl>;
-    template struct Details<ZDateTimePickerCtrl>;
-    template struct Details<ZMonthCalendarCtrl>;
-    template struct Details<ZRichEditCtrl>;
 }

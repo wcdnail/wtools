@@ -65,7 +65,6 @@ namespace CF::Colorized
     class Colorizer;
     struct PaintContext;
     struct NcPainContext;
-    struct IControl;
     template <typename T> struct Control;
     template <typename U> struct Details;
     template <typename U> struct SpecImpl;

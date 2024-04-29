@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "wtl.control.h"
 #include "dh.tracing.h"
-#include <stdexcept>
-#include <format>
 
 namespace CF
 {

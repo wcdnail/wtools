@@ -1,11 +1,13 @@
 #pragma once
 
 #include "wtl.control.h"
-#include "wtl.colorizer.control.specific.h"
 
 namespace CF::Colorized
 {
     class Colorizer;
+    template <typename T> struct Control;
+    template <typename U> struct Details;
+    template <typename U> struct SpecImpl;
 
     //
     //    CWindowImplRoot<TBase>: -> TBase, -> CMessageMap

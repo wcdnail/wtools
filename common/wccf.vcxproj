@@ -579,6 +579,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClInclude Include="wtl.colorizer.inline.h" />
     <ClInclude Include="wtl.column.tree.h" />
     <ClInclude Include="wtl.combobox.h" />
+    <ClInclude Include="wtl.control.defs.h" />
     <ClInclude Include="wtl.control.h" />
     <ClInclude Include="wtl.controls.helpers.h" />
     <ClInclude Include="wtl.cool.menu.bar.h" />

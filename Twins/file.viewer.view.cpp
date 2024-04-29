@@ -155,7 +155,7 @@ namespace Fv
         DebugStatus.clear();
         State.LineCount = 0;
 
-        SCROLLINFO si = { sizeof(si), SIF_PAGE | SIF_RANGE, -1, -1, -1, 0, 0 };
+        SCROLLINFO si = { sizeof(si), SIF_PAGE | SIF_RANGE, -1, -1, static_cast<UINT>(-1), 0, 0 };
         VScroller.SetScrollInfo(&si, FALSE);
         VScroller.SetScrollPos(-1, TRUE);
     }
@@ -507,27 +507,23 @@ namespace Fv
     SizeType Viewer::ScrollInText(DisplayState& s, int amount)
     {
         bool up = amount < 0;
-        int dy = abs(amount);
-
+        int  dy = abs(amount);
         SizeType offset = s.StartOffset;
-        if (up)
-        {
+        if (up) {
             offset = s.InBuffer.FindPrevLine(dy, offset);
-// ##TODO: Adjust offset in line-wrap mode"))
+            // ##TODO: Adjust offset in line-wrap mode
         }
-        else
-        {
+        else {
             offset = s.InBuffer.FindNextLine(dy, offset, s.WrappedLineWidth);
-// ##TODO: Adjust offset at end of file"))
+            // ##TODO: Adjust offset at end of file
         }
-
         return offset;
     }
 
     SizeType Viewer::Go2EndInText(DisplayState& s) 
     {
         SizeType offset = s.InBuffer.FindPrevLineFromEnd(s.LineCount); 
-// ##TODO: Adjust offset in line-wrap mode"))
+        // ##TODO: Adjust offset in line-wrap mode
         return offset;
     }
 
@@ -538,30 +534,26 @@ namespace Fv
         s.DisplayOffset = end;
         
         CRect rcLine = rc;
-        ::DrawTextW(dc, line.c_str(), min(s.VisibleLineLen, (int)line.length()), rcLine
-            , DT_LEFT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
+        ::DrawTextW(dc, line.c_str(), min(s.VisibleLineLen, (int)line.length()), rcLine,
+            DT_LEFT | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
     }
 
     SizeType Viewer::ScrollFixed(DisplayState& s, int amount, int stride)
     {
         bool up = amount < 0;
         int dy = abs(amount);
-        SizeType inc = dy * stride;
-
+        SizeType    inc = dy * stride;
         SizeType offset = s.StartOffset;
-        if (up)
-        {
-            if (inc > offset)
+        if (up) {
+            if (inc > offset) {
                 inc = offset;
-
+            }
             offset -= inc;
         }
-        else
-        {
+        else {
             offset += inc;
             s.InBuffer.CheckFileLimit(offset, s.LineCount * stride);
         }
-
         return offset;
     }
 
@@ -580,18 +572,20 @@ namespace Fv
     void Viewer::DisplayHexLine(CDCHandle dc, CRect const& rc, DisplayState& s, Colors const& c)
     {
         SizeType beg = s.DisplayOffset;
-        if (beg >= s.InBuffer.GetFileSize())
+        if (beg >= s.InBuffer.GetFileSize()) {
             return;
-
+        }
         const int aveSymbolWidth = s.TextMetric.tmAveCharWidth;
 
         WString offsetText;
         wchar_t buffer[32] = {0};
-        ::_snwprintf_s(buffer, _countof(buffer)-1, L"%016x", beg);
+        ::_snwprintf_s(buffer, _countof(buffer)-1, L"%08x%08x",
+            static_cast<UINT>(beg >> 32),
+            static_cast<UINT>(beg & 0xffffffff));
         offsetText = buffer;
 
         SizeType end = s.InBuffer.GetFixedLineEnd(beg, s.HexLineWidth);
-        WString hex = s.InBuffer.GetHexLine(beg, end);
+        WString  hex = s.InBuffer.GetHexLine(beg, end);
         WString text = s.InBuffer.GetTextLine(beg, end, s.CodePage, true);
         s.DisplayOffset = end;
 
