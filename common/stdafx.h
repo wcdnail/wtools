@@ -64,9 +64,17 @@
 #  include <atlctrlw.h>
 #  include <atltheme.h>
 
-// WinUI
+// WinRT/Composition
 #  include <unknwn.h>
 #  include <winrt/base.h>
+#  include <winrt/windows.ui.composition.h>
+#  include <winrt/windows.ui.composition.desktop.h>
+#  include <windows.ui.composition.interop.h>
+#  include <DispatcherQueue.h>
+// Drawing
+#  include <winrt/Windows.Graphics.h>
+#  include <winrt/Windows.Foundation.Collections.h>
+#  include <winrt/Windows.Foundation.Metadata.h>
 #endif
 
 #include <boost/config.hpp>

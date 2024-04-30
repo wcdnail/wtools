@@ -1,12 +1,11 @@
 #include "pch.hxx"
 #include "windows.gui.leaks.h"
+#include "err.printer.h"
 #include "dh.tracing.h"
-#include "crash.report/crash.report.h"
 #include <gtest/gtest.h>
 #include <windows.uses.commoncontrols.h>
-#include <windows.uses.ole.h>
 #include <windows.uses.richedit.h>
-#include <execution>
+#include <exception>
 
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "atls.lib")
@@ -40,7 +39,7 @@ int _tmain(int argc, TCHAR* argv[])
     HINSTANCE hInstance = GetModuleHandleW(nullptr);
 #endif
     try {
-        winrt::init_apartment(winrt::apartment_type::single_threaded);
+        //winrt::init_apartment(winrt::apartment_type::multi_threaded);
 
         Initialize::CommonControls ccontrols(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
         Initialize::RichEdit richedit;
@@ -68,12 +67,10 @@ int _tmain(int argc, TCHAR* argv[])
         return RUN_ALL_TESTS();
     }
     catch (winrt::hresult_error const& ex) {
-        winrt::hstring msg = ex.message();
-        CW2AEX<512> conv(msg.c_str(), 1251);
-        fprintf_s(stderr, "WINRT ERROR! %08x ==> '%s'\n", ex.code().value, conv.m_psz);
+        PrintException("WINRT ERROR", ex);
     }
     catch (std::exception const& ex) {
-        fprintf_s(stderr, "ERROR! '%s'\n", ex.what());
+        PrintException("ERROR", ex);
     }
     return 2;
 }

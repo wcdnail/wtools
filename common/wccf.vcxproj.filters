@@ -139,6 +139,9 @@
     <ClCompile Include="wtl.control.cpp">
       <Filter>wtl.controls</Filter>
     </ClCompile>
+    <ClCompile Include="wtl.compositor\wtl.compositor.cpp">
+      <Filter>wtl.compositor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -448,6 +451,9 @@
     <ClInclude Include="dh.tracing.defs.h">
       <Filter>__</Filter>
     </ClInclude>
+    <ClInclude Include="wtl.compositor\wtl.compositor.h">
+      <Filter>wtl.compositor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">
@@ -479,6 +485,9 @@
     </Filter>
     <Filter Include="wtl.controls\dialogz">
       <UniqueIdentifier>{77ca92a1-13c0-4b75-9634-cc69ff278d5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="wtl.compositor">
+      <UniqueIdentifier>{43c6e3f2-5efa-4930-971b-4a4506d9042c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
