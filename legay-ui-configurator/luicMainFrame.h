@@ -20,6 +20,8 @@ struct CMainFrame: ATL::CDialogImpl<CMainFrame>,
 
 private:
     CLegacyUIConfigurator& m_App;
+    WTL::CTabCtrl          m_Tab;
+    CImageList          m_ImList;
 
     friend class Super;
     friend class Resizer;
@@ -28,15 +30,18 @@ private:
         MSG_WM_INITDIALOG(OnInitDlg)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_COMMAND(OnCommand)
+        MSG_WM_NOTIFY(OnNotify)
         CHAIN_MSG_MAP(Resizer)
     END_MSG_MAP()
 
     BEGIN_DLGRESIZE_MAP(CMainFrame)
-        //DLGRESIZE_CONTROL(CTRL_ID_VIEW, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+        DLGRESIZE_CONTROL(IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y)
+        DLGRESIZE_CONTROL(IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y)
     END_DLGRESIZE_MAP()
 
     int OnInitDlg(HWND, LPARAM);
     void OnDestroy();
+    LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl);
 
     CMainFrame(CMainFrame const&) = delete;

@@ -94,4 +94,7 @@
       <Filter>gen</Filter>
     </Midl>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="resz\legay-ui-configurator.exe.manifest" />
+  </ItemGroup>
 </Project>

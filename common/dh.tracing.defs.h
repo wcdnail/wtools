@@ -2,6 +2,7 @@
 
 #include "dh.tracing.h"
 
+#define LTH_WM_NOTIFY       L"     WM_NOTIFY|"
 #define LTH_WM_COMMAND      L"    WM_COMMAND|"
 #define LTH_DBG_ASSIST      L"    DBG_ASSIST|"
 #define LTH_COLORIZER       L"      Colorize|"

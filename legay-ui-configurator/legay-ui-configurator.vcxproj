@@ -309,6 +309,9 @@
     <Image Include="resz\rom-1.ico" />
     <Image Include="resz\rom-2.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="resz\legay-ui-configurator.exe.manifest" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

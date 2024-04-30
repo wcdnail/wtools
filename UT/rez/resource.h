@@ -17,9 +17,6 @@
 #define IDC_COMBO3                      1004
 #define IDC_APPICON                     1006
 #define IDC_TEXT                        1007
-#define IDC_BUTTON1                     1008
-#define IDC_BUTTON2                     1009
-#define IDC_BUTTON3                     1010
 
 // Next default values for new objects
 // 
