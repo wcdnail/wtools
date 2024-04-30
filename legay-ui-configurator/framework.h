@@ -24,3 +24,5 @@
 #include <atlprint.h>
 #include <atlfind.h>
 #include <atlcrack.h>
+
+#include <winrt/base.h>

@@ -5,6 +5,7 @@
 #include "dh.tracing.defs.h"
 #include "err.printer.h"
 #include "rez/resource.h"
+#include <atluser.h>
 
 struct NormWindow
 {
@@ -75,12 +76,12 @@ inline BOOL MoveToMonitor::MoveAttempt(MONITORINFOEXW const& monInfo) const
         }
     }
     else {
-        CStringW szDev(monInfo.szDevice);
+        ATL::CStringW szDev(monInfo.szDevice);
         int pos = szDev.FindOneOf(L"0123456789");
         if (-1 == pos) {
             return TRUE; 
         }
-        CStringW monNumStr = szDev.Mid(pos);
+        ATL::CStringW monNumStr = szDev.Mid(pos);
         if (monNumStr.IsEmpty()) {
             return TRUE; 
         }

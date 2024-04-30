@@ -1,16 +1,16 @@
 #pragma once
 
-#include "ClAppMainFrame.h"
+#include "luicMainFrame.h"
 #include <atlapp.h>
 
-struct CClassicAppearance: CAppModule
+struct CLegacyUIConfigurator: CAppModule
 {
     using Super = CAppModule;
 
     CMainFrame m_MainFrame;
 
-    ~CClassicAppearance() override;
-    CClassicAppearance();
+    ~CLegacyUIConfigurator() override;
+    CLegacyUIConfigurator();
 
     HRESULT Run(HINSTANCE instHnd, int showCmd);
 

@@ -14,9 +14,9 @@ using  WStrView = std::wstring_view;
 namespace std
 {
     template <typename BaseType, class StringTraits>
-    struct hash<CStringT<BaseType, StringTraits>>
+    struct hash<ATL::CStringT<BaseType, StringTraits>>
     {
-        size_t operator()(const CStringT<BaseType, StringTraits>& _Keyval) const noexcept
+        size_t operator()(const ATL::CStringT<BaseType, StringTraits>& _Keyval) const noexcept
         {
             return (_Hash_array_representation(_Keyval.GetString(), _Keyval.GetLength()));
         }

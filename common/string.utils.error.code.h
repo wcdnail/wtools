@@ -8,7 +8,7 @@ namespace Str
     struct ErrorCode
     {
         using RawStringType = Ct*;
-        using    StringType = CStringT< Ct, StrTraitATL<Ct, ChTraitsCRT<Ct>>> ;
+        using    StringType = ATL::CStringT< Ct, ATL::StrTraitATL<Ct, ATL::ChTraitsCRT<Ct>>> ;
 
         template <class CodeType>
         static StringType SystemMessage(CodeType code)
