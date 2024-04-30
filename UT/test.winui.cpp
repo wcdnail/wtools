@@ -10,7 +10,14 @@ struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg, CWindow>,
     using  Thiz = CTestWinUIDlg;
     using Super = CDialogImpl<CTestWinUIDlg, CWindow>;
 
-    enum { IDD = IDD_EMPTY };
+    enum : LONG
+    {
+        IDD = IDD_EMPTY,
+        DLG_WIDHT = 1200,
+        DLG_HEIGHT = 650,
+    };
+
+    NormWindow m_normal;
 
     BEGIN_MSG_MAP(CAboutDlg)
         COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
@@ -25,8 +32,15 @@ struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg, CWindow>,
 
     LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
     {
-        MakeDlgAppWnd(m_hWnd);
-        PlaceWndToMonitor(m_hWnd, WndMonMover::FirstNotPrimary, PutAt::Center);
+        CRect rcWin;
+        GetWindowRect(rcWin);
+        rcWin.right = rcWin.left + DLG_WIDHT;
+        rcWin.bottom = rcWin.top + DLG_HEIGHT;
+        MoveWindow(rcWin, TRUE);
+
+        m_normal.MakeItNorm(m_hWnd);
+
+        MoveToMonitor{}.Move(m_hWnd, MoveToMonitor::FirstNotPrimary, PutAt::YCenter | PutAt::XCenter);
         return TRUE;
     }
 };

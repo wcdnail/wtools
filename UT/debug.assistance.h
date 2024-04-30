@@ -5,35 +5,49 @@
 #include "err.printer.h"
 #include "rez/resource.h"
 
-static inline void MakeDlgAppWnd(HWND hWnd)
+struct NormWindow
 {
-    HINSTANCE hResInst = GetModuleHandleW(nullptr);
+    static constexpr DWORD   DefaultStyle = WS_OVERLAPPEDWINDOW | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+    static constexpr DWORD DefaultExStyle = WS_EX_APPWINDOW | WS_EX_OVERLAPPEDWINDOW;
 
-    HICON hIcon = LoadIconW(hResInst, MAKEINTRESOURCEW(IDI_WTL_APP));
-    if (hIcon) {
-        HICON    hPrevIcon = reinterpret_cast<HICON>(SendMessageW(hWnd, WM_SETICON, FALSE, reinterpret_cast<LPARAM>(hIcon)));
-        HICON hPrevIconBig = reinterpret_cast<HICON>(SendMessageW(hWnd, WM_SETICON,  TRUE, reinterpret_cast<LPARAM>(hIcon)));
+    CIcon         hIcon;
+    CIcon     hPrevIcon;
+    CIcon  hPrevIconBig;
+    HINSTANCE  hResInst = nullptr;
+    DWORD   dwPrevStyle = 0;
+    DWORD dwPrevExStyle = 0;
+    DWORD       dwStyle = DefaultStyle;
+    DWORD     dwExStyle = DefaultExStyle;
+
+    void MakeItNorm(HWND hWnd);
+};
+
+inline void NormWindow::MakeItNorm(HWND hWnd)
+{
+    if (!hResInst) {
+        hResInst = GetModuleHandleW(nullptr);
     }
-
-    DWORD  style = 0; // GetWindowLongW(hWnd, GWL_STYLE);
-    DWORD estyle = 0; // GetWindowLongW(hWnd, GWL_EXSTYLE);
-
-    estyle |= 0
-           | WS_EX_APPWINDOW
-           | WS_EX_OVERLAPPEDWINDOW;
-
-    style |= 0
-          | WS_OVERLAPPEDWINDOW
-          | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-
-    SetWindowLongW(hWnd, GWL_STYLE, style);
-    SetWindowLongW(hWnd, GWL_EXSTYLE, estyle);
-
-    SetWindowPos(hWnd, HWND_TOP, -1, 0, -1, 0,
-        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+    if (!hIcon) {
+        hIcon = LoadIconW(hResInst, MAKEINTRESOURCEW(IDI_WTL_APP));
+    }
+    if (hIcon) {
+           hPrevIcon = reinterpret_cast<HICON>(SendMessageW(hWnd, WM_SETICON, FALSE, reinterpret_cast<LPARAM>(hIcon.m_hIcon)));
+        hPrevIconBig = reinterpret_cast<HICON>(SendMessageW(hWnd, WM_SETICON,  TRUE, reinterpret_cast<LPARAM>(hIcon.m_hIcon)));
+    }
+      dwPrevStyle = GetWindowLongW(hWnd, GWL_STYLE);
+    dwPrevExStyle = GetWindowLongW(hWnd, GWL_EXSTYLE);
+    if (0 == dwStyle) {
+        dwStyle = NormWindow::DefaultStyle;
+    }
+    if (0 == dwExStyle) {
+        dwExStyle = NormWindow::DefaultExStyle;
+    }
+    SetWindowLongW(hWnd, GWL_STYLE, dwStyle);
+    SetWindowLongW(hWnd, GWL_EXSTYLE, dwExStyle);
+    SetWindowPos(hWnd, HWND_TOP, -1, 0, -1, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 }
 
-struct WndMonMover
+struct MoveToMonitor
 {
     enum : DWORD { FirstNotPrimary = static_cast<DWORD>(-1) };
 
@@ -42,10 +56,14 @@ struct WndMonMover
     unsigned rcHowToPut = PutAt::YCenter | PutAt::Right;
     CRect         rcWnd;
 
+    bool Move(HWND hWnd, DWORD dwDesiredNum = FirstNotPrimary, unsigned rcHowToPut = PutAt::Center);
+
+private:
     BOOL MoveAttempt(MONITORINFOEXW const& monInfo) const;
+    static BOOL EnumeratorProc(HMONITOR hMon, HDC hDC, LPRECT lpRect, MoveToMonitor const* self);
 };
 
-inline BOOL WndMonMover::MoveAttempt(MONITORINFOEXW const& monInfo) const
+inline BOOL MoveToMonitor::MoveAttempt(MONITORINFOEXW const& monInfo) const
 {
     if (!monInfo.szDevice) {
         return TRUE; 
@@ -96,39 +114,27 @@ inline BOOL WndMonMover::MoveAttempt(MONITORINFOEXW const& monInfo) const
     return FALSE;
 }
 
-static inline BOOL CALLBACK EnumPlaceWndToMonitor(HMONITOR hMon, HDC hDC, LPRECT lpRect, WndMonMover const& mover)
+inline BOOL CALLBACK MoveToMonitor::EnumeratorProc(HMONITOR hMon, HDC hDC, LPRECT lpRect, MoveToMonitor const* self)
 {
     MONITORINFOEXW monInfo;
     ZeroMemory(&monInfo, sizeof(monInfo));
     monInfo.cbSize = sizeof(monInfo);
     GetMonitorInfoW(hMon, &monInfo);
     //DebugThreadPrintfc(DH::Category::Module(), L"Enum monitor: '%s'\n", monInfo.szDevice);
-    return mover.MoveAttempt(monInfo);
+    return self->MoveAttempt(monInfo);
 }
 
-static inline bool PlaceWndToMonitor(HWND hWnd, DWORD dwDesiredNum, unsigned rcHowToPut)
+inline bool MoveToMonitor::Move(HWND hWnd, DWORD dwDesiredNum, unsigned rcHowToPut)
 {
-#if 0
-    WINDOWPLACEMENT wplc;
-    ZeroMemory(&wplc, sizeof(wplc));
-    wplc.length = sizeof(wplc);
-    if (!GetWindowPlacement(hWnd, &wplc)) {
-        PrintLastError("Error in 'GetWindowPlacement'");
-        return false;
-    }
-    ;
-    if (!SetWindowPlacement(hWnd, &wplc)) {
-        PrintLastError("Error in 'SetWindowPlacement'");
-        return false;
-    }
-#endif
-    WndMonMover mover;
-    mover.hWnd = hWnd;
-    mover.dwDesiredNum = dwDesiredNum;
-    mover.rcHowToPut = rcHowToPut;
-    GetWindowRect(hWnd, mover.rcWnd);
+    this->hWnd = hWnd;
+    this->dwDesiredNum = dwDesiredNum;
+    this->rcHowToPut = rcHowToPut;
+    GetWindowRect(hWnd, rcWnd);
     const BOOL rv = EnumDisplayMonitors(nullptr, nullptr,
-                                        reinterpret_cast<MONITORENUMPROC>(EnumPlaceWndToMonitor),
-                                        reinterpret_cast<LPARAM>(&mover));
-    return FALSE != rv;
+                                        reinterpret_cast<MONITORENUMPROC>(EnumeratorProc),
+                                        reinterpret_cast<LPARAM>(this));
+    if (rv) {
+        DebugThreadPrintfc(DH::Category::Module(), L"Could not move %08x to desired monitor %d\n", hWnd, dwDesiredNum);
+    }
+    return FALSE == rv;
 }
