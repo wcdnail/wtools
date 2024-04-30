@@ -22,7 +22,7 @@ BOOL CMainFrame::OnInitDlg(HWND, LPARAM)
         SetIcon(raw, TRUE);
     }
 
-    MoveToMonitor{}.Move(m_hWnd);
+    MoveToMonitor{}.Move(m_hWnd, 1);
 
     //DlgResize_Init(false, false);
     return 0;
@@ -30,4 +30,14 @@ BOOL CMainFrame::OnInitDlg(HWND, LPARAM)
 
 void CMainFrame::OnDestroy()
 {
+    PostQuitMessage(0);
+}
+
+void CMainFrame::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
+{
+    switch(nID) {
+    case IDCANCEL:
+        DestroyWindow();
+        break;
+    }
 }

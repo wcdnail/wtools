@@ -27,6 +27,7 @@ private:
     BEGIN_MSG_MAP_EX(CMainFrame)
         MSG_WM_INITDIALOG(OnInitDlg)
         MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_COMMAND(OnCommand)
         CHAIN_MSG_MAP(Resizer)
     END_MSG_MAP()
 
@@ -36,6 +37,7 @@ private:
 
     int OnInitDlg(HWND, LPARAM);
     void OnDestroy();
+    void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl);
 
     CMainFrame(CMainFrame const&) = delete;
     CMainFrame(CMainFrame&&) = delete;
