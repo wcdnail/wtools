@@ -12,6 +12,9 @@
     <Filter Include="from-cf">
       <UniqueIdentifier>{1ad3ba53-ae52-4b00-b85e-dae11bbf6d02}</UniqueIdentifier>
     </Filter>
+    <Filter Include="from-cf\info">
+      <UniqueIdentifier>{3e41e16a-ba56-4e57-91c1-2d6ceb8d0ac9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -35,6 +38,12 @@
     <ClInclude Include="..\common\dh.tracing.h">
       <Filter>from-cf</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\info\runtime.information.h">
+      <Filter>from-cf\info</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\string.utils.format.h">
+      <Filter>from-cf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -50,6 +59,12 @@
       <Filter>from-cf</Filter>
     </ClCompile>
     <ClCompile Include="..\common\dh.tracing.cpp">
+      <Filter>from-cf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\info\runtime.information.cpp">
+      <Filter>from-cf\info</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\string.utils.format.cpp">
       <Filter>from-cf</Filter>
     </ClCompile>
   </ItemGroup>

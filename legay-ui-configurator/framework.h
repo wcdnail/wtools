@@ -26,3 +26,17 @@
 #include <atlcrack.h>
 
 #include <winrt/base.h>
+
+#include <unordered_map>
+#include <filesystem>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <string>
+#include <memory>
+#include <vector>
+#include <mutex>
+#include <list>
+#include <map>
+#include <set>

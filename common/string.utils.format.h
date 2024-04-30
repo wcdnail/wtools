@@ -13,7 +13,7 @@ namespace Str
     template <class C>
     struct Elipsis
     {
-        using String = CStringT<C, StrTraitATL<C, ChTraitsCRT<C>>>;
+        using String = ATL::CStringT<C, ATL::StrTraitATL<C, ATL::ChTraitsCRT<C>>>;
 
         WCDAFX_API static String FormatV(C const* format, va_list ap);
         WCDAFX_API static String Format(C const* format, ...);

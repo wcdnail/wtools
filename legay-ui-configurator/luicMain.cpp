@@ -1,5 +1,7 @@
-#include "pch.h"
+#include "stdafx.h"
 #include "luicMain.h"
+
+#include "dh.tracing.h"
 #include "common/rectz.h"
 #include "common/windows.uses.ole.h"
 #include "common/windows.uses.commoncontrols.h"
@@ -71,6 +73,9 @@ HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
         Initialize::CommonControls cctrls;
         HWND                         hwnd;
         CMessageLoop                 loop;
+
+        DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
+
         hr = Init(nullptr, instHnd);
         if (FAILED(hr)) {
             return hr;

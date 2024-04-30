@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "stdafx.h"
 #include "luicMainFrame.h"
 #include "luicMain.h"
 #include "UT/debug.assistance.h"

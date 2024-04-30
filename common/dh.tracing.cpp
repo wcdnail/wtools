@@ -6,6 +6,7 @@
 #include <atlstr.h>
 #include <filesystem>
 #include <algorithm>
+#include <iostream>
 #include <fstream>
 #include <memory>
 #include <mutex>
@@ -95,8 +96,8 @@ namespace DH
         static LogPath GetLogFilepath(int n);
         static std::string GenLogName();
 
-        void putsMBStr(CStringA&& text) const;
-        void putsWDStr(CStringW&& text) const;
+        void putsMBStr(ATL::CStringA&& text) const;
+        void putsWDStr(ATL::CStringW&& text) const;
 
     public:
         DELETE_COPY_MOVE_OF(LogCtx);
@@ -108,8 +109,8 @@ namespace DH
 
         ScopedLockFree ScopedLock();
 
-        void puts(CStringA&& text);
-        void putws(CStringW&& text);
+        void puts(ATL::CStringA&& text);
+        void putws(ATL::CStringW&& text);
     };
 
     LogCtx& LogCtx::instance()
@@ -194,14 +195,14 @@ namespace DH
         return (nullptr != log_.get()) || (nullptr != stdout_);
     }
 
-    void LogCtx::puts(CStringA&& text)
+    void LogCtx::puts(ATL::CStringA&& text)
     {
         if (this->isLogOpened()) {
             this->putsMBStr(std::move(text));
         }
     }
 
-    void LogCtx::putws(CStringW&& text)
+    void LogCtx::putws(ATL::CStringW&& text)
     {
         if (this->isLogOpened()) {
             this->putsWDStr(std::move(text));
@@ -218,7 +219,7 @@ namespace DH
         }
     }
 
-    void LogCtx::putsMBStr(CStringA&& text) const
+    void LogCtx::putsMBStr(ATL::CStringA&& text) const
     {
         if (stdout_) {
             (*stdout_) << text;
@@ -228,12 +229,12 @@ namespace DH
         }
     }
 
-    void LogCtx::putsWDStr(CStringW&& text) const
+    void LogCtx::putsWDStr(ATL::CStringW&& text) const
     {
         if (!text || !(*text)) {
             return ;
         }
-        CStringA temp;
+        ATL::CStringA temp;
         int     len = text.GetLength() + 1;
         PSTR buffer = temp.GetBufferSetLength(len);
         int    clen = WideCharToMultiByte(LOG_DEF_CODEPAGE, 0, text, len, buffer, len, nullptr, nullptr);
@@ -289,7 +290,7 @@ namespace DH
 #pragma endregion
 #pragma region Tracers
 
-    static void printString(CStringA&& text)
+    static void printString(ATL::CStringA&& text)
     {
         auto logGuard = LogCtx::instance().ScopedLock();
         if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT)) {
@@ -298,7 +299,7 @@ namespace DH
         LogCtx::instance().puts(std::move(text));
     }
 
-    static void printString(CStringW&& text)
+    static void printString(ATL::CStringW&& text)
     {
         auto logGuard = LogCtx::instance().ScopedLock();
         if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT)) {
@@ -406,7 +407,7 @@ namespace DH
         ::memset(Message, 0, _countof(Message)-1);
         va_list ap;
         va_start(ap, format);
-        CStringW temp;
+        ATL::CStringW temp;
         temp.FormatV(format, ap);
         ::wcsncpy_s(Message, temp, std::min<size_t>(static_cast<size_t>(temp.GetLength()), std::size(Message)-1));
         va_end(ap);
