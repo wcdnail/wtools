@@ -67,14 +67,12 @@
     <Image Include="rez\icons\imCompareItemPassed.ico">
       <Filter>res</Filter>
     </Image>
-    <Image Include="icons\wsl.ico">
-      <Filter>res</Filter>
-    </Image>
     <Image Include="rez\icons\wsl.ico">
       <Filter>res</Filter>
     </Image>
-    <Image Include="icons\wtl.ico" />
-    <Image Include="rez\icons\wtl.ico" />
+    <Image Include="rez\icons\wtl.ico">
+      <Filter>res</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="rez\UT.exe.manifest">

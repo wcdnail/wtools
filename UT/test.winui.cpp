@@ -26,7 +26,7 @@ struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg, CWindow>,
     LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
     {
         MakeDlgAppWnd(m_hWnd);
-        PlaceWndToMonitor(m_hWnd);
+        PlaceWndToMonitor(m_hWnd, WndMonMover::FirstNotPrimary, PutAt::Center);
         return TRUE;
     }
 };

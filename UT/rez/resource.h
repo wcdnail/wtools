@@ -5,7 +5,6 @@
 #define IDD_TEST_BASICS_DLG0            101
 #define IDD_TEST_GENERIC                101
 #define IDI_WTL_APP                     103
-#define IDI_WSL                         104
 #define IDI_ALL_FAIL                    105
 #define IDI_ALL_OK                      106
 #define IDD_EMPTY                       127

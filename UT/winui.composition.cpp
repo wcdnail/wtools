@@ -78,11 +78,11 @@ void CompositionHost::AddElement(float size, float x, float y)
         auto visual = m_compositor.CreateSpriteVisual();
 
         auto element = m_compositor.CreateSpriteVisual();
-        uint8_t r = (double)(double)(rand() % 255);
-        uint8_t g = (double)(double)(rand() % 255);
-        uint8_t b = (double)(double)(rand() % 255);
+        double r = static_cast<double>(rand() % 255);
+        double g = static_cast<double>(rand() % 255);
+        double b = static_cast<double>(rand() % 255);
 
-        element.Brush(m_compositor.CreateColorBrush({ 255, r, g, b }));
+        element.Brush(m_compositor.CreateColorBrush({ 255, static_cast<uint8_t>(r), static_cast<uint8_t>(g), static_cast<uint8_t>(b) }));
         element.Size({ size, size });
         element.Offset({ x, y, 0.0f, });
 
