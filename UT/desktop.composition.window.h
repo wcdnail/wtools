@@ -36,15 +36,13 @@ using namespace Windows::UI::Composition::Desktop;
 auto CreateDispatcherQueueController()
 {
     namespace abi = ABI::Windows::System;
-
     DispatcherQueueOptions options
     {
         sizeof(DispatcherQueueOptions),
         DQTYPE_THREAD_CURRENT,
         DQTAT_COM_STA
     };
-
-    Windows::System::DispatcherQueueController controller{ nullptr };
+    Windows::System::DispatcherQueueController controller{nullptr};
     check_hresult(CreateDispatcherQueueController(options, reinterpret_cast<abi::IDispatcherQueueController**>(put_abi(controller))));
     return controller;
 }
@@ -52,20 +50,20 @@ auto CreateDispatcherQueueController()
 template <typename T>
 struct DesktopWindow
 {
-    DesktopWindow() {}
-
-    static T* GetThisFromHandle(HWND const window) noexcept
+    DesktopWindow()
     {
-        return reinterpret_cast<T *>(GetWindowLongPtr(window, GWLP_USERDATA));
     }
 
-    static LRESULT __stdcall WndProc(HWND const window, UINT const message, WPARAM const wparam, LPARAM const lparam) noexcept
+    static T* GetThisFromHandle(const HWND window) noexcept
+    {
+        return reinterpret_cast<T*>(GetWindowLongPtr(window, GWLP_USERDATA));
+    }
+
+    static LRESULT __stdcall WndProc(const HWND window, const UINT message, const WPARAM wparam, const LPARAM lparam) noexcept
     {
         WINRT_ASSERT(window);
-
-        if (WM_NCCREATE == message)
-        {
-            auto cs = reinterpret_cast<CREATESTRUCT *>(lparam);
+        if (WM_NCCREATE == message) {
+            auto cs = reinterpret_cast<CREATESTRUCT*>(lparam);
             T* that = static_cast<T*>(cs->lpCreateParams);
             WINRT_ASSERT(that);
             WINRT_ASSERT(!that->m_window);
@@ -74,11 +72,9 @@ struct DesktopWindow
             EnableNonClientDpiScaling(window);
             m_currentDpi = GetDpiForWindow(window);
         }
-        else if (T* that = GetThisFromHandle(window))
-        {
+        else if (T* that = GetThisFromHandle(window)) {
             return that->MessageHandler(message, wparam, lparam);
         }
-
         return DefWindowProc(window, message, wparam, lparam);
     }
 
@@ -86,62 +82,53 @@ struct DesktopWindow
     static LRESULT HandleDpiChange(HWND hWnd, WPARAM wParam, LPARAM lParam)
     {
         //HWND hWndStatic = GetWindow(hWnd, GW_CHILD);
-        if (hWnd != nullptr)
-        {
+        if (hWnd != nullptr) {
             UINT uDpi = HIWORD(wParam);
-
             // Resize the window.
-            auto lprcNewScale = reinterpret_cast<RECT *>(lParam);
-
+            auto lprcNewScale = reinterpret_cast<RECT*>(lParam);
             SetWindowPos(hWnd, nullptr, lprcNewScale->left, lprcNewScale->top,
-                lprcNewScale->right - lprcNewScale->left,
-                lprcNewScale->bottom - lprcNewScale->top,
-                SWP_NOZORDER | SWP_NOACTIVATE);
-
-            if (T *that = GetThisFromHandle(hWnd))
-            {
+                         lprcNewScale->right - lprcNewScale->left,
+                         lprcNewScale->bottom - lprcNewScale->top,
+                         SWP_NOZORDER | SWP_NOACTIVATE);
+            if (T* that = GetThisFromHandle(hWnd)) {
                 that->NewScale(uDpi);
             }
         }
         return 0;
     }
 
-    LRESULT MessageHandler(UINT const message, WPARAM const wparam, LPARAM const lparam) noexcept
+    LRESULT MessageHandler(const UINT message, const WPARAM wparam, const LPARAM lparam) noexcept
     {
         switch (message) {
-            case WM_DPICHANGED:
-            {
-                return HandleDpiChange(m_window, wparam, lparam);
+        case WM_DPICHANGED: {
+            return HandleDpiChange(m_window, wparam, lparam);
+        }
+        case WM_DESTROY: {
+            PostQuitMessage(0);
+            return 0;
+        }
+        case WM_SIZE: {
+            UINT width = LOWORD(lparam);
+            UINT height = HIWORD(lparam);
+            mCurrentWidth = width;
+            mCurrentHeight = height;
+            if (T* that = GetThisFromHandle(m_window)) {
+                that->DoResize(width, height);
             }
-            
-            case WM_DESTROY: 
-            {
-                PostQuitMessage(0);
-                return 0;
-            }
-            
-            case WM_SIZE: 
-            {
-                UINT width = LOWORD(lparam);
-                UINT height = HIWORD(lparam);
-            
-                mCurrentWidth = width;
-                mCurrentHeight = height;
-                if (T *that = GetThisFromHandle(m_window)) 
-                {
-                    that->DoResize(width, height);
-                }
-            }
+        }
         }
         return DefWindowProc(m_window, message, wparam, lparam);
     }
 
-    void NewScale(UINT dpi) {}
+    void NewScale(UINT dpi)
+    {
+    }
 
-    void DoResize(UINT width, UINT height) {}
+    void DoResize(UINT width, UINT height)
+    {
+    }
 
 protected:
-
     using base_type = DesktopWindow<T>;
     HWND m_window = nullptr;
     inline static UINT m_currentDpi = 0;
@@ -152,7 +139,8 @@ protected:
 // Specialization of DesktopWindow that binds a composition tree to the HWND.
 struct CompositionWindow : DesktopWindow<CompositionWindow>
 {
-    CompositionWindow(std::function<void(const Windows::UI::Composition::Compositor &, const Windows::UI::Composition::Visual &)> func) noexcept : CompositionWindow()
+    CompositionWindow(std::function<void(const Windows::UI::Composition::Compositor&, const Windows::UI::Composition::Visual&)> func) noexcept
+        : CompositionWindow()
     {
         PrepareVisuals(m_compositor);
         func(m_compositor, m_root);
@@ -169,13 +157,11 @@ struct CompositionWindow : DesktopWindow<CompositionWindow>
         wc.lpfnWndProc = WndProc;
         RegisterClass(&wc);
         WINRT_ASSERT(!m_window);
-
         WINRT_VERIFY(CreateWindow(wc.lpszClassName,
             L"Vectors in Win32",
             WS_OVERLAPPEDWINDOW | WS_VISIBLE,
             CW_USEDEFAULT, CW_USEDEFAULT, 850, 874,
             nullptr, nullptr, wc.hInstance, this));
-
         WINRT_ASSERT(m_window);
     }
 
@@ -183,7 +169,7 @@ struct CompositionWindow : DesktopWindow<CompositionWindow>
     {
     }
 
-    LRESULT MessageHandler(UINT const message, WPARAM const wparam, LPARAM const lparam) noexcept
+    LRESULT MessageHandler(const UINT message, const WPARAM wparam, const LPARAM lparam) noexcept
     {
         // Handle messages here...
         return base_type::MessageHandler(message, wparam, lparam);
@@ -192,34 +178,34 @@ struct CompositionWindow : DesktopWindow<CompositionWindow>
     void NewScale(UINT dpi)
     {
         auto scaleFactor = (float)dpi / 100;
-
-        if (m_root != nullptr && scaleFactor > 0)
-        {
-            m_root.Scale({ scaleFactor, scaleFactor, 1.0 });
+        if (m_root != nullptr && scaleFactor > 0) {
+            m_root.Scale({scaleFactor, scaleFactor, 1.0});
         }
     }
 
-    void DoResize(UINT width, UINT height) {
+    void DoResize(UINT width, UINT height)
+    {
         m_currentWidth = width;
         m_currentHeight = height;
     }
 
-    DesktopWindowTarget CreateDesktopWindowTarget(Compositor const& compositor, HWND window)
+    DesktopWindowTarget CreateDesktopWindowTarget(const Compositor& compositor, HWND window)
     {
         namespace abi = ABI::Windows::UI::Composition::Desktop;
-
         auto interop = compositor.as<abi::ICompositorDesktopInterop>();
-        DesktopWindowTarget target{ nullptr };
-        check_hresult(interop->CreateDesktopWindowTarget(window, true, reinterpret_cast<abi::IDesktopWindowTarget**>(put_abi(target))));
+        DesktopWindowTarget target{nullptr};
+        check_hresult(interop->CreateDesktopWindowTarget(window, true,
+                                                         reinterpret_cast<abi::IDesktopWindowTarget**>(winrt::put_abi(target))
+                ));
         return target;
     }
 
-    void PrepareVisuals(Compositor const& compositor)
+    void PrepareVisuals(const Compositor& compositor)
     {
         m_target = CreateDesktopWindowTarget(compositor, m_window);
         m_root = compositor.CreateSpriteVisual();
-        m_root.RelativeSizeAdjustment({ 1.05f, 1.05f });
-        m_root.Brush(compositor.CreateColorBrush({ 0xFF, 0xFF, 0xFF , 0xFF }));
+        m_root.RelativeSizeAdjustment({1.05f, 1.05f});
+        m_root.Brush(compositor.CreateColorBrush({0xFF, 0xFF, 0xFF, 0xFF}));
         m_target.Root(m_root);
     }
 
@@ -228,6 +214,64 @@ private:
     UINT m_currentHeight = 600;
     HWND m_interopWindowHandle = nullptr;
     Compositor m_compositor;
-    DesktopWindowTarget m_target{ nullptr };
-    SpriteVisual m_root{ nullptr };
+    DesktopWindowTarget m_target{nullptr};
+    SpriteVisual m_root{nullptr};
 };
+
+using namespace winrt;
+using namespace Windows::Foundation::Numerics;
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Scenario 1: Construct a simple shape using ShapeVisual.
+///////////////////////////////////////////////////////////////////////////////////////
+
+static void Scenario1SimpleShape(const Compositor & compositor, const ContainerVisual & root)
+{
+    // Create a new ShapeVisual that will contain our drawings.
+    ShapeVisual shape = compositor.CreateShapeVisual();
+    shape.Size({ 400.0f,400.0f });
+
+    // Create a circle geometry and set its radius.
+    auto circleGeometry = compositor.CreateEllipseGeometry();
+    circleGeometry.Radius({ 30.0f, 30.0f });
+
+    // Create a shape object from the geometry and give it a color and offset.
+    auto circleShape = compositor.CreateSpriteShape(circleGeometry);
+    circleShape.FillBrush(compositor.CreateColorBrush(ColorHelper::FromArgb(255, 0, 209, 193)));
+    circleShape.Offset({ 200.0f, 200.0f });
+
+    // Add the circle to our shape visual.
+    shape.Shapes().Append(circleShape);
+
+    // Add to the visual tree.
+    root.Children().InsertAtTop(shape);
+}
+
+static void testThisStuff()
+{
+    init_apartment(apartment_type::single_threaded);
+
+    // Create a dispatcher controller required when using Windows::UI::Composition in Win32.
+    auto controller = CreateDispatcherQueueController();
+
+    // Callback that will build a visual tree containing each sample.
+    auto buildvisualtree =
+        [](const Compositor & compositor, const Visual & root) {
+
+        Scenario1SimpleShape(compositor, root.as<ContainerVisual>());
+        Scenario2SimplePath(compositor, root.as<ContainerVisual>());
+        Scenario3PathMorphImperative(compositor, root.as<ContainerVisual>());
+        Scenario4PlayLottieOutput(compositor, root.as<ContainerVisual>());
+    };
+
+    // Composition Window.
+    CompositionWindow window(buildvisualtree);
+
+    // Win32 MessageLoop
+    MSG message;
+
+    while (GetMessage(&message, nullptr, 0, 0))
+    {
+        DispatchMessage(&message);
+    }
+}

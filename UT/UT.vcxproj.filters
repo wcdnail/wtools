@@ -7,9 +7,6 @@
     <ClCompile Include="pch.cxx">
       <Filter>infrastructure</Filter>
     </ClCompile>
-    <ClCompile Include="UT.entry.cxx">
-      <Filter>infrastructure</Filter>
-    </ClCompile>
     <ClCompile Include="test.dlgz.cpp" />
     <ClCompile Include="test.aero.dlgz.cpp" />
     <ClCompile Include="basic.win.tests.cpp" />
@@ -17,6 +14,7 @@
     <ClCompile Include="winui.composition.cpp">
       <Filter>infrastructure</Filter>
     </ClCompile>
+    <ClCompile Include="UT.entry.cxx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rez\resource.h">

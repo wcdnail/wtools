@@ -40,7 +40,7 @@ int _tmain(int argc, TCHAR* argv[])
     HINSTANCE hInstance = GetModuleHandleW(nullptr);
 #endif
     try {
-        winrt::init_apartment(winrt::apartment_type::multi_threaded);
+        winrt::init_apartment(winrt::apartment_type::single_threaded);
 
         Initialize::CommonControls ccontrols(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
         Initialize::RichEdit richedit;
