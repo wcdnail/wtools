@@ -1,5 +1,7 @@
 #include "pch.hxx"
 #include "dh.tracing.h"
+#include "dh.tracing.defs.h"
+#include "clr.dracula.h"
 #include "err.printer.h"
 #include "debug.assistance.h"
 #include <gtest/gtest.h>
@@ -11,23 +13,17 @@ using DesktopWindowTarget = winrt::Windows::UI::Composition::Desktop::DesktopWin
 
 static void DrawSmthng(Compositor const& compositor, ContainerVisual const& root)
 {
-    // Create a new ShapeVisual that will contain our drawings.
     auto shape = compositor.CreateShapeVisual();
     shape.Size({ 400.0f,400.0f });
+    
+    auto rcGeometry = compositor.CreateRectangleGeometry();
+    rcGeometry.Size({ 500.0f, 500.0f });
 
-    // Create a circle geometry and set its radius.
-    auto circleGeometry = compositor.CreateEllipseGeometry();
-    circleGeometry.Radius({ 30.0f, 30.0f });
+    auto rcShape = compositor.CreateSpriteShape(rcGeometry);
+    rcShape.FillBrush(compositor.CreateColorBrush(UI_CLR_Background));
+    rcShape.Offset({ 100.0f, 100.0f });
 
-    // Create a shape object from the geometry and give it a color and offset.
-    auto circleShape = compositor.CreateSpriteShape(circleGeometry);
-    circleShape.FillBrush(compositor.CreateColorBrush(winrt::Windows::UI::ColorHelper::FromArgb(255, 0, 209, 193)));
-    circleShape.Offset({ 200.0f, 200.0f });
-
-    // Add the circle to our shape visual.
-    shape.Shapes().Append(circleShape);
-
-    // Add to the visual tree.
+    shape.Shapes().Append(rcShape);
     root.Children().InsertAtTop(shape);
 }
 
@@ -39,7 +35,7 @@ struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg, CWindow>,
 
     enum : LONG
     {
-        IDD = IDD_EMPTY,
+        IDD = IDD_STD_CONTROLS,
         DLG_WIDHT = 1200,
         DLG_HEIGHT = 650,
     };
@@ -54,13 +50,14 @@ struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg, CWindow>,
         rcWin.bottom = rcWin.top + DLG_HEIGHT;
         MoveWindow(rcWin, TRUE);
 
+        m_normal.dwExStyle |= WS_EX_COMPOSITED | WS_EX_LAYERED;
         m_normal.MakeItNorm(m_hWnd);
 
-        MoveToMonitor{}.Move(m_hWnd, MoveToMonitor::FirstNotPrimary, PutAt::YCenter | PutAt::XCenter);
+        MoveToMonitor{}.Move(m_hWnd, 3 /*MoveToMonitor::FirstNotPrimary*/, PutAt::YCenter | PutAt::XCenter);
     }
 
     BEGIN_MSG_MAP(CAboutDlg)
-        COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
+        MESSAGE_HANDLER(WM_COMMAND, OnCommand)
         MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
     // Composition --------------------------------------------------
         MESSAGE_HANDLER(WM_DPICHANGED, OnDPIChanged)
@@ -72,19 +69,36 @@ struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg, CWindow>,
         return 0;
     }
 
+    LRESULT OnCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        WORD notifyCode = HIWORD(wParam);
+        WORD      cmdId = LOWORD(wParam);
+        HWND    hCtlWnd = reinterpret_cast<HWND>(lParam);
+        switch (cmdId) {
+        case IDCANCEL:
+            OnCloseCmd(notifyCode, cmdId, hCtlWnd, bHandled);
+            break;
+        default:
+            DebugThreadPrintf(LTH_WM_COMMAND L" Unknown: n:%04d c:%04d w:%08x\n", notifyCode, cmdId, hCtlWnd);
+        }
+        return 0;
+    }    
+
     LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
     {
         PrepareWindow();
         ShowWindow(SW_SHOW);
 
-        EnableNonClientDpiScaling(m_hWnd);
-        m_currentDpi = GetDpiForWindow(m_hWnd);
+        if (1) {
+            EnableNonClientDpiScaling(m_hWnd);
+            m_currentDpi = GetDpiForWindow(m_hWnd);
 
-        PrepareVisuals(m_compositor);
-        OnNewScale(m_currentDpi, nullptr);
+            PrepareVisuals(m_compositor);
+            OnNewScale(m_currentDpi, nullptr);
 
-        auto container = m_root.as<ContainerVisual>();
-        DrawSmthng(m_compositor, container);
+            auto container = m_root.as<ContainerVisual>();
+            DrawSmthng(m_compositor, container);
+        }
         return TRUE;
     }
 

@@ -38,6 +38,7 @@
     <ClInclude Include="debug.assistance.h">
       <Filter>infrastructure</Filter>
     </ClInclude>
+    <ClInclude Include="clr.dracula.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="res">

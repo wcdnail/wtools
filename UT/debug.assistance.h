@@ -2,6 +2,7 @@
 
 #include "rectz.h"
 #include "dh.tracing.h"
+#include "dh.tracing.defs.h"
 #include "err.printer.h"
 #include "rez/resource.h"
 
@@ -107,10 +108,10 @@ inline BOOL MoveToMonitor::MoveAttempt(MONITORINFOEXW const& monInfo) const
         CRect rcNew;
         GetWindowRect(hWnd, rcNew);
         if (rcWin != FromCRect<LONG>(rcNew)) {
-            DebugThreadPrintfc(DH::Category::Module(), L"WARNING: window rect changed!\n");
+            DebugThreadPrintf(LTH_DBG_ASSIST L" WARNING: window rect changed!\n");
         }
     }
-    DebugThreadPrintfc(DH::Category::Module(), L"WND %08x moved to '%s'\n", hWnd, monInfo.szDevice);
+    DebugThreadPrintf(LTH_DBG_ASSIST L" w:%08x moved to '%s'\n", hWnd, monInfo.szDevice);
     return FALSE;
 }
 
@@ -120,7 +121,7 @@ inline BOOL CALLBACK MoveToMonitor::EnumeratorProc(HMONITOR hMon, HDC hDC, LPREC
     ZeroMemory(&monInfo, sizeof(monInfo));
     monInfo.cbSize = sizeof(monInfo);
     GetMonitorInfoW(hMon, &monInfo);
-    //DebugThreadPrintfc(DH::Category::Module(), L"Enum monitor: '%s'\n", monInfo.szDevice);
+    //DebugThreadPrintf(LTH_DBG_ASSIST L" Enum monitor: '%s'\n", monInfo.szDevice);
     return self->MoveAttempt(monInfo);
 }
 
@@ -134,7 +135,7 @@ inline bool MoveToMonitor::Move(HWND hWnd, DWORD dwDesiredNum, unsigned rcHowToP
                                         reinterpret_cast<MONITORENUMPROC>(EnumeratorProc),
                                         reinterpret_cast<LPARAM>(this));
     if (rv) {
-        DebugThreadPrintfc(DH::Category::Module(), L"Could not move %08x to desired monitor %d\n", hWnd, dwDesiredNum);
+        DebugThreadPrintf(LTH_DBG_ASSIST L" Could not move w:%08x to desired monitor %d\n", hWnd, dwDesiredNum);
     }
     return FALSE == rv;
 }

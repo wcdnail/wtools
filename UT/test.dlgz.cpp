@@ -1,6 +1,7 @@
 #include "pch.hxx"
 #include "dh.tracing.h"
 #include "err.printer.h"
+#include "clr.dracula.h"
 #include "wtl.control.h"
 #include "rez/resource.h"
 #include "dev.assistance/dev.assist.h"
@@ -11,22 +12,6 @@
 struct TestDialogs: ::testing::Test
 {
 };
-
-//
-// https://github.com/dracula/dracula-theme
-//
-static constexpr COLORREF CLR_Background  = RGB( 40,  42,  54); // #282a36
-static constexpr COLORREF CLR_CurrentLine = RGB( 68,  71,  90); // #44475a
-static constexpr COLORREF CLR_Selection   = RGB( 68,  71,  90); // #44475a
-static constexpr COLORREF CLR_Foreground  = RGB(248, 248, 242); // #f8f8f2
-static constexpr COLORREF CLR_Comment     = RGB( 98, 114, 164); // #6272a4
-static constexpr COLORREF CLR_Cyan        = RGB(139, 233, 253); // #8be9fd
-static constexpr COLORREF CLR_Green       = RGB( 80, 250, 123); // #50fa7b
-static constexpr COLORREF CLR_Orange      = RGB(255, 184, 108); // #ffb86c
-static constexpr COLORREF CLR_Pink        = RGB(255, 121, 198); // #ff79c6
-static constexpr COLORREF CLR_Purple      = RGB(189, 147, 249); // #bd93f9
-static constexpr COLORREF CLR_Red         = RGB(255,  85,  85); // #ff5555
-static constexpr COLORREF CLR_Yellow      = RGB(241, 250, 140); // #f1fa8c
 
 static constexpr COLORREF WND_BK_COLOR    = CLR_Background;
 static constexpr COLORREF WND_TXT_COLOR   = CLR_Foreground;

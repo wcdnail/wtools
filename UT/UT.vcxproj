@@ -44,6 +44,7 @@
     <ClCompile Include="winui.composition.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="clr.dracula.h" />
     <ClInclude Include="debug.assistance.h" />
     <ClInclude Include="desktop.composition.window.h" />
     <ClInclude Include="err.printer.h" />
