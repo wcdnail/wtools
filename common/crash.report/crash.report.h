@@ -33,7 +33,7 @@ void crash_report(char const* reason
 #ifdef _WIN32
 #include <atlstr.h>
 #include <atlconv.h>
-#include "../string.hp.h"
+#include "strint.h"
 
 #define CRASH_REPORT_UTF8(Reason, Code)                                   \
     do {                                                                  \

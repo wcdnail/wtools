@@ -108,7 +108,7 @@ TEST_F(TestBasics, Dialogs)
     //Rect rc(10, 10, 800, 600);
     TestBasicDlg dlg;
     if (!dlg.ShowModal(hUT)) {
-        PrintLastError();
+        PrintLastError("Error in 'TestBasicDlg::ShowModal'");
         ASSERT_TRUE(false);
     }
     DH::ThreadPrintf(L"DLG result: %d\n", dlg.Result().Code);

@@ -31,7 +31,7 @@
 #  define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS
 #  define ATL_NO_ASSERT_ON_DESTROY_NONEXISTENT_WINDOW
    
-#  include "cf.windef.target.h"
+#  include "targetver.h"
    
 #  include <windows.h>
 #  include <windowsx.h>
@@ -61,6 +61,12 @@
 #  include <atlgdi.h>
 #  include <atluser.h>
 #  include <atlctrlx.h>
+#  include <atlctrlw.h>
+#  include <atltheme.h>
+
+// WinUI
+#  include <unknwn.h>
+#  include <winrt/base.h>
 #endif
 
 #include <boost/config.hpp>

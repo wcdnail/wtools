@@ -63,6 +63,23 @@
 #  include <atlctrlx.h>
 #  include <atlctrlw.h>
 #  include <atltheme.h>
+
+// WinUI/UCRT
+#  include <unknwn.h>
+#  include <winrt/base.h>
+#  include <windows.ui.composition.interop.h>
+#  include <ShellScalingAPI.h>
+#  include <DispatcherQueue.h>
+#  include <Windows.Graphics.Interop.h>
+#  include <winrt/Windows.System.h>
+#  include <winrt/Windows.UI.Composition.Desktop.h>
+#  include <winrt/Windows.Foundation.Collections.h>
+#  include <winrt/Windows.Foundation.Metadata.h>
+#  include <winrt/Windows.Graphics.h>
+#  include <d2d1.h>
+#  include <d2d1_1.h>
+#  include <d2d1helper.h>
+
 #endif
 
 #include <boost/config.hpp>

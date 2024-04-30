@@ -53,6 +53,6 @@ TEST_F(TestAeroDialogs, Customizabe)
     CTestAeroDlg dlg;
     auto rv = dlg.DoModal();
     if (rv <= 0) {
-        PrintLastError();
+        PrintLastError("Error in 'CTestAeroDlg::DoModal'");
     }
 }

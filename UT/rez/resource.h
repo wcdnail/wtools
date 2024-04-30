@@ -4,9 +4,11 @@
 //
 #define IDD_TEST_BASICS_DLG0            101
 #define IDD_TEST_GENERIC                101
-#define IDI_WTL                         103
-#define IDI_ALL_FAIL                    104
-#define IDI_ALL_OK                      105
+#define IDI_WTL_APP                     103
+#define IDI_WSL                         104
+#define IDI_ALL_FAIL                    105
+#define IDI_ALL_OK                      106
+#define IDD_EMPTY                       127
 #define IDC_TREE1                       1001
 #define IDC_COMBO1                      1002
 #define IDB_TEST                        1003
@@ -19,7 +21,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        106
+#define _APS_NEXT_RESOURCE_VALUE        200
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1009
 #define _APS_NEXT_SYMED_VALUE           101

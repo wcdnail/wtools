@@ -379,6 +379,6 @@ TEST_F(TestDialogs, Customizabe)
     CTestDlg dlg;
     auto rv = dlg.DoModal();
     if (rv <= 0) {
-        PrintLastError();
+        PrintLastError("Error in 'CTestDlg::DoModal'");
     }
 }

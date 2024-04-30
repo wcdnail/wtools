@@ -13,6 +13,10 @@
     <ClCompile Include="test.dlgz.cpp" />
     <ClCompile Include="test.aero.dlgz.cpp" />
     <ClCompile Include="basic.win.tests.cpp" />
+    <ClCompile Include="test.winui.cpp" />
+    <ClCompile Include="winui.composition.cpp">
+      <Filter>infrastructure</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rez\resource.h">
@@ -25,6 +29,15 @@
       <Filter>infrastructure</Filter>
     </ClInclude>
     <ClInclude Include="wtl.aero.h">
+      <Filter>infrastructure</Filter>
+    </ClInclude>
+    <ClInclude Include="winui.composition.h">
+      <Filter>infrastructure</Filter>
+    </ClInclude>
+    <ClInclude Include="desktop.composition.window.h">
+      <Filter>infrastructure</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.assistance.h">
       <Filter>infrastructure</Filter>
     </ClInclude>
   </ItemGroup>
@@ -60,5 +73,12 @@
     <Image Include="rez\icons\wsl.ico">
       <Filter>res</Filter>
     </Image>
+    <Image Include="icons\wtl.ico" />
+    <Image Include="rez\icons\wtl.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="rez\UT.exe.manifest">
+      <Filter>res</Filter>
+    </Manifest>
   </ItemGroup>
 </Project>
