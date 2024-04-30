@@ -1,5 +1,6 @@
 #pragma once
 
+#include "luicColors.h"
 #include "resz/resource.h"
 #include <atlwin.h>
 #include <atlframe.h>
@@ -15,13 +16,15 @@ struct CMainFrame: ATL::CDialogImpl<CMainFrame>,
     using   Super = ATL::CDialogImpl<CMainFrame>;
     using Resizer = WTL::CDialogResize<CMainFrame>;
 
+    ~CMainFrame() override;
     CMainFrame(CLegacyUIConfigurator& app);
-    ~CMainFrame();
 
 private:
     CLegacyUIConfigurator& m_App;
     WTL::CTabCtrl          m_Tab;
     CImageList          m_ImList;
+    CColorsPage         m_Colors;
+    HWND                 m_Pages[3];
 
     friend class Super;
     friend class Resizer;
@@ -37,6 +40,7 @@ private:
     BEGIN_DLGRESIZE_MAP(CMainFrame)
         DLGRESIZE_CONTROL(IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y)
         DLGRESIZE_CONTROL(IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+      //DLGRESIZE_CONTROL(IDD_PAGE_COLORS, DLSZ_SIZE_X | DLSZ_SIZE_Y)
     END_DLGRESIZE_MAP()
 
     int OnInitDlg(HWND, LPARAM);

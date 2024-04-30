@@ -240,6 +240,7 @@
     <ClInclude Include="..\common\rectz.h" />
     <ClInclude Include="..\common\string.utils.format.h" />
     <ClInclude Include="idl\legay-ui-configurator_i.h" />
+    <ClInclude Include="luicColors.h" />
     <ClInclude Include="luicMain.h" />
     <ClInclude Include="luicMainFrame.h" />
     <ClInclude Include="framework.h" />
@@ -259,6 +260,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\common\string.utils.format.cpp" />
+    <ClCompile Include="luicColors.cpp" />
     <ClCompile Include="luicMain.cpp" />
     <ClCompile Include="idl\legay-ui-configurator_i.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>

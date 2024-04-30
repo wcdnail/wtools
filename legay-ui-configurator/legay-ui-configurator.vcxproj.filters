@@ -44,6 +44,7 @@
     <ClInclude Include="..\common\string.utils.format.h">
       <Filter>from-cf</Filter>
     </ClInclude>
+    <ClInclude Include="luicColors.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -67,6 +68,7 @@
     <ClCompile Include="..\common\string.utils.format.cpp">
       <Filter>from-cf</Filter>
     </ClCompile>
+    <ClCompile Include="luicColors.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resz\legay-ui-configurator.rc">
