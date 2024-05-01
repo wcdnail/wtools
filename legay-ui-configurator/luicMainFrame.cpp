@@ -186,6 +186,9 @@ CPageImplPtr const& CMainFrame::PagesGetCurrent() const
 
 void CMainFrame::PagesResizingNotify()
 {
+    if (!m_Tab.m_hWnd) {
+        return ;
+    }
     PagesGetRect();
     for (const auto& it: m_PagesMap) {
         it.second->MoveWindow(m_rcTabClient, FALSE);

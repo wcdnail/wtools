@@ -111,6 +111,8 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="resz\legay-ui-configurator.exe.manifest" />
+    <Manifest Include="resz\legay-ui-configurator.exe.manifest">
+      <Filter>res</Filter>
+    </Manifest>
   </ItemGroup>
 </Project>
