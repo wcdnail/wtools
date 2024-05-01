@@ -27,6 +27,13 @@
 #define IDC_TEST_STA5                   211
 #define IDD_PAGE_SETTINGS               211
 #define IDC_TEST_STA6                   212
+#define IDC_STA_SCHEME                  213
+#define IDC_CMB_SCHEME                  214
+#define IDC_STA_ITEM                    215
+#define IDC_CMB_ITEM                    216
+#define IDC_STA_FONT                    217
+#define IDC_CMB_SCHEME2                 218
+#define IDC_CMB_FONT                    218
 
 // Next default values for new objects
 // 
@@ -34,7 +41,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        208
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         213
+#define _APS_NEXT_CONTROL_VALUE         215
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

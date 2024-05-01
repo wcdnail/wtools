@@ -15,6 +15,9 @@
     <Filter Include="from-cf\info">
       <UniqueIdentifier>{3e41e16a-ba56-4e57-91c1-2d6ceb8d0ac9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="pages">
+      <UniqueIdentifier>{21646ebd-fcab-4087-8363-f5709637b93e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -44,14 +47,28 @@
     <ClInclude Include="..\common\string.utils.format.h">
       <Filter>from-cf</Filter>
     </ClInclude>
-    <ClInclude Include="luicAppearance.h" />
-    <ClInclude Include="luicBackground.h" />
-    <ClInclude Include="luicEffects.h" />
-    <ClInclude Include="luicPageDlgTemplate.h" />
-    <ClInclude Include="luicScreenSaver.h" />
-    <ClInclude Include="luicSettings.h" />
-    <ClInclude Include="luicWeb.h" />
     <ClInclude Include="luicPageImpl.h" />
+    <ClInclude Include="luicAppearance.h">
+      <Filter>pages</Filter>
+    </ClInclude>
+    <ClInclude Include="luicBackground.h">
+      <Filter>pages</Filter>
+    </ClInclude>
+    <ClInclude Include="luicEffects.h">
+      <Filter>pages</Filter>
+    </ClInclude>
+    <ClInclude Include="luicPageDlgTemplate.h">
+      <Filter>pages</Filter>
+    </ClInclude>
+    <ClInclude Include="luicScreenSaver.h">
+      <Filter>pages</Filter>
+    </ClInclude>
+    <ClInclude Include="luicSettings.h">
+      <Filter>pages</Filter>
+    </ClInclude>
+    <ClInclude Include="luicWeb.h">
+      <Filter>pages</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -75,14 +92,28 @@
     <ClCompile Include="..\common\string.utils.format.cpp">
       <Filter>from-cf</Filter>
     </ClCompile>
-    <ClCompile Include="luicAppearance.cpp" />
-    <ClCompile Include="luicBackground.cpp" />
-    <ClCompile Include="luicEffects.cpp" />
-    <ClCompile Include="luicPageDlgTemplate.cpp" />
-    <ClCompile Include="luicScreenSaver.cpp" />
-    <ClCompile Include="luicSettings.cpp" />
-    <ClCompile Include="luicWeb.cpp" />
     <ClCompile Include="luicPageImpl.cpp" />
+    <ClCompile Include="luicAppearance.cpp">
+      <Filter>pages</Filter>
+    </ClCompile>
+    <ClCompile Include="luicBackground.cpp">
+      <Filter>pages</Filter>
+    </ClCompile>
+    <ClCompile Include="luicEffects.cpp">
+      <Filter>pages</Filter>
+    </ClCompile>
+    <ClCompile Include="luicPageDlgTemplate.cpp">
+      <Filter>pages</Filter>
+    </ClCompile>
+    <ClCompile Include="luicScreenSaver.cpp">
+      <Filter>pages</Filter>
+    </ClCompile>
+    <ClCompile Include="luicSettings.cpp">
+      <Filter>pages</Filter>
+    </ClCompile>
+    <ClCompile Include="luicWeb.cpp">
+      <Filter>pages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resz\legay-ui-configurator.rc">
