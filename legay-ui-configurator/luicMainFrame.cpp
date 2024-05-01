@@ -41,18 +41,6 @@ CMainFrame::CMainFrame(CLegacyUIConfigurator& app)
 {
 }
 
-static void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMessageBox = false, UINT mbType = MB_ICONERROR)
-{
-    ATL::CStringW msg = Str::ErrorCode<wchar_t>::SystemMessage(code);
-    DH::ThreadPrintfc(DH::Category::Module(), L"%s %s\n", caption.GetString(), msg.GetString());
-
-    if (showMessageBox) {
-        ATL::CStringW userMsg;
-        userMsg.Format(L"%s\r\n%s\r\n", caption.GetString(), msg.GetString());
-        MessageBoxW(nullptr, userMsg.GetString(), L"ERROR", mbType);
-    }
-}
-
 void CMainFrame::ImListCreate()
 {
     enum : int
@@ -84,19 +72,18 @@ void CMainFrame::ImListCreate()
     }
 }
 
-void CMainFrame::PagesGetRect(int tabNum)
+void CMainFrame::PagesGetRect()
 {
-#if !defined(_DEBUG_TAB_RECT)
-    if (!m_rcTabClient.IsRectEmpty()) {
-        return;
-    }
-#endif
     CRect rcTab;
-    CRect rcMy;
-    GetWindowRect(rcMy);
-    m_Tab.GetWindowRect(rcTab);
-    OffsetRect(rcTab, -rcMy.left, -rcMy.top);
-
+    if (0) { // ##FIXME: is m_Tab owns page ?
+        CRect rcMy;
+        GetWindowRect(rcMy);
+        m_Tab.GetWindowRect(rcTab);
+        OffsetRect(rcTab, -rcMy.left, -rcMy.top);
+    }
+    else {
+        m_Tab.GetClientRect(rcTab);
+    }
     m_rcTabClient = rcTab;
 #if !defined(_DEBUG_TAB_RECT)
     TabCtrl_AdjustRect(m_Tab.m_hWnd, FALSE, m_rcTabClient);
@@ -144,7 +131,7 @@ void CMainFrame::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr
     HRESULT code = S_FALSE;
     int  tabIcon = desiredIndex;
     UINT tabMask = TCIF_TEXT;
-    if (tabIcon < m_ImList.GetImageCount()) {
+    if (0 && tabIcon < m_ImList.GetImageCount()) { // ##FIXME: tab control has icons?
         tabIcon = desiredIndex;
         tabMask |= TCIF_IMAGE;
     }
@@ -163,31 +150,76 @@ void CMainFrame::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr
                     code, true, MB_ICONSTOP);
         return ;
     }
-    if (!pagePtr->Create(m_hWnd)) {
+    if (!pagePtr->Create(m_Tab.m_hWnd)) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", str.GetString()), code, true, MB_ICONERROR);
         return ;
     }
-    PagesGetRect(number);
+    if (m_rcTabClient.IsRectEmpty()) {
+        PagesGetRect();
+    }
     pagePtr->MoveWindow(m_rcTabClient, FALSE);
     m_PagesMap[number] = std::move(pagePtr);
+}
+
+void CMainFrame::PagesShow(int numba, bool show)
+{
+    const auto& it = m_PagesMap.find(numba);
+    if (it == m_PagesMap.cend()) {
+        DH::ThreadPrintfc(DH::Category::Module(), L"Page %d does not EXIST!\n", numba);
+        return ;
+    }
+    it->second->ShowWindow(show ? SW_SHOW : SW_HIDE);
+}
+
+CPageImplPtr const& CMainFrame::PagesGetCurrent() const
+{
+    int numba = m_Tab.GetCurSel();
+    const auto& it = m_PagesMap.find(numba);
+    if (it == m_PagesMap.cend()) {
+        static const CPageImplPtr dmyPtr;
+        return dmyPtr;
+    }
+    return it->second;
+}
+
+void CMainFrame::PagesResizingNotify()
+{
+    PagesGetRect();
+    for (const auto& it: m_PagesMap) {
+        it.second->MoveWindow(m_rcTabClient, FALSE);
+    }
 }
 
 BOOL CMainFrame::OnInitDlg(HWND, LPARAM)
 {
     ModifyStyle(0, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX, SWP_FRAMECHANGED);
+
+#if defined(_DEBUG_TAB_RECT)
     MoveToMonitor{}.Move(m_hWnd, 3);
     ShowWindow(SW_SHOW);
+#endif
 
     ImListCreate();
     PagesCreate();
+
+    m_Tab.SetCurSel(PageBackground);
+    PagesShow(PageBackground, true);
 
     HICON tempIco = m_ImList.GetIcon(IconMain);
     SetIcon(tempIco, FALSE);
     SetIcon(tempIco, TRUE);
 
+    m_ResizeArr.Add(_AtlDlgResizeMap{ IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y });
+    m_ResizeArr.Add(_AtlDlgResizeMap{ IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y });
+    m_ResizeArr.Add(_AtlDlgResizeMap{ -1, 0 });
     DlgResize_Init(true, true);
     return TRUE;
+}
+
+WTL::_AtlDlgResizeMap const* CMainFrame::GetDlgResizeMap() const
+{
+    return m_ResizeArr.GetData();
 }
 
 void CMainFrame::OnDestroy()
@@ -199,19 +231,13 @@ LRESULT CMainFrame::OnNotify(int idCtrl, LPNMHDR pnmh)
 {
     switch (pnmh->code) {
     case TCN_SELCHANGE: {
-        int n = TabCtrl_GetCurSel(pnmh->hwndFrom);
-        //if (m_PagesMap[n]) {
-            //::ShowWindow(m_PagesMap[n], SW_SHOW);
-        //}
-        DebugThreadPrintf(LTH_WM_NOTIFY L"   TCN_SELCHANGE: c:%4d n:%d\n", idCtrl, n);
+        int numba = TabCtrl_GetCurSel(pnmh->hwndFrom);
+        PagesShow(numba, true);
         break;
     }
     case TCN_SELCHANGING: {
-        int n = TabCtrl_GetCurSel(pnmh->hwndFrom);
-        //if (m_PagesMap[n]) {
-            //::ShowWindow(m_PagesMap[n], SW_HIDE);
-        //}
-        DebugThreadPrintf(LTH_WM_NOTIFY L" TCN_SELCHANGING: c:%4d n:%d\n", idCtrl, n);
+        int numba = TabCtrl_GetCurSel(pnmh->hwndFrom);
+        PagesShow(numba, false);
         break;
     }
     default:

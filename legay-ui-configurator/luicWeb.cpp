@@ -14,5 +14,6 @@ CPageWeb::CPageWeb()
 
 BOOL CPageWeb::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
+    DlgResizeAdd(IDC_TEST_STA5, DLSZ_SIZE_X | DLSZ_SIZE_Y);
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }

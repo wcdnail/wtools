@@ -5,6 +5,18 @@
 #include "common/windows.uses.ole.h"
 #include "common/windows.uses.commoncontrols.h"
 
+void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMessageBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
+{
+    ATL::CStringW msg = Str::ErrorCode<wchar_t>::SystemMessage(code);
+    DH::ThreadPrintfc(DH::Category::Module(), L"%s %s\n", caption.GetString(), msg.GetString());
+
+    if (showMessageBox) {
+        ATL::CStringW userMsg;
+        userMsg.Format(L"%s\r\n%s\r\n", caption.GetString(), msg.GetString());
+        MessageBoxW(nullptr, userMsg.GetString(), L"ERROR", mbType);
+    }
+}
+
 #if 0
 #include "ClAppearance_i.h"
 #include <atlbase.h>
@@ -47,29 +59,6 @@ extern "C"
 int WINAPI _tWinMain(HINSTANCE instHnd, HINSTANCE, LPTSTR, int showCmd)
 {
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
-#if 0
-    {
-        struct Base: ATL::CStringW
-        {
-            Base(ATL::CStringW&& rhs): ATL::CStringW(rhs) {}
-        };
-        struct Derived: Base
-        {
-            Derived(ATL::CStringW&& rhs): Base(std::move(rhs)) {}
-        };
-        using TestMapVal = std::unique_ptr<Base>;
-        using    TestMap = std::map<int, TestMapVal>;
-        TestMap testMap;
-        for (int i=0; i<10; i++) {
-            auto ptr = std::make_unique<Derived>(Str::ElipsisW::Format(L"Trololo #%d", i));
-            testMap[i] = std::move(ptr);
-        }
-        for (const auto& it: testMap) {
-            DebugThreadPrintf(L"    >>>> %s\n", it.second->GetString());
-        }
-        return 0;
-    }
-#endif
     CLegacyUIConfigurator app;
     HRESULT hr = app.Run(instHnd, showCmd);
     return static_cast<int>(hr);
@@ -99,15 +88,18 @@ HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
 
         hr = Init(nullptr, instHnd);
         if (FAILED(hr)) {
+            ReportError(L"Initialization failure!", hr, true);
             return hr;
         }
         if (!AddMessageLoop(&loop)) {
-            hr = ::GetLastError();
+            hr = GetLastError();
+            ReportError(L"MessageLoop append failure!", hr, true);
             return hr;
         }
         hwnd = m_MainFrame.Create(::GetActiveWindow());
         if (!hwnd) {
             hr = ::GetLastError();
+            ReportError(L"MainFrame creation failure!", hr, true);
             return hr;
         }
         ATLTRACE2(atlTraceUI, 0, _T("All OK, launch main window [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));

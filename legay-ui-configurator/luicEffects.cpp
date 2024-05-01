@@ -14,5 +14,6 @@ CPageEffects::CPageEffects()
 
 BOOL CPageEffects::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
+    DlgResizeAdd(IDC_TEST_STA4, DLSZ_SIZE_X | DLSZ_SIZE_Y);
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }

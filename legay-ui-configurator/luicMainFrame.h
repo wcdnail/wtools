@@ -14,9 +14,10 @@ struct CMainFrame: ATL::CDialogImpl<CMainFrame>,
 {
     enum : int { IDD = IDD_LEGACY_UI_CONF_TOOL };
 
-    using    Super = ATL::CDialogImpl<CMainFrame>;
-    using  Resizer = WTL::CDialogResize<CMainFrame>;
-    using PagesMap = std::map<int, CPageImplPtr>;
+    using     Super = ATL::CDialogImpl<CMainFrame>;
+    using   Resizer = WTL::CDialogResize<CMainFrame>;
+    using  PagesMap = std::map<int, CPageImplPtr>;
+    using ResizeArr = ATL::CSimpleArray<WTL::_AtlDlgResizeMap>;
 
     ~CMainFrame() override;
     CMainFrame(CLegacyUIConfigurator& app);
@@ -27,11 +28,15 @@ private:
     CImageList          m_ImList;
     PagesMap          m_PagesMap;
     CRect          m_rcTabClient;
+    ResizeArr        m_ResizeArr;
 
     void ImListCreate();
-    void PagesGetRect(int tabNum);
+    void PagesGetRect();
     void PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&& pagePtr);
     void PagesCreate();
+    void PagesShow(int numba, bool show);
+    CPageImplPtr const& PagesGetCurrent() const;
+    void PagesResizingNotify();
 
     friend class Super;
     friend class Resizer;
@@ -41,14 +46,13 @@ private:
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_NOTIFY(OnNotify)
-        CHAIN_MSG_MAP(Resizer)
+        if (Resizer::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
+            PagesResizingNotify();
+            return TRUE;
+        }
     END_MSG_MAP()
 
-    BEGIN_DLGRESIZE_MAP(CMainFrame)
-        DLGRESIZE_CONTROL(IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y)
-        DLGRESIZE_CONTROL(IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-      //DLGRESIZE_CONTROL(IDD_PAGE_COLORS, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-    END_DLGRESIZE_MAP()
+    WTL::_AtlDlgResizeMap const* GetDlgResizeMap() const;
 
     int OnInitDlg(HWND, LPARAM);
     void OnDestroy();

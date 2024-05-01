@@ -14,5 +14,6 @@ CPageBackground::CPageBackground()
 
 BOOL CPageBackground::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
+    DlgResizeAdd(IDC_TEST_STA2, DLSZ_SIZE_X | DLSZ_SIZE_Y);
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }
