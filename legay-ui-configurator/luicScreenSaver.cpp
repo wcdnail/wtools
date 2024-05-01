@@ -1,17 +1,18 @@
 #include "stdafx.h"
 #include "luicScreenSaver.h"
 #include "UT/debug.assistance.h"
+#include "resz/resource.h"
 
 CPageScreenSaver::~CPageScreenSaver()
 {
 }
 
 CPageScreenSaver::CPageScreenSaver()
+    : CPageImpl(IDD_PAGE_SCREENSAVER)
 {
 }
 
-BOOL CPageScreenSaver::OnInitDlg(HWND, LPARAM)
+BOOL CPageScreenSaver::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-    DlgResize_Init(false, false);
-    return TRUE;
+    return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }

@@ -1,17 +1,18 @@
 #include "stdafx.h"
 #include "luicEffects.h"
 #include "UT/debug.assistance.h"
+#include "resz/resource.h"
 
 CPageEffects::~CPageEffects()
 {
 }
 
 CPageEffects::CPageEffects()
+    : CPageImpl(IDD_PAGE_EFFECTS)
 {
 }
 
-BOOL CPageEffects::OnInitDlg(HWND, LPARAM)
+BOOL CPageEffects::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-    DlgResize_Init(false, false);
-    return TRUE;
+    return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }

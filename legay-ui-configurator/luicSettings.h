@@ -1,7 +1,6 @@
 #pragma once
 
 #include "luicPageImpl.h"
-#include "resz/resource.h"
 
 struct CPageSettings: CPageImpl
 {

@@ -9,10 +9,10 @@ struct CPageImpl;
 
 using  CPageImplPtr = std::unique_ptr<CPageImpl>;
 
-struct CPageImpl: ATL::CDialogImpl<CPageImpl, CPageImpl>,
+struct CPageImpl: ATL::CDialogImpl<CPageImpl>,
                   WTL::CDialogResize<CPageImpl>
 {
-    using   Super = ATL::CDialogImpl<CPageImpl, CPageImpl>;
+    using   Super = ATL::CDialogImpl<CPageImpl>;
     using Resizer = WTL::CDialogResize<CPageImpl>;
 
     ~CPageImpl() override;

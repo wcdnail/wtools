@@ -1,17 +1,18 @@
 #include "stdafx.h"
 #include "luicWeb.h"
 #include "UT/debug.assistance.h"
+#include "resz/resource.h"
 
 CPageWeb::~CPageWeb()
 {
 }
 
 CPageWeb::CPageWeb()
+    : CPageImpl(IDD_PAGE_WEB)
 {
 }
 
-BOOL CPageWeb::OnInitDlg(HWND, LPARAM)
+BOOL CPageWeb::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-    DlgResize_Init(false, false);
-    return TRUE;
+    return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }
