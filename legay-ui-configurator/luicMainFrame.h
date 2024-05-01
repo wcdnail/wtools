@@ -25,10 +25,11 @@ private:
     CLegacyUIConfigurator& m_App;
     WTL::CTabCtrl          m_Tab;
     CImageList          m_ImList;
-    PagesMap             m_Pages;
+    PagesMap          m_PagesMap;
 
     void ImListCreate();
-    void PagesAppend(ATL::CStringW&& str, CPageImplPtr&& pagePtr);
+    void PagesGetRect(int n, CRect& rcTab);
+    void PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&& pagePtr);
     void PagesCreate();
 
     friend class Super;

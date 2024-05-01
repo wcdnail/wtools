@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "luicMain.h"
-
 #include "dh.tracing.h"
-#include "common/rectz.h"
+#include "string.utils.format.h"
 #include "common/windows.uses.ole.h"
 #include "common/windows.uses.commoncontrols.h"
 
@@ -47,6 +46,30 @@ return _AtlModule.WinMain(showCmd);
 extern "C"
 int WINAPI _tWinMain(HINSTANCE instHnd, HINSTANCE, LPTSTR, int showCmd)
 {
+    DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
+#if 0
+    {
+        struct Base: ATL::CStringW
+        {
+            Base(ATL::CStringW&& rhs): ATL::CStringW(rhs) {}
+        };
+        struct Derived: Base
+        {
+            Derived(ATL::CStringW&& rhs): Base(std::move(rhs)) {}
+        };
+        using TestMapVal = std::unique_ptr<Base>;
+        using    TestMap = std::map<int, TestMapVal>;
+        TestMap testMap;
+        for (int i=0; i<10; i++) {
+            auto ptr = std::make_unique<Derived>(Str::ElipsisW::Format(L"Trololo #%d", i));
+            testMap[i] = std::move(ptr);
+        }
+        for (const auto& it: testMap) {
+            DebugThreadPrintf(L"    >>>> %s\n", it.second->GetString());
+        }
+        return 0;
+    }
+#endif
     CLegacyUIConfigurator app;
     HRESULT hr = app.Run(instHnd, showCmd);
     return static_cast<int>(hr);
@@ -73,8 +96,6 @@ HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
         Initialize::CommonControls cctrls;
         HWND                         hwnd;
         CMessageLoop                 loop;
-
-        DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
 
         hr = Init(nullptr, instHnd);
         if (FAILED(hr)) {

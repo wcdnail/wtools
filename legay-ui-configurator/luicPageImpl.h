@@ -43,9 +43,3 @@ private:
     CPageImpl& operator = (CPageImpl&&) = delete;
 };
 
-template <typename Target, typename ...Args>
-static inline CPageImplPtr CreatePageDlg(Args&&... args)
-{
-    auto ptr = std::make_unique<Target>(std::forward<Args>(args)...);
-    return ptr;
-}
