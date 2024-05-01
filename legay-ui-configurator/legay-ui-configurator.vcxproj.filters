@@ -44,7 +44,14 @@
     <ClInclude Include="..\common\string.utils.format.h">
       <Filter>from-cf</Filter>
     </ClInclude>
-    <ClInclude Include="luicColors.h" />
+    <ClInclude Include="luicAppearance.h" />
+    <ClInclude Include="luicBackground.h" />
+    <ClInclude Include="luicEffects.h" />
+    <ClInclude Include="luicPageDlgTemplate.h" />
+    <ClInclude Include="luicScreenSaver.h" />
+    <ClInclude Include="luicSettings.h" />
+    <ClInclude Include="luicWeb.h" />
+    <ClInclude Include="luicPageImpl.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -68,7 +75,14 @@
     <ClCompile Include="..\common\string.utils.format.cpp">
       <Filter>from-cf</Filter>
     </ClCompile>
-    <ClCompile Include="luicColors.cpp" />
+    <ClCompile Include="luicAppearance.cpp" />
+    <ClCompile Include="luicBackground.cpp" />
+    <ClCompile Include="luicEffects.cpp" />
+    <ClCompile Include="luicPageDlgTemplate.cpp" />
+    <ClCompile Include="luicScreenSaver.cpp" />
+    <ClCompile Include="luicSettings.cpp" />
+    <ClCompile Include="luicWeb.cpp" />
+    <ClCompile Include="luicPageImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resz\legay-ui-configurator.rc">

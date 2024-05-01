@@ -240,10 +240,17 @@
     <ClInclude Include="..\common\rectz.h" />
     <ClInclude Include="..\common\string.utils.format.h" />
     <ClInclude Include="idl\legay-ui-configurator_i.h" />
-    <ClInclude Include="luicColors.h" />
+    <ClInclude Include="luicAppearance.h" />
+    <ClInclude Include="luicBackground.h" />
+    <ClInclude Include="luicEffects.h" />
     <ClInclude Include="luicMain.h" />
     <ClInclude Include="luicMainFrame.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="luicPageDlgTemplate.h" />
+    <ClInclude Include="luicPageImpl.h" />
+    <ClInclude Include="luicScreenSaver.h" />
+    <ClInclude Include="luicSettings.h" />
+    <ClInclude Include="luicWeb.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resz\resource.h" />
@@ -260,7 +267,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\common\string.utils.format.cpp" />
-    <ClCompile Include="luicColors.cpp" />
+    <ClCompile Include="luicAppearance.cpp" />
+    <ClCompile Include="luicBackground.cpp" />
+    <ClCompile Include="luicEffects.cpp" />
     <ClCompile Include="luicMain.cpp" />
     <ClCompile Include="idl\legay-ui-configurator_i.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -277,6 +286,11 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="luicMainFrame.cpp" />
+    <ClCompile Include="luicPageDlgTemplate.cpp" />
+    <ClCompile Include="luicPageImpl.cpp" />
+    <ClCompile Include="luicScreenSaver.cpp" />
+    <ClCompile Include="luicSettings.cpp" />
+    <ClCompile Include="luicWeb.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

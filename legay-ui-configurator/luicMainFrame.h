@@ -1,10 +1,11 @@
 #pragma once
 
-#include "luicColors.h"
+#include "luicPageImpl.h"
 #include "resz/resource.h"
 #include <atlwin.h>
 #include <atlframe.h>
 #include <atlcrack.h>
+#include <map>
 
 struct CLegacyUIConfigurator;
 
@@ -13,8 +14,9 @@ struct CMainFrame: ATL::CDialogImpl<CMainFrame>,
 {
     enum : int { IDD = IDD_LEGACY_UI_CONF_TOOL };
 
-    using   Super = ATL::CDialogImpl<CMainFrame>;
-    using Resizer = WTL::CDialogResize<CMainFrame>;
+    using    Super = ATL::CDialogImpl<CMainFrame>;
+    using  Resizer = WTL::CDialogResize<CMainFrame>;
+    using PagesMap = std::map<int, CPageImplPtr>;
 
     ~CMainFrame() override;
     CMainFrame(CLegacyUIConfigurator& app);
@@ -23,10 +25,11 @@ private:
     CLegacyUIConfigurator& m_App;
     WTL::CTabCtrl          m_Tab;
     CImageList          m_ImList;
-    CPageAppearance         m_Colors;
-    HWND                 m_Pages[3];
+    PagesMap             m_Pages;
 
     void ImListCreate();
+    void PagesAppend(ATL::CStringW&& str, CPageImplPtr&& pagePtr);
+    void PagesCreate();
 
     friend class Super;
     friend class Resizer;
