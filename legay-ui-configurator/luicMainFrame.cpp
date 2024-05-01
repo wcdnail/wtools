@@ -177,6 +177,7 @@ CPageImplPtr const& CMainFrame::PagesGetCurrent() const
     int numba = m_Tab.GetCurSel();
     const auto& it = m_PagesMap.find(numba);
     if (it == m_PagesMap.cend()) {
+        DH::ThreadPrintfc(DH::Category::Module(), L"Page %d does not EXIST!\n", numba);
         static const CPageImplPtr dmyPtr;
         return dmyPtr;
     }
@@ -200,11 +201,14 @@ BOOL CMainFrame::OnInitDlg(HWND, LPARAM)
     ShowWindow(SW_SHOW);
 #endif
 
+    SetWindowTextW(L"Display Properties");
+
     ImListCreate();
     PagesCreate();
 
-    m_Tab.SetCurSel(PageBackground);
-    PagesShow(PageBackground, true);
+    const int initialPage = PageAppearance;
+    m_Tab.SetCurSel(initialPage);
+    PagesShow(initialPage, true);
 
     HICON tempIco = m_ImList.GetIcon(IconMain);
     SetIcon(tempIco, FALSE);
