@@ -26,9 +26,10 @@ private:
     WTL::CTabCtrl          m_Tab;
     CImageList          m_ImList;
     PagesMap          m_PagesMap;
+    CRect          m_rcTabClient;
 
     void ImListCreate();
-    void PagesGetRect(int n, CRect& rcTab);
+    void PagesGetRect(int tabNum);
     void PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&& pagePtr);
     void PagesCreate();
 

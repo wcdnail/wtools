@@ -33,7 +33,11 @@ CMainFrame::~CMainFrame()
 }
 
 CMainFrame::CMainFrame(CLegacyUIConfigurator& app)
-    : m_App(app)
+    :         m_App { app }
+    ,         m_Tab {}
+    ,      m_ImList {}
+    ,    m_PagesMap {}
+    , m_rcTabClient {}
 {
 }
 
@@ -53,8 +57,8 @@ void CMainFrame::ImListCreate()
 {
     enum : int
     {
-        MaxIconWidth  = 32,
-        MaxIconHeight = 32,
+        MaxIconWidth  = 16,
+        MaxIconHeight = 16,
     };
     static const int iconsIDs[] = {
         IDI_COMP,
@@ -80,19 +84,38 @@ void CMainFrame::ImListCreate()
     }
 }
 
-void CMainFrame::PagesGetRect(int tabNum, CRect& rcTab)
+void CMainFrame::PagesGetRect(int tabNum)
 {
-    CRect rcHead;
-    m_Tab.GetItemRect(tabNum, rcHead);
+#if !defined(_DEBUG_TAB_RECT)
+    if (!m_rcTabClient.IsRectEmpty()) {
+        return;
+    }
+#endif
+    CRect rcTab;
+    CRect rcMy;
+    GetWindowRect(rcMy);
+    m_Tab.GetWindowRect(rcTab);
+    OffsetRect(rcTab, -rcMy.left, -rcMy.top);
 
-    m_Tab.GetClientRect(rcTab);
-    TabCtrl_AdjustRect(m_Tab.m_hWnd, FALSE, rcTab);
-
+    m_rcTabClient = rcTab;
+#if !defined(_DEBUG_TAB_RECT)
+    TabCtrl_AdjustRect(m_Tab.m_hWnd, FALSE, m_rcTabClient);
+#else
+    m_Tab.ShowWindow(SW_HIDE);
     {
         CWindowDC dc(m_hWnd);
-        dc.FillSolidRect(rcHead, 0x00ffff00);
-        dc.FillSolidRect(rcTab, 0x00ff00ff);
+        CRect rcEdge = m_rcTabClient;
+        rcEdge.InflateRect(4, 4);
+        dc.FillSolidRect(rcEdge, 0x005f5fff);
+
+        CRect rcAdj = m_rcTabClient;
+        TabCtrl_AdjustRect(m_Tab.m_hWnd, FALSE, rcAdj);
+        dc.FillSolidRect(m_rcTabClient, 0x001f1f1f);
+        dc.FillSolidRect(rcAdj, 0x003f3f1f);
     }
+    m_Tab.Invalidate(TRUE);
+    m_Tab.ShowWindow(SW_SHOW);
+#endif
 }
 
 void CMainFrame::PagesCreate()
@@ -119,7 +142,13 @@ void CMainFrame::PagesCreate()
 void CMainFrame::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&& pagePtr)
 {
     HRESULT code = S_FALSE;
-    int number = m_Tab.InsertItem(m_Tab.GetItemCount(), TCIF_TEXT /*| TCIF_IMAGE*/, str.GetString(), 0, 0l);
+    int  tabIcon = desiredIndex;
+    UINT tabMask = TCIF_TEXT;
+    if (tabIcon < m_ImList.GetImageCount()) {
+        tabIcon = desiredIndex;
+        tabMask |= TCIF_IMAGE;
+    }
+    int number = m_Tab.InsertItem(m_Tab.GetItemCount(), tabMask, str.GetString(), tabIcon, 0l);
     if (number < 0) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", str.GetString()), code, true, MB_ICONERROR);
@@ -139,9 +168,8 @@ void CMainFrame::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr
         ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", str.GetString()), code, true, MB_ICONERROR);
         return ;
     }
-    CRect rcTab;
-    PagesGetRect(number, rcTab);
-    pagePtr->MoveWindow(rcTab, FALSE);
+    PagesGetRect(number);
+    pagePtr->MoveWindow(m_rcTabClient, FALSE);
     m_PagesMap[number] = std::move(pagePtr);
 }
 
