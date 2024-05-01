@@ -16,6 +16,7 @@
 #define IDC_TAB1                        205
 #define IDC_BN_APPLY                    206
 #define IDD_PAGE_COLORS                 206
+#define IDD_PAGE_APPEARANCE             206
 #define IDC_TEST_STA1                   207
 
 // Next default values for new objects

@@ -23,8 +23,10 @@ private:
     CLegacyUIConfigurator& m_App;
     WTL::CTabCtrl          m_Tab;
     CImageList          m_ImList;
-    CColorsPage         m_Colors;
+    CPageAppearance         m_Colors;
     HWND                 m_Pages[3];
+
+    void ImListCreate();
 
     friend class Super;
     friend class Resizer;

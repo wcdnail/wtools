@@ -25,16 +25,37 @@ CMainFrame::CMainFrame(CLegacyUIConfigurator& app)
     ZeroMemory(&m_Pages, sizeof(m_Pages));
 }
 
+void CMainFrame::ImListCreate()
+{
+    enum : int
+    {
+        MaxIconWidth  = 32,
+        MaxIconHeight = 32,
+    };
+
+    static const int iconsIDs[] = {
+        IDI_COMP,
+    };
+
+    m_ImList.Create(MaxIconWidth, MaxIconHeight, ILC_MASK, _countof(iconsIDs), 0);
+
+    CIconHandle tempIco;
+    for (const auto it: iconsIDs) {
+        tempIco.LoadIconW(it, MaxIconWidth, MaxIconHeight);
+        m_ImList.AddIcon(tempIco.Detach());
+    }
+}
+
 BOOL CMainFrame::OnInitDlg(HWND, LPARAM)
 {
-    m_ImList.Create(32, 32, ILC_MASK, 0, 0);
+    ImListCreate();
 
     HICON rawIcon = LoadIconW(m_App.GetModuleInstance(), MAKEINTRESOURCEW(IDI_COMP));
     if (nullptr != rawIcon) {
         SetIcon(rawIcon, FALSE);
         SetIcon(rawIcon, TRUE);
     }
-    m_ImList.AddIcon(rawIcon); // 0 = IconMain
+    
 
     m_Tab.Attach(GetDlgItem(IDC_TAB1));
     m_Tab.ModifyStyle(0, WS_TABSTOP);

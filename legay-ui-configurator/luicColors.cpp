@@ -3,15 +3,15 @@
 #include "UT/debug.assistance.h"
 #include "resz/resource.h"
 
-CColorsPage::~CColorsPage()
+CPageAppearance::~CPageAppearance()
 {
 }
 
-CColorsPage::CColorsPage()
+CPageAppearance::CPageAppearance()
 {
 }
 
-BOOL CColorsPage::OnInitDlg(HWND, LPARAM)
+BOOL CPageAppearance::OnInitDlg(HWND, LPARAM)
 {
     DlgResize_Init(false, false);
     return TRUE;

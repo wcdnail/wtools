@@ -5,16 +5,16 @@
 #include <atlframe.h>
 #include <atlcrack.h>
 
-struct CColorsPage: ATL::CDialogImpl<CColorsPage>,
-                    WTL::CDialogResize<CColorsPage>
+struct CPageAppearance: ATL::CDialogImpl<CPageAppearance>,
+                        WTL::CDialogResize<CPageAppearance>
 {
-    enum : int { IDD = IDD_PAGE_COLORS };
+    enum : int { IDD = IDD_PAGE_APPEARANCE };
 
-    using   Super = ATL::CDialogImpl<CColorsPage>;
-    using Resizer = WTL::CDialogResize<CColorsPage>;
+    using   Super = ATL::CDialogImpl<CPageAppearance>;
+    using Resizer = WTL::CDialogResize<CPageAppearance>;
 
-    ~CColorsPage() override;
-    CColorsPage();
+    ~CPageAppearance() override;
+    CPageAppearance();
 
 private:
     friend class Super;
@@ -31,8 +31,8 @@ private:
 
     int OnInitDlg(HWND, LPARAM);
 
-    CColorsPage(CColorsPage const&) = delete;
-    CColorsPage(CColorsPage&&) = delete;
-    CColorsPage& operator = (CColorsPage const&) = delete;
-    CColorsPage& operator = (CColorsPage&&) = delete;
+    CPageAppearance(CPageAppearance const&) = delete;
+    CPageAppearance(CPageAppearance&&) = delete;
+    CPageAppearance& operator = (CPageAppearance const&) = delete;
+    CPageAppearance& operator = (CPageAppearance&&) = delete;
 };
