@@ -15,14 +15,12 @@ struct CMainFrame: CPageImpl
 private:
     CLegacyUIConfigurator& m_App;
     WTL::CTabCtrl          m_Tab;
-    CImageList          m_ImList;
     PagesMap          m_PagesMap;
     CRect          m_rcTabClient;
 
     CPageImplPtr const& PagesGet(int numba) const;
     CPageImplPtr const& PagesGetCurrent() const;
     
-    void ImListCreate();
     void PagesGetRect();
     void PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&& pagePtr);
     void PagesCreate();

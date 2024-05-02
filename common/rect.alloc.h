@@ -25,6 +25,8 @@ namespace CF
         WCDAFX_API T Width() const;
         WCDAFX_API T Height() const;
 
+        WCDAFX_API void Shift(T sx, T sy);
+
     private:
         static T Max(T v, T limit);
 

@@ -81,6 +81,7 @@ CLegacyUIConfigurator::~CLegacyUIConfigurator()
 CLegacyUIConfigurator::CLegacyUIConfigurator()
     :       Super{}
     , m_MainFrame{ *this }
+    ,    m_ImList{}
     , m_wAccelTab{ nullptr }
 {
     {
@@ -94,12 +95,63 @@ CTheme& CLegacyUIConfigurator::CurrentTheme() const
     return g_ThemeNative;
 }
 
+HICON CLegacyUIConfigurator::GetIcon(int icon) const
+{
+    if (icon < 0 || icon >= IconCount) {
+        return nullptr;
+    }
+    return m_ImList.GetIcon(icon);
+}
+
+HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID)
+{
+    HRESULT hr = CAppModule::Init(pObjMap, hInstance, pLibID);
+    if (FAILED(hr)) {
+        return hr;
+    }
+    hr = ImListCreate();
+    return hr;
+}
+
 CLegacyUIConfigurator* CLegacyUIConfigurator::App()
 {
     if (!g_pApp) {
         throw std::logic_error("CLegacyUIConfigurator::App is NULL");
     }
     return g_pApp;
+}
+
+HRESULT CLegacyUIConfigurator::ImListCreate()
+{
+    enum : int
+    {
+        MaxIconWidth = 16,
+        MaxIconHeight = 16,
+    };
+    static const int iconsIDs[] = {
+        IDI_COMP,
+        IDI_MON_BRUSH,
+        IDI_START_MENU
+    };
+    HRESULT code = S_FALSE;
+    m_ImList.Create(MaxIconWidth, MaxIconHeight, ILC_MASK, _countof(iconsIDs), 0);
+    if (!m_ImList.m_hImageList) {
+        code = static_cast<HRESULT>(GetLastError());
+        ReportError(L"Creation of ImageList failed!", code, true, MB_ICONWARNING);
+        return code;
+    }
+    CIconHandle tempIco;
+    for (const auto it : iconsIDs) {
+        tempIco.LoadIconW(it, MaxIconWidth, MaxIconHeight);
+        if (!tempIco.m_hIcon) {
+            code = static_cast<HRESULT>(GetLastError());
+            ReportError(Str::ElipsisW::Format(L"Load icon (%d) failed!", it), code);
+            continue;
+        }
+        m_ImList.AddIcon(tempIco.Detach());
+    }
+    ATLASSUME(IconCount == m_ImList.GetImageCount());
+    return S_OK;
 }
 
 BOOL CLegacyUIConfigurator::PreTranslateMessage(MSG* pMsg)
@@ -123,7 +175,7 @@ HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
         HWND                         hwnd;
         CMessageLoop                 loop;
 
-        hr = Init(nullptr, instHnd);
+        hr = Initialize(nullptr, instHnd);
         if (FAILED(hr)) {
             ReportError(L"Initialization failure!", hr, true);
             return hr;

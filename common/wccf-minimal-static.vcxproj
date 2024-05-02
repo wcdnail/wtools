@@ -23,6 +23,7 @@
     <ClCompile Include="dh.timer.cpp" />
     <ClCompile Include="dh.tracing.cpp" />
     <ClCompile Include="info\runtime.information.cpp" />
+    <ClCompile Include="rect.alloc.cpp" />
     <ClCompile Include="rectz.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">Use</PrecompiledHeader>
@@ -47,6 +48,11 @@
     <ClInclude Include="dh.timer.h" />
     <ClInclude Include="dh.tracing.h" />
     <ClInclude Include="info\runtime.information.h" />
+    <ClInclude Include="rect.alloc.h" />
+    <ClInclude Include="rect.aspect.ratio.h" />
+    <ClInclude Include="rect.gdi+.h" />
+    <ClInclude Include="rect.putinto.h" />
+    <ClInclude Include="rect.screen.h" />
     <ClInclude Include="rectz.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="string.utils.format.h" />

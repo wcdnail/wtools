@@ -120,6 +120,12 @@
     <Image Include="resz\rom-2.ico">
       <Filter>resz</Filter>
     </Image>
+    <Image Include="rom-1.ico">
+      <Filter>resz</Filter>
+    </Image>
+    <Image Include="rom-2.ico">
+      <Filter>resz</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="idl\legay-ui-configurator.idl">

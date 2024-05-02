@@ -2,6 +2,18 @@
 
 #include <atlwin.h>
 
+#include "luicTheme.h"
+
+struct CWndFrameRects
+{
+    int m_BorderSize = { 0 };
+    CRect m_rcBorder = {};
+    CRect  m_rcFrame = {};
+    CRect   m_rcCapt = {};
+
+    void Calc(CRect const& rc, const CTheme& theme);
+};
+
 using CThemePreviewerTraits = ATL::CWinTraits<WS_CHILD | WS_VISIBLE | WS_BORDER, 0>;
 
 struct CThemePreviewer: ATL::CWindowImpl<CThemePreviewer, ATL::CWindow, CThemePreviewerTraits>
@@ -15,6 +27,8 @@ struct CThemePreviewer: ATL::CWindowImpl<CThemePreviewer, ATL::CWindow, CThemePr
 
 private:
     friend Super;
+
+    CWndFrameRects m_WndRect[3];
 
     void OnPaint(CDCHandle dc);
 

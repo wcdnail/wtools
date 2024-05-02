@@ -2,7 +2,21 @@
 #include "luicTheme.h"
 #include "resz/resource.h"
 
-const CTheme::SizeRange CTheme::g_DefaultSizeRange[CTheme::SIZES_Count] =
+template <typename Res>
+static inline Res GetCurrentDPI()
+{
+    int temp = USER_DEFAULT_SCREEN_DPI;
+    HDC screenDc{ GetDC(nullptr) };
+    if (screenDc) {
+        temp = GetDeviceCaps(screenDc, LOGPIXELSY);
+        ReleaseDC(nullptr, screenDc);
+    }
+    return static_cast<Res>(temp);
+}
+
+int CTheme::g_DPI = GetCurrentDPI<int>();
+
+const SizeRange CTheme::g_DefaultSizeRange[SIZES_Count] =
 {
     // Index                     Min  Max  Current Orig.Max
     /* SIZE_BORDER          */  {  1,  15,  1 },   //  50
@@ -134,17 +148,17 @@ PCTSTR CTheme::ColorName(int color)
 static int GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size)
 {
     switch (size) {
-    case CTheme::SIZE_Border:           return ncMetrics->iBorderWidth;
-    case CTheme::SIZE_ScrollWidth:      return ncMetrics->iScrollWidth;
-    case CTheme::SIZE_ScrollHeight:     return ncMetrics->iScrollHeight;
-    case CTheme::SIZE_CaptionWidth:     return ncMetrics->iCaptionWidth;
-    case CTheme::SIZE_CaptionHeight:    return ncMetrics->iCaptionHeight;
-    case CTheme::SIZE_SMCaptionWidth:   return ncMetrics->iSmCaptionWidth;
-    case CTheme::SIZE_SMCaptionHeight:  return ncMetrics->iSmCaptionHeight;
-    case CTheme::SIZE_MenuWidth:        return ncMetrics->iMenuWidth;
-    case CTheme::SIZE_MenuHeight:       return ncMetrics->iMenuHeight;
+    case SIZE_Border:           return ncMetrics->iBorderWidth;
+    case SIZE_ScrollWidth:      return ncMetrics->iScrollWidth;
+    case SIZE_ScrollHeight:     return ncMetrics->iScrollHeight;
+    case SIZE_CaptionWidth:     return ncMetrics->iCaptionWidth;
+    case SIZE_CaptionHeight:    return ncMetrics->iCaptionHeight;
+    case SIZE_SMCaptionWidth:   return ncMetrics->iSmCaptionWidth;
+    case SIZE_SMCaptionHeight:  return ncMetrics->iSmCaptionHeight;
+    case SIZE_MenuWidth:        return ncMetrics->iMenuWidth;
+    case SIZE_MenuHeight:       return ncMetrics->iMenuHeight;
 #if WINVER >= WINVER_VISTA
-    case CTheme::SIZE_PaddedBorder:     return ncMetrics->iPaddedBorderWidth;
+    case SIZE_PaddedBorder:     return ncMetrics->iPaddedBorderWidth;
 #endif
     }
     return -1;
@@ -154,12 +168,12 @@ _Ret_maybenull_
 static LOGFONT* GetNcMetricFont(CTheme& theme, int font)
 {
     switch (font) {
-    case CTheme::FONT_Caption:   return &theme.m_ncMetrics.lfCaptionFont;
-    case CTheme::FONT_SMCaption: return &theme.m_ncMetrics.lfSmCaptionFont;
-    case CTheme::FONT_Menu:      return &theme.m_ncMetrics.lfMenuFont;
-    case CTheme::FONT_Tooltip:   return &theme.m_ncMetrics.lfStatusFont;
-    case CTheme::FONT_Message:   return &theme.m_ncMetrics.lfMessageFont;
-    case CTheme::FONT_Desktop:   return &theme.m_lfIconFont;
+    case FONT_Caption:   return &theme.m_ncMetrics.lfCaptionFont;
+    case FONT_SMCaption: return &theme.m_ncMetrics.lfSmCaptionFont;
+    case FONT_Menu:      return &theme.m_ncMetrics.lfMenuFont;
+    case FONT_Tooltip:   return &theme.m_ncMetrics.lfStatusFont;
+    case FONT_Message:   return &theme.m_ncMetrics.lfMessageFont;
+    case FONT_Desktop:   return &theme.m_lfIconFont;
     }
     return nullptr;
 }
@@ -168,12 +182,32 @@ bool CTheme::RefreshBrushes()
 {
     CBrush tmpBrush[COLORS_COUNT];
     for (int iColor = 0; iColor < COLORS_COUNT; iColor++) {
-        if (CLR_INVALID != m_Color[iColor]) {
-            tmpBrush[iColor].CreateSolidBrush(m_Color[iColor]);
+        if (CLR_INVALID == m_Color[iColor]) {
+            // ##TODO: придумать решение
+            continue;
         }
+        tmpBrush[iColor].CreateSolidBrush(m_Color[iColor]);
     }
     for (int iBrush = 0; iBrush < COLORS_COUNT; iBrush++) {
         m_Brush[iBrush].Attach(tmpBrush[iBrush].Detach());
+    }
+    return true;
+}
+
+bool CTheme::RefreshFonts()
+{
+    CFont tmpFont[FONTS_Count];
+    for (int iFont = 0; iFont < FONTS_Count; iFont++) {
+        LOGFONT* lf = GetNcMetricFont(*this, iFont);
+        if (!lf) {
+            // ##TODO: придумать решение
+            continue;
+        }
+        CLogFont lfObj(*lf);
+        tmpFont[iFont] = lfObj.CreateFontIndirectW();
+    }
+    for (int iFont = 0; iFont < FONTS_Count; iFont++) {
+        m_Font[iFont].Attach(tmpFont[iFont].Detach());
     }
     return true;
 }
@@ -210,6 +244,7 @@ bool CTheme::LoadSysNcMetrics()
     }
     CopyMemory(&m_ncMetrics, &ncMetrics, sizeof(ncMetrics));
     CopyMemory(&m_SizeRange, &sizeRanges, sizeof(sizeRanges));
+    RefreshFonts();
     return true;
 }
 
@@ -252,8 +287,8 @@ bool CTheme::LoadSysTheme()
 {
     bool ret = true;
     ret &= LoadSysColors();
-    ret &= LoadSysNcMetrics();
     ret &= LoadSysIconFont();
+    ret &= LoadSysNcMetrics();
     ret &= LoadSysGradientCaptionsSetting();
     ret &= LoadSysFlatMenusSetting();
     return ret;

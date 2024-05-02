@@ -50,9 +50,18 @@ namespace CF
     }
 
     template <class T>
+    void RectzAllocator<T>::Shift(T sx, T sy)
+    {
+        x += sx;
+        y += sy;
+        w -= sx;
+        h -= sy;
+    }
+
+    template <class T>
     RectT<T> RectzAllocator<T>::Next(T cx, T cy, T sx, T sy)
     {
-        RectT<T> rv(x, y, Max(cx, w), Max(cy, h));
+        MyRect rv(x, y, Max(cx, w), Max(cy, h));
 
         T nx = rv.Width() + sx;
         x += nx;

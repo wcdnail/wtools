@@ -11,11 +11,6 @@
 #include "UT/debug.assistance.h"
 #include "resz/resource.h"
 
-enum IconIndex: int
-{
-    IconMain = 0,
-};
-
 enum PageIndex: int
 {
     PageBegin = -1,
@@ -36,7 +31,6 @@ CMainFrame::CMainFrame(CLegacyUIConfigurator& app)
     :      CPageImpl{ IDD_LEGACY_UI_CONF_TOOL }
     ,         m_App { app }
     ,         m_Tab {}
-    ,      m_ImList {}
     ,    m_PagesMap {}
     , m_rcTabClient {}
 {
@@ -56,37 +50,6 @@ CPageImplPtr const& CMainFrame::PagesGet(int numba) const
 CPageImplPtr const& CMainFrame::PagesGetCurrent() const
 {
     return PagesGet(m_Tab.GetCurSel());
-}
-
-void CMainFrame::ImListCreate()
-{
-    enum : int
-    {
-        MaxIconWidth  = 16,
-        MaxIconHeight = 16,
-    };
-    static const int iconsIDs[] = {
-        IDI_COMP,
-    };
-    HRESULT code = S_FALSE;
-
-    m_ImList.Create(MaxIconWidth, MaxIconHeight, ILC_MASK, _countof(iconsIDs), 0);
-    if (!m_ImList.m_hImageList) {
-        code = static_cast<HRESULT>(GetLastError());
-        ReportError(L"Creation of ImageList failed!", code, true, MB_ICONWARNING);
-        return ;
-    }
-
-    CIconHandle tempIco;
-    for (const auto it: iconsIDs) {
-        tempIco.LoadIconW(it, MaxIconWidth, MaxIconHeight);
-        if (!tempIco.m_hIcon) {
-            code = static_cast<HRESULT>(GetLastError());
-            ReportError(Str::ElipsisW::Format(L"Load icon (%d) failed!", it), code);
-            continue;
-        }
-        m_ImList.AddIcon(tempIco.Detach());
-    }
 }
 
 void CMainFrame::PagesGetRect()
@@ -134,7 +97,6 @@ void CMainFrame::PagesCreate()
 
     m_Tab.Attach(GetDlgItem(IDC_TAB1));
     m_Tab.ModifyStyle(0, WS_TABSTOP);
-    m_Tab.SetImageList(m_ImList);
 
     PagesAppend(PageBackground,  L"Background",  std::move(pBackground));
     PagesAppend(PageScreenSaver, L"ScreenSaver", std::move(pScreenSaver));
@@ -157,7 +119,7 @@ void CMainFrame::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr
     HRESULT code = S_FALSE;
     int  tabIcon = desiredIndex;
     UINT tabMask = TCIF_TEXT;
-    if (0 && tabIcon < m_ImList.GetImageCount()) { // ##FIXME: tab control has icons?
+    if (0 /*&& tabIcon < m_ImList.GetImageCount()*/) { // ##FIXME: tab control has icons?
         tabIcon = desiredIndex;
         tabMask |= TCIF_IMAGE;
     }
@@ -202,17 +164,14 @@ void CMainFrame::OnResizeNotify()
 BOOL CMainFrame::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
     ModifyStyle(0, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX, SWP_FRAMECHANGED);
-
     SetWindowTextW(L"Display Properties");
-
-    ImListCreate();
     PagesCreate();
 
     const int initialPage = PageAppearance;
     m_Tab.SetCurSel(initialPage);
     PagesShow(initialPage, true);
 
-    HICON tempIco = m_ImList.GetIcon(IconMain);
+    HICON tempIco = CLegacyUIConfigurator::App()->GetIcon(IconMain);
     SetIcon(tempIco, FALSE);
     SetIcon(tempIco, TRUE);
 
