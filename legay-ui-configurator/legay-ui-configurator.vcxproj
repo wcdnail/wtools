@@ -251,6 +251,7 @@
     <ClInclude Include="luicPageImpl.h" />
     <ClInclude Include="luicScreenSaver.h" />
     <ClInclude Include="luicSettings.h" />
+    <ClInclude Include="luicTheme.h" />
     <ClInclude Include="luicWeb.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="resource.h" />
@@ -287,6 +288,7 @@
     <ClCompile Include="luicPageImpl.cpp" />
     <ClCompile Include="luicScreenSaver.cpp" />
     <ClCompile Include="luicSettings.cpp" />
+    <ClCompile Include="luicTheme.cpp" />
     <ClCompile Include="luicWeb.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

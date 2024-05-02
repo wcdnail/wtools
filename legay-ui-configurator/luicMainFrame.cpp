@@ -33,12 +33,29 @@ CMainFrame::~CMainFrame()
 }
 
 CMainFrame::CMainFrame(CLegacyUIConfigurator& app)
-    :         m_App { app }
+    :      CPageImpl{ IDD_LEGACY_UI_CONF_TOOL }
+    ,         m_App { app }
     ,         m_Tab {}
     ,      m_ImList {}
     ,    m_PagesMap {}
     , m_rcTabClient {}
 {
+}
+
+CPageImplPtr const& CMainFrame::PagesGet(int numba) const
+{
+    const auto& it = m_PagesMap.find(numba);
+    if (it == m_PagesMap.cend()) {
+        DH::ThreadPrintfc(DH::Category::Module(), L"Page #%d does not EXIST!\n", numba);
+        static const CPageImplPtr dmyPtr;
+        return dmyPtr;
+    }
+    return it->second;
+}
+
+CPageImplPtr const& CMainFrame::PagesGetCurrent() const
+{
+    return PagesGet(m_Tab.GetCurSel());
 }
 
 void CMainFrame::ImListCreate()
@@ -127,6 +144,14 @@ void CMainFrame::PagesCreate()
     PagesAppend(PageSettings,    L"Settings",    std::move(pPageSettings));
 }
 
+void CMainFrame::PagesShow(int numba, bool show)
+{
+    const auto& page = PagesGet(numba);
+    if (page) {
+        page->ShowWindow(show ? SW_SHOW : SW_HIDE);
+    }
+}
+
 void CMainFrame::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&& pagePtr)
 {
     HRESULT code = S_FALSE;
@@ -163,29 +188,7 @@ void CMainFrame::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr
     m_PagesMap[number] = std::move(pagePtr);
 }
 
-void CMainFrame::PagesShow(int numba, bool show)
-{
-    const auto& it = m_PagesMap.find(numba);
-    if (it == m_PagesMap.cend()) {
-        DH::ThreadPrintfc(DH::Category::Module(), L"Page %d does not EXIST!\n", numba);
-        return ;
-    }
-    it->second->ShowWindow(show ? SW_SHOW : SW_HIDE);
-}
-
-CPageImplPtr const& CMainFrame::PagesGetCurrent() const
-{
-    int numba = m_Tab.GetCurSel();
-    const auto& it = m_PagesMap.find(numba);
-    if (it == m_PagesMap.cend()) {
-        DH::ThreadPrintfc(DH::Category::Module(), L"Page %d does not EXIST!\n", numba);
-        static const CPageImplPtr dmyPtr;
-        return dmyPtr;
-    }
-    return it->second;
-}
-
-void CMainFrame::PagesResizingNotify()
+void CMainFrame::OnResizeNotify()
 {
     if (!m_Tab.m_hWnd) {
         return ;
@@ -196,7 +199,7 @@ void CMainFrame::PagesResizingNotify()
     }
 }
 
-BOOL CMainFrame::OnInitDlg(HWND, LPARAM)
+BOOL CMainFrame::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
     ModifyStyle(0, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX, SWP_FRAMECHANGED);
 
@@ -218,21 +221,15 @@ BOOL CMainFrame::OnInitDlg(HWND, LPARAM)
     SetIcon(tempIco, FALSE);
     SetIcon(tempIco, TRUE);
 
-    m_ResizeArr.Add(_AtlDlgResizeMap{ IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y });
-    m_ResizeArr.Add(_AtlDlgResizeMap{ IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y });
-    m_ResizeArr.Add(_AtlDlgResizeMap{ -1, 0 });
-    DlgResize_Init(true, true);
-    return TRUE;
-}
-
-WTL::_AtlDlgResizeMap const* CMainFrame::GetDlgResizeMap() const
-{
-    return m_ResizeArr.GetData();
+    DlgResizeAdd(IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y);
+    DlgResizeAdd(IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y);
+    return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }
 
 void CMainFrame::OnDestroy()
 {
     PostQuitMessage(0);
+    CPageImpl::OnDestroy();
 }
 
 LRESULT CMainFrame::OnNotify(int idCtrl, LPNMHDR pnmh)
@@ -261,7 +258,6 @@ void CMainFrame::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     case IDCANCEL:
         DestroyWindow();
         break;
-    default:
-        DebugThreadPrintf(LTH_WM_COMMAND L" Unknown: n:%4d c:%4d w:%08x\n", uNotifyCode, nID, wndCtl);
     }
+    CPageImpl::OnCommand(uNotifyCode, nID, wndCtl);
 }

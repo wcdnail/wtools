@@ -31,7 +31,12 @@ protected:
 
     void DlgResizeAdd(int nCtlID, DWORD dwResizeFlags);
 
+    virtual void OnResizeNotify();
     virtual BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
+    virtual void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl);
+    virtual LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
+    virtual void OnDestroy();
+
     HBRUSH OnEraseBkgnd(CDCHandle dc);
 
 private:
@@ -40,7 +45,13 @@ private:
     BEGIN_MSG_MAP_EX(CColorsPage)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_ERASEBKGND(OnEraseBkgnd)
-        CHAIN_MSG_MAP(Resizer)
+        MSG_WM_COMMAND(OnCommand)
+        MSG_WM_NOTIFY(OnNotify)
+        MSG_WM_DESTROY(OnDestroy)
+        if (Resizer::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
+            OnResizeNotify();
+            return TRUE;
+        }
     END_MSG_MAP()
 
     WTL::_AtlDlgResizeMap const* GetDlgResizeMap() const;

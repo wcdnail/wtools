@@ -6,7 +6,7 @@
 #include "common/windows.uses.commoncontrols.h"
 #include "resz/resource.h"
 
-CBrush CLegacyUIConfigurator::g_brBackBrush = CreateSolidBrush(0x00ff00ff);
+const CTheme CLegacyUIConfigurator::m_ThemeNative(true);
 
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMessageBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
 {

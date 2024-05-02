@@ -18,6 +18,12 @@ HWND CPageImpl::CreateDlg(HWND hWndParent, LPARAM dwInitParam)
     return Super::Create(hWndParent, dwInitParam);
 }
 
+WTL::_AtlDlgResizeMap const* CPageImpl::GetDlgResizeMap() const
+{
+    static const WTL::_AtlDlgResizeMap emptyMap[] = { { -1, 0 } };
+    return m_resiseMap.empty() ? emptyMap : &m_resiseMap[0];
+}
+
 void CPageImpl::DlgResizeAdd(int nCtlID, DWORD dwResizeFlags)
 {
     CWindow item = GetDlgItem(nCtlID);
@@ -34,15 +40,36 @@ BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     return TRUE;
 }
 
-HBRUSH CPageImpl::OnEraseBkgnd(CDCHandle dc)
+void CPageImpl::OnResizeNotify() {}
+
+void CPageImpl::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
-    return CLegacyUIConfigurator::g_brBackBrush.m_hBrush;
+    UNREFERENCED_ARG(uNotifyCode);
+    UNREFERENCED_ARG(nID);
+    UNREFERENCED_ARG(wndCtl);
+    SetMsgHandled(FALSE);
+    DebugThreadPrintf(LTH_WM_COMMAND L" Unknown: n:%4d c:%4d w:%08x\n", uNotifyCode, nID, wndCtl);
 }
 
-WTL::_AtlDlgResizeMap const* CPageImpl::GetDlgResizeMap() const
+LRESULT CPageImpl::OnNotify(int idCtrl, LPNMHDR pnmh)
 {
-    static const WTL::_AtlDlgResizeMap emptyMap[] = {
-        { -1, 0 }
-    };
-    return m_resiseMap.empty() ? emptyMap : &m_resiseMap[0];
+    UNREFERENCED_ARG(idCtrl);
+    UNREFERENCED_ARG(pnmh);
+    SetMsgHandled(FALSE);
+    return 0;
+}
+
+void CPageImpl::OnDestroy()
+{
+    SetMsgHandled(FALSE);
+}
+
+HBRUSH CPageImpl::OnEraseBkgnd(CDCHandle dc)
+{
+    CTheme const& theme = CLegacyUIConfigurator::m_ThemeNative;
+
+    CRect rc;
+    GetClientRect(rc);
+    dc.FillSolidRect(rc, theme.m_Color[COLOR_WINDOW]);
+    return theme.m_Brush[COLOR_WINDOW];
 }

@@ -34,6 +34,11 @@
 #define IDC_CMB_ITEM                    216
 #define IDC_STA_FONT                    217
 #define IDC_CMB_FONT                    218
+#define IDC_BN_SAVE_AS                  219
+#define IDC_BN_DELETE                   220
+#define IDC_ITEM_SIZE_SPIN              221
+#define IDC_STA_ITEM2                   222
+#define IDC_STA_ITEM_SIZE_CAP           222
 #define ID_ACC_ALT_ENTER                32769
 #define ID_ACC_ALT_TAB                  32771
 
@@ -43,7 +48,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        209
 #define _APS_NEXT_COMMAND_VALUE         32772
-#define _APS_NEXT_CONTROL_VALUE         215
+#define _APS_NEXT_CONTROL_VALUE         223
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

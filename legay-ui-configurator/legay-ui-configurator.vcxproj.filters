@@ -12,6 +12,9 @@
     <Filter Include="pages">
       <UniqueIdentifier>{21646ebd-fcab-4087-8363-f5709637b93e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="theme">
+      <UniqueIdentifier>{52d02225-c195-42c8-94e7-587f039d908c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -51,6 +54,9 @@
     <ClInclude Include="luicPageAppearanceSystem.h">
       <Filter>pages</Filter>
     </ClInclude>
+    <ClInclude Include="luicTheme.h">
+      <Filter>theme</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -83,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="luicPageAppearanceSystem.cpp">
       <Filter>pages</Filter>
+    </ClCompile>
+    <ClCompile Include="luicTheme.cpp">
+      <Filter>theme</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
