@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="res">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="gen">
       <UniqueIdentifier>{fd3b67c2-f731-4ca1-bbcc-6409a6eb790a}</UniqueIdentifier>
       <SourceControlFiles>False</SourceControlFiles>
@@ -15,13 +11,17 @@
     <Filter Include="theme">
       <UniqueIdentifier>{52d02225-c195-42c8-94e7-587f039d908c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resz">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="resource.h">
-      <Filter>res</Filter>
+      <Filter>resz</Filter>
     </ClInclude>
     <ClInclude Include="luicMainFrame.h" />
     <ClInclude Include="luicMain.h" />
@@ -55,6 +55,9 @@
       <Filter>pages</Filter>
     </ClInclude>
     <ClInclude Include="luicTheme.h">
+      <Filter>theme</Filter>
+    </ClInclude>
+    <ClInclude Include="luicThemePreviewer.h">
       <Filter>theme</Filter>
     </ClInclude>
   </ItemGroup>
@@ -93,26 +96,29 @@
     <ClCompile Include="luicTheme.cpp">
       <Filter>theme</Filter>
     </ClCompile>
+    <ClCompile Include="luicThemePreviewer.cpp">
+      <Filter>theme</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resz\legay-ui-configurator.rc">
-      <Filter>res</Filter>
+      <Filter>resz</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resz\legay-ui-configurator.rgs">
-      <Filter>res</Filter>
+      <Filter>resz</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resz\rom-0.ico">
-      <Filter>res</Filter>
+      <Filter>resz</Filter>
     </Image>
     <Image Include="resz\rom-1.ico">
-      <Filter>res</Filter>
+      <Filter>resz</Filter>
     </Image>
     <Image Include="resz\rom-2.ico">
-      <Filter>res</Filter>
+      <Filter>resz</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
@@ -122,7 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="resz\legay-ui-configurator.exe.manifest">
-      <Filter>res</Filter>
+      <Filter>resz</Filter>
     </Manifest>
   </ItemGroup>
 </Project>

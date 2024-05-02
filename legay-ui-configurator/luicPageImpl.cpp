@@ -36,7 +36,7 @@ BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     UNREFERENCED_ARG(wndFocus);
     UNREFERENCED_ARG(lInitParam);
     m_resiseMap.emplace_back(_AtlDlgResizeMap{ -1, 0 });
-    DlgResize_Init(false, false);
+    DlgResize_Init(false, true);
     return TRUE;
 }
 
@@ -70,6 +70,6 @@ HBRUSH CPageImpl::OnEraseBkgnd(CDCHandle dc)
 
     CRect rc;
     GetClientRect(rc);
-    dc.FillSolidRect(rc, theme.m_Color[COLOR_WINDOW]);
-    return theme.m_Brush[COLOR_WINDOW];
+    dc.FillSolidRect(rc, theme.m_Color[COLOR_APPWORKSPACE]);
+    return theme.m_Brush[COLOR_APPWORKSPACE];
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "luicPageImpl.h"
+#include "luicThemePreviewer.h"
 #include <atlctrls.h>
 
 struct CPageAppearance: CPageImpl
@@ -9,7 +10,8 @@ struct CPageAppearance: CPageImpl
     CPageAppearance();
 
 private:
-    WTL::CStatic m_Preview;
+    CThemePreviewer m_Preview;
 
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
+    void OnDestroy() override;
 };

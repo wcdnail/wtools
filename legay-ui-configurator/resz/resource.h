@@ -4,6 +4,7 @@
 //
 #define IDS_PROJNAME                    100
 #define IDR_CLAPPEARANCE                101
+#define IDD_PAGE_APPEARANCE_EX          200
 #define IDI_ICON1                       201
 #define IDI_MAIN                        201
 #define BTN_ID_APPLY                    201
@@ -16,6 +17,7 @@
 #define IDC_TAB1                        205
 #define IDC_BN_APPLY                    206
 #define IDD_PAGE_APPEARANCE             206
+#define IDD_PAGE_APPEARANCE_BAD         206
 #define IDC_TEST_STA1                   207
 #define IDD_PAGE_BACKGROUND             207
 #define IDC_TEST_STA2                   208
