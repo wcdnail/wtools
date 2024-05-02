@@ -203,11 +203,6 @@ BOOL CMainFrame::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
     ModifyStyle(0, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX, SWP_FRAMECHANGED);
 
-#if defined(_DEBUG_TAB_RECT)
-    MoveToMonitor{}.Move(m_hWnd, 3);
-    ShowWindow(SW_SHOW);
-#endif
-
     SetWindowTextW(L"Display Properties");
 
     ImListCreate();
@@ -223,7 +218,13 @@ BOOL CMainFrame::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 
     DlgResizeAdd(IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y);
     DlgResizeAdd(IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y);
-    return CPageImpl::OnInitDialog(wndFocus, lInitParam);
+    BOOL rv = CPageImpl::OnInitDialog(wndFocus, lInitParam);
+
+#if 1 || defined(_DEBUG_TAB_RECT)
+    MoveToMonitor{}.Move(m_hWnd, 3);
+    ShowWindow(SW_SHOW);
+#endif
+    return rv;
 }
 
 void CMainFrame::OnDestroy()

@@ -16,22 +16,9 @@ struct CThemePreviewer: ATL::CWindowImpl<CThemePreviewer, ATL::CWindow, CThemePr
 private:
     friend Super;
 
+    void OnPaint(CDCHandle dc);
+
     BEGIN_MSG_MAP_EX(PanelView)
-        //CHAIN_MSG_MAP_MEMBER(Search)
-        //CHAIN_MSG_MAP_MEMBER(DragnDrop)
-        //MSG_WM_CREATE(OnCreate)
-        //MSG_WM_DESTROY(OnDestroy)
-        //MSG_WM_ERASEBKGND(OnEraseBkgnd)
-        //MSG_WM_PAINT(OnPaint)
-        //MSG_WM_KEYDOWN(OnKeyDown)
-        //MSG_WM_LBUTTONDOWN(OnMouseDown)
-        //MSG_WM_LBUTTONDBLCLK(OnLButtonDblClk)
-        //MSG_WM_RBUTTONUP(OnRButtonUp)
-        //MSG_WM_MOUSEWHEEL(OnMouseWheel)
-        //MSG_WM_SETFOCUS(OnSetFocus)
-        //MSG_WM_VSCROLL(OnVScroll)
-        //MSG_WM_DROPFILES(OnDropFiles)
-        //MSG_WM_CONTEXTMENU(OnContextMenu)
-        //CHAIN_MSG_MAP(SuperResizer)
+        MSG_WM_PAINT(OnPaint)
     END_MSG_MAP()
 };

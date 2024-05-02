@@ -38,6 +38,7 @@ protected:
     virtual LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
     virtual void OnDestroy();
 
+    HBRUSH OnCtlColorStatic(CDCHandle dc, HWND wndStatic);
     HBRUSH OnEraseBkgnd(CDCHandle dc);
 
 private:
@@ -45,6 +46,7 @@ private:
 
     BEGIN_MSG_MAP_EX(CColorsPage)
         MSG_WM_INITDIALOG(OnInitDialog)
+        MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
         MSG_WM_ERASEBKGND(OnEraseBkgnd)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_NOTIFY(OnNotify)

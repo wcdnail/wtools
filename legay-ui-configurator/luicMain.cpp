@@ -6,7 +6,10 @@
 #include "common/windows.uses.commoncontrols.h"
 #include "resz/resource.h"
 
-const CTheme CLegacyUIConfigurator::m_ThemeNative(true);
+CTheme CLegacyUIConfigurator::g_ThemeNative{ true };
+
+CLegacyUIConfigurator* CLegacyUIConfigurator::g_pApp{ nullptr };
+std::recursive_mutex CLegacyUIConfigurator::m_pAppMx{};
 
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMessageBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
 {
@@ -69,6 +72,10 @@ int WINAPI _tWinMain(HINSTANCE instHnd, HINSTANCE, LPTSTR, int showCmd)
 
 CLegacyUIConfigurator::~CLegacyUIConfigurator()
 {
+    {
+        std::lock_guard<std::recursive_mutex> guard(m_pAppMx);
+        g_pApp = nullptr;
+    }
 }
 
 CLegacyUIConfigurator::CLegacyUIConfigurator()
@@ -76,6 +83,23 @@ CLegacyUIConfigurator::CLegacyUIConfigurator()
     , m_MainFrame{ *this }
     , m_wAccelTab{ nullptr }
 {
+    {
+        std::lock_guard<std::recursive_mutex> guard(m_pAppMx);
+        g_pApp = this;
+    }
+}
+
+CTheme& CLegacyUIConfigurator::CurrentTheme() const
+{
+    return g_ThemeNative;
+}
+
+CLegacyUIConfigurator* CLegacyUIConfigurator::App()
+{
+    if (!g_pApp) {
+        throw std::logic_error("CLegacyUIConfigurator::App is NULL");
+    }
+    return g_pApp;
 }
 
 BOOL CLegacyUIConfigurator::PreTranslateMessage(MSG* pMsg)

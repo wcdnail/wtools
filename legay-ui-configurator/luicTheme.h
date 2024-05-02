@@ -33,6 +33,17 @@ struct CTheme
 
     static const SizeRange g_DefaultSizeRange[CTheme::SIZES_Count];
 
+    enum FontNames: int
+    {
+        FONT_Caption,
+        FONT_SMCaption,
+        FONT_Menu,
+        FONT_Tooltip,
+        FONT_Message,
+        FONT_Desktop,
+        FONTS_Count
+    };
+
 #if WINVER < WINVER_2K
     static const int COLORS_COUNT = 25;
 #elif WINVER < WINVER_XP
@@ -104,6 +115,7 @@ struct CTheme
     CTheme(bool loadSystemTheme);
 
     static PCTSTR SizeName(int size);
+    PCTSTR FontName(int font);
     static PCTSTR ColorName(int color);
 
     bool LoadSysTheme();

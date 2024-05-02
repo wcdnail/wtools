@@ -64,7 +64,6 @@ void CPageAppearance::InitResizeMap()
 
 BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-    //// Preview ---
     if (!m_Preview.SubclassWindow(GetDlgItem(IDC_APP_PREVIEW))) {
         HRESULT code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Previewer SubclassWindow failure!"), code, true, MB_ICONERROR);

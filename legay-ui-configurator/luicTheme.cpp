@@ -39,6 +39,7 @@ CTheme::CTheme(bool loadSystemTheme)
     }
 }
 
+_Ret_maybenull_
 PCTSTR CTheme::SizeName(int size)
 {
     static const PCTSTR gsl_sizeNames[SIZES_Count] = {
@@ -61,6 +62,21 @@ PCTSTR CTheme::SizeName(int size)
     return gsl_sizeNames[size];
 }
 
+PCTSTR CTheme::FontName(int font)
+{
+    static const PCTSTR gsl_fontNames[FONTS_Count] = {
+        TEXT("CaptionFont"),            // 0 = FONT_CAPTION
+        TEXT("SmCaptionFont"),          // 1 = FONT_SMCAPTION
+        TEXT("MenuFont"),               // 2 = FONT_MENU
+        TEXT("StatusFont"),             // 3 = FONT_TOOLTIP
+        TEXT("MessageFont"),            // 4 = FONT_MESSAGE
+        TEXT("IconFont")                // 5 = FONT_DESKTOP
+    };
+    if (font < 0 || font >= FONTS_Count) {
+        return nullptr;
+    }
+    return gsl_fontNames[font];
+}
 
 PCTSTR CTheme::ColorName(int color)
 {
@@ -115,7 +131,7 @@ PCTSTR CTheme::ColorName(int color)
     return gsl_ColorName[color];
 }
 
-static int GetSizeNcMetric(NONCLIENTMETRICS const* ncMetrics, int size)
+static int GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size)
 {
     switch (size) {
     case CTheme::SIZE_Border:           return ncMetrics->iBorderWidth;
@@ -132,6 +148,20 @@ static int GetSizeNcMetric(NONCLIENTMETRICS const* ncMetrics, int size)
 #endif
     }
     return -1;
+}
+
+_Ret_maybenull_
+static LOGFONT* GetNcMetricFont(CTheme& theme, int font)
+{
+    switch (font) {
+    case CTheme::FONT_Caption:   return &theme.m_ncMetrics.lfCaptionFont;
+    case CTheme::FONT_SMCaption: return &theme.m_ncMetrics.lfSmCaptionFont;
+    case CTheme::FONT_Menu:      return &theme.m_ncMetrics.lfMenuFont;
+    case CTheme::FONT_Tooltip:   return &theme.m_ncMetrics.lfStatusFont;
+    case CTheme::FONT_Message:   return &theme.m_ncMetrics.lfMessageFont;
+    case CTheme::FONT_Desktop:   return &theme.m_lfIconFont;
+    }
+    return nullptr;
 }
 
 bool CTheme::RefreshBrushes()
@@ -154,7 +184,7 @@ bool CTheme::LoadSysColors()
     for (int iColor = 0; iColor < COLORS_COUNT; iColor++) {
         const auto color = static_cast<COLORREF>(GetSysColor(iColor));
         if (color == CLR_INVALID) {
-            // ##TODO: придумай решение
+            // ##TODO: придумать решение
         }
         colors[iColor] = color;
     }
@@ -176,7 +206,7 @@ bool CTheme::LoadSysNcMetrics()
     }
     SizeRange sizeRanges[SIZES_Count] = { 0 };
     for (int iSize = 0; iSize < SIZES_Count; iSize++) {
-        sizeRanges[iSize].current = GetSizeNcMetric(&ncMetrics, iSize);
+        sizeRanges[iSize].current = GetNcMetricSize(&ncMetrics, iSize);
     }
     CopyMemory(&m_ncMetrics, &ncMetrics, sizeof(ncMetrics));
     CopyMemory(&m_SizeRange, &sizeRanges, sizeof(sizeRanges));
@@ -221,12 +251,10 @@ bool CTheme::LoadSysFlatMenusSetting()
 bool CTheme::LoadSysTheme()
 {
     bool ret = true;
-
     ret &= LoadSysColors();
     ret &= LoadSysNcMetrics();
     ret &= LoadSysIconFont();
     ret &= LoadSysGradientCaptionsSetting();
     ret &= LoadSysFlatMenusSetting();
-
     return ret;
 }
