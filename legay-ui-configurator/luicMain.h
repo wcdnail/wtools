@@ -5,11 +5,15 @@
 
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMessageBox = false, UINT mbType = MB_ICONERROR);
 
-struct CLegacyUIConfigurator: CAppModule
+struct CLegacyUIConfigurator: CAppModule,
+                              CMessageFilter
 {
     using Super = CAppModule;
 
+    static CBrush g_brBackBrush;
+
     CMainFrame m_MainFrame;
+    HACCEL     m_wAccelTab;
 
     ~CLegacyUIConfigurator() override;
     CLegacyUIConfigurator();
@@ -18,4 +22,6 @@ struct CLegacyUIConfigurator: CAppModule
 
 private:
     friend Super;
+
+    BOOL PreTranslateMessage(MSG* pMsg) override;
 };

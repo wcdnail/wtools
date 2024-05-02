@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "legay-ui-configurator", "le
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Franco-Tortoriello-WinClassicThemeConfig", "3rd-party\Franco-Tortoriello-WinClassicThemeConfig\Franco-Tortoriello-WinClassicThemeConfig.vcxproj", "{8D82B44E-3068-464B-80F3-EA456AEC7351}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wccf-minimal-static", "common\wccf-minimal-static.vcxproj", "{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,18 @@ Global
 		{8D82B44E-3068-464B-80F3-EA456AEC7351}.Release|x64.Build.0 = product|x64
 		{8D82B44E-3068-464B-80F3-EA456AEC7351}.Release|x86.ActiveCfg = debug|Win32
 		{8D82B44E-3068-464B-80F3-EA456AEC7351}.Release|x86.Build.0 = debug|Win32
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.Debug|x64.ActiveCfg = debug|x64
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.Debug|x64.Build.0 = debug|x64
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.Debug|x86.ActiveCfg = debug|Win32
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.Debug|x86.Build.0 = debug|Win32
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.product|x64.ActiveCfg = product|x64
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.product|x64.Build.0 = product|x64
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.product|x86.ActiveCfg = product|Win32
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.product|x86.Build.0 = product|Win32
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.Release|x64.ActiveCfg = product|x64
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.Release|x64.Build.0 = product|x64
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.Release|x86.ActiveCfg = debug|Win32
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.Release|x86.Build.0 = debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

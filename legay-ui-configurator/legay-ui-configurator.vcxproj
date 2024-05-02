@@ -234,11 +234,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\dh.timer.h" />
-    <ClInclude Include="..\common\dh.tracing.h" />
-    <ClInclude Include="..\common\info\runtime.information.h" />
-    <ClInclude Include="..\common\rectz.h" />
-    <ClInclude Include="..\common\string.utils.format.h" />
     <ClInclude Include="idl\legay-ui-configurator_i.h" />
     <ClInclude Include="luicAppearance.h" />
     <ClInclude Include="luicBackground.h" />
@@ -246,6 +241,12 @@
     <ClInclude Include="luicMain.h" />
     <ClInclude Include="luicMainFrame.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="luicPageAppearanceSystem.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="luicPageDlgTemplate.h" />
     <ClInclude Include="luicPageImpl.h" />
     <ClInclude Include="luicScreenSaver.h" />
@@ -257,16 +258,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\dh.timer.cpp" />
-    <ClCompile Include="..\common\dh.tracing.cpp" />
-    <ClCompile Include="..\common\info\runtime.information.cpp" />
-    <ClCompile Include="..\common\rectz.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\common\string.utils.format.cpp" />
     <ClCompile Include="luicAppearance.cpp" />
     <ClCompile Include="luicBackground.cpp" />
     <ClCompile Include="luicEffects.cpp" />
@@ -286,6 +277,12 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="luicMainFrame.cpp" />
+    <ClCompile Include="luicPageAppearanceSystem.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="luicPageDlgTemplate.cpp" />
     <ClCompile Include="luicPageImpl.cpp" />
     <ClCompile Include="luicScreenSaver.cpp" />
@@ -327,6 +324,11 @@
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="resz\legay-ui-configurator.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\wccf-minimal-static.vcxproj">
+      <Project>{dc0c6531-b048-4c6c-bcd3-71f3f7cf9ab3}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,6 +4,9 @@
 #include "string.utils.format.h"
 #include "common/windows.uses.ole.h"
 #include "common/windows.uses.commoncontrols.h"
+#include "resz/resource.h"
+
+CBrush CLegacyUIConfigurator::g_brBackBrush = CreateSolidBrush(0x00ff00ff);
 
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMessageBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
 {
@@ -69,9 +72,19 @@ CLegacyUIConfigurator::~CLegacyUIConfigurator()
 }
 
 CLegacyUIConfigurator::CLegacyUIConfigurator()
-    : Super()
-    , m_MainFrame(*this)
+    :       Super{}
+    , m_MainFrame{ *this }
+    , m_wAccelTab{ nullptr }
 {
+}
+
+BOOL CLegacyUIConfigurator::PreTranslateMessage(MSG* pMsg)
+{
+    int rv = TranslateAcceleratorW(m_MainFrame.m_hWnd, m_wAccelTab, pMsg);
+    if (rv > 0) {
+        return TRUE;
+    }
+    return FALSE;
 }
 
 HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
@@ -102,9 +115,16 @@ HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
             ReportError(L"MainFrame creation failure!", hr, true);
             return hr;
         }
+        m_wAccelTab = LoadAcceleratorsW(instHnd, MAKEINTRESOURCEW(IDR_APP_ACCEL));
+        if (!m_wAccelTab) {
+            hr = ::GetLastError();
+            ReportError(L"LoadAccelerators failure!", hr, true, MB_ICONWARNING);
+        }
+        loop.AddMessageFilter(this);
         ATLTRACE2(atlTraceUI, 0, _T("All OK, launch main window [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
         m_MainFrame.ShowWindow(showCmd);
         hr = loop.Run();
+        loop.RemoveMessageFilter(this);
         RemoveMessageLoop();
     }
     catch(std::exception const& ex) {

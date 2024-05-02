@@ -4,8 +4,6 @@
 #include "strint.h"
 #include <cstdint>
 
-#include "strint.h"
-
 namespace DH
 {
     enum WindowTypes: uint64_t

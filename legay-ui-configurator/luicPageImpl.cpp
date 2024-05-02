@@ -13,6 +13,11 @@ CPageImpl::CPageImpl(UINT idd)
 {
 }
 
+HWND CPageImpl::CreateDlg(HWND hWndParent, LPARAM dwInitParam)
+{
+    return Super::Create(hWndParent, dwInitParam);
+}
+
 void CPageImpl::DlgResizeAdd(int nCtlID, DWORD dwResizeFlags)
 {
     CWindow item = GetDlgItem(nCtlID);
@@ -27,6 +32,11 @@ BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_resiseMap.emplace_back(_AtlDlgResizeMap{ -1, 0 });
     DlgResize_Init(false, false);
     return TRUE;
+}
+
+HBRUSH CPageImpl::OnEraseBkgnd(CDCHandle dc)
+{
+    return CLegacyUIConfigurator::g_brBackBrush.m_hBrush;
 }
 
 WTL::_AtlDlgResizeMap const* CPageImpl::GetDlgResizeMap() const

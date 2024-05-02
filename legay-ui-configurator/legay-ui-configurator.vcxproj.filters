@@ -9,12 +9,6 @@
       <UniqueIdentifier>{fd3b67c2-f731-4ca1-bbcc-6409a6eb790a}</UniqueIdentifier>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="from-cf">
-      <UniqueIdentifier>{1ad3ba53-ae52-4b00-b85e-dae11bbf6d02}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="from-cf\info">
-      <UniqueIdentifier>{3e41e16a-ba56-4e57-91c1-2d6ceb8d0ac9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="pages">
       <UniqueIdentifier>{21646ebd-fcab-4087-8363-f5709637b93e}</UniqueIdentifier>
     </Filter>
@@ -32,21 +26,6 @@
       <Filter>gen</Filter>
     </ClInclude>
     <ClInclude Include="resz\resource.h" />
-    <ClInclude Include="..\common\rectz.h">
-      <Filter>from-cf</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\dh.timer.h">
-      <Filter>from-cf</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\dh.tracing.h">
-      <Filter>from-cf</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\info\runtime.information.h">
-      <Filter>from-cf\info</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\string.utils.format.h">
-      <Filter>from-cf</Filter>
-    </ClInclude>
     <ClInclude Include="luicPageImpl.h" />
     <ClInclude Include="luicAppearance.h">
       <Filter>pages</Filter>
@@ -69,6 +48,9 @@
     <ClInclude Include="luicWeb.h">
       <Filter>pages</Filter>
     </ClInclude>
+    <ClInclude Include="luicPageAppearanceSystem.h">
+      <Filter>pages</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -76,21 +58,6 @@
     <ClCompile Include="luicMainFrame.cpp" />
     <ClCompile Include="idl\legay-ui-configurator_i.c">
       <Filter>gen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\rectz.cpp">
-      <Filter>from-cf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\dh.timer.cpp">
-      <Filter>from-cf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\dh.tracing.cpp">
-      <Filter>from-cf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\info\runtime.information.cpp">
-      <Filter>from-cf\info</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\string.utils.format.cpp">
-      <Filter>from-cf</Filter>
     </ClCompile>
     <ClCompile Include="luicPageImpl.cpp" />
     <ClCompile Include="luicAppearance.cpp">
@@ -112,6 +79,9 @@
       <Filter>pages</Filter>
     </ClCompile>
     <ClCompile Include="luicWeb.cpp">
+      <Filter>pages</Filter>
+    </ClCompile>
+    <ClCompile Include="luicPageAppearanceSystem.cpp">
       <Filter>pages</Filter>
     </ClCompile>
   </ItemGroup>

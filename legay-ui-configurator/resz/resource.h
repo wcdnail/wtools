@@ -20,6 +20,7 @@
 #define IDD_PAGE_BACKGROUND             207
 #define IDC_TEST_STA2                   208
 #define IDD_PAGE_SCREENSAVER            208
+#define IDR_APP_ACCEL                   208
 #define IDC_TEST_STA3                   209
 #define IDD_PAGE_EFFECTS                209
 #define IDC_TEST_STA4                   210
@@ -32,15 +33,16 @@
 #define IDC_STA_ITEM                    215
 #define IDC_CMB_ITEM                    216
 #define IDC_STA_FONT                    217
-#define IDC_CMB_SCHEME2                 218
 #define IDC_CMB_FONT                    218
+#define ID_ACC_ALT_ENTER                32769
+#define ID_ACC_ALT_TAB                  32771
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        208
-#define _APS_NEXT_COMMAND_VALUE         32768
+#define _APS_NEXT_RESOURCE_VALUE        209
+#define _APS_NEXT_COMMAND_VALUE         32772
 #define _APS_NEXT_CONTROL_VALUE         215
 #define _APS_NEXT_SYMED_VALUE           106
 #endif

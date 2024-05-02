@@ -27,6 +27,10 @@
 
 #include <winrt/base.h>
 
+#include <CommCtrl.h>
+#include <shellapi.h>
+#include <prsht.h>
+
 #include <unordered_map>
 #include <filesystem>
 #include <algorithm>

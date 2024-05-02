@@ -87,6 +87,7 @@ void CMainFrame::PagesGetRect()
     m_rcTabClient = rcTab;
 #if !defined(_DEBUG_TAB_RECT)
     TabCtrl_AdjustRect(m_Tab.m_hWnd, FALSE, m_rcTabClient);
+    m_rcTabClient.InflateRect(4, 4);
 #else
     m_Tab.ShowWindow(SW_HIDE);
     {
@@ -150,7 +151,7 @@ void CMainFrame::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr
                     code, true, MB_ICONSTOP);
         return ;
     }
-    if (!pagePtr->Create(m_Tab.m_hWnd)) {
+    if (!pagePtr->CreateDlg(m_Tab.m_hWnd)) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", str.GetString()), code, true, MB_ICONERROR);
         return ;
