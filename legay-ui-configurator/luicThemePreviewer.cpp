@@ -23,6 +23,8 @@ public:
     static DrawRoutines& instance();
 
     static void DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush);
+    static LONG DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, int buttonWidth, UINT uFlags,
+                                   const CTheme& theme);
     static void DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags, const CTheme& theme);
     void DrawWindow(CDCHandle dc, CTheme const& theme, const CWndFrameRects& rects, UINT flags, HMENU hMenu);
 
@@ -95,6 +97,55 @@ void DrawRoutines::DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidt
     }
 }
 
+LONG DrawRoutines::DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, int buttonWidth,
+                                      UINT uFlags, const CTheme& theme)
+{
+    static const int margin = 2;
+    buttonWidth -= margin;
+
+    int iColor;
+#if WINVER >= WINVER_2K
+    if (uFlags & DC_GRADIENT) {
+        if (uFlags & DC_ACTIVE) {
+            iColor = COLOR_GRADIENTACTIVECAPTION;
+        }
+        else {
+            iColor = COLOR_GRADIENTINACTIVECAPTION;
+        }
+    }
+    else
+#endif
+    {
+        if (uFlags & DC_ACTIVE) {
+            iColor = COLOR_ACTIVECAPTION;
+        }
+        else {
+            iColor = COLOR_INACTIVECAPTION;
+        }
+    }
+    dc.FillRect(rcCaption, theme.GetBrush(iColor));
+
+    CRect rc;
+    rc.top = rcCaption.top + margin;
+    rc.bottom = rcCaption.bottom - margin;
+
+    /* Close */
+    rc.right = rcCaption.right - margin;
+    rc.left = rc.right - buttonWidth;
+    dc.DrawFrameControl(rc, DFC_CAPTION, DFCS_CAPTIONCLOSE);
+
+    if (withMinMax) {
+        rc.right = rc.left - margin;
+        rc.left = rc.right - buttonWidth;
+        dc.DrawFrameControl(rc, DFC_CAPTION, DFCS_CAPTIONMAX);
+
+        rc.right = rc.left;
+        rc.left = rc.right - buttonWidth;
+        dc.DrawFrameControl(rc, DFC_CAPTION, DFCS_CAPTIONMIN);
+    }
+    return rc.left;
+}
+
 void DrawRoutines::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags, const CTheme& theme)
 {
     CRect rcTmp = rcParam;
@@ -139,10 +190,6 @@ void DrawRoutines::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, 
         vert[1].Blue = static_cast<COLOR16>((colors[1] >> 8) & 0xFF00);
         vert[1].Alpha = 0;
 #if defined(WINVER_IS_98)
-        /* Win98 has GradientFill on Msimg32 only.
-         * Later versions redirect to the implementation of GdiGradientFill on
-         * Gdi32.
-         */
         GradientFill(dc, vert, 2, &gcap, 1, GRADIENT_FILL_RECT_H);
 #else
         GdiGradientFill(dc, vert, 2, &gcap, 1, GRADIENT_FILL_RECT_H);
@@ -163,7 +210,7 @@ void DrawRoutines::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, 
     }
     rcTmp.left += 2;
     dc.SetBkMode(TRANSPARENT);
-    dc.DrawTextW(str, -1, &rcTmp, DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+    dc.DrawTextW(str, -1, rcTmp, DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
     if (prevFont) {
         dc.SelectFont(prevFont);
     }
@@ -175,15 +222,17 @@ void DrawRoutines::DrawWindow(CDCHandle dc, const CTheme& theme, const CWndFrame
     HFONT  menuFont = theme.GetFont(FONT_Menu);
     HFONT  captFont = theme.GetFont(FONT_Caption);
     HICON  captIcon = nullptr;
-    PCWSTR captText = L"Caption text...";
+    PCWSTR captText = L"Tool window...";
     UINT  captFlags = flags | DC_TEXT;
 
     if (0 == (DC_SMALLCAP & flags)) {
         if (0 != (DC_ACTIVE & flags)) {
             captIcon = CLegacyUIConfigurator::App()->GetIcon(IconStartmenu);
+            captText = L"Active window...";
         }
         else {
             captIcon = CLegacyUIConfigurator::App()->GetIcon(IconAppearance);
+            captText = L"Inactive window...";
         }
         captFlags |= DC_ICON;
     }
@@ -201,10 +250,12 @@ void DrawRoutines::DrawWindow(CDCHandle dc, const CTheme& theme, const CWndFrame
     DrawBorder(dc, rects.m_rcBorder, rects.m_BorderSize, theme.GetBrush(borderColorIndex));
     dc.DrawEdge(CRect(rects.m_rcBorder), EDGE_RAISED, BF_RECT | BF_ADJUST); // *****
     dc.FillSolidRect(rects.m_rcFrame, theme.GetColor(COLOR_MENU));
-    DrawCaption(dc, rects.m_rcCapt, captFont, captIcon, captText, captFlags, theme);
+
+    CRect rcCapt = rects.m_rcCapt;
+    rcCapt.right = DrawCaptionButtons(dc, rcCapt, (0 == (DC_SMALLCAP & flags)), 32, captFlags, theme);
+    DrawCaption(dc, rcCapt, captFont, captIcon, captText, captFlags, theme);
 
     if (hMenu) {
-        //dc.FillSolidRect(rects.m_rcMenu, theme.m_Color[COLOR_APPWORKSPACE]);
         DrawMenuBarTemp(nullptr, dc, CRect(rects.m_rcMenu), hMenu, menuFont);
     }
     if (0) {
