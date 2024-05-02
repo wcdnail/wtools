@@ -2,16 +2,28 @@
 #include "luicTheme.h"
 #include "resz/resource.h"
 
-template <typename Res>
-static inline Res GetCurrentDPI()
+namespace
 {
-    int temp = USER_DEFAULT_SCREEN_DPI;
-    HDC screenDc{ GetDC(nullptr) };
-    if (screenDc) {
-        temp = GetDeviceCaps(screenDc, LOGPIXELSY);
-        ReleaseDC(nullptr, screenDc);
+#if WINVER < WINVER_2K
+    static const int COLORS_COUNT = 25;
+#elif WINVER < WINVER_XP
+    static const int COLORS_COUNT = 29;
+#else
+    static const int COLORS_COUNT = 31;
+#endif
+    static_assert(CLR_Count == COLORS_COUNT, "CLR_Count COUNT is NOT match COLORS_COUNT!");
+
+    template <typename Res>
+    static inline Res GetCurrentDPI()
+    {
+        int temp = USER_DEFAULT_SCREEN_DPI;
+        HDC screenDc{ GetDC(nullptr) };
+        if (screenDc) {
+            temp = GetDeviceCaps(screenDc, LOGPIXELSY);
+            ReleaseDC(nullptr, screenDc);
+        }
+        return static_cast<Res>(temp);
     }
-    return static_cast<Res>(temp);
 }
 
 int CTheme::g_DPI = GetCurrentDPI<int>();
@@ -94,7 +106,7 @@ PCTSTR CTheme::FontName(int font)
 
 PCTSTR CTheme::ColorName(int color)
 {
-    static const PCTSTR gsl_ColorName[COLORS_COUNT] = {
+    static const PCTSTR gsl_ColorName[CLR_Count] = {
         TEXT("Scrollbar"),              // 00 = COLOR_SCROLLBAR
         TEXT("Background"),             // 01 = COLOR_BACKGROUND
         // COLOR_DESKTOP -------------------------------------------------
@@ -139,7 +151,7 @@ PCTSTR CTheme::ColorName(int color)
         TEXT("MenuBar")                 // 30 = COLOR_MENUBAR
 #endif
     };
-    if (color < 0 || color >= COLORS_COUNT) {
+    if (color < 0 || color >= CLR_Count) {
         return nullptr;
     }
     return gsl_ColorName[color];
@@ -165,7 +177,7 @@ static int GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size)
 }
 
 _Ret_maybenull_
-static LOGFONT* GetNcMetricFont(CTheme& theme, int font)
+LOGFONT* CTheme::GetNcMetricFont(CTheme& theme, int font)
 {
     switch (font) {
     case FONT_Caption:   return &theme.m_ncMetrics.lfCaptionFont;
@@ -180,15 +192,15 @@ static LOGFONT* GetNcMetricFont(CTheme& theme, int font)
 
 bool CTheme::RefreshBrushes()
 {
-    CBrush tmpBrush[COLORS_COUNT];
-    for (int iColor = 0; iColor < COLORS_COUNT; iColor++) {
+    CBrush tmpBrush[CLR_Count];
+    for (int iColor = 0; iColor < CLR_Count; iColor++) {
         if (CLR_INVALID == m_Color[iColor]) {
             // ##TODO: придумать решение
             continue;
         }
         tmpBrush[iColor].CreateSolidBrush(m_Color[iColor]);
     }
-    for (int iBrush = 0; iBrush < COLORS_COUNT; iBrush++) {
+    for (int iBrush = 0; iBrush < CLR_Count; iBrush++) {
         m_Brush[iBrush].Attach(tmpBrush[iBrush].Detach());
     }
     return true;
@@ -214,8 +226,8 @@ bool CTheme::RefreshFonts()
 
 bool CTheme::LoadSysColors()
 {
-    COLORREF colors[COLORS_COUNT] = { 0 };
-    for (int iColor = 0; iColor < COLORS_COUNT; iColor++) {
+    COLORREF colors[CLR_Count] = { 0 };
+    for (int iColor = 0; iColor < CLR_Count; iColor++) {
         const auto color = static_cast<COLORREF>(GetSysColor(iColor));
         if (color == CLR_INVALID) {
             // ##TODO: придумать решение
@@ -292,4 +304,28 @@ bool CTheme::LoadSysTheme()
     ret &= LoadSysGradientCaptionsSetting();
     ret &= LoadSysFlatMenusSetting();
     return ret;
+}
+
+COLORREF CTheme::GetColor(int color) const
+{
+    if (color < 0 || color >= CLR_Count) {
+        return CLR_INVALID;
+    }
+    return m_Color[color];
+}
+
+HBRUSH CTheme::GetBrush(int color) const
+{
+    if (color < 0 || color >= CLR_Count) {
+        return nullptr;
+    }
+    return m_Brush[color];
+}
+
+HFONT CTheme::GetFont(int font) const
+{
+    if (font < 0 || font >= FONTS_Count) {
+        return nullptr;
+    }
+    return m_Font[font];
 }

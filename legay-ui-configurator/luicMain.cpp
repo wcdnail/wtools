@@ -103,6 +103,11 @@ HICON CLegacyUIConfigurator::GetIcon(int icon) const
     return m_ImList.GetIcon(icon);
 }
 
+CMenu const& CLegacyUIConfigurator::GetMenu() const
+{
+    return m_TestMenu;
+}
+
 HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID)
 {
     HRESULT hr = CAppModule::Init(pObjMap, hInstance, pLibID);
@@ -110,6 +115,7 @@ HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINST
         return hr;
     }
     hr = ImListCreate();
+    m_TestMenu.LoadMenuW(IDR_MENU1);
     return hr;
 }
 

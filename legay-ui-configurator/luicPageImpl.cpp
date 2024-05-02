@@ -75,9 +75,9 @@ void CPageImpl::OnDestroy()
 HBRUSH CPageImpl::OnCtlColorStatic(CDCHandle dc, HWND wndStatic)
 {
     CTheme& theme = CLegacyUIConfigurator::App()->CurrentTheme();
-    dc.SetTextColor(theme.m_Color[COLOR_CAPTIONTEXT]);
-    dc.SetBkColor(theme.m_Color[COLOR_MENU]);
-    return theme.m_Brush[COLOR_MENU];
+    dc.SetTextColor(theme.GetColor(COLOR_CAPTIONTEXT));
+    dc.SetBkColor(theme.GetColor(COLOR_MENU));
+    return theme.GetBrush(COLOR_MENU);
 }
 
 HBRUSH CPageImpl::OnEraseBkgnd(CDCHandle dc)
@@ -85,6 +85,6 @@ HBRUSH CPageImpl::OnEraseBkgnd(CDCHandle dc)
     CTheme& theme = CLegacyUIConfigurator::App()->CurrentTheme();
     CRect rc;
     GetClientRect(rc);
-    dc.FillSolidRect(rc, theme.m_Color[COLOR_MENU]);
-    return theme.m_Brush[COLOR_MENU];
+    dc.FillSolidRect(rc, theme.GetColor(COLOR_MENU));
+    return theme.GetBrush(COLOR_MENU);
 }

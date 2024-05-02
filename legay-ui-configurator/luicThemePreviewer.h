@@ -10,8 +10,9 @@ struct CWndFrameRects
     CRect m_rcBorder = {};
     CRect  m_rcFrame = {};
     CRect   m_rcCapt = {};
+    CRect   m_rcMenu = {};
 
-    void Calc(CRect const& rc, const CTheme& theme);
+    void Calc(CRect const& rc, const CTheme& theme, bool wMenu, bool wWorkspace);
 };
 
 using CThemePreviewerTraits = ATL::CWinTraits<WS_CHILD | WS_VISIBLE | WS_BORDER, 0>;

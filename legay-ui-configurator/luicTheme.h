@@ -40,14 +40,6 @@ enum FONT_NAMES : int
     FONTS_Count
 };
 
-#if WINVER < WINVER_2K
-static const int COLORS_COUNT = 25;
-#elif WINVER < WINVER_XP
-static const int COLORS_COUNT = 29;
-#else
-static const int COLORS_COUNT = 31;
-#endif
-
 enum COLOR_NAMES : int
 {
     CLR_Scrollbar = 0,          // 00 = COLOR_SCROLLBAR
@@ -96,10 +88,25 @@ enum COLOR_NAMES : int
     CLR_Count
 };
 
-static_assert(CLR_Count == COLORS_COUNT, "CLR_Count COUNT is NOT match COLORS_COUNT!");
-
 struct CTheme
 {
+    static int g_DPI;
+
+    ~CTheme();
+    CTheme(bool loadSystemTheme);
+
+    static PCTSTR SizeName(int size);
+    static PCTSTR FontName(int font);
+    static PCTSTR ColorName(int color);
+
+    bool LoadSysTheme();
+    COLORREF GetColor(int color) const;
+    HBRUSH GetBrush(int color) const;
+    HFONT GetFont(int font) const;
+    bool IsGradientCaptions() const;
+    NONCLIENTMETRICS const& GetNcMetrcs() const;
+
+private:
     static const SizeRange g_DefaultSizeRange[SIZES_Count];
 
     ATL::CString          m_SchemeName;
@@ -112,17 +119,8 @@ struct CTheme
     CFont          m_Font[FONTS_Count];
     SizeRange m_SizeRange[SIZES_Count];
 
-    ~CTheme();
-    CTheme(bool loadSystemTheme);
+    static LOGFONT* GetNcMetricFont(CTheme& theme, int font);
 
-    static int g_DPI;
-    static PCTSTR SizeName(int size);
-    static PCTSTR FontName(int font);
-    static PCTSTR ColorName(int color);
-
-    bool LoadSysTheme();
-
-private:
     bool RefreshBrushes();
     bool RefreshFonts();
     bool LoadSysColors();
@@ -136,4 +134,14 @@ template <typename Res>
 inline Res ScaleForDpi(Res n)
 {
     return MulDiv(static_cast<int>(n), CTheme::g_DPI, USER_DEFAULT_SCREEN_DPI);
+}
+
+inline bool CTheme::IsGradientCaptions() const
+{
+    return m_bGradientCaptions;
+}
+
+inline NONCLIENTMETRICS const& CTheme::GetNcMetrcs() const
+{
+    return m_ncMetrics;
 }

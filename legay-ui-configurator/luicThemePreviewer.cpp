@@ -12,9 +12,9 @@ class DrawRoutines
     HMODULE USER32;
 
 public:
-    using DrawCaptionTempWFn = BOOL(WINAPI*)(HWND hWnd, HDC hdc, const RECT* pRect, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags);
+    using DrawCaptionTempWFn = BOOL(WINAPI*)(HWND hWnd, HDC dc, const RECT* pRect, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags);
     using SetSysColorsTempFn = DWORD_PTR(WINAPI*)(const COLORREF* pPens, const HBRUSH* pBrushes, DWORD_PTR n);
-    using  DrawMenuBarTempFn = int(WINAPI*)(HWND hWnd, HDC hdc, RECT* pRect, HMENU hMenu, HFONT hFont);
+    using  DrawMenuBarTempFn = int(WINAPI*)(HWND hWnd, HDC dc, RECT* pRect, HMENU hMenu, HFONT hFont);
 
     DrawCaptionTempWFn DrawCaptionTempW;
     SetSysColorsTempFn SetSysColorsTemp;
@@ -23,7 +23,8 @@ public:
     static DrawRoutines& instance();
 
     static void DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush);
-    void DrawWindow(CDCHandle dc, CTheme const& theme, const CWndFrameRects& rects, UINT flags);
+    static void DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags, const CTheme& theme);
+    void DrawWindow(CDCHandle dc, CTheme const& theme, const CWndFrameRects& rects, UINT flags, HMENU hMenu);
 
 private:
     ~DrawRoutines();
@@ -94,62 +95,133 @@ void DrawRoutines::DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidt
     }
 }
 
-void DrawRoutines::DrawWindow(CDCHandle dc, const CTheme& theme, const CWndFrameRects& rects, UINT flags)
+void DrawRoutines::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags, const CTheme& theme)
 {
-    HFONT  captFont = theme.m_Font[FONT_Caption];
-    HICON  captIcon = CLegacyUIConfigurator::App()->GetIcon(IconAppearance);
-    PCWSTR captText = L"Caption text...";
-    UINT  captFlags = DC_TEXT;
-    bool   mdiFrame = false;
-
-    if (0 == (DC_SMALLCAP & flags)) {
-        captIcon = CLegacyUIConfigurator::App()->GetIcon(IconAppearance);
-        captFlags |= DC_ICON;
-        mdiFrame = true;
+    CRect rcTmp = rcParam;
+    int iColor1 = COLOR_INACTIVECAPTION;
+    if (uFlags & DC_ACTIVE) {
+        iColor1 = COLOR_ACTIVECAPTION;
     }
-    else {
-        captFlags |= DC_SMALLCAP;
+    if (hIcon) {
+        int        iconSize = GetSystemMetrics(SM_CYSMICON);  /* Same as SM_CXSMICON */
+        int totalIconMargin = rcTmp.bottom - rcTmp.top - iconSize;
+        int      iconMargin = totalIconMargin / 2;
+        rcTmp.right = rcTmp.left + iconSize + totalIconMargin;
+        dc.FillRect(rcTmp, theme.GetBrush(iColor1));
+        if (DrawIconEx(dc, rcTmp.left + iconMargin + 1, rcTmp.top + iconMargin, hIcon, 0, 0, 0, nullptr, DI_NORMAL) != 0) {
+            rcTmp.left = rcTmp.right;
+        }
+        rcTmp.right = rcParam.right;
     }
 
 #if WINVER >= WINVER_2K
-    if (theme.m_bGradientCaptions) {
+    if (uFlags & DC_GRADIENT) {
+        GRADIENT_RECT gcap = { 0, 1 };
+        TRIVERTEX  vert[2];
+        COLORREF colors[2];
+        colors[0] = theme.GetColor(iColor1);
+        if (uFlags & DC_ACTIVE) {
+            colors[1] = theme.GetColor(COLOR_GRADIENTACTIVECAPTION);
+        }
+        else {
+            colors[1] = theme.GetColor(COLOR_GRADIENTINACTIVECAPTION);
+        }
+        vert[0].x = rcTmp.left;
+        vert[0].y = rcTmp.top;
+        vert[0].Red = static_cast<COLOR16>(colors[0] << 8);
+        vert[0].Green = static_cast<COLOR16>(colors[0] & 0xFF00);
+        vert[0].Blue = static_cast<COLOR16>((colors[0] >> 8) & 0xFF00);
+        vert[0].Alpha = 0;
+        vert[1].x = rcTmp.right;
+        vert[1].y = rcTmp.bottom;
+        vert[1].Red = static_cast<COLOR16>(colors[1] << 8);
+        vert[1].Green = static_cast<COLOR16>(colors[1] & 0xFF00);
+        vert[1].Blue = static_cast<COLOR16>((colors[1] >> 8) & 0xFF00);
+        vert[1].Alpha = 0;
+#if defined(WINVER_IS_98)
+        /* Win98 has GradientFill on Msimg32 only.
+         * Later versions redirect to the implementation of GdiGradientFill on
+         * Gdi32.
+         */
+        GradientFill(dc, vert, 2, &gcap, 1, GRADIENT_FILL_RECT_H);
+#else
+        GdiGradientFill(dc, vert, 2, &gcap, 1, GRADIENT_FILL_RECT_H);
+#endif
+    }
+    else
+#endif
+    {
+        dc.FillRect(rcTmp, theme.GetBrush(iColor1));
+    }
+
+    HFONT prevFont = dc.SelectFont(hFont);
+    if (uFlags & DC_ACTIVE) {
+        SetTextColor(dc, theme.GetColor(COLOR_CAPTIONTEXT));
+    }
+    else {
+        SetTextColor(dc, theme.GetColor(COLOR_INACTIVECAPTIONTEXT));
+    }
+    rcTmp.left += 2;
+    dc.SetBkMode(TRANSPARENT);
+    dc.DrawTextW(str, -1, &rcTmp, DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+    if (prevFont) {
+        dc.SelectFont(prevFont);
+    }
+}
+
+
+void DrawRoutines::DrawWindow(CDCHandle dc, const CTheme& theme, const CWndFrameRects& rects, UINT flags, HMENU hMenu)
+{
+    HFONT  menuFont = theme.GetFont(FONT_Menu);
+    HFONT  captFont = theme.GetFont(FONT_Caption);
+    HICON  captIcon = nullptr;
+    PCWSTR captText = L"Caption text...";
+    UINT  captFlags = flags | DC_TEXT;
+
+    if (0 == (DC_SMALLCAP & flags)) {
+        if (0 != (DC_ACTIVE & flags)) {
+            captIcon = CLegacyUIConfigurator::App()->GetIcon(IconStartmenu);
+        }
+        else {
+            captIcon = CLegacyUIConfigurator::App()->GetIcon(IconAppearance);
+        }
+        captFlags |= DC_ICON;
+    }
+
+#if WINVER >= WINVER_2K
+    if (theme.IsGradientCaptions()) {
         captFlags |= DC_GRADIENT;
     }
 #endif
     int borderColorIndex = COLOR_INACTIVEBORDER;
     if (0 != (DC_ACTIVE & flags)) {
         borderColorIndex = COLOR_ACTIVEBORDER;
-        captFlags |= DC_ACTIVE;
-        captIcon = CLegacyUIConfigurator::App()->GetIcon(IconStartmenu);
     }
-#if (_WIN32_WINNT >= 0x0501)
-    captFlags |= DC_BUTTONS;
-#endif
 
-    DrawBorder(dc, rects.m_rcBorder, rects.m_BorderSize, theme.m_Brush[borderColorIndex]);
+    DrawBorder(dc, rects.m_rcBorder, rects.m_BorderSize, theme.GetBrush(borderColorIndex));
     dc.DrawEdge(CRect(rects.m_rcBorder), EDGE_RAISED, BF_RECT | BF_ADJUST); // *****
+    dc.FillSolidRect(rects.m_rcFrame, theme.GetColor(COLOR_MENU));
+    DrawCaption(dc, rects.m_rcCapt, captFont, captIcon, captText, captFlags, theme);
 
-    dc.FillSolidRect(rects.m_rcFrame, theme.m_Color[COLOR_MENU]);
+    if (hMenu) {
+        //dc.FillSolidRect(rects.m_rcMenu, theme.m_Color[COLOR_APPWORKSPACE]);
+        DrawMenuBarTemp(nullptr, dc, CRect(rects.m_rcMenu), hMenu, menuFont);
+    }
+    if (0) {
+        //rcMDI = rcFrame;
+        //rcMDI.Shrink(2, 2);
 
-    DrawCaptionTempW(nullptr, dc, rects.m_rcCapt, captFont, captIcon, captText, captFlags);
+        //CRect rcLMDI = ToCRect<long>(rcMDI);
+        //dc.FillSolidRect(rcLMDI, theme.m_Color[COLOR_APPWORKSPACE]);
+        //dc.DrawEdge(rcLMDI, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
 
-    if (mdiFrame) {
-        if (0) {
-            //rcMDI = rcFrame;
-            //rcMDI.Shrink(2, 2);
-
-            //CRect rcLMDI = ToCRect<long>(rcMDI);
-            //dc.FillSolidRect(rcLMDI, theme.m_Color[COLOR_APPWORKSPACE]);
-            //dc.DrawEdge(rcLMDI, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
-
-            //
-        }
+        //
     }
 }
 
 ///----------------------------------------------------------------------------
 
-void CWndFrameRects::Calc(CRect const& rc, const CTheme& theme)
+void CWndFrameRects::Calc(CRect const& rc, const CTheme& theme, bool wMenu, bool wWorkspace)
 {
     long   dpiScale = ScaleForDpi<long>(8);
     LRect  rcBorder = FromCRect<long>(rc);
@@ -160,9 +232,9 @@ void CWndFrameRects::Calc(CRect const& rc, const CTheme& theme)
 
     m_rcBorder = ToCRect(rcBorder);
 
-    m_BorderSize = theme.m_ncMetrics.iBorderWidth + 1;
+    m_BorderSize = theme.GetNcMetrcs().iBorderWidth + 1;
 #if WINVER >= WINVER_VISTA
-    m_BorderSize += theme.m_ncMetrics.iPaddedBorderWidth;
+    m_BorderSize += theme.GetNcMetrcs().iPaddedBorderWidth;
 #endif
 
     rcFrame = rcBorder;
@@ -171,9 +243,15 @@ void CWndFrameRects::Calc(CRect const& rc, const CTheme& theme)
     m_rcFrame = ToCRect(rcFrame);
 
     rcCapt = rcFrame;
-    rcCapt.cy = theme.m_ncMetrics.iCaptionHeight;
+    rcCapt.cy = theme.GetNcMetrcs().iCaptionHeight;
     rcCapt.Shrink(1, 1);
     m_rcCapt = ToCRect(rcCapt);
+
+    if (wMenu) {
+        rcMenu = rcCapt;
+        rcMenu.y += rcCapt.cy + 1;
+        m_rcMenu = ToCRect(rcMenu);
+    }
 }
 
 CThemePreviewer::~CThemePreviewer()
@@ -225,16 +303,16 @@ void CThemePreviewer::OnPaint(CDCHandle dcParam)
     rcIcon3.cx += rcFull.Width() / 15.;
     rcIcon3.cy += rcFull.Height() / 5.5;
 
-    dc.FillSolidRect(rcClient, theme.m_Color[COLOR_BACKGROUND]);
+    dc.FillSolidRect(rcClient, theme.GetColor(COLOR_BACKGROUND));
 
     // active -> inactive order
-    m_WndRect[2].Calc(ToCRect<double>(rcIcon3), theme);
-    m_WndRect[1].Calc(ToCRect<double>(rcWin1), theme);
-    m_WndRect[0].Calc(ToCRect<double>(rcWin2), theme);
+    m_WndRect[2].Calc(ToCRect<double>(rcIcon3), theme, false, false);
+    m_WndRect[1].Calc(ToCRect<double>(rcWin1), theme, true, true);
+    m_WndRect[0].Calc(ToCRect<double>(rcWin2), theme, true, true);
 
     // inactive -> active order
-    DrawRoutines::instance().DrawWindow(dc, theme, m_WndRect[1], 0);
-    DrawRoutines::instance().DrawWindow(dc, theme, m_WndRect[0], DC_ACTIVE);
-    DrawRoutines::instance().DrawWindow(dc, theme, m_WndRect[2], DC_ACTIVE | DC_SMALLCAP);
+    DrawRoutines::instance().DrawWindow(dc, theme, m_WndRect[1], 0, CLegacyUIConfigurator::App()->GetMenu());
+    DrawRoutines::instance().DrawWindow(dc, theme, m_WndRect[0], DC_ACTIVE, CLegacyUIConfigurator::App()->GetMenu());
+    DrawRoutines::instance().DrawWindow(dc, theme, m_WndRect[2], DC_ACTIVE | DC_SMALLCAP, nullptr);
     
 }
