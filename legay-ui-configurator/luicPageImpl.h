@@ -15,7 +15,7 @@ struct CPageImpl: ATL::CDialogImpl<CPageImpl>,
 {
     using     Super = ATL::CDialogImpl<CPageImpl>;
     using   Resizer = WTL::CDialogResize<CPageImpl>;
-    using ResizeVec = std::vector<_AtlDlgResizeMap>;
+    using ResizeVec = std::vector<WTL::_AtlDlgResizeMap>;
 
     virtual HWND CreateDlg(HWND hWndParent, LPARAM dwInitParam = NULL);
 
@@ -30,6 +30,7 @@ protected:
     CPageImpl(UINT idd);
 
     void DlgResizeAdd(int nCtlID, DWORD dwResizeFlags);
+    void DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count);
 
     virtual void OnResizeNotify();
     virtual BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
@@ -40,7 +41,7 @@ protected:
     HBRUSH OnEraseBkgnd(CDCHandle dc);
 
 private:
-    ResizeVec m_resiseMap;
+    ResizeVec m_ResiseMap;
 
     BEGIN_MSG_MAP_EX(CColorsPage)
         MSG_WM_INITDIALOG(OnInitDialog)

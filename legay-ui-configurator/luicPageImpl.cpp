@@ -9,7 +9,7 @@ CPageImpl::~CPageImpl()
 
 CPageImpl::CPageImpl(UINT idd)
     :         IDD(idd)
-    , m_resiseMap()
+    , m_ResiseMap()
 {
 }
 
@@ -21,21 +21,29 @@ HWND CPageImpl::CreateDlg(HWND hWndParent, LPARAM dwInitParam)
 WTL::_AtlDlgResizeMap const* CPageImpl::GetDlgResizeMap() const
 {
     static const WTL::_AtlDlgResizeMap emptyMap[] = { { -1, 0 } };
-    return m_resiseMap.empty() ? emptyMap : &m_resiseMap[0];
+    return m_ResiseMap.empty() ? emptyMap : &m_ResiseMap[0];
 }
 
 void CPageImpl::DlgResizeAdd(int nCtlID, DWORD dwResizeFlags)
 {
     CWindow item = GetDlgItem(nCtlID);
     _ASSERT_EXPR(item.Detach() != nullptr, _CRT_WIDE("Attempting to append not existing control to ResizeMap!"));
-    m_resiseMap.emplace_back(_AtlDlgResizeMap{ nCtlID, dwResizeFlags });
+    m_ResiseMap.emplace_back(_AtlDlgResizeMap{ nCtlID, dwResizeFlags });
+}
+
+void CPageImpl::DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count)
+{
+    ResizeVec newItems(m_ResiseMap.size() + count + 1);
+    newItems.assign(vec, vec + count);
+    newItems.append_range(m_ResiseMap);
+    newItems.swap(m_ResiseMap);
 }
 
 BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
     UNREFERENCED_ARG(wndFocus);
     UNREFERENCED_ARG(lInitParam);
-    m_resiseMap.emplace_back(_AtlDlgResizeMap{ -1, 0 });
+    m_ResiseMap.emplace_back(_AtlDlgResizeMap{ -1, 0 });
     DlgResize_Init(false, true);
     return TRUE;
 }

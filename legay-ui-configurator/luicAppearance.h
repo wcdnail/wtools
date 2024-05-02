@@ -12,6 +12,7 @@ struct CPageAppearance: CPageImpl
 private:
     CThemePreviewer m_Preview;
 
+    void InitResizeMap();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
 };
