@@ -28,6 +28,10 @@
 #define IDD_PAGE_SETTINGS               211
 #define IDR_MENU1                       211
 #define IDC_TEST_STA6                   212
+#define IDI_SAVE                        212
+#define IDI_EDIT_NAME                   213
+#define IDI_ICON1                       214
+#define IDI_HATCH_CROSS                 214
 #define IDC_APP_DLG_APPEARANCE_START    3000
 #define IDC_APP_THEME_CAP               3001
 #define IDC_APP_THEME_SEL               3002
@@ -76,7 +80,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        212
+#define _APS_NEXT_RESOURCE_VALUE        215
 #define _APS_NEXT_COMMAND_VALUE         32772
 #define _APS_NEXT_CONTROL_VALUE         213
 #define _APS_NEXT_SYMED_VALUE           106

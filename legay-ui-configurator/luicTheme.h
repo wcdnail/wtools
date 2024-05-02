@@ -5,6 +5,8 @@
 #include <atluser.h>
 #include <atlgdi.h>
 
+struct CPageAppearance;
+
 enum SIZE_NAMES : int
 {
     SIZE_Border,
@@ -88,6 +90,52 @@ enum COLOR_NAMES : int
     CLR_Count
 };
 
+enum ELEMENT_NAME : int
+{
+    EN_Desktop,
+    EN_AppBackground,
+    EN_Window,
+    EN_Menu,             // The width affects the icon and caption buttons of MDI children
+    EN_ActiveCaption,    // Title bar of active windows
+    EN_InactiveCaption,  // Title bar of inactive windows
+    EN_SMCaption,        // Title bar of palette (small) windows
+    EN_ActiveBorder,     // Border of active resizable windows
+    EN_InactiveBorder,   // Border of inactive resizable windows
+    EN_Scrollbar,
+    EN_3DObject,
+    EN_3DShadow,         // Not in official applets
+    EN_3DLight,          // Not in official applets
+    EN_SelectedItem,     // Also used for text selection
+    EN_DisabledItem,
+    EN_Tooltip,
+    EN_MsgBox,
+#if WINVER >= WINVER_2K
+    EN_Hyperlink,
+#endif
+#if WINVER >= WINVER_XP
+    EN_FlatmenuBar,
+#endif
+#if WINVER >= WINVER_VISTA
+    /**
+     * Border of windows, including property sheets for some reason.
+     * If SIZE_PADDEDBORDER is > 0, the windows with fixed borders affected also
+     * include SIZE_BORDER
+     */
+    EN_PaddedBorder,
+#endif
+    Element_Count
+};
+
+struct ElementAssignment
+{
+    int     size1;
+    int     size2;
+    int    color1;
+    int    color2;
+    int      font;
+    int fontColor;
+};
+
 struct CTheme
 {
     static int g_DPI;
@@ -98,6 +146,7 @@ struct CTheme
     static PCTSTR SizeName(int size);
     static PCTSTR FontName(int font);
     static PCTSTR ColorName(int color);
+    static ElementAssignment const* GetElementAssignment(int dex);
 
     bool LoadSysTheme();
     COLORREF GetColor(int color) const;
@@ -107,10 +156,12 @@ struct CTheme
     bool IsFlatMenus() const;
     NONCLIENTMETRICS const& GetNcMetrcs() const;
 
+    void InitUI(CPageAppearance& uiPage);
+
 private:
     static const SizeRange g_DefaultSizeRange[SIZES_Count];
 
-    ATL::CString          m_SchemeName;
+    ATL::CString          m_MyName;
     CLogFont              m_lfIconFont;
     bool           m_bGradientCaptions;
     bool                  m_bFlatMenus;
@@ -129,6 +180,9 @@ private:
     bool LoadSysIconFont();
     bool LoadSysGradientCaptionsSetting();
     bool LoadSysFlatMenusSetting();
+
+    void LoadExistingThemes(WTL::CComboBox& themeSel);
+    void LoadExistingElements(WTL::CComboBox& themeSel);
 };
 
 template <typename Res>

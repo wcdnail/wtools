@@ -137,7 +137,10 @@ HRESULT CLegacyUIConfigurator::ImListCreate()
     static const int iconsIDs[] = {
         IDI_COMP,
         IDI_MON_BRUSH,
-        IDI_START_MENU
+        IDI_START_MENU,
+        IDI_SAVE,
+        IDI_EDIT_NAME,
+        IDI_HATCH_CROSS,
     };
     HRESULT code = S_FALSE;
     m_ImList.Create(MaxIconWidth, MaxIconHeight, ILC_MASK, _countof(iconsIDs), 0);

@@ -126,6 +126,24 @@
     <Image Include="rom-2.ico">
       <Filter>resz</Filter>
     </Image>
+    <Image Include="rom-save.ico">
+      <Filter>resz</Filter>
+    </Image>
+    <Image Include="resz\rom-save.ico">
+      <Filter>resz</Filter>
+    </Image>
+    <Image Include="rom-rename.ico">
+      <Filter>resz</Filter>
+    </Image>
+    <Image Include="resz\rom-rename.ico">
+      <Filter>resz</Filter>
+    </Image>
+    <Image Include="rom-delete.ico">
+      <Filter>resz</Filter>
+    </Image>
+    <Image Include="resz\rom-delete.ico">
+      <Filter>resz</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="idl\legay-ui-configurator.idl">

@@ -64,10 +64,24 @@ void CPageAppearance::InitResizeMap()
 
 BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
+    auto const* app = CLegacyUIConfigurator::App();
+
     if (!m_Preview.SubclassWindow(GetDlgItem(IDC_APP_PREVIEW))) {
         HRESULT code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Previewer SubclassWindow failure!"), code, true, MB_ICONERROR);
     }
+        m_ThemeSel.Attach(GetDlgItem(IDC_APP_THEME_SEL));
+    m_ThemeSizeSel.Attach(GetDlgItem(IDC_APP_SIZE_SEL));
+       m_ThemeSave.Attach(GetDlgItem(IDC_APP_THEME_BN_SAVE));
+     m_ThemeRename.Attach(GetDlgItem(IDC_APP_THEME_BN_RENAME));
+     m_ThemeDelete.Attach(GetDlgItem(IDC_APP_THEME_BN_REMOVE));
+      m_ElementSel.Attach(GetDlgItem(IDC_APP_ITEM_SEL));
+
+     m_ThemeSave.SetIcon(app->GetIcon(IconFloppy));
+     m_ThemeRename.SetIcon(app->GetIcon(IconEditField));
+     m_ThemeDelete.SetIcon(app->GetIcon(IconHatchCross));
+
+    CLegacyUIConfigurator::App()->CurrentTheme().InitUI(*this);
     InitResizeMap();
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }

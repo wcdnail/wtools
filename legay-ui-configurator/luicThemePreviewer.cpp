@@ -7,6 +7,16 @@
 
 // https://stackoverflow.com/questions/14994012/how-draw-caption-in-alttab-switcher-when-paint-custom-captionframe
 
+struct WndDrawParams
+{
+    CTheme const&         theme;
+    const CWndFrameRects& rects;
+    ATL::CStringW       caption;
+    UINT              captFlags;
+    HMENU                 hMenu;
+    int            selectedMenu;
+};
+
 class DrawRoutines
 {
     //HMODULE USER32;
@@ -28,7 +38,7 @@ public:
     static void DrawMenuText(CDCHandle hdc, PCWSTR text, CRect& rc, UINT format, int color, CTheme const& theme);
     static void DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UINT format, CTheme const& theme);
     static void DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selectedItem, CTheme const& theme);
-    static void DrawWindow(CDCHandle dc, const CWndFrameRects& rects, UINT flags, HMENU hMenu, int selectedMenu, CTheme const& theme);
+    static void DrawWindow(CDCHandle dc, WndDrawParams const& params);
 
 private:
     ~DrawRoutines();
@@ -334,35 +344,32 @@ void DrawRoutines::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
     SelectObject(dc, prevFnt);
 }
 
-
-void DrawRoutines::DrawWindow(CDCHandle dc, const CWndFrameRects& rects, UINT flags, HMENU hMenu, int selectedMenu, CTheme const& theme)
+void DrawRoutines::DrawWindow(CDCHandle dc, WndDrawParams const& params)
 {
-    HFONT  menuFont = theme.GetFont(FONT_Menu);
-    HFONT  captFont = theme.GetFont(FONT_Caption);
-    HICON  captIcon = nullptr;
-    PCWSTR captText = L"Tool window...";
-    UINT  captFlags = flags | DC_TEXT;
+    CTheme const&         theme = params.theme;
+    CWndFrameRects const& rects = params.rects;
+    HFONT              menuFont = theme.GetFont(FONT_Menu);
+    HFONT              captFont = theme.GetFont(FONT_Caption);
+    HICON              captIcon = nullptr;
+    UINT              captFlags = params.captFlags | DC_TEXT;
+    int     workspaceColorIndex = COLOR_APPWORKSPACE;
+    int        borderColorIndex = COLOR_INACTIVEBORDER;
+    const bool        isToolWnd = (0 != (DC_SMALLCAP & params.captFlags));
+    const bool         isActive = (0 != (DC_ACTIVE & params.captFlags));
 
-    if (0 == (DC_SMALLCAP & flags)) {
-        if (0 != (DC_ACTIVE & flags)) {
+    if (!isToolWnd) {
+        if (isActive) {
             captIcon = CLegacyUIConfigurator::App()->GetIcon(IconStartmenu);
-            captText = L"Active window...";
         }
         else {
             captIcon = CLegacyUIConfigurator::App()->GetIcon(IconAppearance);
-            captText = L"Inactive window...";
         }
         captFlags |= DC_ICON;
     }
-
-#if WINVER >= WINVER_2K
-    if (theme.IsGradientCaptions()) {
+    if (params.theme.IsGradientCaptions()) {
         captFlags |= DC_GRADIENT;
     }
-#endif
-    int workspaceColorIndex = COLOR_APPWORKSPACE;
-    int    borderColorIndex = COLOR_INACTIVEBORDER;
-    if (0 != (DC_ACTIVE & flags)) {
+    if (isActive) {
         borderColorIndex    = COLOR_ACTIVEBORDER;
         workspaceColorIndex = COLOR_3DFACE;
     }
@@ -372,13 +379,14 @@ void DrawRoutines::DrawWindow(CDCHandle dc, const CWndFrameRects& rects, UINT fl
     dc.FillSolidRect(rects.m_rcFrame, theme.GetColor(COLOR_MENU));
 
     CRect rcCapt = rects.m_rcCapt;
-    rcCapt.right = DrawCaptionButtons(dc, rcCapt, (0 == (DC_SMALLCAP & flags)), theme.GetNcMetrcs().iCaptionWidth, captFlags, theme);
-    DrawCaption(dc, rcCapt, captFont, captIcon, captText, captFlags, theme);
+    rcCapt.right = DrawCaptionButtons(dc, rcCapt, !isToolWnd, theme.GetNcMetrcs().iCaptionWidth, captFlags, theme);
+    DrawCaption(dc, rcCapt, captFont, captIcon, params.caption, captFlags, theme);
 
-    if (hMenu) {
-        DrawMenuBar(dc, rects.m_rcMenu, hMenu, menuFont, selectedMenu, theme);
-    }
-    if (0 == (DC_SMALLCAP & flags)) {
+    if (!isToolWnd) {
+        if (params.hMenu) {
+            DrawMenuBar(dc, rects.m_rcMenu, params.hMenu, menuFont, params.selectedMenu, theme);
+        }
+
         CRect rcWork = rects.m_rcWorkspace;
         rcWork.DeflateRect(1, 1);
 
@@ -417,8 +425,8 @@ void CWndFrameRects::Calc(CRect const& rc, CTheme const& theme, bool wMenu, bool
     rcCapt.Shrink(1, 1);
     m_rcCapt = ToCRect(rcCapt);
 
+    rcMenu = rcCapt;
     if (wMenu) {
-        rcMenu = rcCapt;
         rcMenu.y  = rcCapt.Bottom() + 1;
         rcMenu.cy = theme.GetNcMetrcs().iMenuHeight + 1;
         m_rcMenu = ToCRect(rcMenu);
@@ -480,15 +488,19 @@ void CThemePreviewer::OnPaint(CDCHandle dcParam)
     rcIcon3.cx += rcFull.Width() / 15.;
     rcIcon3.cy += rcFull.Height() / 5.5;
 
-    // active -> inactive order
-    m_WndRect[WND_Back].Calc(ToCRect<double>(rcWin1), theme, true, true);
+    m_WndRect[WND_Back].Calc(ToCRect<double>(rcWin1), theme, false, true);
     m_WndRect[WND_Front].Calc(ToCRect<double>(rcWin2), theme, true, true);
     m_WndRect[WND_MsgBox].Calc(ToCRect<double>(rcIcon3), theme, false, true);
 
     dc.FillSolidRect(rcClient, theme.GetColor(COLOR_BACKGROUND));
 
-    // inactive -> active order
-    DrawRoutines::instance().DrawWindow(dc, m_WndRect[WND_Back], 0, CLegacyUIConfigurator::App()->GetMenu(), 2, theme);
-    DrawRoutines::instance().DrawWindow(dc, m_WndRect[WND_Front], DC_ACTIVE, CLegacyUIConfigurator::App()->GetMenu(), -1, theme);
-    DrawRoutines::instance().DrawWindow(dc, m_WndRect[WND_MsgBox], DC_ACTIVE | DC_SMALLCAP, nullptr, -1, theme);
+    const WndDrawParams params[WND_Count] = {
+        { theme,   m_WndRect[WND_Back], L"Inactive window...", 0, nullptr, -1 },
+        { theme,  m_WndRect[WND_Front], L"Active window...", DC_ACTIVE, CLegacyUIConfigurator::App()->GetMenu(), 2 },
+        { theme, m_WndRect[WND_MsgBox], L"Tool window...", DC_ACTIVE | DC_SMALLCAP, nullptr, -1 },
+    };
+
+    for (const auto& it : params) {
+        DrawRoutines::instance().DrawWindow(dc, it);
+    }
 }

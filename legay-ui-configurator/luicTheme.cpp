@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "luicTheme.h"
+#include "luicAppearance.h"
 #include "resz/resource.h"
 
 namespace
@@ -50,7 +51,7 @@ CTheme::~CTheme()
 }
 
 CTheme::CTheme(bool loadSystemTheme)
-    :        m_SchemeName("Native")
+    :        m_MyName("Native")
     ,        m_lfIconFont()
     , m_bGradientCaptions(true)
     ,        m_bFlatMenus(false)
@@ -155,6 +156,45 @@ PCTSTR CTheme::ColorName(int color)
         return nullptr;
     }
     return gsl_ColorName[color];
+}
+
+ElementAssignment const* CTheme::GetElementAssignment(int dex)
+{
+    // Assign the color and metric numbers to each element of the combo box
+    //       Size 1                Size 2               Color 1                 Color 2                         Font            Fontcolor
+    static const ElementAssignment gsl_assignment[Element_Count] =
+    {
+    /* 0*/ { -1,                   -1,                  COLOR_DESKTOP,          -1,                             FONT_Desktop,   -1                          },
+    /* 1*/ { -1,                   -1,                  COLOR_APPWORKSPACE,     -1,                             -1,             -1                          },
+    /* 2*/ { -1,                   -1,                  COLOR_WINDOW,           COLOR_WINDOWFRAME,              -1,             COLOR_WINDOWTEXT            },
+    /* 3*/ { SIZE_MenuHeight,      SIZE_MenuWidth,      COLOR_MENU,             -1,                             FONT_Menu,      COLOR_MENUTEXT              },
+    /* 4*/ { SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_ACTIVECAPTION,    COLOR_GRADIENTACTIVECAPTION,    FONT_Caption,   COLOR_CAPTIONTEXT           },
+    /* 5*/ { SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_INACTIVECAPTION,  COLOR_GRADIENTINACTIVECAPTION,  FONT_Caption,   COLOR_INACTIVECAPTIONTEXT   },
+    /* 6*/ { SIZE_SMCaptionHeight, SIZE_SMCaptionWidth, -1,                     -1,                             FONT_SMCaption, -1                          },
+    /* 7*/ { SIZE_Border,          -1,                  COLOR_ACTIVEBORDER,     -1,                             -1,             -1                          },
+    /* 8*/ { SIZE_Border,          -1,                  COLOR_INACTIVEBORDER,   -1,                             -1,             -1                          },
+    /* 9*/ { SIZE_ScrollWidth,     SIZE_ScrollHeight,   COLOR_SCROLLBAR,        -1,                             -1,             -1                          },
+    /*10*/ { -1,                   -1,                  COLOR_3DFACE,           -1,                             -1,             COLOR_BTNTEXT               },
+    /*11*/ { -1,                   -1,                  COLOR_3DSHADOW,         COLOR_3DDKSHADOW,               -1,             -1                          },
+    /*12*/ { -1,                   -1,                  COLOR_3DHILIGHT,        COLOR_3DLIGHT,                  -1,             -1                          },
+    /*13*/ { -1,                   -1,                  COLOR_HIGHLIGHT,        -1,                             -1,             COLOR_HIGHLIGHTTEXT         },
+    /*14*/ { -1,                   -1,                  -1,                     -1,                             -1,             COLOR_GRAYTEXT              },
+    /*15*/ { -1,                   -1,                  COLOR_INFOBK,           -1,                             FONT_Tooltip,   COLOR_INFOTEXT              },
+    /*16*/ { -1,                   -1,                  -1,                     -1,                             FONT_Message,   COLOR_WINDOWTEXT            },
+#if WINVER >= WINVER_2K
+    /*17*/ { -1,                   -1,                  -1,                     -1,                             -1,             COLOR_HOTLIGHT              },
+#endif
+#if WINVER >= WINVER_XP
+    /*18*/ { -1,                   -1,                  COLOR_MENUBAR,          COLOR_MENUHILIGHT,              -1,             -1                          },
+#endif
+#if WINVER >= WINVER_VISTA
+    /*19*/ { SIZE_PaddedBorder,    -1,                  -1,                     -1,                             -1,             -1                          },
+#endif
+    };
+    if (dex < 0 || dex >= Element_Count) {
+        return nullptr;
+    }
+    return &gsl_assignment[dex];
 }
 
 static int GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size)
@@ -303,6 +343,7 @@ bool CTheme::LoadSysTheme()
     ret &= LoadSysNcMetrics();
     ret &= LoadSysGradientCaptionsSetting();
     ret &= LoadSysFlatMenusSetting();
+    m_MyName = L"(Current)";
     return ret;
 }
 
@@ -328,4 +369,33 @@ HFONT CTheme::GetFont(int font) const
         return nullptr;
     }
     return m_Font[font];
+}
+
+void CTheme::LoadExistingThemes(WTL::CComboBox& themeSel)
+{
+    themeSel.ResetContent();
+    int item = themeSel.AddString(m_MyName);
+    // ##TODO: handle -1 == item
+    themeSel.SetItemDataPtr(item, (void*)this);
+    themeSel.SetCurSel(item);
+}
+
+void CTheme::LoadExistingElements(WTL::CComboBox& itemSel)
+{
+    itemSel.ResetContent();
+    for (int iColor = 0; iColor < CLR_Count; iColor++) {
+        int item = itemSel.AddString(ColorName(iColor));
+        // ##TODO: handle -1 == item
+        itemSel.SetItemData(item, static_cast<DWORD_PTR>(iColor));
+    }
+    //itemSel.SetCurSel(CLR_Background);
+}
+
+void CTheme::InitUI(CPageAppearance& uiPage)
+{
+    LoadExistingThemes(uiPage.m_ThemeSel);
+    uiPage.m_ThemeSizeSel.EnableWindow(FALSE);
+    uiPage.m_ThemeDelete.EnableWindow(FALSE);
+
+    LoadExistingElements(uiPage.m_ElementSel);
 }

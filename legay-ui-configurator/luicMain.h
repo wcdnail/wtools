@@ -10,6 +10,9 @@ enum IconIndex : int
     IconMain = 0,
     IconAppearance,
     IconStartmenu,
+    IconFloppy,
+    IconEditField,
+    IconHatchCross,
     IconCount
 };
 
