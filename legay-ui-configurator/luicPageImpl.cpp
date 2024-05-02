@@ -3,6 +3,12 @@
 #include "luicMain.h"
 #include "UT/debug.assistance.h"
 
+#ifdef _DEBUG
+#  define DEBUG_FALSE false
+#else
+#  define DEBUG_FALSE true
+#endif
+
 CPageImpl::~CPageImpl()
 {
 }
@@ -44,7 +50,7 @@ BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     UNREFERENCED_ARG(wndFocus);
     UNREFERENCED_ARG(lInitParam);
     m_ResiseMap.emplace_back(_AtlDlgResizeMap{ -1, 0 });
-    DlgResize_Init(false, true);
+    DlgResize_Init(false, DEBUG_FALSE);
     return TRUE;
 }
 

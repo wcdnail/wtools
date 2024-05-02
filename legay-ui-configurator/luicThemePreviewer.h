@@ -6,11 +6,12 @@
 
 struct CWndFrameRects
 {
-    int m_BorderSize = { 0 };
-    CRect m_rcBorder = {};
-    CRect  m_rcFrame = {};
-    CRect   m_rcCapt = {};
-    CRect   m_rcMenu = {};
+    int    m_BorderSize = { 0 };
+    CRect    m_rcBorder = {};
+    CRect     m_rcFrame = {};
+    CRect      m_rcCapt = {};
+    CRect      m_rcMenu = {};
+    CRect m_rcWorkspace = {};
 
     void Calc(CRect const& rc, const CTheme& theme, bool wMenu, bool wWorkspace);
 };
@@ -27,9 +28,17 @@ struct CThemePreviewer: ATL::CWindowImpl<CThemePreviewer, ATL::CWindow, CThemePr
     CThemePreviewer();
 
 private:
+    enum WND_Index : int
+    {
+        WND_Front = 0,
+        WND_Back,
+        WND_MsgBox,
+        WND_Count
+    };
+
     friend Super;
 
-    CWndFrameRects m_WndRect[3];
+    CWndFrameRects m_WndRect[WND_Count];
 
     void OnPaint(CDCHandle dc);
 

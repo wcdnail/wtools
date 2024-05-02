@@ -9,24 +9,26 @@
 
 class DrawRoutines
 {
-    HMODULE USER32;
+    //HMODULE USER32;
 
 public:
-    using DrawCaptionTempWFn = BOOL(WINAPI*)(HWND hWnd, HDC dc, const RECT* pRect, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags);
-    using SetSysColorsTempFn = DWORD_PTR(WINAPI*)(const COLORREF* pPens, const HBRUSH* pBrushes, DWORD_PTR n);
-    using  DrawMenuBarTempFn = int(WINAPI*)(HWND hWnd, HDC dc, RECT* pRect, HMENU hMenu, HFONT hFont);
-
-    DrawCaptionTempWFn DrawCaptionTempW;
-    SetSysColorsTempFn SetSysColorsTemp;
-    DrawMenuBarTempFn   DrawMenuBarTemp;
+    //using DrawCaptionTempWFn = BOOL(WINAPI*)(HWND hWnd, HDC dc, const RECT* pRect, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags);
+    //using SetSysColorsTempFn = DWORD_PTR(WINAPI*)(const COLORREF* pPens, const HBRUSH* pBrushes, DWORD_PTR n);
+    //using  DrawMenuBarTempFn = int(WINAPI*)(HWND hWnd, HDC dc, RECT* pRect, HMENU hMenu, HFONT hFont);
+    //
+    //DrawCaptionTempWFn DrawCaptionTempW;
+    //SetSysColorsTempFn SetSysColorsTemp;
+    //DrawMenuBarTempFn   DrawMenuBarTemp;
 
     static DrawRoutines& instance();
 
     static void DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush);
-    static LONG DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, int buttonWidth, UINT uFlags,
-                                   const CTheme& theme);
-    static void DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags, const CTheme& theme);
-    void DrawWindow(CDCHandle dc, CTheme const& theme, const CWndFrameRects& rects, UINT flags, HMENU hMenu);
+    static LONG DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, int buttonWidth, UINT uFlags, CTheme const& theme);
+    static void DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags, CTheme const& theme);
+    static void DrawMenuText(CDCHandle hdc, PCWSTR text, CRect& rc, UINT format, int color, CTheme const& theme);
+    static void DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UINT format, CTheme const& theme);
+    static void DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selectedItem, CTheme const& theme);
+    static void DrawWindow(CDCHandle dc, const CWndFrameRects& rects, UINT flags, HMENU hMenu, int selectedMenu, CTheme const& theme);
 
 private:
     ~DrawRoutines();
@@ -43,16 +45,16 @@ DrawRoutines& DrawRoutines::instance()
 
 DrawRoutines::~DrawRoutines()
 {
-    if (USER32) {
-        FreeLibrary(USER32);
-    }
+    //if (USER32) {
+    //    FreeLibrary(USER32);
+    //}
 }
 
 DrawRoutines::DrawRoutines()
-    :           USER32{ LoadLibraryW(L"USER32") }
-    , DrawCaptionTempW{ nullptr }
-    , SetSysColorsTemp{ nullptr }
-    ,  DrawMenuBarTemp{ nullptr }
+    //:           USER32{ LoadLibraryW(L"USER32") }
+    //, DrawCaptionTempW{ nullptr }
+    //, SetSysColorsTemp{ nullptr }
+    //,  DrawMenuBarTemp{ nullptr }
 
 {
     Init();
@@ -73,9 +75,9 @@ static inline bool GetProcAddressEx(HMODULE hMod, T& routine, PCSTR routineName,
 
 void DrawRoutines::Init()
 {
-    GetProcAddressEX(USER32, DrawCaptionTempW);
-    GetProcAddressEX(USER32, SetSysColorsTemp);
-    GetProcAddressEX(USER32, DrawMenuBarTemp);
+    //GetProcAddressEX(USER32, DrawCaptionTempW);
+    //GetProcAddressEX(USER32, SetSysColorsTemp);
+    //GetProcAddressEX(USER32, DrawMenuBarTemp);
 }
 
 void DrawRoutines::DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush)
@@ -98,7 +100,7 @@ void DrawRoutines::DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidt
 }
 
 LONG DrawRoutines::DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, int buttonWidth,
-                                      UINT uFlags, const CTheme& theme)
+                                      UINT uFlags, CTheme const& theme)
 {
     static const int margin = 2;
     buttonWidth -= margin;
@@ -146,7 +148,7 @@ LONG DrawRoutines::DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool
     return rc.left;
 }
 
-void DrawRoutines::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags, const CTheme& theme)
+void DrawRoutines::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags, CTheme const& theme)
 {
     CRect rcTmp = rcParam;
     int iColor1 = COLOR_INACTIVECAPTION;
@@ -216,8 +218,124 @@ void DrawRoutines::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, 
     }
 }
 
+void DrawRoutines::DrawMenuText(CDCHandle hdc, PCWSTR text, CRect& rc, UINT format, int color, CTheme const& theme)
+{
+    SetTextColor(hdc, theme.GetColor(color));
+    DrawTextW(hdc, text, -1, rc, format);
+}
 
-void DrawRoutines::DrawWindow(CDCHandle dc, const CTheme& theme, const CWndFrameRects& rects, UINT flags, HMENU hMenu)
+void DrawRoutines::DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UINT format, CTheme const& theme)
+{
+    OffsetRect(rc, 1, 1);
+    DrawMenuText(dc, text, rc, format, COLOR_3DHILIGHT, theme);
+    OffsetRect(rc, -1, -1);
+    DrawMenuText(dc, text, rc, format, COLOR_3DSHADOW, theme);
+}
+
+void DrawRoutines::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selectedItem, CTheme const& theme)
+{
+    int backColorIndex = COLOR_MENU;
+#if WINVER >= WINVER_XP
+    if (theme.IsFlatMenus()) {
+        backColorIndex = COLOR_MENUBAR;
+    }
+#endif
+    dc.FillRect(rc, theme.GetBrush(backColorIndex));
+
+    if (!hMenu || !hFont) {
+        return ;
+    }
+
+    int    spacing = 10;
+    HFONT  prevFnt = dc.SelectFont(hFont);
+    UINT txtFormat = DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOCLIP;
+    CRect   rcItem = rc;
+    CRect   rcText;
+    SIZE      size;
+    int     margin;
+
+#if WINVER >= WINVER_2K
+    BOOL  bKbdCues = FALSE;
+    if (SystemParametersInfoW(SPI_GETKEYBOARDCUES, 0, &bKbdCues, 0) && !bKbdCues) {
+        txtFormat |= DT_HIDEPREFIX;
+    }
+#endif
+    TEXTMETRIC tm;
+    if (GetTextMetrics(dc, &tm)) {
+        spacing = tm.tmAveCharWidth;
+    }
+    margin = spacing / 2;
+
+    rcItem.bottom--;
+    rcText.top = rcItem.top - 1;
+    rcText.bottom = rcItem.bottom;
+
+    int menuItemCount = GetMenuItemCount(hMenu);
+    for (int iMenuItem = 0; iMenuItem < menuItemCount; iMenuItem++) {
+        WCHAR text[32] = { 0 };
+        if (!GetMenuStringW(hMenu, iMenuItem, text, _countof(text)-1, MF_BYPOSITION)) {
+            continue;
+        }
+        if (!GetTextExtentPoint32W(dc, text, lstrlen(text), &size)) {
+            continue;
+        }
+        rcItem.right = rcItem.left + size.cx + spacing;
+        if (rcItem.right > (rc.right - margin)) {
+            SelectObject(dc, prevFnt);
+            break;
+        }
+        rcText.left = rcItem.left + margin;
+        rcText.right = rcItem.right - margin;
+        UINT state = GetMenuState(hMenu, iMenuItem, MF_BYPOSITION);
+        if ((state & MF_GRAYED) || (state & MF_DISABLED)) {
+            if ((theme.GetColor(COLOR_MENU) == theme.GetColor(COLOR_3DFACE))
+#if WINVER >= WINVER_XP
+                || theme.IsFlatMenus()
+#endif
+                )
+            {
+                DrawDisabledMenuText(dc, text, rcText, txtFormat, theme);
+            }
+            else {
+                DrawMenuText(dc, text, rcText, txtFormat, COLOR_GRAYTEXT, theme);
+            }
+        }
+        else if ((state & MF_HILITE) || (iMenuItem == selectedItem)) {
+#if WINVER >= WINVER_2K
+#if WINVER >= WINVER_XP
+            if (theme.IsFlatMenus()) {
+                FrameRect(dc, &rcItem, theme.GetBrush(COLOR_HIGHLIGHT));
+
+                InflateRect(&rcItem, -1, -1);
+                FillRect(dc, &rcItem, theme.GetBrush(COLOR_MENUHILIGHT));
+                InflateRect(&rcItem, 1, 1);
+
+                DrawMenuText(dc, text, rcText, txtFormat, COLOR_HIGHLIGHTTEXT, theme);
+            }
+            else
+#endif
+            {
+                dc.DrawEdge(rcItem, BDR_SUNKENOUTER, BF_RECT);
+
+                OffsetRect(&rcText, 1, 1);
+                DrawMenuText(dc, text, rcText, txtFormat, COLOR_MENUTEXT, theme);
+            }
+#else  /* WINVER < WINVER_2K */
+            FillRect(dc, rcItem, theme.GetBrush(COLOR_HIGHLIGHT));
+            DrawMenuText(dc, text, rcText, textFormat, COLOR_HIGHLIGHTTEXT, theme);
+#endif
+        }
+        else {
+            DrawMenuText(dc, text, rcText, txtFormat, COLOR_MENUTEXT, theme);
+        }
+        rcItem.left = rcItem.right;
+    }
+
+    SelectObject(dc, prevFnt);
+}
+
+
+void DrawRoutines::DrawWindow(CDCHandle dc, const CWndFrameRects& rects, UINT flags, HMENU hMenu, int selectedMenu, CTheme const& theme)
 {
     HFONT  menuFont = theme.GetFont(FONT_Menu);
     HFONT  captFont = theme.GetFont(FONT_Caption);
@@ -242,44 +360,43 @@ void DrawRoutines::DrawWindow(CDCHandle dc, const CTheme& theme, const CWndFrame
         captFlags |= DC_GRADIENT;
     }
 #endif
-    int borderColorIndex = COLOR_INACTIVEBORDER;
+    int workspaceColorIndex = COLOR_APPWORKSPACE;
+    int    borderColorIndex = COLOR_INACTIVEBORDER;
     if (0 != (DC_ACTIVE & flags)) {
-        borderColorIndex = COLOR_ACTIVEBORDER;
+        borderColorIndex    = COLOR_ACTIVEBORDER;
+        workspaceColorIndex = COLOR_3DFACE;
     }
 
     DrawBorder(dc, rects.m_rcBorder, rects.m_BorderSize, theme.GetBrush(borderColorIndex));
-    dc.DrawEdge(CRect(rects.m_rcBorder), EDGE_RAISED, BF_RECT | BF_ADJUST); // *****
+    dc.DrawEdge(CRect(rects.m_rcBorder), EDGE_RAISED, BF_RECT | BF_ADJUST);
     dc.FillSolidRect(rects.m_rcFrame, theme.GetColor(COLOR_MENU));
 
     CRect rcCapt = rects.m_rcCapt;
-    rcCapt.right = DrawCaptionButtons(dc, rcCapt, (0 == (DC_SMALLCAP & flags)), 32, captFlags, theme);
+    rcCapt.right = DrawCaptionButtons(dc, rcCapt, (0 == (DC_SMALLCAP & flags)), theme.GetNcMetrcs().iCaptionWidth, captFlags, theme);
     DrawCaption(dc, rcCapt, captFont, captIcon, captText, captFlags, theme);
 
     if (hMenu) {
-        DrawMenuBarTemp(nullptr, dc, CRect(rects.m_rcMenu), hMenu, menuFont);
+        DrawMenuBar(dc, rects.m_rcMenu, hMenu, menuFont, selectedMenu, theme);
     }
-    if (0) {
-        //rcMDI = rcFrame;
-        //rcMDI.Shrink(2, 2);
+    if (0 == (DC_SMALLCAP & flags)) {
+        CRect rcWork = rects.m_rcWorkspace;
+        rcWork.DeflateRect(1, 1);
 
-        //CRect rcLMDI = ToCRect<long>(rcMDI);
-        //dc.FillSolidRect(rcLMDI, theme.m_Color[COLOR_APPWORKSPACE]);
-        //dc.DrawEdge(rcLMDI, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
-
-        //
+        dc.FillSolidRect(rcWork, theme.GetColor(workspaceColorIndex));
+        dc.DrawEdge(rcWork, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
     }
 }
 
 ///----------------------------------------------------------------------------
 
-void CWndFrameRects::Calc(CRect const& rc, const CTheme& theme, bool wMenu, bool wWorkspace)
+void CWndFrameRects::Calc(CRect const& rc, CTheme const& theme, bool wMenu, bool wWorkspace)
 {
     long   dpiScale = ScaleForDpi<long>(8);
     LRect  rcBorder = FromCRect<long>(rc);
     LRect   rcFrame;
     LRect    rcCapt;
     LRect    rcMenu;
-    LRect     rcMDI;
+    LRect    rcWork;
 
     m_rcBorder = ToCRect(rcBorder);
 
@@ -292,16 +409,25 @@ void CWndFrameRects::Calc(CRect const& rc, const CTheme& theme, bool wMenu, bool
     rcFrame.Shrink(m_BorderSize, m_BorderSize);
     rcFrame.PutInto(rcBorder, PutAt::Center);
     m_rcFrame = ToCRect(rcFrame);
+    rcWork = rcFrame;
 
     rcCapt = rcFrame;
-    rcCapt.cy = theme.GetNcMetrcs().iCaptionHeight;
+    rcCapt.cy = theme.GetNcMetrcs().iCaptionHeight + 2;
+    rcWork.cy -= rcCapt.cy;
     rcCapt.Shrink(1, 1);
     m_rcCapt = ToCRect(rcCapt);
 
     if (wMenu) {
         rcMenu = rcCapt;
-        rcMenu.y += rcCapt.cy + 1;
+        rcMenu.y  = rcCapt.Bottom() + 1;
+        rcMenu.cy = theme.GetNcMetrcs().iMenuHeight + 1;
         m_rcMenu = ToCRect(rcMenu);
+        rcWork.cy -= rcCapt.cy;
+    }
+
+    if (wWorkspace) {
+        rcWork.y = rcMenu.Bottom() + 1;
+        m_rcWorkspace = ToCRect(rcWork);
     }
 }
 
@@ -354,16 +480,15 @@ void CThemePreviewer::OnPaint(CDCHandle dcParam)
     rcIcon3.cx += rcFull.Width() / 15.;
     rcIcon3.cy += rcFull.Height() / 5.5;
 
+    // active -> inactive order
+    m_WndRect[WND_Back].Calc(ToCRect<double>(rcWin1), theme, true, true);
+    m_WndRect[WND_Front].Calc(ToCRect<double>(rcWin2), theme, true, true);
+    m_WndRect[WND_MsgBox].Calc(ToCRect<double>(rcIcon3), theme, false, true);
+
     dc.FillSolidRect(rcClient, theme.GetColor(COLOR_BACKGROUND));
 
-    // active -> inactive order
-    m_WndRect[2].Calc(ToCRect<double>(rcIcon3), theme, false, false);
-    m_WndRect[1].Calc(ToCRect<double>(rcWin1), theme, true, true);
-    m_WndRect[0].Calc(ToCRect<double>(rcWin2), theme, true, true);
-
     // inactive -> active order
-    DrawRoutines::instance().DrawWindow(dc, theme, m_WndRect[1], 0, CLegacyUIConfigurator::App()->GetMenu());
-    DrawRoutines::instance().DrawWindow(dc, theme, m_WndRect[0], DC_ACTIVE, CLegacyUIConfigurator::App()->GetMenu());
-    DrawRoutines::instance().DrawWindow(dc, theme, m_WndRect[2], DC_ACTIVE | DC_SMALLCAP, nullptr);
-    
+    DrawRoutines::instance().DrawWindow(dc, m_WndRect[WND_Back], 0, CLegacyUIConfigurator::App()->GetMenu(), 2, theme);
+    DrawRoutines::instance().DrawWindow(dc, m_WndRect[WND_Front], DC_ACTIVE, CLegacyUIConfigurator::App()->GetMenu(), -1, theme);
+    DrawRoutines::instance().DrawWindow(dc, m_WndRect[WND_MsgBox], DC_ACTIVE | DC_SMALLCAP, nullptr, -1, theme);
 }

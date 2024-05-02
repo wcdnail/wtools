@@ -104,6 +104,7 @@ struct CTheme
     HBRUSH GetBrush(int color) const;
     HFONT GetFont(int font) const;
     bool IsGradientCaptions() const;
+    bool IsFlatMenus() const;
     NONCLIENTMETRICS const& GetNcMetrcs() const;
 
 private:
@@ -139,6 +140,11 @@ inline Res ScaleForDpi(Res n)
 inline bool CTheme::IsGradientCaptions() const
 {
     return m_bGradientCaptions;
+}
+
+inline bool CTheme::IsFlatMenus() const
+{
+    return m_bFlatMenus;
 }
 
 inline NONCLIENTMETRICS const& CTheme::GetNcMetrcs() const

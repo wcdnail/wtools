@@ -163,6 +163,11 @@ void CMainFrame::OnResizeNotify()
 
 BOOL CMainFrame::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
+#if 0 || defined(_DEBUG_TAB_RECT)
+    MoveToMonitor{}.Move(m_hWnd, 3);
+    ShowWindow(SW_SHOW);
+#endif
+
     ModifyStyle(0, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX, SWP_FRAMECHANGED);
     SetWindowTextW(L"Display Properties");
     PagesCreate();
@@ -178,11 +183,6 @@ BOOL CMainFrame::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     DlgResizeAdd(IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y);
     DlgResizeAdd(IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y);
     BOOL rv = CPageImpl::OnInitDialog(wndFocus, lInitParam);
-
-#if 1 || defined(_DEBUG_TAB_RECT)
-    MoveToMonitor{}.Move(m_hWnd, 3);
-    ShowWindow(SW_SHOW);
-#endif
     return rv;
 }
 
