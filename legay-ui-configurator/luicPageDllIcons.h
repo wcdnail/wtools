@@ -27,4 +27,5 @@ private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
     void OnResizeNotify() override;
+    void OnDropFiles(HDROP hDropInfo) override;
 };

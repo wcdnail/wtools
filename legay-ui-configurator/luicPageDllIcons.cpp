@@ -113,6 +113,7 @@ BOOL CPageDllIcons::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_bnExport.SetIcon(app->GetIcon(IconFloppy));
 
     OnCollectionLoad(app->ShellIcons());
+    DragAcceptFiles(m_hWnd, TRUE);
 
     DlgResizeAdd(IDC_ED_OPEN_DLL_PATHNAME, DLSZ_SIZE_X);
     DlgResizeAdd(IDC_BN_OPEN_DLG, DLSZ_MOVE_X);
@@ -185,4 +186,60 @@ void CPageDllIcons::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 void CPageDllIcons::OnResizeNotify()
 {
     m_lvView.Arrange(LVA_ALIGNTOP);
+}
+
+namespace
+{
+struct HDropWrapper
+{
+    HDROP m_hDrop;
+    HDropWrapper(HDROP hDrop)
+        : m_hDrop { hDrop }
+    {
+    }
+    ~HDropWrapper()
+    {
+        if (m_hDrop) {
+            DragFinish(m_hDrop);
+        }
+    }
+    static BOOL IsInClientRect(HDROP hDrop, HWND hWnd)
+    {
+        CPoint p;
+        CRect rc;
+        DragQueryPoint(hDrop, &p);
+        GetClientRect(hWnd, rc);
+        return PtInRect(&rc, p);
+    }
+    UINT FileCount(void) const
+    {
+        return DragQueryFileW(m_hDrop, static_cast<UINT>(-1), nullptr, 0);
+    }
+
+    ATL::CStringW QueryFile(UINT index)
+    {
+        ATL::CStringW temp;
+        UINT dlen = MAX_PATH * 4;
+        UINT qlen = DragQueryFileW(m_hDrop, index, temp.GetBufferSetLength(dlen), dlen - 1);
+        temp.ReleaseBufferSetLength(qlen);
+        return temp;
+    }
+};
+}
+
+void CPageDllIcons::OnDropFiles(HDROP hDropInfo)
+{
+    if (!HDropWrapper::IsInClientRect(hDropInfo, m_hWnd)) {
+        return;
+    }
+    HDropWrapper drop(hDropInfo);
+    UINT count = drop.FileCount();
+    for (UINT i = 0; i < count; i++) {
+        auto pathname = drop.QueryFile(i);
+        if (!pathname.IsEmpty()) {
+            AttemptToLoadNew(std::wstring{ pathname.GetString(), static_cast<size_t>(pathname.GetLength()) });
+            break; // https://www.codeproject.com/Articles/6166/Dropping-Files-into-a-WTL-Window-The-Easy-Way
+            // Вместо break; в оригинале было i = count + 10 )))
+        }
+    }
 }

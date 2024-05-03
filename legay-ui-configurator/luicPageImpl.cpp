@@ -73,6 +73,11 @@ LRESULT CPageImpl::OnNotify(int idCtrl, LPNMHDR pnmh)
     return 0;
 }
 
+void CPageImpl::OnDropFiles(HDROP hDropInfo)
+{
+    UNREFERENCED_PARAMETER(hDropInfo);
+}
+
 void CPageImpl::OnDestroy()
 {
     SetMsgHandled(FALSE);

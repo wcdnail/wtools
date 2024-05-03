@@ -36,6 +36,7 @@ protected:
     virtual BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
     virtual void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl);
     virtual LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
+    virtual void OnDropFiles(HDROP hDropInfo);
     virtual void OnDestroy();
 
     HBRUSH OnCtlColorStatic(CDCHandle dc, HWND wndStatic);
@@ -50,6 +51,7 @@ private:
         MSG_WM_ERASEBKGND(OnEraseBkgnd)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_NOTIFY(OnNotify)
+        MSG_WM_DROPFILES(OnDropFiles)
         MSG_WM_DESTROY(OnDestroy)
         if (Resizer::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
             OnResizeNotify();
