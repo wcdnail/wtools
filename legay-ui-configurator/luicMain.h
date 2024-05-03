@@ -2,6 +2,7 @@
 
 #include "luicMainFrame.h"
 #include "luicTheme.h"
+#include "icons.dll.h"
 #include <atlapp.h>
 #include <mutex>
 
@@ -17,7 +18,8 @@ enum IconIndex : int
     IconCount
 };
 
-void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMessageBox = false, UINT mbType = MB_ICONERROR);
+void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
+void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 
 struct CLegacyUIConfigurator: CAppModule,
                               CMessageFilter
@@ -30,6 +32,7 @@ struct CLegacyUIConfigurator: CAppModule,
     CTheme& CurrentTheme() const;
     HICON GetIcon(int icon) const;
     CMenu const& GetTestMenu() const;
+    CIconCollectionFile const& ShellIcons() const;
 
     HRESULT Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID = NULL);
     HRESULT Run(HINSTANCE instHnd, int showCmd);
@@ -39,10 +42,11 @@ struct CLegacyUIConfigurator: CAppModule,
 private:
     friend Super;
 
-    CMainFrame m_MainFrame;
-    CImageList    m_ImList;
-    HACCEL     m_wAccelTab;
-    CMenu       m_TestMenu;
+    CMainFrame           m_MainFrame;
+    CImageList              m_ImList;
+    HACCEL               m_wAccelTab;
+    CMenu                 m_TestMenu;
+    CIconCollectionFile m_ShellIcons;
 
     static CTheme g_ThemeNative;
     static CLegacyUIConfigurator* g_pApp;
@@ -52,3 +56,8 @@ private:
 
     BOOL PreTranslateMessage(MSG* pMsg) override;
 };
+
+inline CIconCollectionFile const& CLegacyUIConfigurator::ShellIcons() const
+{
+    return m_ShellIcons;
+}

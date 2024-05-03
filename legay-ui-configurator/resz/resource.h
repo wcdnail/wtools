@@ -12,6 +12,7 @@
 #define IDD_LEGACY_UI_CONF_TOOL         202
 #define IDC_LABLE1                      202
 #define IDC_EDIT1                       203
+#define IDC_ED_OPEN_DLL_PATHNAME        203
 #define IDC_TAB1                        205
 #define IDC_BN_APPLY                    206
 #define IDD_PAGE_BACKGROUND             207
@@ -30,9 +31,12 @@
 #define IDC_TEST_STA6                   212
 #define IDI_SAVE                        212
 #define IDI_EDIT_NAME                   213
+#define IDC_BN_OPEN_DLG                 213
 #define IDI_HATCH_CROSS                 214
-#define IDI_ICON1                       215
 #define IDI_FOLDER_OPEN                 215
+#define IDD_PAGE_DLL_FILE_ICONS         216
+#define IDC_LIST1                       217
+#define IDC_LB_VIEW                     217
 #define IDC_APP_DLG_APPEARANCE_START    3000
 #define IDC_APP_THEME_CAP               3001
 #define IDC_APP_THEME_SEL               3002
@@ -82,9 +86,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        216
+#define _APS_NEXT_RESOURCE_VALUE        217
 #define _APS_NEXT_COMMAND_VALUE         32772
-#define _APS_NEXT_CONTROL_VALUE         213
+#define _APS_NEXT_CONTROL_VALUE         218
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

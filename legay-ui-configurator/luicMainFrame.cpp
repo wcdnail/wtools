@@ -5,6 +5,7 @@
 #include "luicScreenSaver.h"
 #include "luicAppearance.h"
 #include "luicEffects.h"
+#include "luicPageDllIcons.h"
 #include "luicWeb.h"
 #include "luicSettings.h"
 #include "string.utils.format.h"
@@ -20,6 +21,9 @@ enum PageIndex: int
     PageEffects,
     PageWeb,
     PageSettings,
+#ifdef _DEBUG
+    PageDllIcons,
+#endif
     PageEnd
 };
 
@@ -104,6 +108,11 @@ void CMainFrame::PagesCreate()
     PagesAppend(PageEffects,     L"Effects",     std::move(pPageEffects));
     PagesAppend(PageWeb,         L"Web",         std::move(pPageWeb));
     PagesAppend(PageSettings,    L"Settings",    std::move(pPageSettings));
+
+#ifdef _DEBUG
+    auto pPageDllIcons = std::make_unique<CPageDllIcons>();
+    PagesAppend(PageDllIcons, L"DLL Icons", std::move(pPageDllIcons));
+#endif
 }
 
 void CMainFrame::PagesShow(int numba, bool show)
@@ -146,6 +155,7 @@ void CMainFrame::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr
     if (m_rcTabClient.IsRectEmpty()) {
         PagesGetRect();
     }
+    pagePtr->ShowWindow(SW_HIDE);
     pagePtr->MoveWindow(m_rcTabClient, FALSE);
     m_PagesMap[number] = std::move(pagePtr);
 }
@@ -172,7 +182,11 @@ BOOL CMainFrame::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     SetWindowTextW(L"Display Properties");
     PagesCreate();
 
+#ifdef _DEBUG
+    const int initialPage = PageDllIcons;
+#else
     const int initialPage = PageAppearance;
+#endif
     m_Tab.SetCurSel(initialPage);
     PagesShow(initialPage, true);
 

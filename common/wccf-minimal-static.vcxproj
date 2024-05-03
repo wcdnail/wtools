@@ -22,6 +22,7 @@
     <ClCompile Include="dev.assistance\dev.assist.cpp" />
     <ClCompile Include="dh.timer.cpp" />
     <ClCompile Include="dh.tracing.cpp" />
+    <ClCompile Include="icons.dll.cpp" />
     <ClCompile Include="info\runtime.information.cpp" />
     <ClCompile Include="rect.alloc.cpp" />
     <ClCompile Include="rectz.cpp">
@@ -48,6 +49,7 @@
     <ClInclude Include="dev.assistance\window.messages.consts.h" />
     <ClInclude Include="dh.timer.h" />
     <ClInclude Include="dh.tracing.h" />
+    <ClInclude Include="icons.dll.h" />
     <ClInclude Include="info\runtime.information.h" />
     <ClInclude Include="rect.alloc.h" />
     <ClInclude Include="rect.aspect.ratio.h" />

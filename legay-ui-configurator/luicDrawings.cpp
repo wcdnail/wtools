@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "luicDrawings.h"
 #include "luicTheme.h"
+#include "luicMain.h"
 #include "dh.tracing.h"
 #include "dh.tracing.defs.h"
 #include "string.utils.error.code.h"
@@ -34,7 +35,6 @@ CIconHandle LoadShellIcon(ATL::CStringW const& entry, UINT flags = SHGFI_SMALLIC
     return CIconHandle(info.hIcon);
 }
 
-
 struct CDrawRoutine::StaticInit
 {
     using DrawCaptionTempWFn = BOOL(WINAPI*)(HWND hWnd, HDC dc, const RECT* pRect, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags);
@@ -46,8 +46,8 @@ struct CDrawRoutine::StaticInit
     SetSysColorsTempFn SetSysColorsTemp;
     DrawMenuBarTempFn   DrawMenuBarTemp;
 
-    CIcon   m_IconActiveWnd;
-    CIcon m_IconInactiveWnd;
+    CIconHandle   m_IconActiveWnd;
+    CIconHandle m_IconInactiveWnd;
 
     static StaticInit& instance()
     {
@@ -74,12 +74,6 @@ private:
         GetProcAddressEX(USER32, DrawCaptionTempW);
         GetProcAddressEX(USER32, SetSysColorsTemp);
         GetProcAddressEX(USER32, DrawMenuBarTemp);
-
-        const ATL::CStringW shell32dll = L"%SYSTEMROOT%\\System32\\shell32.dll";
-        HICON tempIcon[1024];
-        ZeroMemory(tempIcon, sizeof(tempIcon));
-        UINT extrNum = ExtractIconExW(shell32dll.GetString(), -1, tempIcon, nullptr, _countof(tempIcon));
-        //m_IconActiveWnd = tempIcon;
     }
 
     ~StaticInit()

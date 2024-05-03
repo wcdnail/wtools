@@ -154,7 +154,7 @@ void CWndResizer::ResizeUI(CWndResizer::CPanel * pRoot)
 
   if (panels.GetCount() > 0)
   {
-    HDWP hDWP = ::BeginDeferWindowPos(panels.GetCount());
+    HDWP hDWP = ::BeginDeferWindowPos(static_cast<int>(panels.GetCount()));
     ASSERT( hDWP != NULL);
     pos = panels.GetHeadPosition();
     while (pos != NULL)
@@ -294,11 +294,11 @@ void CWndResizer::OnSizing(UINT fwSide, LPRECT pRect)
   CRect rcMin(0, 0, root.MinSize.cx, root.MinSize.cy);
   CRect rcMax(0, 0, root.MaxSize.cx, root.MaxSize.cy);
 
-  LONG_PTR style = GetWindowLongPtr(m_pHookedWnd->m_hWnd , GWL_STYLE);
-  LONG_PTR styleEx = GetWindowLongPtr(m_pHookedWnd->m_hWnd, GWL_EXSTYLE);
+  DWORD   style = GetWindowLong(m_pHookedWnd->m_hWnd , GWL_STYLE);
+  DWORD styleEx = GetWindowLong(m_pHookedWnd->m_hWnd, GWL_EXSTYLE);
 
-  ::AdjustWindowRectEx(&rcMin, style, (m_pHookedWnd->GetMenu() != NULL), styleEx);
-  ::AdjustWindowRectEx(&rcMax, style, (m_pHookedWnd->GetMenu() != NULL), styleEx);
+  ::AdjustWindowRectEx(&rcMin, style, (m_pHookedWnd->GetMenu() != nullptr), styleEx);
+  ::AdjustWindowRectEx(&rcMax, style, (m_pHookedWnd->GetMenu() != nullptr), styleEx);
 
   switch (fwSide)
   {

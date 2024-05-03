@@ -249,6 +249,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="luicPageDlgTemplate.h" />
+    <ClInclude Include="luicPageDllIcons.h" />
     <ClInclude Include="luicPageImpl.h" />
     <ClInclude Include="luicScreenSaver.h" />
     <ClInclude Include="luicSettings.h" />
@@ -288,6 +289,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="luicPageDlgTemplate.cpp" />
+    <ClCompile Include="luicPageDllIcons.cpp" />
     <ClCompile Include="luicPageImpl.cpp" />
     <ClCompile Include="luicScreenSaver.cpp" />
     <ClCompile Include="luicSettings.cpp" />

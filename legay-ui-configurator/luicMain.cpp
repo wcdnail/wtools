@@ -11,12 +11,24 @@ CTheme CLegacyUIConfigurator::g_ThemeNative{ true };
 CLegacyUIConfigurator* CLegacyUIConfigurator::g_pApp{ nullptr };
 std::recursive_mutex CLegacyUIConfigurator::m_pAppMx{};
 
-void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMessageBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
+void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
+{
+    ATL::CStringA msg = Str::ErrorCode<char>::SystemMessage(code);
+    DH::ThreadPrintfc(DH::Category::Module(), "%s %s\n", caption.GetString(), msg.GetString());
+
+    if (showMBox) {
+        ATL::CStringA userMsg;
+        userMsg.Format("%s\r\n%s\r\n", caption.GetString(), msg.GetString());
+        MessageBoxA(nullptr, userMsg.GetString(), "ERROR", mbType);
+    }
+}
+
+void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
 {
     ATL::CStringW msg = Str::ErrorCode<wchar_t>::SystemMessage(code);
     DH::ThreadPrintfc(DH::Category::Module(), L"%s %s\n", caption.GetString(), msg.GetString());
 
-    if (showMessageBox) {
+    if (showMBox) {
         ATL::CStringW userMsg;
         userMsg.Format(L"%s\r\n%s\r\n", caption.GetString(), msg.GetString());
         MessageBoxW(nullptr, userMsg.GetString(), L"ERROR", mbType);
@@ -110,13 +122,18 @@ CMenu const& CLegacyUIConfigurator::GetTestMenu() const
 
 HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID)
 {
-    HRESULT hr = CAppModule::Init(pObjMap, hInstance, pLibID);
-    if (FAILED(hr)) {
-        return hr;
+    HRESULT code = CAppModule::Init(pObjMap, hInstance, pLibID);
+    if (FAILED(code)) {
+        return code;
     }
-    hr = ImListCreate();
+    static const ATL::CStringW shell32dll = L"%SYSTEMROOT%\\System32\\shell32.dll";
+    if (!m_ShellIcons.Load(shell32dll.GetString())) {
+        code = static_cast<HRESULT>(GetLastError());
+        ReportError(Str::ElipsisW::Format(L"Load DLL '%s' icon collection failed!", shell32dll.GetString()), code, false, MB_ICONWARNING);
+    }
+    code = ImListCreate();
     m_TestMenu.LoadMenuW(IDR_MENU1);
-    return hr;
+    return code;
 }
 
 CLegacyUIConfigurator* CLegacyUIConfigurator::App()

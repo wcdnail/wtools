@@ -63,6 +63,9 @@
     <ClInclude Include="luicDrawings.h">
       <Filter>theme</Filter>
     </ClInclude>
+    <ClInclude Include="luicPageDllIcons.h">
+      <Filter>pages</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -104,6 +107,9 @@
     </ClCompile>
     <ClCompile Include="luicDrawings.cpp">
       <Filter>theme</Filter>
+    </ClCompile>
+    <ClCompile Include="luicPageDllIcons.cpp">
+      <Filter>pages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
