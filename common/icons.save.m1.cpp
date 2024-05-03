@@ -1,6 +1,10 @@
 #include "stdafx.h"
 
 //
+// https://stackoverflow.com/a/15329195/7145154
+//
+
+//
 // ICONS (.ICO type 1) are structured like this:
 //
 // ICONHEADER (just 1)
@@ -95,13 +99,10 @@ static UINT WriteIconImageHeader(HANDLE hFile, BITMAP *pbmpColor, BITMAP *pbmpMa
     BITMAPINFOHEADER biHeader;
     DWORD nWritten;
     UINT nImageBytes;
-
     // calculate how much space the COLOR and MASK bitmaps take
     nImageBytes = NumBitmapBytes(pbmpColor) + NumBitmapBytes(pbmpMask);
-
     // write the ICONIMAGE to disk (first the BITMAPINFOHEADER)
     ZeroMemory(&biHeader, sizeof(biHeader));
-
     // Fill in only those fields that are necessary
     biHeader.biSize = sizeof(biHeader);
     biHeader.biWidth = pbmpColor->bmWidth;
@@ -109,16 +110,11 @@ static UINT WriteIconImageHeader(HANDLE hFile, BITMAP *pbmpColor, BITMAP *pbmpMa
     biHeader.biPlanes = pbmpColor->bmPlanes;
     biHeader.biBitCount = pbmpColor->bmBitsPixel;
     biHeader.biSizeImage = nImageBytes;
-
     // write the BITMAPINFOHEADER
     WriteFile(hFile, &biHeader, sizeof(biHeader), &nWritten, 0);
-
     // write the RGBQUAD color table (for 16 and 256 colour icons)
-    if(pbmpColor->bmBitsPixel == 2 || pbmpColor->bmBitsPixel == 8)
-    {
-
+    if(pbmpColor->bmBitsPixel == 2 || pbmpColor->bmBitsPixel == 8) {
     }
-
     return nWritten;
 }
 
@@ -127,15 +123,15 @@ static UINT WriteIconImageHeader(HANDLE hFile, BITMAP *pbmpColor, BITMAP *pbmpMa
 //
 static BOOL GetIconBitmapInfo(HICON hIcon, ICONINFO *pIconInfo, BITMAP *pbmpColor, BITMAP *pbmpMask)
 {
-    if(!GetIconInfo(hIcon, pIconInfo))
+    if(!GetIconInfo(hIcon, pIconInfo)) {
         return FALSE;
-
-    if(!GetObject(pIconInfo->hbmColor, sizeof(BITMAP), pbmpColor))
+    }
+    if(!GetObject(pIconInfo->hbmColor, sizeof(BITMAP), pbmpColor)) {
         return FALSE;
-
-    if(!GetObject(pIconInfo->hbmMask, sizeof(BITMAP), pbmpMask))
+    }
+    if(!GetObject(pIconInfo->hbmMask, sizeof(BITMAP), pbmpMask)) {
         return FALSE;
-
+    }
     return TRUE;
 }
 
@@ -146,23 +142,19 @@ static UINT WriteIconDirectoryEntry(HANDLE hFile, int nIdx, HICON hIcon, UINT nI
 {
     ICONINFO iconInfo;
     ICONDIR iconDir;
-
     BITMAP bmpColor;
     BITMAP bmpMask;
-
     DWORD nWritten;
     UINT nColorCount;
     UINT nImageBytes;
-
     GetIconBitmapInfo(hIcon, &iconInfo, &bmpColor, &bmpMask);
-
     nImageBytes = NumBitmapBytes(&bmpColor) + NumBitmapBytes(&bmpMask);
-
-    if(bmpColor.bmBitsPixel >= 8)
+    if (bmpColor.bmBitsPixel >= 8) {
         nColorCount = 0;
-    else
+    }
+    else {
         nColorCount = 1 << (bmpColor.bmBitsPixel * bmpColor.bmPlanes);
-
+    }
     // Create the ICONDIR structure
     iconDir.bWidth = (BYTE)bmpColor.bmWidth;
     iconDir.bHeight = (BYTE)bmpColor.bmHeight;
@@ -172,14 +164,11 @@ static UINT WriteIconDirectoryEntry(HANDLE hFile, int nIdx, HICON hIcon, UINT nI
     iconDir.wBitCount = bmpColor.bmBitsPixel;
     iconDir.dwBytesInRes = sizeof(BITMAPINFOHEADER) + nImageBytes;
     iconDir.dwImageOffset = nImageOffset;
-
     // Write to disk
     WriteFile(hFile, &iconDir, sizeof(iconDir), &nWritten, 0);
-
     // Free resources
     DeleteObject(iconInfo.hbmColor);
     DeleteObject(iconInfo.hbmMask);
-
     return nWritten;
 }
 
@@ -188,42 +177,31 @@ static UINT WriteIconData(HANDLE hFile, HBITMAP hBitmap)
     BITMAP bmp;
     int i;
     BYTE * pIconData;
-
     UINT nBitmapBytes;
     DWORD nWritten;
-
     GetObject(hBitmap, sizeof(BITMAP), &bmp);
-
     nBitmapBytes = NumBitmapBytes(&bmp);
-
     pIconData = (BYTE *)malloc(nBitmapBytes);
-
     GetBitmapBits(hBitmap, nBitmapBytes, pIconData);
-
     // bitmaps are stored inverted (vertically) when on disk..
     // so write out each line in turn, starting at the bottom + working
     // towards the top of the bitmap. Also, the bitmaps are stored in packed
     // in memory - scanlines are NOT 32bit aligned, just 1-after-the-other
-    for(i = bmp.bmHeight - 1; i >= 0; i--)
-    {
+    for(i = bmp.bmHeight - 1; i >= 0; i--) {
         // Write the bitmap scanline
-        WriteFile(
-            hFile,
+        WriteFile(hFile,
             pIconData + (i * bmp.bmWidthBytes), // calculate offset to the line
             bmp.bmWidthBytes, // 1 line of BYTES
             &nWritten,
             0);
 
         // extend to a 32bit boundary (in the file) if necessary
-        if(bmp.bmWidthBytes & 3)
-        {
+        if(bmp.bmWidthBytes & 3) {
             DWORD padding = 0;
             WriteFile(hFile, &padding, 4 - bmp.bmWidthBytes, &nWritten, 0);
         }
     }
-
     free(pIconData);
-
     return nBitmapBytes;
 }
 
@@ -235,66 +213,49 @@ BOOL SaveIcon3(PCTSTR szIconFile, HICON hIcon[], int nNumIcons)
     HANDLE hFile;
     int i;
     int * pImageOffset;
-
-    if(hIcon == 0 || nNumIcons < 1)
+    if(hIcon == 0 || nNumIcons < 1) {
         return FALSE;
-
+    }
     // Save icon to disk:
     hFile = CreateFile(szIconFile, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
-
-    if(hFile == INVALID_HANDLE_VALUE)
+    if(hFile == INVALID_HANDLE_VALUE) {
         return FALSE;
-
+    }
     //
     // Write the iconheader first of all
     //
     WriteIconHeader(hFile, nNumIcons);
-
     //
     // Leave space for the IconDir entries
     //
     SetFilePointer(hFile, sizeof(ICONDIR) * nNumIcons, 0, FILE_CURRENT);
-
     pImageOffset = (int *)malloc(nNumIcons * sizeof(int));
-
     //
     // Now write the actual icon images!
     //
-    for(i = 0; i < nNumIcons; i++)
-    {
+    for(i = 0; i < nNumIcons; i++) {
         ICONINFO iconInfo;
         BITMAP bmpColor, bmpMask;
-
         GetIconBitmapInfo(hIcon[i], &iconInfo, &bmpColor, &bmpMask);
-
         // record the file-offset of the icon image for when we write the icon directories
         pImageOffset[i] = SetFilePointer(hFile, 0, 0, FILE_CURRENT);
-
         // bitmapinfoheader + colortable
         WriteIconImageHeader(hFile, &bmpColor, &bmpMask);
-
         // color and mask bitmaps
         WriteIconData(hFile, iconInfo.hbmColor);
         WriteIconData(hFile, iconInfo.hbmMask);
-
         DeleteObject(iconInfo.hbmColor);
         DeleteObject(iconInfo.hbmMask);
     }
-
     //
     // Lastly, skip back and write the icon directories.
     //
     SetFilePointer(hFile, sizeof(ICONHEADER), 0, FILE_BEGIN);
-
-    for(i = 0; i < nNumIcons; i++)
-    {
+    for(i = 0; i < nNumIcons; i++) {
         WriteIconDirectoryEntry(hFile, i, hIcon[i], pImageOffset[i]);
     }
-
     free(pImageOffset);
-
     // finished!
     CloseHandle(hFile);
-
     return TRUE;
 }

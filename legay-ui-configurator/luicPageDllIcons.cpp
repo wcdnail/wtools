@@ -304,22 +304,27 @@ void CPageDllIcons::AttemptToSaveSelected(std::wstring const& filename, UINT cou
         needBig = true;
         break;
     }
-    std::wstring const* pFileName = &filename;
-    std::wstring nextFilename;
-
     bool noErrors = true;
-    int it = -1;
-    for (UINT n = 0; n < count; n++) {
-        it = m_lvView.GetNextItem(it, LVIS_SELECTED);
-        if (-1 == it) {
-            break;
-        }
-        if (!ExportIconPLAIN(it, needBig, *pFileName)) {
-            noErrors = false;
-            break;
-        }
+    if (1 == count) {
+        int it = m_lvView.GetNextItem(-1, LVIS_SELECTED);
+        noErrors = ExportIconPLAIN(it, needBig, filename);
     }
-
+    else {
+        std::filesystem::path path = filename;
+        int it = -1;
+        UINT n = 0;
+        for (; n < count; n++) {
+            it = m_lvView.GetNextItem(it, LVIS_SELECTED);
+            if (-1 == it) {
+                break;
+            }
+            std::wstring nextFilename = path / (L"icon-" + std::to_wstring(it) + L".ico");
+            if (!ExportIconPLAIN(it, needBig, nextFilename)) {
+                break;
+            }
+        }
+        noErrors = n == count;
+    }
     if (noErrors) {
         SetMFStatus(STA_Info, L"Export #%d item(s) to '%s' done", count, filename.c_str());
     }
@@ -336,12 +341,6 @@ bool CPageDllIcons::ExportIconOLE(int it, bool needBig, std::wstring const& file
             Str::ErrorCode<>::SystemMessage(code).GetString());
         return false;
     }
-    //DIBSECTION dibMask = { 0 };
-    //DIBSECTION    dibs = { 0 };
-    //ICONINFO      info = { 0 };
-    //GetIconInfo(icon, &info);
-    //GetObject(info.hbmMask, sizeof(dibMask), &dibMask);
-    //GetObject(info.hbmColor, sizeof(dibs), &dibs);
     LONG                   cbSize = { 0 };
     PICTDESC            sPictDesc = { sizeof(sPictDesc), PICTYPE_ICON };
     ATL::CComPtr<IPicture2> pPict = {};
@@ -468,7 +467,7 @@ bool CPageDllIcons::ExportIconPLAIN(int it, bool needBig, std::wstring const& fi
 {
     HRESULT      code = S_OK;
     CImageList& ilSrc = needBig ? m_ilBig : m_ilSmall;
-    HICON        icon = ilSrc.GetIcon(it);
+    HICON        icon = ilSrc.GetIcon(it, ILD_TRANSPARENT);
     if (!icon) {
         code = static_cast<HRESULT>(GetLastError());
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),

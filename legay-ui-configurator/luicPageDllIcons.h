@@ -25,10 +25,10 @@ private:
     void AttemptToLoadNew(std::wstring const& filename);
     void ExportMultiple(UINT count);
     void ExportSinle();
-    bool ExportIconOLE(int it, bool needBig, std::wstring const& filename);
-    bool ExportIconGDIP(int it, bool needBig, std::wstring const& filename);
-    bool ExportIconOLE2(int it, bool needBig, std::wstring const& filename);
-    bool ExportIconPLAIN(int it, bool needBig, std::wstring const& filename);
+    bool ExportIconOLE(int it, bool needBig, std::wstring const& filename); // OK, 4bpp
+    bool ExportIconGDIP(int it, bool needBig, std::wstring const& filename); // error, need investigate
+    bool ExportIconOLE2(int it, bool needBig, std::wstring const& filename);  // OK, 4bpp
+    bool ExportIconPLAIN(int it, bool needBig, std::wstring const& filename);  // OK
     void AttemptToSaveSelected(std::wstring const& filename, UINT count);
     void OnCollectionLoad(CIconCollectionFile const& collection);
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
