@@ -151,13 +151,33 @@ void CPageDllIcons::AttemptToLoadNew(std::wstring const& filename)
     OnCollectionLoad(tempFile);
 }
 
+void CPageDllIcons::AttemptToSaveSelected(std::wstring const& filename)
+{
+
+}
+
 void CPageDllIcons::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
     DWORD viewType = LV_VIEW_ICON;
     switch (nID) {
-    case IDC_BN_OPEN_DLG:{
+    case IDC_BN_EXPORT_SEL: {
+        WTL::CShellFileSaveDialog dlg{};
+        const auto rv = dlg.DoModal(m_hWnd);
+        if (IDOK != rv) {
+            return ;
+        }
+        std::wstring tempFilename;
+        HRESULT code = IFileDialog_GetDisplayName(*dlg.m_spFileDlg, tempFilename);
+        if (FAILED(code)) {
+            SetError(code, L"File dialog failed.");
+            return ;
+        }
+        AttemptToSaveSelected(tempFilename);
+        return;
+    }
+    case IDC_BN_OPEN_DLG: {
         WTL::CShellFileOpenDialog dlg{ m_CurrFilename.c_str() };
-        auto rv = dlg.DoModal(m_hWnd);
+        const auto rv = dlg.DoModal(m_hWnd);
         if (IDOK != rv) {
             return ;
         }

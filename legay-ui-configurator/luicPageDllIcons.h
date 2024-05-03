@@ -23,6 +23,7 @@ private:
     void Reset();
     void SetError(HRESULT code, PCWSTR format, ...);
     void AttemptToLoadNew(std::wstring const& filename);
+    void AttemptToSaveSelected(std::wstring const& filename);
     void OnCollectionLoad(CIconCollectionFile const& collection);
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
