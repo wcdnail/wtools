@@ -1,6 +1,6 @@
 #pragma once
 
-#include "luicMainFrame.h"
+#include "luicMainFrameWnd.h"
 #include "luicTheme.h"
 #include "icons.dll.h"
 #include <atlapp.h>
@@ -21,8 +21,7 @@ enum IconIndex : int
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 
-struct CLegacyUIConfigurator: CAppModule,
-                              CMessageFilter
+struct CLegacyUIConfigurator: CAppModule
 {
     using Super = CAppModule;
 
@@ -41,11 +40,10 @@ struct CLegacyUIConfigurator: CAppModule,
     static CLegacyUIConfigurator* App();
 
 private:
-    friend Super;
+    //friend Super;
 
     CMainFrame           m_MainFrame;
     CImageList              m_ImList;
-    HACCEL               m_wAccelTab;
     CMenu                 m_TestMenu;
     CIconCollectionFile m_ShellIcons;
 
@@ -54,8 +52,6 @@ private:
     static std::recursive_mutex m_pAppMx;
 
     HRESULT ImListCreate();
-
-    BOOL PreTranslateMessage(MSG* pMsg) override;
 };
 
 inline CIconCollectionFile const& CLegacyUIConfigurator::ShellIcons() const

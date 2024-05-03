@@ -5,12 +5,12 @@
 
 struct CLegacyUIConfigurator;
 
-struct CMainFrame: CPageImpl
+struct CMainView: CPageImpl
 {
     using  PagesMap = std::map<int, CPageImplPtr>;
 
-    ~CMainFrame() override;
-    CMainFrame(CLegacyUIConfigurator& app);
+    ~CMainView() override;
+    CMainView(CLegacyUIConfigurator& app);
 
 private:
     CLegacyUIConfigurator& m_App;

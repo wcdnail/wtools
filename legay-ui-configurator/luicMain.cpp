@@ -6,6 +6,28 @@
 #include "common/windows.uses.commoncontrols.h"
 #include "resz/resource.h"
 
+#if 0
+// TODO: GENERATED CODE, reserved for future use, DO NOT EARSE!!!!
+#include <atlbase.h>
+struct CAtlApp: ATL::CAtlExeModuleT<CAtlApp>
+{
+    using    Super = ATL::CAtlExeModuleT<CAtlApp>;
+    using SuperMod = ATL::CAtlModuleT<CAtlApp>;
+    ~CAtlApp() override;
+    CAtlApp();
+private:
+    friend Super;
+    friend SuperMod;
+    CLegacyUIConfigurator m_App;
+    DECLARE_LIBID(LIBID_ClAppearanceLib)
+    DECLARE_REGISTRY_APPID_RESOURCEID(IDR_CLAPPEARANCE, "{a189a989-5210-498e-9326-eadb11ad6d14}")
+    HRESULT Run(int showCmd);
+};
+CAtlApp _AtlModule;
+return _AtlModule.WinMain(showCmd);
+// TODO: GENERATED CODE, reserved for future use, DO NOT EARSE!!!!
+#endif
+
 CTheme CLegacyUIConfigurator::g_ThemeNative{ true };
 
 CLegacyUIConfigurator* CLegacyUIConfigurator::g_pApp{ nullptr };
@@ -35,44 +57,6 @@ void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox/* = false*
     }
 }
 
-#if 0
-#include "ClAppearance_i.h"
-#include <atlbase.h>
-
-struct CAtlApp: ATL::CAtlExeModuleT<CAtlApp>
-{
-    using    Super = ATL::CAtlExeModuleT<CAtlApp>;
-    using SuperMod = ATL::CAtlModuleT<CAtlApp>;
-
-    ~CAtlApp() override;
-    CAtlApp();
-
-private:
-    friend Super;
-    friend SuperMod;
-
-    CLegacyUIConfigurator m_App;
-
-    DECLARE_LIBID(LIBID_ClAppearanceLib)
-    DECLARE_REGISTRY_APPID_RESOURCEID(IDR_CLAPPEARANCE, "{a189a989-5210-498e-9326-eadb11ad6d14}")
-
-    HRESULT Run(int showCmd);
-};
-
-CAtlApp::~CAtlApp()
-{
-}
-
-CAtlApp::CAtlApp()
-    : Super()
-    , m_App()
-{
-}
-
-CAtlApp _AtlModule;
-return _AtlModule.WinMain(showCmd);
-#endif
-
 extern "C"
 int WINAPI _tWinMain(HINSTANCE instHnd, HINSTANCE, LPTSTR, int showCmd)
 {
@@ -92,9 +76,8 @@ CLegacyUIConfigurator::~CLegacyUIConfigurator()
 
 CLegacyUIConfigurator::CLegacyUIConfigurator()
     :       Super{}
-    , m_MainFrame{ *this }
+    , m_MainFrame{}
     ,    m_ImList{}
-    , m_wAccelTab{ nullptr }
 {
     {
         std::lock_guard<std::recursive_mutex> guard(m_pAppMx);
@@ -181,15 +164,6 @@ HRESULT CLegacyUIConfigurator::ImListCreate()
     return S_OK;
 }
 
-BOOL CLegacyUIConfigurator::PreTranslateMessage(MSG* pMsg)
-{
-    int rv = TranslateAcceleratorW(m_MainFrame.m_hWnd, m_wAccelTab, pMsg);
-    if (rv > 0) {
-        return TRUE;
-    }
-    return FALSE;
-}
-
 HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
 {
     static constexpr int MF_Initial_CX = 1000;
@@ -218,16 +192,9 @@ HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
             ReportError(L"MainFrame creation failure!", hr, true);
             return hr;
         }
-        m_wAccelTab = LoadAcceleratorsW(instHnd, MAKEINTRESOURCEW(IDR_APP_ACCEL));
-        if (!m_wAccelTab) {
-            hr = ::GetLastError();
-            ReportError(L"LoadAccelerators failure!", hr, true, MB_ICONWARNING);
-        }
-        loop.AddMessageFilter(this);
         ATLTRACE2(atlTraceUI, 0, _T("All OK, launch main window [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
         m_MainFrame.ShowWindow(showCmd);
         hr = loop.Run();
-        loop.RemoveMessageFilter(this);
         RemoveMessageLoop();
     }
     catch(std::exception const& ex) {

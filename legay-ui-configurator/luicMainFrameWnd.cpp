@@ -1,58 +1,15 @@
-#include "pch.h"
-#include "ClAppMainFrame.h"
-#include "ClAppearance.h"
-#include "resource.h"
+#include "stdafx.h"
+#include "luicMainFrameWnd.h"
+#include "luicMain.h"
+#include "resz/resource.h"
 #include <atlwin.h>
-
-struct CMainFrame::CView: ATL::CDialogImpl<CView>
-{
-    enum { IDD = IDD_MF_VIEW };
-
-    ~CView()
-    {
-    }
-
-    CView()
-    {
-    }
-
-    //void DoInitTemplate() 
-    //{
-    //}
-    //
-    //void DoInitControls() 
-    //{
-    //}
-
-    BEGIN_MSG_MAP(CAboutDlg)
-        MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
-        COMMAND_ID_HANDLER(IDOK, OnCloseCmd)
-        COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
-    END_MSG_MAP()
-
-    LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-    {
-        //CenterWindow(GetParent());
-        return TRUE;
-    }
-
-    LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-    {
-        //EndDialog(wID);
-        return 0;
-    }
-};
-
 
 CMainFrame::~CMainFrame()
 {
-    delete m_pView;
 }
 
-CMainFrame::CMainFrame(CClassicAppearance& app)
+CMainFrame::CMainFrame()
     : Super()
-    , m_App(app)
-    , m_pView(new CView)
 {
 }
 
@@ -61,9 +18,9 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
     if (Super::PreTranslateMessage(pMsg)) {
         return TRUE;
     }
-    //if (m_pView && m_pView->PreTranslateMessage(pMsg)) {
-    //    return TRUE;
-    //}
+  //if (m_pView && m_pView->PreTranslateMessage(pMsg)) {
+  //    return TRUE;
+  //}
     return FALSE;
 }
 
@@ -74,12 +31,11 @@ BOOL CMainFrame::OnIdle()
 
 int CMainFrame::OnCreate(LPCREATESTRUCT)
 {
-    CIcon icon(::LoadIconW(m_App.GetModuleInstance(), MAKEINTRESOURCEW(IDI_MAIN)));
-    if (nullptr != icon) {
-        HICON raw = icon.Detach();
-        SetIcon(raw, FALSE);
-        SetIcon(raw, TRUE);
-    }
+    auto const* pApp = CLegacyUIConfigurator::App();
+
+    HICON tempIco = pApp->GetIcon(IconMain);
+    SetIcon(tempIco, FALSE);
+    SetIcon(tempIco, TRUE);
 
     CreateSimpleStatusBar();
     m_SBar.SubclassWindow(m_hWndStatusBar);
@@ -95,30 +51,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
     GetClientRect(rc);
     rc.InflateRect(1, 1);
 
-    if (m_pView) {
-        CRect rcView = rc;
-        m_hWndClient = m_pView->Create(m_hWnd, rcView, reinterpret_cast<LPARAM>(this));
-      //m_hWndClient = m_pView->Create(m_hWnd, rcView, nullptr,
-      //    WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-      //    WS_EX_CLIENTEDGE,
-      //    ATL::_U_MENUorID(CTRL_ID_VIEW)
-      //);
-        if (!m_hWndClient) {
-            HRESULT hr = ::GetLastError();
-            ATLTRACE2(atlTraceUI, 0, _T("FAILED create VIEW [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
-        }
-        else {
-            ////m_pView->Invalidate();
-            //ATL::_U_MENUorID mnu(CTRL_ID_VIEW);
-            //if (!::SetMenu(m_hWndClient, mnu.m_hMenu)) {
-            //    HRESULT hr = ::GetLastError();
-            //    ATLTRACE2(atlTraceUI, 0, _T("FAILED set VIEW id [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
-            //}
-        }
-    }
-
-    CMessageLoop* pLoop = m_App.GetMessageLoop();
-    ATLASSERT(pLoop != NULL);
+    CMessageLoop* pLoop = pApp->GetMessageLoop();
+    ATLASSERT(pLoop != nullptr);
     pLoop->AddMessageFilter(this);
     pLoop->AddIdleHandler(this);
 
@@ -128,8 +62,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
 
 void CMainFrame::OnDestroy()
 {
-    CMessageLoop* pLoop = m_App.GetMessageLoop();
-    ATLASSERT(pLoop != NULL);
+    CMessageLoop* pLoop = CLegacyUIConfigurator::App()->GetMessageLoop();
+    ATLASSERT(pLoop != nullptr);
     pLoop->RemoveIdleHandler(this);
     pLoop->RemoveMessageFilter(this);
 
@@ -140,23 +74,6 @@ void CMainFrame::OnDestroy()
         // TODO: save rc
     }
 
-    ::PostQuitMessage(0);
+    PostQuitMessage(0);
     SetMsgHandled(FALSE);
-}
-
-BOOL CMainFrame::OnEraseBkgnd(CDCHandle dc)
-{
-    return TRUE;
-}
-
-void CMainFrame::OnActivate(UINT, BOOL, HWND)
-{
-    //viewer.SetFocus();
-}
-
-void CMainFrame::OnKeyDown(UINT code, UINT, UINT)
-{
-    if(VK_ESCAPE == code) {
-       //DestroyWindow();
-    }
 }

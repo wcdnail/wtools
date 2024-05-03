@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "luicMainFrame.h"
+#include "luicMainFrameDlg.h"
 #include "luicMain.h"
 #include "luicBackground.h"
 #include "luicScreenSaver.h"
@@ -27,11 +27,11 @@ enum PageIndex: int
     PageEnd
 };
 
-CMainFrame::~CMainFrame()
+CMainView::~CMainView()
 {
 }
 
-CMainFrame::CMainFrame(CLegacyUIConfigurator& app)
+CMainView::CMainView(CLegacyUIConfigurator& app)
     :      CPageImpl{ IDD_LEGACY_UI_CONF_TOOL }
     ,         m_App { app }
     ,         m_Tab {}
@@ -40,7 +40,7 @@ CMainFrame::CMainFrame(CLegacyUIConfigurator& app)
 {
 }
 
-CPageImplPtr const& CMainFrame::PagesGet(int numba) const
+CPageImplPtr const& CMainView::PagesGet(int numba) const
 {
     const auto& it = m_PagesMap.find(numba);
     if (it == m_PagesMap.cend()) {
@@ -51,12 +51,12 @@ CPageImplPtr const& CMainFrame::PagesGet(int numba) const
     return it->second;
 }
 
-CPageImplPtr const& CMainFrame::PagesGetCurrent() const
+CPageImplPtr const& CMainView::PagesGetCurrent() const
 {
     return PagesGet(m_Tab.GetCurSel());
 }
 
-void CMainFrame::PagesGetRect()
+void CMainView::PagesGetRect()
 {
     CRect rcTab;
     if (0) { // ##FIXME: is m_Tab owns page ?
@@ -90,7 +90,7 @@ void CMainFrame::PagesGetRect()
 #endif
 }
 
-void CMainFrame::PagesCreate()
+void CMainView::PagesCreate()
 {
     auto   pBackground = std::make_unique<CPageBackground>();
     auto  pScreenSaver = std::make_unique<CPageScreenSaver>();
@@ -115,7 +115,7 @@ void CMainFrame::PagesCreate()
 #endif
 }
 
-void CMainFrame::PagesShow(int numba, bool show)
+void CMainView::PagesShow(int numba, bool show)
 {
     const auto& page = PagesGet(numba);
     if (page) {
@@ -123,7 +123,7 @@ void CMainFrame::PagesShow(int numba, bool show)
     }
 }
 
-void CMainFrame::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&& pagePtr)
+void CMainView::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&& pagePtr)
 {
     HRESULT code = S_FALSE;
     int  tabIcon = desiredIndex;
@@ -160,7 +160,7 @@ void CMainFrame::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr
     m_PagesMap[number] = std::move(pagePtr);
 }
 
-void CMainFrame::OnResizeNotify()
+void CMainView::OnResizeNotify()
 {
     if (!m_Tab.m_hWnd) {
         return ;
@@ -171,15 +171,15 @@ void CMainFrame::OnResizeNotify()
     }
 }
 
-BOOL CMainFrame::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
+BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
 #if 0 || defined(_DEBUG_TAB_RECT)
     MoveToMonitor{}.Move(m_hWnd, 3);
     ShowWindow(SW_SHOW);
 #endif
 
-    ModifyStyle(0, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX, SWP_FRAMECHANGED);
-    SetWindowTextW(L"Display Properties");
+    //ModifyStyle(0, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX, SWP_FRAMECHANGED);
+    //SetWindowTextW(L"Display Properties");
     PagesCreate();
 
 #ifdef _DEBUG
@@ -190,23 +190,19 @@ BOOL CMainFrame::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_Tab.SetCurSel(initialPage);
     PagesShow(initialPage, true);
 
-    HICON tempIco = CLegacyUIConfigurator::App()->GetIcon(IconMain);
-    SetIcon(tempIco, FALSE);
-    SetIcon(tempIco, TRUE);
-
     DlgResizeAdd(IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y);
     DlgResizeAdd(IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y);
     BOOL rv = CPageImpl::OnInitDialog(wndFocus, lInitParam);
     return rv;
 }
 
-void CMainFrame::OnDestroy()
+void CMainView::OnDestroy()
 {
     PostQuitMessage(0);
     CPageImpl::OnDestroy();
 }
 
-LRESULT CMainFrame::OnNotify(int idCtrl, LPNMHDR pnmh)
+LRESULT CMainView::OnNotify(int idCtrl, LPNMHDR pnmh)
 {
     switch (pnmh->code) {
     case TCN_SELCHANGE: {
@@ -226,7 +222,7 @@ LRESULT CMainFrame::OnNotify(int idCtrl, LPNMHDR pnmh)
     return 0;
 }
 
-void CMainFrame::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
+void CMainView::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
     switch(nID) {
     case IDCANCEL:
