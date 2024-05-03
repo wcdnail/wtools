@@ -30,8 +30,9 @@
 #define IDC_TEST_STA6                   212
 #define IDI_SAVE                        212
 #define IDI_EDIT_NAME                   213
-#define IDI_ICON1                       214
 #define IDI_HATCH_CROSS                 214
+#define IDI_ICON1                       215
+#define IDI_FOLDER_OPEN                 215
 #define IDC_APP_DLG_APPEARANCE_START    3000
 #define IDC_APP_THEME_CAP               3001
 #define IDC_APP_THEME_SEL               3002
@@ -73,6 +74,7 @@
 #define IDC_APP_CB_TTILEBAR_GRAD        3038
 #define IDC_APP_CB_FLATMENUS            3039
 #define IDC_APP_PREVIEW                 3040
+#define IDC_APP_THEME_BN_IMPORT         3041
 #define ID_ACC_ALT_ENTER                32769
 #define ID_ACC_ALT_TAB                  32771
 
@@ -80,7 +82,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        215
+#define _APS_NEXT_RESOURCE_VALUE        216
 #define _APS_NEXT_COMMAND_VALUE         32772
 #define _APS_NEXT_CONTROL_VALUE         213
 #define _APS_NEXT_SYMED_VALUE           106

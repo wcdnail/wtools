@@ -78,34 +78,34 @@ namespace
     ElementAssignment const* GetElementAssignment(int dex)
     {
         // Assign the color and metric numbers to each element of the combo box
-        //            Name           Size 1                Size 2               Color 1                 Color 2                         Font            Fontcolor
+        //                              Name  Size 1                Size 2               Color 1                 Color 2                         Font            Fontcolor
         static const ElementAssignment gsl_assignment[ELEMENT_Count] =
         {
-        /* 0*/ {         L"Desktop", -1,                   -1,                  COLOR_DESKTOP,          -1,                             FONT_Desktop,   -1                          },
-        /* 1*/ {   L"AppBackground", -1,                   -1,                  COLOR_APPWORKSPACE,     -1,                             -1,             -1                          },
-        /* 2*/ {          L"Window", -1,                   -1,                  COLOR_WINDOW,           COLOR_WINDOWFRAME,              -1,             COLOR_WINDOWTEXT            },
-        /* 3*/ {            L"Menu", SIZE_MenuHeight,      SIZE_MenuWidth,      COLOR_MENU,             -1,                             FONT_Menu,      COLOR_MENUTEXT              },
-        /* 4*/ {   L"ActiveCaption", SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_ACTIVECAPTION,    COLOR_GRADIENTACTIVECAPTION,    FONT_Caption,   COLOR_CAPTIONTEXT           },
-        /* 5*/ { L"InactiveCaption", SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_INACTIVECAPTION,  COLOR_GRADIENTINACTIVECAPTION,  FONT_Caption,   COLOR_INACTIVECAPTIONTEXT   },
-        /* 6*/ {       L"SMCaption", SIZE_SMCaptionHeight, SIZE_SMCaptionWidth, -1,                     -1,                             FONT_SMCaption, -1                          },
-        /* 7*/ {    L"ActiveBorder", SIZE_Border,          -1,                  COLOR_ACTIVEBORDER,     -1,                             -1,             -1                          },
-        /* 8*/ {  L"InactiveBorder", SIZE_Border,          -1,                  COLOR_INACTIVEBORDER,   -1,                             -1,             -1                          },
-        /* 9*/ {       L"Scrollbar", SIZE_ScrollWidth,     SIZE_ScrollHeight,   COLOR_SCROLLBAR,        -1,                             -1,             -1                          },
-        /*10*/ {        L"3DObject", -1,                   -1,                  COLOR_3DFACE,           -1,                             -1,             COLOR_BTNTEXT               },
-        /*11*/ {        L"3DShadow", -1,                   -1,                  COLOR_3DSHADOW,         COLOR_3DDKSHADOW,               -1,             -1                          },
-        /*12*/ {         L"3DLight", -1,                   -1,                  COLOR_3DHILIGHT,        COLOR_3DLIGHT,                  -1,             -1                          },
-        /*13*/ {    L"SelectedItem", -1,                   -1,                  COLOR_HIGHLIGHT,        -1,                             -1,             COLOR_HIGHLIGHTTEXT         },
-        /*14*/ {    L"DisabledItem", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_GRAYTEXT              },
-        /*15*/ {         L"Tooltip", -1,                   -1,                  COLOR_INFOBK,           -1,                             FONT_Tooltip,   COLOR_INFOTEXT              },
-        /*16*/ {          L"MsgBox", -1,                   -1,                  -1,                     -1,                             FONT_Message,   COLOR_WINDOWTEXT            },
+        /* 0*/ {                  L"Desktop", -1,                   -1,                  COLOR_DESKTOP,          -1,                             FONT_Desktop,   -1                          },
+        /* 1*/ {   L"Application Background", -1,                   -1,                  COLOR_APPWORKSPACE,     -1,                             -1,             -1                          },
+        /* 2*/ {                   L"Window", -1,                   -1,                  COLOR_WINDOW,           COLOR_WINDOWFRAME,              -1,             COLOR_WINDOWTEXT            },
+        /* 3*/ {                     L"Menu", SIZE_MenuHeight,      SIZE_MenuWidth,      COLOR_MENU,             -1,                             FONT_Menu,      COLOR_MENUTEXT              },
+        /* 4*/ {       L"Title Bar - Active", SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_ACTIVECAPTION,    COLOR_GRADIENTACTIVECAPTION,    FONT_Caption,   COLOR_CAPTIONTEXT           },
+        /* 5*/ {     L"Title Bar - Inactive", SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_INACTIVECAPTION,  COLOR_GRADIENTINACTIVECAPTION,  FONT_Caption,   COLOR_INACTIVECAPTIONTEXT   },
+        /* 6*/ {      L"Title Bar - Palette", SIZE_SMCaptionHeight, SIZE_SMCaptionWidth, -1,                     -1,                             FONT_SMCaption, -1                          },
+        /* 7*/ {   L"Window Border - Active", SIZE_Border,          -1,                  COLOR_ACTIVEBORDER,     -1,                             -1,             -1                          },
+        /* 8*/ { L"Window Border - Inactive", SIZE_Border,          -1,                  COLOR_INACTIVEBORDER,   -1,                             -1,             -1                          },
+        /* 9*/ {                L"Scrollbar", SIZE_ScrollWidth,     SIZE_ScrollHeight,   COLOR_SCROLLBAR,        -1,                             -1,             -1                          },
+        /*10*/ {                L"3D Object", -1,                   -1,                  COLOR_3DFACE,           -1,                             -1,             COLOR_BTNTEXT               },
+        /*11*/ {                L"3D Shadow", -1,                   -1,                  COLOR_3DSHADOW,         COLOR_3DDKSHADOW,               -1,             -1                          },
+        /*12*/ {                 L"3D Light", -1,                   -1,                  COLOR_3DHILIGHT,        COLOR_3DLIGHT,                  -1,             -1                          },
+        /*13*/ {            L"Selected Item", -1,                   -1,                  COLOR_HIGHLIGHT,        -1,                             -1,             COLOR_HIGHLIGHTTEXT         },
+        /*14*/ {            L"Disabled Item", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_GRAYTEXT              },
+        /*15*/ {                  L"ToolTip", -1,                   -1,                  COLOR_INFOBK,           -1,                             FONT_Tooltip,   COLOR_INFOTEXT              },
+        /*16*/ {              L"Message Box", -1,                   -1,                  -1,                     -1,                             FONT_Message,   COLOR_WINDOWTEXT            },
 #if WINVER >= WINVER_2K
-        /*17*/ {       L"Hyperlink", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_HOTLIGHT              },
+        /*17*/ {                L"Hyperlink", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_HOTLIGHT              },
 #endif
 #if WINVER >= WINVER_XP
-        /*18*/ {     L"FlatmenuBar", -1,                   -1,                  COLOR_MENUBAR,          COLOR_MENUHILIGHT,              -1,             -1                          },
+        /*18*/ {          L"Menu Bar (Flat)", -1,                   -1,                  COLOR_MENUBAR,          COLOR_MENUHILIGHT,              -1,             -1                          },
 #endif
 #if WINVER >= WINVER_VISTA
-        /*19*/ {    L"PaddedBorder", SIZE_PaddedBorder,    -1,                  -1,                     -1,                             -1,             -1                          },
+        /*19*/ {     L"Window Padded Border", SIZE_PaddedBorder,    -1,                  -1,                     -1,                             -1,             -1                          },
 #endif
         };
         if (dex < 0 || dex >= ELEMENT_Count) {
@@ -139,7 +139,7 @@ CTheme::~CTheme()
 }
 
 CTheme::CTheme(bool loadSystemTheme)
-    :        m_MyName("Native")
+    :            m_MyName("Native")
     ,        m_lfIconFont()
     , m_bGradientCaptions(true)
     ,        m_bFlatMenus(false)
@@ -369,7 +369,6 @@ bool CTheme::LoadSysGradientCaptionsSetting()
     m_bGradientCaptions = bGradientCaptions != FALSE;
 #endif
     return true;
-
 }
 
 bool CTheme::LoadSysFlatMenusSetting()

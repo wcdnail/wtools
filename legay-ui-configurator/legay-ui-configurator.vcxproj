@@ -237,6 +237,7 @@
     <ClInclude Include="idl\legay-ui-configurator_i.h" />
     <ClInclude Include="luicAppearance.h" />
     <ClInclude Include="luicBackground.h" />
+    <ClInclude Include="luicDrawings.h" />
     <ClInclude Include="luicEffects.h" />
     <ClInclude Include="luicMain.h" />
     <ClInclude Include="luicMainFrame.h" />
@@ -262,6 +263,7 @@
   <ItemGroup>
     <ClCompile Include="luicAppearance.cpp" />
     <ClCompile Include="luicBackground.cpp" />
+    <ClCompile Include="luicDrawings.cpp" />
     <ClCompile Include="luicEffects.cpp" />
     <ClCompile Include="luicMain.cpp" />
     <ClCompile Include="idl\legay-ui-configurator_i.c">
@@ -326,11 +328,13 @@
     <Image Include="resz\rom-1.ico" />
     <Image Include="resz\rom-2.ico" />
     <Image Include="resz\rom-delete.ico" />
+    <Image Include="resz\rom-open.ico" />
     <Image Include="resz\rom-rename.ico" />
     <Image Include="resz\rom-save.ico" />
     <Image Include="rom-1.ico" />
     <Image Include="rom-2.ico" />
     <Image Include="rom-delete.ico" />
+    <Image Include="rom-open.ico" />
     <Image Include="rom-rename.ico" />
     <Image Include="rom-save.ico" />
   </ItemGroup>

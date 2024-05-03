@@ -13,6 +13,7 @@ enum IconIndex : int
     IconFloppy,
     IconEditField,
     IconHatchCross,
+    IconFolderOpen,
     IconCount
 };
 
@@ -28,7 +29,7 @@ struct CLegacyUIConfigurator: CAppModule,
 
     CTheme& CurrentTheme() const;
     HICON GetIcon(int icon) const;
-    CMenu const& GetMenu() const;
+    CMenu const& GetTestMenu() const;
 
     HRESULT Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID = NULL);
     HRESULT Run(HINSTANCE instHnd, int showCmd);

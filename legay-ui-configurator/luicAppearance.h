@@ -18,6 +18,7 @@ private:
     WTL::CComboBox     m_ThemeSel;
     WTL::CComboBox m_ThemeSizeSel;
     WTL::CButton      m_ThemeSave;
+    WTL::CButton    m_ThemeImport;
     WTL::CButton    m_ThemeRename;
     WTL::CButton    m_ThemeDelete;
     WTL::CComboBox   m_ElementSel;

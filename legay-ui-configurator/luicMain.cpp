@@ -103,7 +103,7 @@ HICON CLegacyUIConfigurator::GetIcon(int icon) const
     return m_ImList.GetIcon(icon);
 }
 
-CMenu const& CLegacyUIConfigurator::GetMenu() const
+CMenu const& CLegacyUIConfigurator::GetTestMenu() const
 {
     return m_TestMenu;
 }
@@ -141,6 +141,7 @@ HRESULT CLegacyUIConfigurator::ImListCreate()
         IDI_SAVE,
         IDI_EDIT_NAME,
         IDI_HATCH_CROSS,
+        IDI_FOLDER_OPEN,
     };
     HRESULT code = S_FALSE;
     m_ImList.Create(MaxIconWidth, MaxIconHeight, ILC_MASK, _countof(iconsIDs), 0);

@@ -22,6 +22,7 @@ void CPageAppearance::InitResizeMap()
         { IDC_APP_THEME_SEL,                DLSZ_SIZE_X | DLSZ_MOVE_Y },
         { IDC_APP_SIZE_CAP,                 DLSZ_MOVE_X | DLSZ_MOVE_Y },
         { IDC_APP_SIZE_SEL,                 DLSZ_MOVE_X | DLSZ_MOVE_Y },
+        { IDC_APP_THEME_BN_IMPORT,          DLSZ_MOVE_X | DLSZ_MOVE_Y },
         { IDC_APP_THEME_BN_SAVE,            DLSZ_MOVE_X | DLSZ_MOVE_Y },
         { IDC_APP_THEME_BN_RENAME,          DLSZ_MOVE_X | DLSZ_MOVE_Y },
         { IDC_APP_THEME_BN_REMOVE,          DLSZ_MOVE_X | DLSZ_MOVE_Y },
@@ -72,14 +73,19 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     }
         m_ThemeSel.Attach(GetDlgItem(IDC_APP_THEME_SEL));
     m_ThemeSizeSel.Attach(GetDlgItem(IDC_APP_SIZE_SEL));
+     m_ThemeImport.Attach(GetDlgItem(IDC_APP_THEME_BN_IMPORT));
        m_ThemeSave.Attach(GetDlgItem(IDC_APP_THEME_BN_SAVE));
      m_ThemeRename.Attach(GetDlgItem(IDC_APP_THEME_BN_RENAME));
      m_ThemeDelete.Attach(GetDlgItem(IDC_APP_THEME_BN_REMOVE));
       m_ElementSel.Attach(GetDlgItem(IDC_APP_ITEM_SEL));
 
-     m_ThemeSave.SetIcon(app->GetIcon(IconFloppy));
+       m_ThemeSave.SetIcon(app->GetIcon(IconFloppy));
      m_ThemeRename.SetIcon(app->GetIcon(IconEditField));
      m_ThemeDelete.SetIcon(app->GetIcon(IconHatchCross));
+     m_ThemeImport.SetIcon(app->GetIcon(IconFolderOpen));
+
+    m_ThemeSizeSel.AddString(L"Normal");
+    m_ThemeSizeSel.SetCurSel(0);
 
     CLegacyUIConfigurator::App()->CurrentTheme().InitUI(*this);
     InitResizeMap();

@@ -1,20 +1,7 @@
 #pragma once
 
+#include "luicDrawings.h"
 #include <atlwin.h>
-
-#include "luicTheme.h"
-
-struct CWndFrameRects
-{
-    int    m_BorderSize = { 0 };
-    CRect    m_rcBorder = {};
-    CRect     m_rcFrame = {};
-    CRect      m_rcCapt = {};
-    CRect      m_rcMenu = {};
-    CRect m_rcWorkspace = {};
-
-    void Calc(CRect const& rc, const CTheme& theme, bool wMenu, bool wWorkspace);
-};
 
 using CThemePreviewerTraits = ATL::CWinTraits<WS_CHILD | WS_VISIBLE | WS_BORDER, 0>;
 
@@ -38,7 +25,7 @@ private:
 
     friend Super;
 
-    CWndFrameRects m_WndRect[WND_Count];
+    WindowRects m_WndRect[WND_Count];
 
     void OnPaint(CDCHandle dc);
 

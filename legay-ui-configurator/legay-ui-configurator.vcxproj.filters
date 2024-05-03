@@ -60,6 +60,9 @@
     <ClInclude Include="luicThemePreviewer.h">
       <Filter>theme</Filter>
     </ClInclude>
+    <ClInclude Include="luicDrawings.h">
+      <Filter>theme</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -97,6 +100,9 @@
       <Filter>theme</Filter>
     </ClCompile>
     <ClCompile Include="luicThemePreviewer.cpp">
+      <Filter>theme</Filter>
+    </ClCompile>
+    <ClCompile Include="luicDrawings.cpp">
       <Filter>theme</Filter>
     </ClCompile>
   </ItemGroup>
@@ -142,6 +148,12 @@
       <Filter>resz</Filter>
     </Image>
     <Image Include="resz\rom-delete.ico">
+      <Filter>resz</Filter>
+    </Image>
+    <Image Include="rom-open.ico">
+      <Filter>resz</Filter>
+    </Image>
+    <Image Include="resz\rom-open.ico">
       <Filter>resz</Filter>
     </Image>
   </ItemGroup>
