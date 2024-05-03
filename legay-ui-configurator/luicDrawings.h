@@ -7,15 +7,26 @@ struct CTheme;
 
 struct WindowRects
 {
-    int    m_BorderSize = { 0 };
-    CRect    m_rcBorder = {};
-    CRect     m_rcFrame = {};
-    CRect      m_rcCapt = {};
-    CRect      m_rcMenu = {};
-    CRect m_rcWorkspace = {};
-    CRect    m_rcScroll = {};
+    int     m_BorderSize = { 0 };
+    CRect     m_rcBorder = {};
+    CRect      m_rcFrame = {};
+    CRect       m_rcCapt = {};
+    CRect       m_rcMenu = {};
+    CRect  m_rcWorkspace = {};
+    CRect     m_rcScroll = {};
+};
 
-    void Calc(CRect const& rc, UINT captFlags, const CTheme& theme);
+struct WinText
+{
+    bool        selected = { false };
+    ATL::CStringW   text = {};
+};
+
+struct WindowText
+{
+    WinText const*  line = { nullptr };
+    int        lineCount = { 0 };
+    UINT           flags = { 0 };
 };
 
 struct DrawWindowArgs
@@ -26,7 +37,7 @@ struct DrawWindowArgs
     UINT        captFlags;
     HMENU           hMenu;
     int      selectedMenu;
-    ATL::CStringW    text;
+    WindowText       text;
 };
 
 class CDrawRoutine
@@ -34,6 +45,8 @@ class CDrawRoutine
 public:
     ~CDrawRoutine();
     CDrawRoutine(CTheme const& theme);
+
+    void CalcRects(CRect const& rc, UINT captFlags, WindowRects& target) const;
 
     void DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const;
     LONG DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags) const;

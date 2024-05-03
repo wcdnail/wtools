@@ -266,7 +266,7 @@ static int GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size)
 }
 
 _Ret_maybenull_
-LOGFONT* CTheme::GetNcMetricFont(CTheme& theme, int font)
+LOGFONT const* CTheme::GetNcMetricFont(CTheme const& theme, int font)
 {
     switch (font) {
     case FONT_Caption:   return &theme.m_ncMetrics.lfCaptionFont;
@@ -299,7 +299,7 @@ bool CTheme::RefreshFonts()
 {
     CFont tmpFont[FONTS_Count];
     for (int iFont = 0; iFont < FONTS_Count; iFont++) {
-        LOGFONT* lf = GetNcMetricFont(*this, iFont);
+        LOGFONT const* lf = GetNcMetricFont(*this, iFont);
         if (!lf) {
             // ##TODO: придумать решение
             continue;
@@ -417,6 +417,11 @@ HFONT CTheme::GetFont(int font) const
         return nullptr;
     }
     return m_Font[font];
+}
+
+LOGFONT const* CTheme::GetLogFont(int font) const
+{
+    return GetNcMetricFont(*this, font);
 }
 
 void CTheme::LoadExistingThemes(WTL::CComboBox& themeSel)

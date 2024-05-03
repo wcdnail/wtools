@@ -4,6 +4,45 @@
 #include "rect.alloc.h"
 #include "string.utils.format.h"
 
+namespace 
+{
+    const WinText Il_DL_Begin[] = {
+        { false, L"  Логика — наука о формах и закономерностях мышления, теория" },
+        {  true, L"мышления. В настоящее время  термином «логика»  обозначаются" },
+        { false, L"теории, различающиеся  не только по способу разработки одних" },
+        { false, L"и  тех же  вопросов, но и по предмету  исследования.  Термин" },
+        {  true, L"«логика»   употребляется   поэтому  обычно  с  тем или  иным" },
+        {  true, L"прилагательным    («формальная    логика»,   «математическая" },
+        { false, L"логика», «индуктивная», «модальная» и т.д.)." },
+        { false, L"  Решение  вопроса  о  предмете логики как науки по существу" },
+        { false, L"зависит  от решения основного вопроса философии и отражает в" },
+        { false, L"себе     теоретические,    мировоззренческие,    философские" },
+        { false, L"установки, в том числе представление о природе мышления, об" },
+        { false, L"отношении мышления к его предмету, о движущих силах," },
+        { false, L"стимулах развития мышления и т.д. Не случайно поэтому логика" },
+        { false, L"всегда была и остаётся объектом острой идейной борьбы" },
+        { false, L"основных философских направлений — материализма и" },
+        { false, L"идеализма, диалектики и метафизики." },
+        { false, L"  Марксистско-ленинское решение вопроса о предмете логики," },
+        { false, L"представляющее собой итог всей истории философской мысли," },
+        { false, L"разработано Марксом, Энгельсом и Лениным в ходе критической" },
+        { false, L"и материалистической переработки высших достижений" },
+        { false, L"предшествующей философии в области теории мышления." },
+        { false, L"Логика, разработанная на основе диалектико-" },
+        { false, L"материалистического понимания и решения проблемы мышления" },
+        { false, L"и соответствующая современному уровню развития человеческой" },
+        { false, L"культуры, науки и техники, обычно именуется диалектической" },
+        { false, L"логикой." },
+        {  true, L"  # Диалектическая логика" },
+        { false, L"  Логика диалектическая — наука об объективных формах и" },
+        { false, L"законах развития человеческого мышления, понимаемого как" },
+        { false, L"исторический процесс отражения внешнего мира в знании" },
+        { false, L"людей, как объективная истина в её развитии. В этом понимании" },
+        { false, L"логика диалектическая совпадает с диалектикой и теорией" },
+        { false, L"познания материализма." },
+    };
+}
+
 CThemePreviewer::~CThemePreviewer()
 {
 }
@@ -53,15 +92,16 @@ void CThemePreviewer::OnPaint(CDCHandle dcParam)
 
     dc.FillSolidRect(rcClient, theme.GetColor(COLOR_BACKGROUND));
 
+
     const DrawWindowArgs params[WND_Count] = {
-        {   m_WndRect[WND_Back],  rcWin1, L"Inactive window", 0, nullptr, -1, L"" },
-        {  m_WndRect[WND_Front],  rcWin2, L"Active window", DC_ACTIVE, hMenu, 2, L"" },
-        { m_WndRect[WND_MsgBox], rcIcon3, L"Tool window", DC_ACTIVE | DC_SMALLCAP, nullptr, -1, L"" },
+        {   m_WndRect[WND_Back],  rcWin1, L"Inactive window", 0, nullptr, -1, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
+        {  m_WndRect[WND_Front],  rcWin2, L"Active window", DC_ACTIVE, hMenu, 2, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
+        { m_WndRect[WND_MsgBox], rcIcon3, L"Tool window", DC_ACTIVE | DC_SMALLCAP, nullptr, -1, { nullptr, 0, 0 } },
     };
 
     CDrawRoutine drawings(theme);
     for (auto& it : params) {
-        it.rects.Calc(ToCRect<double>(it.rcSrc), it.captFlags, theme);
+        drawings.CalcRects(ToCRect<double>(it.rcSrc), it.captFlags, it.rects);
         drawings.DrawWindow(dc, it);
     }
 }

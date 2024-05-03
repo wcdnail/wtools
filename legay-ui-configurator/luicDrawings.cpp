@@ -2,10 +2,38 @@
 #include "luicDrawings.h"
 #include "luicTheme.h"
 #include "dh.tracing.h"
+#include "dh.tracing.defs.h"
+#include "string.utils.error.code.h"
 
 //
 // https://stackoverflow.com/questions/14994012/how-draw-caption-in-alttab-switcher-when-paint-custom-captionframe
 //
+
+CIconHandle LoadShellIcon(ATL::CStringW const& entry, UINT flags = SHGFI_SMALLICON | SHGFI_ADDOVERLAYS, unsigned attrs = INVALID_FILE_ATTRIBUTES)
+{
+    if (INVALID_FILE_ATTRIBUTES == attrs) {
+        attrs = GetFileAttributesW(entry.GetString());
+    }
+    if (INVALID_FILE_ATTRIBUTES == attrs) {
+        const auto code = static_cast<HRESULT>(GetLastError());
+        DH::ThreadPrintf(LTH_SHELL_ICON L" Can't get attrs for '%s' - %d '%s'\n",
+            entry.GetString(), code, Str::ErrorCode<>::SystemMessage(code)
+        );
+        return {};
+    }
+    SHFILEINFOW info;
+    ZeroMemory(&info, sizeof(info));
+    const DWORD_PTR rv = SHGetFileInfoW(entry.GetString(), attrs, &info, sizeof(info), SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | flags);
+    if (0 == rv) {
+        const auto code = static_cast<HRESULT>(GetLastError());
+        DH::ThreadPrintf(LTH_SHELL_ICON L" Can't load icon for '%s' - %d '%s'\n",
+            entry.GetString(), code, Str::ErrorCode<>::SystemMessage(code)
+        );
+        return {};
+    }
+    return CIconHandle(info.hIcon);
+}
+
 
 struct CDrawRoutine::StaticInit
 {
@@ -46,6 +74,9 @@ private:
         GetProcAddressEX(USER32, DrawCaptionTempW);
         GetProcAddressEX(USER32, SetSysColorsTemp);
         GetProcAddressEX(USER32, DrawMenuBarTemp);
+
+        const ATL::CStringW runDll32 = L"%SYSTEMROOT%\\System32\\rundll32.dll";
+        m_IconActiveWnd = LoadShellIcon(runDll32);
     }
 
     ~StaticInit()
@@ -56,10 +87,12 @@ private:
     }
 
     StaticInit()
-        :           USER32{ LoadLibraryW(L"USER32") }
-        , DrawCaptionTempW{ nullptr }
-        , SetSysColorsTemp{ nullptr }
-        ,  DrawMenuBarTemp{ nullptr }
+        :            USER32{ LoadLibraryW(L"USER32") }
+        ,  DrawCaptionTempW{ nullptr }
+        ,  SetSysColorsTemp{ nullptr }
+        ,   DrawMenuBarTemp{ nullptr }
+        ,   m_IconActiveWnd{}
+        , m_IconInactiveWnd{}
     {
         Init();
     }
@@ -385,7 +418,7 @@ void CDrawRoutine::DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enable
     }
 }
 
-void WindowRects::Calc(CRect const& rc, UINT captFlags, CTheme const& theme)
+void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& target) const
 {
   //long        dpiScale = ScaleForDpi<long>(8);
     const bool isToolWnd = (0 != (DC_SMALLCAP & captFlags));
@@ -397,49 +430,49 @@ void WindowRects::Calc(CRect const& rc, UINT captFlags, CTheme const& theme)
     LRect         rcWork;
     LRect       rcScroll;
 
-    m_rcBorder = ToCRect(rcBorder);
+    target.m_rcBorder = ToCRect(rcBorder);
 
-    m_BorderSize = theme.GetNcMetrcs().iBorderWidth + 1;
+    target.m_BorderSize = m_Theme.GetNcMetrcs().iBorderWidth + 1;
 #if WINVER >= WINVER_VISTA
-    m_BorderSize += theme.GetNcMetrcs().iPaddedBorderWidth;
+    target.m_BorderSize += m_Theme.GetNcMetrcs().iPaddedBorderWidth;
 #endif
 
     rcFrame = rcBorder;
-    rcFrame.Shrink(m_BorderSize, m_BorderSize);
+    rcFrame.Shrink(target.m_BorderSize, target.m_BorderSize);
     rcFrame.PutInto(rcBorder, PutAt::Center);
-    m_rcFrame = ToCRect(rcFrame);
+    target.m_rcFrame = ToCRect(rcFrame);
     rcWork = rcFrame;
 
     rcCapt = rcFrame;
-    rcCapt.cy = theme.GetNcMetrcs().iCaptionHeight + 2;
+    rcCapt.cy = m_Theme.GetNcMetrcs().iCaptionHeight + 2;
     rcWork.cy -= rcCapt.cy;
     rcCapt.Shrink(1, 1);
-    m_rcCapt = ToCRect(rcCapt);
+    target.m_rcCapt = ToCRect(rcCapt);
 
     rcMenu = rcCapt;
     if (!isToolWnd) {
         rcMenu.y  = rcCapt.Bottom() + 1;
-        rcMenu.cy = theme.GetNcMetrcs().iMenuHeight + 1;
-        m_rcMenu = ToCRect(rcMenu);
+        rcMenu.cy = m_Theme.GetNcMetrcs().iMenuHeight + 1;
+        target.m_rcMenu = ToCRect(rcMenu);
         rcWork.cy -= rcCapt.cy;
     }
 
     if (!isToolWnd) {
         rcWork.Shrink(2, 2);
         rcWork.y = rcMenu.Bottom() + 1;
-        m_rcWorkspace = ToCRect(rcWork);
+        target.m_rcWorkspace = ToCRect(rcWork);
 
         rcScroll = rcWork;
         rcScroll.Shrink(0, 2);
-        rcScroll.cx = theme.GetNcMetrcs().iScrollWidth;
+        rcScroll.cx = m_Theme.GetNcMetrcs().iScrollWidth;
         rcScroll.x = rcWork.Right() - rcScroll.cx - 2;
-        m_rcScroll = ToCRect(rcScroll);
+        target.m_rcScroll = ToCRect(rcScroll);
     }
 }
 
 void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
 {
-    WindowRects const&      rects = params.rects;
+    WindowRects const&    rects = params.rects;
     HFONT              menuFont = m_Theme.GetFont(FONT_Menu);
     HFONT              captFont = m_Theme.GetFont(FONT_Caption);
     HICON              captIcon = nullptr;
@@ -452,7 +485,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
     if (!isToolWnd) {
         if (isActive) { captIcon = StaticInit::instance().m_IconActiveWnd; }
         else          { captIcon = StaticInit::instance().m_IconInactiveWnd; }
-        captFlags |= DC_ICON;
+        if (captIcon) { captFlags |= DC_ICON; }
     }
     if (m_Theme.IsGradientCaptions()) {
         captFlags |= DC_GRADIENT;
@@ -487,6 +520,45 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
         CRect rcWork = rects.m_rcWorkspace;
         dc.FillSolidRect(rcWork, m_Theme.GetColor(workspaceColorIndex));
         dc.DrawEdge(rcWork, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
+
+        if (params.text.lineCount > 0) {
+            int textColorIndex = isActive ? COLOR_WINDOWTEXT : COLOR_GRAYTEXT;
+            HFONT      prevFnt = dc.SelectFont(m_Theme.GetFont(FONT_Desktop));
+            COLORREF   prevClr = dc.SetTextColor(m_Theme.GetColor(textColorIndex));
+            COLORREF prevBkClr = dc.SetBkColor(m_Theme.GetColor(workspaceColorIndex));
+            int     prevBkMode = dc.SetBkMode(TRANSPARENT);
+            CRect       rcText = rcWork;
+            rcText.right = rects.m_rcScroll.left - 1;
+            rcText.DeflateRect(rcWork.Width() / 16, 4);
+            CRect  rcLine = rcText;
+            LONG       cy = -(m_Theme.GetLogFont(FONT_Desktop)->lfHeight) + 2;
+            rcLine.bottom = rcLine.top + cy;
+
+            for (int i = 0; i < params.text.lineCount; i++) {
+                if (rcLine.top > rcText.bottom) {
+                    break;
+                }
+                const auto& line = params.text.line[i];
+                if (line.selected) {
+                    CRect rcSel = rcLine;
+                    rcSel.top += 1;
+                    rcSel.InflateRect(3, 2);
+                    dc.FillSolidRect(rcSel, m_Theme.GetColor(COLOR_HIGHLIGHT));
+                    dc.SetTextColor(m_Theme.GetColor(COLOR_HIGHLIGHTTEXT));
+                }
+                else {
+                    dc.SetTextColor(m_Theme.GetColor(textColorIndex));
+                }
+                dc.DrawTextW(line.text.GetString(), line.text.GetLength(), rcLine, params.text.flags);
+                rcLine.top = rcLine.bottom;
+                rcLine.bottom = rcLine.top + cy;
+            }
+
+            dc.SetBkMode(prevBkMode);
+            dc.SetTextColor(prevBkClr);
+            dc.SetTextColor(prevClr);
+            dc.SelectFont(prevFnt);
+        }
 
         DrawScrollbar(dc, rects.m_rcScroll, isActive);
     }

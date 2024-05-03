@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="info\runtime.information.cpp">
+      <Filter>info</Filter>
+    </ClCompile>
+    <ClCompile Include="dh.timer.cpp" />
+    <ClCompile Include="dh.tracing.cpp" />
+    <ClCompile Include="rectz.cpp" />
+    <ClCompile Include="string.utils.format.cpp" />
+    <ClCompile Include="dev.assistance\dev.assist.cpp">
+      <Filter>dev.assistance</Filter>
+    </ClCompile>
+    <ClCompile Include="rect.alloc.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="info\runtime.information.h">
+      <Filter>info</Filter>
+    </ClInclude>
+    <ClInclude Include="dh.timer.h" />
+    <ClInclude Include="dh.tracing.h" />
+    <ClInclude Include="rectz.h" />
+    <ClInclude Include="string.utils.format.h" />
+    <ClInclude Include="dev.assistance\dev.assist.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\list.view.exstyles.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\list.view.styles.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\notify.codes.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\virtual.keys.consts.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\window.messages.consts.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.alloc.h" />
+    <ClInclude Include="rect.aspect.ratio.h" />
+    <ClInclude Include="rect.gdi+.h" />
+    <ClInclude Include="rect.putinto.h" />
+    <ClInclude Include="rect.screen.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="info">
+      <UniqueIdentifier>{ce25371b-ae6a-4707-b739-4dd723b67a72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dev.assistance">
+      <UniqueIdentifier>{f3e05629-8356-44e1-addf-c389094f1804}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

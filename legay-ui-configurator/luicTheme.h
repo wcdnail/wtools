@@ -105,6 +105,7 @@ struct CTheme
     COLORREF GetColor(int color) const;
     HBRUSH GetBrush(int color) const;
     HFONT GetFont(int font) const;
+    LOGFONT const* GetLogFont(int font) const;
     bool IsGradientCaptions() const;
     bool IsFlatMenus() const;
     NONCLIENTMETRICS const& GetNcMetrcs() const;
@@ -114,7 +115,7 @@ struct CTheme
 private:
     static const SizeRange g_DefaultSizeRange[SIZES_Count];
 
-    ATL::CString          m_MyName;
+    ATL::CString              m_MyName;
     CLogFont              m_lfIconFont;
     bool           m_bGradientCaptions;
     bool                  m_bFlatMenus;
@@ -124,7 +125,7 @@ private:
     CFont          m_Font[FONTS_Count];
     SizeRange m_SizeRange[SIZES_Count];
 
-    static LOGFONT* GetNcMetricFont(CTheme& theme, int font);
+    static LOGFONT const* GetNcMetricFont(CTheme const& theme, int font);
 
     bool RefreshBrushes();
     bool RefreshFonts();
