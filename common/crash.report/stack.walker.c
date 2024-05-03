@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "debug.output.h"
 #include "stack.walker.h"
 #include <assert.h>

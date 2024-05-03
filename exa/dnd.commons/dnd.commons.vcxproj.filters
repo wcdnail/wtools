@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="test.frame.cpp" />
+    <ClCompile Include="..\..\..\libs\common\dh.timer.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\common\dh.tracing.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\common\info\runtime.information.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\common\crash.report\crash.report.c">
+      <Filter>common\crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\common\crash.report\crash.report.impl.c">
+      <Filter>common\crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\common\crash.report\debug.output.c">
+      <Filter>common\crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\common\crash.report\run.context.c">
+      <Filter>common\crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\common\crash.report\run.context.info.c">
+      <Filter>common\crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\common\crash.report\stack.walker.c">
+      <Filter>common\crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\common\crash.report\string.buffer.c">
+      <Filter>common\crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="dnd.target.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="test.frame.h" />
+    <ClInclude Include="..\..\..\libs\common\dh.tracing.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\common\dh.timer.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\common\info\runtime.information.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\common\crash.report\crash.report.h">
+      <Filter>common\crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\common\crash.report\debug.output.h">
+      <Filter>common\crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\common\crash.report\run.context.h">
+      <Filter>common\crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\common\crash.report\run.context.info.h">
+      <Filter>common\crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\common\crash.report\stack.walker.h">
+      <Filter>common\crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\common\crash.report\string.buffer.h">
+      <Filter>common\crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="dnd.target.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{d393ff9f-7253-42ac-b955-ff7a04c37104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\crash.report">
+      <UniqueIdentifier>{217014c6-1510-4c27-8f06-21660f52cf7b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

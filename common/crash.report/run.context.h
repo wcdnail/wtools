@@ -30,4 +30,29 @@ WCDAFX_API void      capture_run_context(PRUN_CONTEXT* ppctx);
 
 #ifdef __cplusplus
 }
+
+#include <memory>
+
+template <>
+struct std::default_delete<RUN_CTX>
+{
+    void operator()(RUN_CTX* pctx)
+    {
+        free_run_context(pctx);
+    }
+};
+
+using RUN_CTX_Ptr = std::unique_ptr<RUN_CTX>;
+
+inline RUN_CTX_Ptr cxx_capture_run_context()
+{
+    PRUN_CONTEXT rawPtr = nullptr;
+    capture_run_context(&rawPtr);
+    RUN_CTX_Ptr res;
+    if (rawPtr) {
+        res.reset(rawPtr);
+    }
+    return res;
+}
+
 #endif

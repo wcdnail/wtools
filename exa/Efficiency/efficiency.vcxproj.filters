@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="efficiency.cxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="..\..\..\libs\common\atl.or.stl.string.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\common\string.utils.native.adopt.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="measure.stuff.h" />
+    <ClInclude Include="atl.std.string.adapter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{28eb41b5-7fc8-4578-b975-e8c33d42d734}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="reports">
+      <UniqueIdentifier>{6d584fb7-0aa3-4540-b6c8-96d147bdaaa7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="results.xlsx">
+      <Filter>reports</Filter>
+    </None>
+    <None Include="results_athome.xlsx">
+      <Filter>reports</Filter>
+    </None>
+    <None Include="results_athome.2.xlsx">
+      <Filter>reports</Filter>
+    </None>
+  </ItemGroup>
+</Project>

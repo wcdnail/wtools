@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application xmlns='http://schemas.microsoft.com/windows/2009/Ribbon'>
+    <Application.Commands>
+        <Command Name="cmdExit" Symbol="RIDC_EXIT" LabelTitle="E&amp;xit" />
+        <Command Name="cmdMRUList" LabelTitle="..." />
+        <Command Name="tabOne" LabelTitle="#1" />
+        <Command Name="tabTwo" LabelTitle="#2" />
+    </Application.Commands>
+    <Application.Views>
+        <Ribbon>
+            <Ribbon.ApplicationMenu>
+                <ApplicationMenu CommandName="cmdApplicationMenu">
+                    <ApplicationMenu.RecentItems>
+                        <RecentItems CommandName="cmdMRUList" />
+                    </ApplicationMenu.RecentItems>
+                    <MenuGroup>
+                        <Button CommandName="cmdExit" />
+                    </MenuGroup>
+                </ApplicationMenu>
+            </Ribbon.ApplicationMenu>
+            <Ribbon.Tabs>
+                <Tab CommandName="tabOne">
+                </Tab>
+                <Tab CommandName="tabTwo">
+                </Tab>
+            </Ribbon.Tabs>
+        </Ribbon>
+    </Application.Views>
+</Application>

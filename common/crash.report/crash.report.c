@@ -1,6 +1,7 @@
+#include "stdafx.h"
 #include "crash.report.h"
 #include "string.buffer.h"
-#include "Run.Context.Info.h"
+#include "run.context.info.h"
 #include <stdlib.h>
 
 void crash_report_window(STRING_BUFFER_PTR);

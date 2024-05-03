@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="res\pixmaps">
+      <UniqueIdentifier>{f49b8ec5-f38e-46f5-b9ad-11d6be1e11fc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ChildFrm.h" />
+    <ClInclude Include="ChildView.h" />
+    <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="Resource.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLBrowser.App.h" />
+    <ClInclude Include="ConnectDlg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ChildFrm.cpp" />
+    <ClCompile Include="ChildView.cpp" />
+    <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="SQLBrowser.App.cpp" />
+    <ClCompile Include="ConnectDlg.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\buttons.bmp">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+    <Image Include="res\filelarge.bmp">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+    <Image Include="res\filesmall.bmp">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+    <Image Include="res\main.bmp">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+    <Image Include="res\sqlb.ico">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+    <Image Include="res\Toolbar.bmp">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+    <Image Include="res\Toolbar256.bmp">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+    <Image Include="res\writelarge.bmp">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+    <Image Include="res\writesmall.bmp">
+      <Filter>res\pixmaps</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\ribbon.mfcribbon-ms">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\sqlb.rc2">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="sqlbrowser.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

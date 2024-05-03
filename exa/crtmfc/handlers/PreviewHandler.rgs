@@ -1,0 +1,46 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {A46F7008-9F86-4BB3-A3E5-55D0439911D7} = s 'Preview Handler Class'
+		{
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			TypeLib = s '{EF61B872-7EE2-4D44-B58B-D0F16438E2AB}'
+			Version = s '1.0'
+			val AppID = s '{6d2b5079-2f0b-48dd-ab7f-97cec514d30b}'
+			val DisplayName = s '@%MODULE%,-101'
+			val Icon = s '%MODULE%,201'
+		}
+	}
+
+	NoRemove .mcrt
+	{
+		NoRemove ShellEx
+		{
+			ForceRemove {8895b1c6-b41f-4c1c-a562-0d564250836f} = s '{A46F7008-9F86-4BB3-A3E5-55D0439911D7}'
+		}
+	}
+}
+
+HKLM
+{
+	NoRemove Software
+	{
+		NoRemove Microsoft
+		{
+			NoRemove Windows
+			{
+				NoRemove CurrentVersion
+				{
+					NoRemove PreviewHandlers
+					{
+						val {A46F7008-9F86-4BB3-A3E5-55D0439911D7} = s 'Preview Handler Class'
+					}
+				}
+			}
+		}
+	}
+}

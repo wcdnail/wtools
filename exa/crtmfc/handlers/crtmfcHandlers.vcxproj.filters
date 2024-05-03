@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="gen">
+      <UniqueIdentifier>{1601b712-88a9-4c4c-ac49-c4d1793c09f4}</UniqueIdentifier>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="crtmfcHandlers_i.c">
+      <Filter>gen</Filter>
+    </ClCompile>
+    <ClCompile Include="xdlldata.c" />
+    <ClCompile Include="crtmfcHandlers.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="..\doc.cpp" />
+    <ClCompile Include="..\srvritem.cpp" />
+    <ClCompile Include="..\view.cpp" />
+    <ClCompile Include="..\cntritem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="crtmfcHandlers_i.h">
+      <Filter>gen</Filter>
+    </ClInclude>
+    <ClInclude Include="xdlldata.h" />
+    <ClInclude Include="dllmain.h" />
+    <ClInclude Include="FilterHandler.h" />
+    <ClInclude Include="PreviewHandler.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="ThumbnailHandler.h" />
+    <ClInclude Include="..\doc.h" />
+    <ClInclude Include="..\srvritem.h" />
+    <ClInclude Include="..\view.h" />
+    <ClInclude Include="..\cntritem.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="crtmfcHandlers.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="crtmfcHandlers.rgs">
+      <Filter>res</Filter>
+    </None>
+    <None Include="PreviewHandler.rgs">
+      <Filter>res</Filter>
+    </None>
+    <None Include="ThumbnailHandler.rgs">
+      <Filter>res</Filter>
+    </None>
+    <None Include="FilterHandler.rgs">
+      <Filter>res</Filter>
+    </None>
+    <None Include="crtmfcHandlers.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="crtmfcHandlers.idl" />
+  </ItemGroup>
+</Project>

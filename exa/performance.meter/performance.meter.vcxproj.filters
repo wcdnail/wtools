@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="performance.meter">
+      <UniqueIdentifier>{0690951b-38c9-4814-ae31-592b9f61fcf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="performance.meter\precompiled">
+      <UniqueIdentifier>{20cf8f54-6973-421a-a9d5-59ed96883432}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="performance.meter\_gen">
+      <UniqueIdentifier>{aea9378e-46ef-4e98-8eb6-e5656910fd38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="performance.meter\_res">
+      <UniqueIdentifier>{f49e9f10-54b4-43c5-bbd7-aaf136a64b6f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="precompiled.cpp">
+      <Filter>performance.meter\precompiled</Filter>
+    </ClCompile>
+    <ClCompile Include="pm.main.cpp">
+      <Filter>performance.meter</Filter>
+    </ClCompile>
+    <ClCompile Include="pm.qmainwindow.cpp">
+      <Filter>performance.meter</Filter>
+    </ClCompile>
+    <ClCompile Include="__gen\pm.qmainwindow.h.moc">
+      <Filter>performance.meter\_gen</Filter>
+    </ClCompile>
+    <ClCompile Include="__gen\resources.qrc.cpp">
+      <Filter>performance.meter\_gen</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="precompiled.h">
+      <Filter>performance.meter\precompiled</Filter>
+    </ClInclude>
+    <ClInclude Include="__gen\aboutdialog.ui.h">
+      <Filter>performance.meter\_gen</Filter>
+    </ClInclude>
+    <ClInclude Include="__gen\mainwindow.ui.h">
+      <Filter>performance.meter\_gen</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="pm.qmainwindow.h">
+      <Filter>performance.meter</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\aboutdialog.ui">
+      <Filter>performance.meter\_res</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\mainwindow.ui">
+      <Filter>performance.meter\_res</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\resources.qrc">
+      <Filter>performance.meter\_res</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

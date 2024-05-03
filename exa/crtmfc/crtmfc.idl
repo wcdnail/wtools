@@ -1,0 +1,29 @@
+// crtmfc.idl : источник библиотеки типов для crtmfc.exe
+
+// Этот файл будет обработан компилятором MIDL для создания
+// библиотеки типов (crtmfc.tlb).
+
+[ uuid(3DC5B89B-94AA-4358-AEF3-FC7E93A30A09), version(1.0) ]
+library crtmfc
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	//  Первичный интерфейс диспетчеризации для CDoc
+	
+	[ uuid(1AABBAE6-0AB9-4CC2-A6B3-DD56F1C5A611) ]
+	dispinterface Icrtmfc
+	{
+		properties:
+			
+		methods:
+	};
+
+	//  Информация о классе для CDoc
+	
+	[ uuid(3D532F87-ED85-47B8-B175-A37878BF9F63) ]
+	coclass CDoc
+	{
+		[default] dispinterface Icrtmfc;
+	};
+};

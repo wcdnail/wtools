@@ -1,0 +1,496 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="controls">
+      <UniqueIdentifier>{b69071b6-ec05-450c-9a32-fba4f09a3cce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="res\pixmaps">
+      <UniqueIdentifier>{fbc9aaf8-11a6-43ed-98df-aa3ff5c54de0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res\icons">
+      <UniqueIdentifier>{fa105bcc-772c-4316-b6bb-ed036745c719}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res\help">
+      <UniqueIdentifier>{d0dad3b0-6e5e-486e-a2b1-2352298a1d0c}</UniqueIdentifier>
+      <Extensions>hhp;hhc;hhk;gif;jpg</Extensions>
+    </Filter>
+    <Filter Include="res\help.topics">
+      <UniqueIdentifier>{34893e15-6c6d-44a9-93f6-6a489b7ddfc0}</UniqueIdentifier>
+      <Extensions>htm;html</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\ribbon.mfcribbon-ms">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\crtmfc.rc2">
+      <Filter>res</Filter>
+    </None>
+    <None Include="hlp\crtmfc.hhk">
+      <Filter>res\help</Filter>
+    </None>
+    <None Include="hlp\crtmfc.hhc">
+      <Filter>res\help</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_color.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_fileopen.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_filesave.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_find.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_font.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_newtypedlg.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_replace.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidp_default.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidw_dockbar_top.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidw_status_bar.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidw_toolbar.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hidr_doc1type.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_app_about.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_app_exit.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_context_help.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_edit_clear.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_edit_clear_all.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_edit_copy.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_edit_cut.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_edit_find.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_edit_paste.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_edit_redo.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_edit_repeat.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_edit_replace.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_edit_undo.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_close.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_mru_file1.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_new.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_open.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_save.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_save_as.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_send_mail.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_help_index.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_help_using.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_ht_caption.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_ht_nowhere.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_next_pane.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_prev_pane.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_sc_close.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_sc_maximize.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_sc_minimize.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_sc_move.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_sc_nextwindow.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_sc_prevwindow.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_sc_restore.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_sc_size.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_sc_tasklist.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_view_ruler.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_view_status_bar.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_view_toolbar.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_window_all.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_window_arrange.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_window_cascade.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_window_new.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_window_split.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_window_tile.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_window_tile_horz.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_window_tile_vert.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\main_index.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\menu_edit.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\menu_file.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\menu_help.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\menu_view.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\menu_window.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\scrollbars.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_print.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_printdlg.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_printsetup.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidw_preview_bar.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_page_setup.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_print.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_print_preview.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_print_setup.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afxo0001.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_changeicon.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_convert.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_editlinks.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_insertobject.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidd_pastespecial.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_edit_paste_link.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_ole_edit_links.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_ole_insert_new.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_ole_verb_1.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\afx_hidw_resize_bar.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_save_copy_as.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\hid_file_update.htm">
+      <Filter>res\help.topics</Filter>
+    </None>
+    <None Include="hlp\Images\Bullet.gif">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\buttons.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\classview.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\classview_hc.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\explorer.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\explorer_hc.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\filelarge.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\nav_large_hc.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\filesmall.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\fileview.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\fileview_hc.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\info.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\IToolbar.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\IToolbar256.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\main.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\menuimages.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\menuimages_hc.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\nav_large.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\pages.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\properties_hc.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\pages_hc.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\pages_small.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\pages_small_hc.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\properties.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\sort.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\writesmall.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\sort_hc.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\Toolbar.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\Toolbar256.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\writelarge.bmp">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="res\class_view.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\class_view_hc.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\crtmfc.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\crtmfcDoc.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\file_view.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\file_view_hc.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\output_wnd.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\output_wnd_hc.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\properties_wnd.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="res\properties_wnd_hc.ico">
+      <Filter>res\icons</Filter>
+    </None>
+    <None Include="crtmfc.reg">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="childframe.h" />
+    <ClInclude Include="cntritem.h" />
+    <ClInclude Include="doc.h" />
+    <ClInclude Include="ipframe.h" />
+    <ClInclude Include="mainframe.h" />
+    <ClInclude Include="srvritem.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="view.h" />
+    <ClInclude Include="CalendarBar.h">
+      <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="ClassView.h">
+      <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="FileView.h">
+      <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputWnd.h">
+      <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertiesWnd.h">
+      <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewTree.h">
+      <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="cm.app.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="childframe.cpp" />
+    <ClCompile Include="cntritem.cpp" />
+    <ClCompile Include="doc.cpp" />
+    <ClCompile Include="ipframe.cpp" />
+    <ClCompile Include="mainframe.cpp" />
+    <ClCompile Include="srvritem.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="view.cpp" />
+    <ClCompile Include="CalendarBar.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
+    <ClCompile Include="ClassView.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
+    <ClCompile Include="FileView.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputWnd.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertiesWnd.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewTree.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
+    <ClCompile Include="cm.app.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="crtmfc.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="hlp\crtmfc.hhp">
+      <Filter>res\help</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Resource.h">
+      <Filter>res</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="crtmfc.idl" />
+  </ItemGroup>
+</Project>

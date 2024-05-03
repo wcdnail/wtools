@@ -1,0 +1,25 @@
+[WCD:Locale en_US.UTF8]
+`Краткая справка:`                                  | `Short refference:`
+`Раздел справки отсутствует.`                       | `Topic is absent.`
+`Очистка экрана.`                                   | `Clear screen.`
+`Полный сброс.`                                     | `Full reset.`
+`Вывод справки: help [имя]`                         | `Display help info: help [name]`
+`Выход с сохранением состояния.`                    | `Exiting with save state.`
+`Выход без всякого сохранения.`                     | `Exiting without any saving.`
+`Незамедлительное прерывание работы.`               | `Exiting immediately (::abort).`
+`Вывод текущего пути (совместимость с POSIX).`      | `Output current path (POSIX compatibility).`
+`Внутренняя ошибка`                                 | `Internal error`
+`'%s' - Неизвестная команда.`                       | `'%s' - Unknown command.`
+`Листинг директории`                                | `Directory listing`
+`путь не существует`                                | `path not exist`
+`не является директорией`                           | `not a directory`
+`Смена директории`                                  | `Changing directory`
+`Смена текущей директории: cd [путь]`               | `Change current directory: cd [path]`
+`Листинг содержимого директории: ls [путь]`         | `Directory content listing: ls [path]`
+`сек.`                                              | `sec.`
+`Вывод информации: info [имя]`                      | `Show information: info [name]`
+`Информация отсутствует.`                           | `Information is absent.`
+`Переключатель POSIX: posix [off]`                  | `POSIX toggle: posix [off]`
+`Команды с префиксом `i` - внутренние - `           |
+`введены для частичной POSIX-совместимости.`        |
+`запуск`                                            | `launch`

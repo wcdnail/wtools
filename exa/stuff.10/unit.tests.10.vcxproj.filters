@@ -1,0 +1,331 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="MAIN.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="win32.host.window.cpp">
+      <Filter>simple</Filter>
+    </ClCompile>
+    <ClCompile Include="win32.host.app.cpp">
+      <Filter>simple</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\dh.timer.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\dh.tracing.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\status.bar.ex.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\command.line.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="temp\Redir.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\extern.item.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\extern.run.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\string.locale.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\info\runtime.information.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\tab.bar.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\tab.bar.item.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\windows.wtl.buffered.paint.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\theme.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\reflection\ref.var.cpp">
+      <Filter>common\reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\reflection\ref.var.list.cpp">
+      <Filter>common\reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\keyboard.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\config.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\dialogz.common.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\dialogz.find.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\file.entry.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\file.list.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\file.list.sort.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\basic.enumerator.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\ntfs.links.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\twins\basic.entry.cpp">
+      <Filter>twins-sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="res\resource.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="win32.host.window.h">
+      <Filter>simple</Filter>
+    </ClInclude>
+    <ClInclude Include="win32.host.app.h">
+      <Filter>simple</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\dh.timer.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\dh.tracing.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\com.iunknown.impl.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\string.utils.format.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\string.utils.error.code.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\status.bar.ex.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\command.line.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\Redir.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\extern.item.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\extern.run.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\res\resource.h">
+      <Filter>twins-res</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\locale.helper.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\string.locale.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\info\runtime.information.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\tab.bar.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\tab.bar.item.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\windows.wtl.buffered.paint.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\theme.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\reflection\ref.brush.h">
+      <Filter>common\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\reflection\ref.logfont.h">
+      <Filter>common\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\reflection\ref.object.h">
+      <Filter>common\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\reflection\ref.pen.h">
+      <Filter>common\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\reflection\ref.pod.array.h">
+      <Filter>common\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\reflection\ref.rect.h">
+      <Filter>common\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\reflection\ref.serialization.h">
+      <Filter>common\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\reflection\ref.std.h">
+      <Filter>common\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\reflection\ref.std.streaming.h">
+      <Filter>common\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\reflection\ref.var.h">
+      <Filter>common\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\reflection\ref.var.list.h">
+      <Filter>common\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\keyboard.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\config.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\dialogz.find.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\dialogz.common.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\file.entry.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\file.list.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\file.list.sort.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\basic.enumerator.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\ntfs.links.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\basic.entry.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\twins\twins.string.h">
+      <Filter>twins-sources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{b4910168-ac36-4cc7-a34e-8ccf3866b71e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res\pixmaps">
+      <UniqueIdentifier>{650b5f60-97f0-4a2d-935a-8f967423696d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="simple">
+      <UniqueIdentifier>{4ff30a20-8ece-4793-8732-b6a53325493d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{d9dc5ff3-1171-4ced-b071-b01d699cf2bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="temp">
+      <UniqueIdentifier>{8d6ac49f-f213-4f28-9684-53db566328f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="twins-res">
+      <UniqueIdentifier>{fd1c4923-99c1-4e5b-997d-e4ec4b7823d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="twins-res\files">
+      <UniqueIdentifier>{b353dca3-322d-4706-a871-c913965a951c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\reflection">
+      <UniqueIdentifier>{ed307415-b8ad-4ee3-88fd-b9f11800255c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="twins-sources">
+      <UniqueIdentifier>{fe3dfe2e-ef17-44c6-b10d-f7439a940487}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\unit.tests.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="..\twins\res\managed.rc">
+      <Filter>twins-res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\lime48.ico">
+      <Filter>res\pixmaps</Filter>
+    </None>
+    <None Include="temp\find\1.png">
+      <Filter>temp</Filter>
+    </None>
+    <None Include="temp\find\2.png">
+      <Filter>temp</Filter>
+    </None>
+    <None Include="..\twins\res\icons\cancel.ico">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\twins\res\main.frame.toolbar.bmp">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\twins\res\icons\confirm.ico">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\twins\res\cursors\drop-multiple.cur">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\twins\res\cursors\drop-no.cur">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\twins\res\cursors\drop-single.cur">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\twins\res\icons\floppy.ico">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\twins\res\icons\hdr_asc.ico">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\twins\res\icons\hdr_desc.ico">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\twins\res\icons\link_overlay.ico">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\twins\res\main.frame.ico">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\twins\res\icons\upper-dir.ico">
+      <Filter>twins-res\files</Filter>
+    </None>
+    <None Include="..\..\libs\common\reflection\ref.var.inl">
+      <Filter>common\reflection</Filter>
+    </None>
+    <None Include="..\..\libs\common\reflection\ref.var.list.inl">
+      <Filter>common\reflection</Filter>
+    </None>
+    <None Include="..\..\libs\common\reflection\ref.var.list.serialization.inl">
+      <Filter>common\reflection</Filter>
+    </None>
+    <None Include="..\..\libs\common\reflection\ref.var.list.streaming.inl">
+      <Filter>common\reflection</Filter>
+    </None>
+    <None Include="..\..\libs\common\reflection\ref.var.serialization.inl">
+      <Filter>common\reflection</Filter>
+    </None>
+    <None Include="..\..\libs\common\reflection\ref.var.streaming.inl">
+      <Filter>common\reflection</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="res\unit.tests.exe.manifest">
+      <Filter>res</Filter>
+    </Manifest>
+    <Manifest Include="..\twins\res\twins.exe.manifest">
+      <Filter>twins-res\files</Filter>
+    </Manifest>
+  </ItemGroup>
+</Project>

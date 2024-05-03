@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="pixmaps">
+    <file>../../../art/my.wife/_DSC3580.jpg</file>
+  </qresource>
+  <qresource prefix="icons">
+    <file>../../../art/icons/figures.png</file>
+  </qresource>
+</RCC>

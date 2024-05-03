@@ -30,6 +30,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="shell.imagelist.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Create</PrecompiledHeader>
@@ -54,6 +55,7 @@
     <ClInclude Include="rect.putinto.h" />
     <ClInclude Include="rect.screen.h" />
     <ClInclude Include="rectz.h" />
+    <ClInclude Include="shell.imagelist.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="string.utils.format.h" />
   </ItemGroup>

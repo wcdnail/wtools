@@ -1,0 +1,28 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(3F0BF747-645F-4AA6-AFBF-AF35D4658D23),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IATest : IDispatch{
+};
+[
+	uuid(2634BABF-5964-4A21-9BD6-7502B6890E44),
+	version(1.0),
+]
+library atlcomLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(592A229C-5B19-48FB-9FF1-D5D0806D18E6)		
+	]
+	coclass ATest
+	{
+		[default] interface IATest;
+	};
+};
+

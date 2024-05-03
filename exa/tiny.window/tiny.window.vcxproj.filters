@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="dirfiles.counter.cxx" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="tiny.window.cxx" />
+    <ClCompile Include="..\..\..\libs\common\dh.timer.cpp">
+      <Filter>commons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\common\dh.tracing.cpp">
+      <Filter>commons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\common\info\runtime.information.cpp">
+      <Filter>commons\info</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="..\..\..\libs\common\dh.timer.h">
+      <Filter>commons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\common\dh.tracing.h">
+      <Filter>commons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\common\info\runtime.information.h">
+      <Filter>commons\info</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="commons">
+      <UniqueIdentifier>{f1ae5c3b-a905-4456-b26d-2b8ede920a1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="commons\info">
+      <UniqueIdentifier>{05f6a378-cb79-48ab-879c-6d9423e1cd4d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

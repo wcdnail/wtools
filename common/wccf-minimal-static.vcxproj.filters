@@ -13,6 +13,7 @@
       <Filter>dev.assistance</Filter>
     </ClCompile>
     <ClCompile Include="rect.alloc.cpp" />
+    <ClCompile Include="shell.imagelist.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -46,6 +47,7 @@
     <ClInclude Include="rect.gdi+.h" />
     <ClInclude Include="rect.putinto.h" />
     <ClInclude Include="rect.screen.h" />
+    <ClInclude Include="shell.imagelist.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

@@ -1,0 +1,675 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+#include "verrsrc.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral (Default) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
+LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
+#pragma code_page(1251)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About CGridListCtrlEx"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME2,IDC_STATIC,11,17,20,20
+    LTEXT           "CGridListCtrlEx Version 1.0",IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2008",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+END
+
+#endif    // Neutral (Default) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian (Russia) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "#include ""verrsrc.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)\r\n"
+    "LANGUAGE 25, 1\r\n"
+    "#include ""res\\basix.rc2""  // ресурсы, не редактируемые в Microsoft Visual C++\r\n"
+    "#include ""l.RUS\\afxres.rc""      // —тандартные компоненты\r\n"
+    "#if !defined(_AFXDLL)\r\n"
+    "#include ""l.RUS\\afxprint.rc""        // ресурсы дл€ печати/предварительного просмотра\r\n"
+    "#include ""l.RUS\\afxribbon.rc""        // Ћента MFC и ресурсы панели управлени€\r\n"
+    "#endif\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\basix.ico"
+IDR_basixTYPE           ICON                    "res\\basixDoc.ico"
+IDI_FILE_VIEW           ICON                    "res\\file_view.ico"
+IDI_FILE_VIEW_HC        ICON                    "res\\file_view_hc.ico"
+IDI_CLASS_VIEW          ICON                    "res\\class_view.ico"
+IDI_CLASS_VIEW_HC       ICON                    "res\\class_view_hc.ico"
+IDI_OUTPUT_WND          ICON                    "res\\output_wnd.ico"
+IDI_OUTPUT_WND_HC       ICON                    "res\\output_wnd_hc.ico"
+IDI_PROPERTIES_WND      ICON                    "res\\properties_wnd.ico"
+IDI_PROPERTIES_WND_HC   ICON                    "res\\properties_wnd_hc.ico"
+IDR_MAINFRAME2          ICON                    "res\\CGridListCtrlEx.ico"
+IDI_FLGDEN              ICON                    "res\\FLGDEN.ICO"
+IDI_FLGFRAN             ICON                    "res\\FLGFRAN.ICO"
+IDI_FLGGERM             ICON                    "res\\FLGGERM.ICO"
+IDI_FLGGREEC            ICON                    "res\\FLGGREEC.ICO"
+IDI_FLGSPAIN            ICON                    "res\\FLGSPAIN.ICO"
+IDI_FLGSWED             ICON                    "res\\FLGSWED.ICO"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
+IDB_MAIN                BITMAP                  "res\\main.bmp"
+IDB_FILELARGE           BITMAP                  "res\\filelarge.bmp"
+IDB_FILESMALL           BITMAP                  "res\\filesmall.bmp"
+IDB_WRITELARGE          BITMAP                  "res\\writelarge.bmp"
+IDB_WRITESMALL          BITMAP                  "res\\writesmall.bmp"
+IDB_BUTTONS             BITMAP                  "res\\buttons.bmp"
+IDR_SORT                BITMAP                  "res\\sort.bmp"
+IDB_SORT_24             BITMAP                  "res\\sort_hc.bmp"
+IDB_FILE_VIEW           BITMAP                  "res\\fileview.bmp"
+IDB_FILE_VIEW_24        BITMAP                  "res\\fileview_hc.bmp"
+IDB_CLASS_VIEW          BITMAP                  "res\\classview.bmp"
+IDB_CLASS_VIEW_24       BITMAP                  "res\\classview_hc.bmp"
+IDR_EXPLORER            BITMAP                  "res\\explorer.bmp"
+IDB_EXPLORER_24         BITMAP                  "res\\explorer_hc.bmp"
+IDR_MENU_IMAGES         BITMAP                  "res\\menuimages.bmp"
+IDB_MENU_IMAGES_24      BITMAP                  "res\\menuimages_hc.bmp"
+IDR_PROPERTIES          BITMAP                  "res\\properties.bmp"
+IDB_PROPERTIES_HC       BITMAP                  "res\\properties_hc.bmp"
+IDB_NAVIGATION_LARGE    BITMAP                  "res\\nav_large.bmp"
+IDB_NAVIGATION_LARGE_HC BITMAP                  "res\\nav_large_hc.bmp"
+IDB_PAGES               BITMAP                  "res\\pages.bmp"
+IDB_PAGES_HC            BITMAP                  "res\\pages_hc.bmp"
+IDB_PAGES_SMALL         BITMAP                  "res\\pages_small.bmp"
+IDB_PAGES_SMALL_HC      BITMAP                  "res\\pages_small_hc.bmp"
+IDB_INFO                BITMAP                  "res\\info.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_CGRIDLISTCTRLEX_DIALOG DIALOGEX 0, 0, 360, 156
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "CGridListCtrlEx"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,295,7,50,16
+    PUSHBUTTON      "Cancel",IDCANCEL,295,25,50,16
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,275,142
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_EDIT_CUT
+    BUTTON      ID_EDIT_COPY
+    BUTTON      ID_EDIT_PASTE
+    SEPARATOR
+    BUTTON      ID_FILE_PRINT
+    BUTTON      ID_APP_ABOUT
+END
+
+IDR_MAINFRAME_256 TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_EDIT_CUT
+    BUTTON      ID_EDIT_COPY
+    BUTTON      ID_EDIT_PASTE
+    SEPARATOR
+    BUTTON      ID_FILE_PRINT
+    BUTTON      ID_APP_ABOUT
+END
+
+IDR_SORT TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_SORT_MENU
+    BUTTON      ID_NEW_FOLDER
+END
+
+IDR_EXPLORER TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_PROPERTIES
+END
+
+IDR_MENU_IMAGES TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_WINDOW_MANAGER
+    SEPARATOR
+    BUTTON      ID_WINDOW_CASCADE
+    BUTTON      ID_WINDOW_TILE_HORZ
+    BUTTON      ID_TOOLS_MACRO
+    BUTTON      ID_SORTING_SORTALPHABETIC
+    BUTTON      ID_SORTING_SORTBYTYPE
+    BUTTON      ID_SORTING_SORTBYACCESS
+    BUTTON      ID_SORTING_GROUPBYTYPE
+END
+
+IDR_PROPERTIES TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_EXPAND_ALL
+    BUTTON      ID_SORTPROPERTIES
+    BUTTON      ID_PROPERTIES1
+    BUTTON      ID_PROPERTIES2
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "&Oaee"
+    BEGIN
+        MENUITEM "Nica&aou\tCtrl+N",            ID_FILE_NEW
+        MENUITEM "&Ioe?uou...\tCtrl+O",         ID_FILE_OPEN
+        MENUITEM "&Cae?uou",                    ID_FILE_CLOSE
+        MENUITEM SEPARATOR
+        MENUITEM "Iineaaiee oaee",              ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "A&uoia",                      ID_APP_EXIT
+    END
+    POPUP "&Aea"
+    BEGIN
+        MENUITEM "&No?iea ninoiyiey",           ID_VIEW_STATUS_BAR
+        MENUITEM "&Caaieiaie ieia",             ID_VIEW_CAPTION_BAR
+        POPUP "&Aea i?eei?aiey"
+        BEGIN
+            MENUITEM "Windows &2000",               ID_VIEW_APPLOOK_WIN_2000
+            MENUITEM "Office &XP",                  ID_VIEW_APPLOOK_OFF_XP
+            MENUITEM "&Windows XP",                 ID_VIEW_APPLOOK_WIN_XP
+            MENUITEM "Office 200&3",                ID_VIEW_APPLOOK_OFF_2003
+            MENUITEM "Visual Studio 200&5",         ID_VIEW_APPLOOK_VS_2005
+            MENUITEM "Visual Studio 200&8",         ID_VIEW_APPLOOK_VS_2008
+            POPUP "Office 200&7"
+            BEGIN
+                MENUITEM "&Aieoaie noeeu",              ID_VIEW_APPLOOK_OFF_2007_BLUE
+                MENUITEM "?&a?iue noeeu",               ID_VIEW_APPLOOK_OFF_2007_BLACK
+                MENUITEM "&Na?aa?enoue noeeu",          ID_VIEW_APPLOOK_OFF_2007_SILVER
+                MENUITEM "&Caeaiiaaoi-aieoaie noeeu",   ID_VIEW_APPLOOK_OFF_2007_AQUA
+            END
+        END
+    END
+    POPUP "&Ni?aaea"
+    BEGIN
+        MENUITEM "&I i?iaeoa basix...",         ID_APP_ABOUT
+    END
+END
+
+IDR_basixTYPE MENU
+BEGIN
+    POPUP "&Oaee"
+    BEGIN
+        MENUITEM "Nica&aou\tCtrl+N",            ID_FILE_NEW
+        MENUITEM "&Ioe?uou...\tCtrl+O",         ID_FILE_OPEN
+        MENUITEM "&Cae?uou",                    ID_FILE_CLOSE
+        MENUITEM "Ni&o?aieou\tCtrl+S",          ID_FILE_SAVE
+        MENUITEM "Nio?aieou &eae...",           ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "Iineaaiee oaee",              ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "A&uoia",                      ID_APP_EXIT
+    END
+    POPUP "&I?aaea"
+    BEGIN
+        MENUITEM "&Ioiaieou\tCtrl+Z",           ID_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "&Au?acaou\tCtrl+X",           ID_EDIT_CUT
+        MENUITEM "&Eiie?iaaou\tCtrl+C",         ID_EDIT_COPY
+        MENUITEM "Ano&aaeou\tCtrl+V",           ID_EDIT_PASTE
+    END
+    POPUP "&Aea"
+    BEGIN
+        MENUITEM "&No?iea ninoiyiey",           ID_VIEW_STATUS_BAR
+        MENUITEM "&Caaieiaie ieia",             ID_VIEW_CAPTION_BAR
+        POPUP "&Aea i?eei?aiey"
+        BEGIN
+            MENUITEM "Windows &2000",               ID_VIEW_APPLOOK_WIN_2000
+            MENUITEM "Office &XP",                  ID_VIEW_APPLOOK_OFF_XP
+            MENUITEM "&Windows XP",                 ID_VIEW_APPLOOK_WIN_XP
+            MENUITEM "Office 200&3",                ID_VIEW_APPLOOK_OFF_2003
+            MENUITEM "Visual Studio 200&5",         ID_VIEW_APPLOOK_VS_2005
+            MENUITEM "Visual Studio 200&8",         ID_VIEW_APPLOOK_VS_2008
+            POPUP "Office 200&7"
+            BEGIN
+                MENUITEM "&Aieoaie noeeu",              ID_VIEW_APPLOOK_OFF_2007_BLUE
+                MENUITEM "?&a?iue noeeu",               ID_VIEW_APPLOOK_OFF_2007_BLACK
+                MENUITEM "&Na?aa?enoue noeeu",          ID_VIEW_APPLOOK_OFF_2007_SILVER
+                MENUITEM "&Caeaiiaaoi-aieoaie noeeu",   ID_VIEW_APPLOOK_OFF_2007_AQUA
+            END
+        END
+    END
+    POPUP "&Ieii"
+    BEGIN
+        MENUITEM "&Iiaia ieii",                 ID_WINDOW_NEW
+    END
+    POPUP "&Ni?aaea"
+    BEGIN
+        MENUITEM "&I i?iaeoa basix...",         ID_APP_ABOUT
+    END
+END
+
+IDR_POPUP_EDIT MENU
+BEGIN
+    POPUP "?aaaeoe?iaaou"
+    BEGIN
+        MENUITEM "&Au?acaou\tCtrl+X",           ID_EDIT_CUT
+        MENUITEM "&Eiie?iaaou\tCtrl+C",         ID_EDIT_COPY
+        MENUITEM "Ano&aaeou\tCtrl+V",           ID_EDIT_PASTE
+    END
+END
+
+IDR_WINDOWS_MENU MENU
+BEGIN
+    MENUITEM "&Iiaia ieii",                 ID_WINDOW_NEW
+END
+
+IDR_POPUP_SORT MENU
+BEGIN
+    POPUP "Ni?oe?iaea"
+    BEGIN
+        MENUITEM "&Ni?oe?iaaou ii aeoaaeoo",    ID_SORTING_SORTALPHABETIC
+        MENUITEM "Ni?oe?iaaou ii &oeio",        ID_SORTING_SORTBYTYPE
+        MENUITEM "Ni?oe?iaaou ii o?iai? ai&nooia", ID_SORTING_SORTBYACCESS
+        MENUITEM "A?oiie?iaaou ii oe&io",       ID_SORTING_GROUPBYTYPE
+    END
+END
+
+IDR_POPUP_EXPLORER MENU
+BEGIN
+    POPUP "I?iaiaiee"
+    BEGIN
+        MENUITEM "&Ioe?uou",                    ID_OPEN
+        MENUITEM "Ioe?uou &n iiiiuu?....",      ID_OPEN_WITH
+        MENUITEM SEPARATOR
+        MENUITEM "&Eiiieee?iaaou",              ID_DUMMY_COMPILE
+        MENUITEM SEPARATOR
+        MENUITEM "&Au?acaou\tCtrl+X",           ID_EDIT_CUT
+        MENUITEM "&Eiie?iaaou\tCtrl+C",         ID_EDIT_COPY
+        MENUITEM "&Oaaeeou",                    ID_EDIT_CLEAR
+        MENUITEM SEPARATOR
+        MENUITEM "&Naienoaa...",                ID_PROPERTIES
+    END
+END
+
+IDR_OUTPUT_POPUP MENU
+BEGIN
+    POPUP "Eiioaenoiia iai?"
+    BEGIN
+        MENUITEM "&Eiie?iaaou",                 ID_EDIT_COPY
+        MENUITEM "&I?enoeou",                   ID_EDIT_CLEAR
+        MENUITEM SEPARATOR
+        MENUITEM "&Ne?uou",                     ID_VIEW_OUTPUTWND
+    END
+END
+
+IDR_HELP_MENU MENU
+BEGIN
+    MENUITEM "&I i?iaeoa basix...",         ID_APP_ABOUT
+END
+
+IDR_THEME_MENU MENU
+BEGIN
+    MENUITEM "Office 2007 (&aieoaie noeeu)", ID_VIEW_APPLOOK_OFF_2007_BLUE
+    MENUITEM "Office 2007 (?&a?iue noeeu)", ID_VIEW_APPLOOK_OFF_2007_BLACK
+    MENUITEM "Office 2007 (&na?aa?enoue noeeu)", ID_VIEW_APPLOOK_OFF_2007_SILVER
+    MENUITEM "Office 2007 (&caeaiiaaoi-aieoaie noeeu)", ID_VIEW_APPLOOK_OFF_2007_AQUA
+    MENUITEM "Win&dows 7",                  ID_VIEW_APPLOOK_WINDOWS_7
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS
+BEGIN
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041904B0"
+        BEGIN
+            VALUE "CompanyName", "TODO: <Iacaaiea i?aaiecaoee>"
+            VALUE "FileDescription", "basix"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "basix.exe"
+            VALUE "LegalCopyright", "TODO: (c) <Iacaaiea i?aaiecaoee>. Ana i?aaa caueuaiu."
+            VALUE "OriginalFilename", "basix.exe"
+            VALUE "ProductName", "TODO: <Iacaaiea i?iaoeoa>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x419, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Ribbon
+//
+
+IDR_RIBBON              RT_RIBBON_XML           "res\\ribbon.mfcribbon-ms"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDP_OLE_INIT_FAILED     "Ia oaaeinu auiieieou eieoeaeecaoe? OLE. Oaaaeoanu a oii, ?oi eniieuco?ony i?aaeeuiua aa?nee aeaeeioae OLE."
+END
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "basix"
+    IDR_basixTYPE           "\nbasix\nbasix\n\n\nbasix.Document\nbasix.Document"
+    ID_WINDOW_MANAGER       "&Ieia..."
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_APP_TITLE       "basix"
+    AFX_IDS_IDLEMESSAGE     "Aioiai"
+END
+
+STRINGTABLE
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_NEW             "Nicaaiea iiaiai aieoiaioa\nNicaaou"
+    ID_FILE_OPEN            "Ioe?uoea nouanoao?uaai aieoiaioa\nIoe?uou"
+    ID_FILE_CLOSE           "Cae?uoea aeoeaiiai aieoiaioa\nCae?uou"
+    ID_FILE_SAVE            "Nio?aiaiea aeoeaiiai aieoiaioa\nNio?aieou"
+    ID_FILE_SAVE_AS         "Nio?aiaiea aeoeaiiai aieoiaioa iia iiaui eiaiai\nNio?aieou eae"
+END
+
+STRINGTABLE
+BEGIN
+    ID_APP_ABOUT            "Auaia naaaaiee i i?ia?aiia, aa aa?nee e aaoi?neeo i?aaao\nI i?ia?aiia"
+    ID_APP_EXIT             "Caaa?oaiea ?aaiou i?eei?aiey n cai?inii ia nio?aiaiea aieoiaioia\nAuoia"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_MRU_FILE1       "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE2       "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE3       "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE4       "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE5       "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE6       "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE7       "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE8       "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE9       "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE10      "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE11      "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE12      "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE13      "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE14      "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE15      "Ioe?uoea aaiiiai aieoiaioa"
+    ID_FILE_MRU_FILE16      "Ioe?uoea aaiiiai aieoiaioa"
+END
+
+STRINGTABLE
+BEGIN
+    ID_NEXT_PANE            "Ia?aoia e neaao?uae iaeanoe ieia\nNeaao?uay iaeanou"
+    ID_PREV_PANE            "Aica?ao e i?aauaouae iaeanoe ieia\nI?aauaouay iaeanou"
+END
+
+STRINGTABLE
+BEGIN
+    ID_WINDOW_NEW           "Ioe?uoea aua iaiiai ieia aey aeoeaiiai aieoiaioa\nIiaia ieii"
+    ID_WINDOW_ARRANGE       "?aniiei?aiea cia?eia aaieu ie?iae a?aieou ieia\nOii?yai?eou cia?ee"
+    ID_WINDOW_CASCADE       "?aniiei?aiea ieii a?oa ca a?oaii (n ia?ae?uoeai)\nIeia eaneaaii"
+    ID_WINDOW_TILE_HORZ     "?aniiei?aiea ieii ?yaii (aac ia?ae?uoey)\nIeia ?yaii"
+    ID_WINDOW_TILE_VERT     "?aniiei?aiea ieii ?yaii (aac ia?ae?uoey)\nIeia ?yaii"
+    ID_WINDOW_SPLIT         "?acaaeaiea aeoeaiiai ieia ia iaeanoe\n?acaaeeou"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_CLEAR           "Oaaeaiea auaaeaiiiai o?aaiaioa\nOaaeeou"
+    ID_EDIT_CLEAR_ALL       "Iieiia oaaeaiea niaa??eiiai aieoiaioa\nOaaeeou ana"
+    ID_EDIT_COPY            "Eiie?iaaiea auaaeaiiiai o?aaiaioa a aooa? iaiaia\nEiie?iaaou"
+    ID_EDIT_CUT             "Oaaeaiea auaaeaiiiai o?aaiaioa a aooa? iaiaia\nAu?acaou"
+    ID_EDIT_FIND            "Iiene oeacaiiiai oaenoa\nIaeoe"
+    ID_EDIT_PASTE           "Anoaaea niaa??eiiai aooa?a iaiaia\nAnoaaeou"
+    ID_EDIT_REPEAT          "Iiaoi?aiea iineaaiaai aaenoaey\nIiaoi?eou"
+    ID_EDIT_REPLACE         "Caiaia caaaiiiai oaenoa a?oaei oaenoii\nCaiaieou"
+    ID_EDIT_SELECT_ALL      "Auaaeaiea anaai aieoiaioa\nAuaaeeou ana"
+    ID_EDIT_UNDO            "Ioiaia iineaaiaai aaenoaey\nIoiaieou"
+    ID_EDIT_REDO            "Iiaoi?iia auiieiaiea iineaaiaai ioiaiaiiiai aaenoaey\nAa?ioou"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_TOOLBAR         "Ioia?a?aiea eee ne?uoea iaiaee eino?oiaioia\nIaiaeu eino?oiaioia"
+    ID_VIEW_STATUS_BAR      "Iieacaou eee ne?uou no?ieo ninoiyiey\n Ia?aee??aiea no?iee ninoiyiey"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_CAPTION_BAR     "Iieacaou eee ne?uou caaieiaie ieia\nIa?aee??aiea caaieiaea ieia"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCSIZE          "Eciaiaiea ?acia?a ieia"
+    AFX_IDS_SCMOVE          "Eciaiaiea iiei?aiey ieia"
+    AFX_IDS_SCMINIMIZE      "Naa?ouaaiea ieia a cia?ie"
+    AFX_IDS_SCMAXIMIZE      "?acaa?ouaaiea ieia ai iieiiai ?acia?a"
+    AFX_IDS_SCNEXTWINDOW    "Ia?aoia e neaao?uaio ieio aieoiaioa"
+    AFX_IDS_SCPREVWINDOW    "Ia?aoia e i?aauaouaio ieio aieoiaioa"
+    AFX_IDS_SCCLOSE         "Cae?uoea aeoeaiiai ieia n cai?inii ia nio?aiaiea aieoiaioia"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCRESTORE       "Ainnoaiiaeaiea enoiaiuo ?acia?ia ieia"
+    AFX_IDS_SCTASKLIST      "Ia?aoia e nieneo caaa?"
+    AFX_IDS_MDICHILD        "Ia?aoia e aaiiiio ieio"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_STATUS_PANE1        "Iaiaeu 1"
+    IDS_STATUS_PANE2        "Iaiaeu 2"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_FILE_VIEW           "I?aanoaaeaiea oaeeia"
+    IDS_CLASS_VIEW          "I?aanoaaeaiea eeannia"
+    IDS_OUTPUT_WND          "Auione"
+    IDS_PROPERTIES_WND      "Naienoaa"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_EXPLORER            "I?iaiaiee"
+    IDS_EDIT_MENU           "?aaaeoe?iaaou"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_BUILD_TAB           "Nai?ea"
+    IDS_DEBUG_TAB           "Ioeaaea"
+    IDS_FIND_TAB            "Iaeoe"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_MYCALENDARS         "Iie eaeaiaa?e"
+    IDS_CALENDAR            "Eaeaiaa?u"
+    IDS_SHORTCUTS           "??euee"
+    IDS_FOLDERS             "Iaiee"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_OUTLOOKBAR          "Iaiaeu Outlook"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_CAPTION_BUTTON      "Ia?aiao?u..."
+    IDS_CAPTION_BUTTON_TIP  "Uaeeieoa caanu aey i?iniio?a aiiieieoaeuiuo ia?aiao?ia"
+    IDS_CAPTION_TEXT        "Yoi caaieiaie ieia, a eioi?ii iieuciaaoae? ii?ao auou i?aainoaaeaii niiauaiea."
+    IDS_CAPTION_IMAGE_TIP   "Aa?ii"
+    IDS_CAPTION_IMAGE_TEXT  "Caanu ?aniiei?aii eioi?iaoeiiiia niiauaiea aey iieuciaaoaey."
+END
+
+#endif    // Russian (Russia) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+LANGUAGE 25, 1
+#include "res\basix.rc2"  // ???????, ?? ????????????? ? Microsoft Visual C++
+#include "l.RUS\afxres.rc"      // ??????????? ??????????
+#if !defined(_AFXDLL)
+#include "l.RUS\afxprint.rc"        // ??????? ??? ??????/???????????????? ?????????
+#include "l.RUS\afxribbon.rc"        // ????? MFC ? ??????? ?????? ??????????
+#endif
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

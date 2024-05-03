@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="sqlbro.main.cxx" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="sqlbro.appwindow.cxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="sqlbro.main.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="sqlbro.appwindow.h" />
+    <ClInclude Include="rx\ribbon.main.h">
+      <Filter>res\gen</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{0e2350ef-205d-416f-824a-c85d404284f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res\gen">
+      <UniqueIdentifier>{4f5e21a1-6af1-411e-9e02-d67abdfb6888}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="rx\toolbar.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="rx\wtl.ico">
+      <Filter>res</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="rx\ribbon.main.bml">
+      <Filter>res\gen</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="rx\ribbon.main.rc">
+      <Filter>res\gen</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="rx\ribbon.main.xml" />
+  </ItemGroup>
+</Project>

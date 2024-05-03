@@ -1,0 +1,69 @@
+// Этот исходный код MFC Samples демонстрирует функционирование пользовательского интерфейса Fluent на основе MFC в Microsoft Office
+// ("Fluent UI") и предоставляется исключительно как справочный материал в качестве дополнения к
+// справочнику по пакету Microsoft Foundation Classes и связанной электронной документации,
+// включенной в программное обеспечение библиотеки MFC C++. 
+// Условия лицензионного соглашения на копирование, использование или распространение Fluent UI доступны отдельно. 
+// Для получения дополнительных сведений о нашей лицензионной программе Fluent UI посетите веб-узел
+// http://msdn.microsoft.com/officeui.
+//
+// (C) Корпорация Майкрософт (Microsoft Corp.)
+// Все права защищены.
+
+#pragma once
+
+/////////////////////////////////////////////////////////////////////////////
+// окно COutputList
+
+class COutputList : public CListBox
+{
+// Создание
+public:
+	COutputList();
+
+// Реализация
+public:
+	virtual ~COutputList();
+
+protected:
+	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
+	afx_msg void OnEditCopy();
+	afx_msg void OnEditClear();
+	afx_msg void OnViewOutput();
+
+	DECLARE_MESSAGE_MAP()
+};
+
+class COutputWnd : public CDockablePane
+{
+// Создание
+public:
+	COutputWnd();
+
+	void UpdateFonts();
+
+// Атрибуты
+protected:
+	CMFCTabCtrl	m_wndTabs;
+
+	COutputList m_wndOutputBuild;
+	COutputList m_wndOutputDebug;
+	COutputList m_wndOutputFind;
+
+protected:
+	void FillBuildWindow();
+	void FillDebugWindow();
+	void FillFindWindow();
+
+	void AdjustHorzScroll(CListBox& wndListBox);
+
+// Реализация
+public:
+	virtual ~COutputWnd();
+
+protected:
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+
+	DECLARE_MESSAGE_MAP()
+};
+

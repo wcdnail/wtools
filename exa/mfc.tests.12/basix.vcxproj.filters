@@ -1,0 +1,278 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="CGridListCtrlEx">
+      <UniqueIdentifier>{4f218666-37ba-40a7-8b45-340b24f707af}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="basix.h" />
+    <ClInclude Include="BasixDoc.h" />
+    <ClInclude Include="BasixView.h" />
+    <ClInclude Include="CalendarBar.h" />
+    <ClInclude Include="ChildFrm.h" />
+    <ClInclude Include="ClassView.h" />
+    <ClInclude Include="FileView.h" />
+    <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="OutputWnd.h" />
+    <ClInclude Include="PropertiesWnd.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="ViewTree.h" />
+    <ClInclude Include="CGridListCtrlEx\CGridColumnTrait.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridColumnTraitCombo.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridColumnTraitDateTime.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridColumnTraitEdit.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridColumnTraitHyperLink.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridColumnTraitImage.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridColumnTraitMultilineEdit.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridColumnTraitText.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridColumnTraitVisitor.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridListCtrlEx.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridListCtrlGroups.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridRowTrait.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridRowTraitText.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridRowTraitVisitor.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\CGridRowTraitXP.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlEx\ViewConfigSection.h">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="CGridListCtrlExDlg.h" />
+    <ClInclude Include="CListCtrl_DataModel.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="basix.cpp" />
+    <ClCompile Include="BasixDoc.cpp" />
+    <ClCompile Include="BasixView.cpp" />
+    <ClCompile Include="CalendarBar.cpp" />
+    <ClCompile Include="ChildFrm.cpp" />
+    <ClCompile Include="ClassView.cpp" />
+    <ClCompile Include="FileView.cpp" />
+    <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="OutputWnd.cpp" />
+    <ClCompile Include="PropertiesWnd.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="ViewTree.cpp" />
+    <ClCompile Include="CGridListCtrlEx\CGridColumnTraitCombo.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlEx\CGridColumnTraitDateTime.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlEx\CGridColumnTraitEdit.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlEx\CGridColumnTraitHyperLink.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlEx\CGridColumnTraitImage.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlEx\CGridColumnTraitMultilineEdit.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlEx\CGridColumnTraitText.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlEx\CGridListCtrlEx.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlEx\CGridListCtrlGroups.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlEx\CGridRowTraitText.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlEx\CGridRowTraitXP.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlEx\ViewConfigSection.cpp">
+      <Filter>CGridListCtrlEx</Filter>
+    </ClCompile>
+    <ClCompile Include="CGridListCtrlExDlg.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="basix.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\file_view.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\file_view_hc.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\class_view.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\class_view_hc.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\fileview.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\fileview_hc.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\classview.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\classview_hc.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\explorer.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\explorer_hc.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\sort.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\sort_hc.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\menuimages.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\menuimages_hc.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\output_wnd.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\output_wnd_hc.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\properties_wnd.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\properties_wnd_hc.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\properties.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\properties_hc.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\nav_large.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\nav_large_hc.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\pages.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\pages_hc.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\pages_small.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\pages_small_hc.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\info.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\buttons.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\filelarge.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\filesmall.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\main.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\writelarge.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\writesmall.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\basixDoc.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\basix.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\Toolbar.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\Toolbar256.bmp">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\CGridListCtrlEx.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\FLGDEN.ICO">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\FLGFRAN.ICO">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\FLGGERM.ICO">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\FLGGREEC.ICO">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\FLGSPAIN.ICO">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\FLGSWED.ICO">
+      <Filter>res</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\ribbon.mfcribbon-ms">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\basix.rc2">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+</Project>

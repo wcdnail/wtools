@@ -10,13 +10,13 @@ extern "C" {
 /*
  * Call `crash_report` in desperate situation.
  *
- */ 
-void crash_report(char const* reason
-                , char const* source
-                , int line
-                , int errcode
-                , PCRUN_CONTEXT rc
-                , int terminate);
+ */
+void crash_report(char const* reason,
+    char const* source,
+    int line,
+    int errcode,
+    PCRUN_CONTEXT rc,
+    int terminate);
 
 #ifdef __cplusplus
 }

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #if 0
 #include "crash.smtp.h"
 #include "debug.output.h"

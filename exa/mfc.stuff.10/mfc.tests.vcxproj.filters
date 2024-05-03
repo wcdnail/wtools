@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.dialog.cpp" />
+    <ClCompile Include="mfc.tests.app.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="shell.icons.dlg.cpp" />
+    <ClCompile Include="mfc.resizable.window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="main.dialog.h" />
+    <ClInclude Include="mfc.tests.app.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="res\resource.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="shell.helpers.h" />
+    <ClInclude Include="shell.icons.dlg.h" />
+    <ClInclude Include="mfc.resizable.window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\mfc.tests.ico">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\mfc.tests.rc2">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{e013943c-82ae-4236-926c-3a4ae6a4362e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\mfc.tests.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

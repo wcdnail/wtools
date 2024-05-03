@@ -1,0 +1,4 @@
+LIBRARY	report.bugs
+
+EXPORTS
+		DoBugReport

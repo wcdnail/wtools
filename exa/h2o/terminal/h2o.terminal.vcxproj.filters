@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="charset.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="xcwidth.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="child.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="config.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="ctrls.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="minibidi.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="std.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="term.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="termclip.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="termline.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="termmouse.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="termout.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="winclip.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="winctrls.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="windialog.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="wininput.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="winmain.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="winprint.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="wintext.c">
+      <Filter>c</Filter>
+    </ClCompile>
+    <ClCompile Include="wintip.c">
+      <Filter>c</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="appinfo.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="charset.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="child.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="ctrls.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="minibidi.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="print.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="std.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="term.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="termpriv.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="win.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="winctrls.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="winids.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="winpriv.h">
+      <Filter>h</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="c">
+      <UniqueIdentifier>{2399ecbc-2d3d-407a-9a32-9f7438e283be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="h">
+      <UniqueIdentifier>{78817c07-cb7d-4d69-ba81-bde2d8e850c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{1c4793b8-0104-4ff4-8695-424a76bc72c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res\icon">
+      <UniqueIdentifier>{1506fd94-f3c7-4188-b8e3-421f33be29bd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res.mft">
+      <Filter>res</Filter>
+    </None>
+    <None Include="icon\terminal.ico">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="icon\terminal-16.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="icon\terminal-32.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="icon\terminal-48.png">
+      <Filter>res\icon</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

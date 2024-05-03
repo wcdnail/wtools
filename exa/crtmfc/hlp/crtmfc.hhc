@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</HEAD><BODY>
+<UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&lt;&lt;Приложение&gt;&gt;: указатель справки">
+		<param name="Local" value="main_index.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Меню">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Команды меню ''Файл''">
+			<param name="Local" value="menu_file.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Команды меню ''Правка''">
+			<param name="Local" value="menu_edit.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Команды меню ''Вид''">
+			<param name="Local" value="menu_view.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Команды меню ''Окно''">
+			<param name="Local" value="menu_window.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Команды меню ''Справка''">
+			<param name="Local" value="menu_help.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="строка состояния">
+		<param name="Local" value="afx_hidw_status_bar.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="панель инструментов">
+		<param name="Local" value="afx_hidw_toolbar.htm">
+		</OBJECT>
+</UL>
+</BODY></HTML>

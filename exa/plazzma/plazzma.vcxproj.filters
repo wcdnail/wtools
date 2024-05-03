@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{0214ea8c-2fe9-434b-86b5-8eef25b48592}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ereport.cpp" />
+    <ClCompile Include="StdAfx.cpp" />
+    <ClCompile Include="gfx.cpp" />
+    <ClCompile Include="kernel.cpp" />
+    <ClCompile Include="Plazzma.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ereport.h" />
+    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="gfx.h" />
+    <ClInclude Include="kernel.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="main.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Plazzma.ico">
+      <Filter>res</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

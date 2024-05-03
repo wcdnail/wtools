@@ -1,0 +1,69 @@
+// crtmfcHandlers.idl: источник IDL для crtmfcHandlers
+//
+
+// Этот файл будет обработан средством MIDL для
+// создания библиотеки типов (crtmfcHandlers.tlb) и кода маршалирования.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(49D0A1B6-C877-4B53-8780-87615EB14AF6),
+	pointer_default(unique)
+]
+interface IPreview : IUnknown
+{
+};
+
+[
+	object,
+	uuid(E0E31942-3A81-4AEB-A7C5-F202EB21EECA),
+	pointer_default(unique)
+]
+interface IThumbnail : IUnknown
+{
+};
+
+[
+	object,
+	uuid(BB6C1581-45C2-40A3-85D4-C51B1A66BB00),
+	pointer_default(unique)
+]
+interface ISearch : IUnknown
+{
+};
+
+[
+	uuid(EF61B872-7EE2-4D44-B58B-D0F16438E2AB),
+	version(1.0),
+]
+library crtmfcHandlersLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(A46F7008-9F86-4BB3-A3E5-55D0439911D7)
+	]
+	coclass Preview
+	{
+		[default] interface IPreviewHandler;
+	};
+	[
+		uuid(3682265C-9D2E-4F7E-9980-A7F3F714F4E3)
+	]
+	coclass Thumbnail
+	{
+		[default] interface IThumbnailProvider;
+	};
+	[
+		uuid(C85B6AFB-6E84-4220-B459-D4C31BB70FD0)
+	]
+	coclass Search
+	{
+		[default] interface IFilter;
+	};
+};
+
+import "shobjidl.idl";
+import "thumbcache.idl";
+import "filter.idl";

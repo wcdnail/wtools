@@ -1,0 +1,5 @@
+#ifndef RT_MANIFEST
+#define RT_MANIFEST 24
+#endif
+
+1 RT_MANIFEST file.view.manifest

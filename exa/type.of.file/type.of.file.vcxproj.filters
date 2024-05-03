@@ -1,0 +1,733 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="type.of.file.main.cpp" />
+    <ClCompile Include="magix.db.load.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="magix.db.load.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="magix.db">
+      <UniqueIdentifier>{ecd8e8d1-bad4-4b2d-8671-819f1cfa454f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="magix.db\acorn">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\adi">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\adventure">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\allegro">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\alliant">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\amanda">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\amigaos">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\animation">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\apl">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\apple">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\applix">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\archive">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\assembler">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\asterix">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\att3b">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\audio">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\basis">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\bflt">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\blcr">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\blender">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\blit">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\bout">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\bsdi">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\bsi">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\btsnoop">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\c-lang">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\c64">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\cad">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\cafebabe">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\cddb">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\chord">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\cisco">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\citrus">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\clarion">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\claris">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\clipper">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\commands">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\communications">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\compress">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\console">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\convex">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\cracklib">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ctags">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\cups">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\dact">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\database">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\diamond">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\diff">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\digital">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\dolby">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\dump">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\dyadic">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ebml">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\editors">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\efi">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\elf">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\encore">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\epoc">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\erlang">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\esri">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\fcs">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\filesystems">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\flash">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\fonts">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\fortran">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\frame">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\freebsd">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\fsav">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\fusecompress">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\games">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\gcc">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\geo">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\geos">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\gimp">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\gnome-keyring">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\gnu">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\gnumeric">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\grace">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\graphviz">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\gringotts">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\guile">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\hitachi-sh">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\hp">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\human68k">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ibm370">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ibm6000">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\iff">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\images">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\inform">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\intel">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\interleaf">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\island">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ispell">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\isz">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\java">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\jpeg">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\karma">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\kde">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\kml">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\lecter">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\lex">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\lif">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\linux">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\lisp">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\llvm">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\lua">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\luks">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\m4">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mach">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\macintosh">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\magic">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\make">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\maple">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\marc21">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mathcad">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mathematica">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\matroska">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mcrypt">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mercurial">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\metastore">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mime">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mips">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mirage">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\misctools">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mkid">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mlssa">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mmdf">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\modem">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\motorola">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mozilla">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\msdos">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\msooxml">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\msvc">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mup">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\music">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\natinst">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ncr">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\netbsd">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\netscape">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\netware">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\news">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\nitpicker">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\oasis">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ocaml">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\octave">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ole2compounddocs">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\olf">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\os2">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\os9">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\os400">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\osf1">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\palm">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\parix">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\parrot">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\pascal">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\pbm">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\pdf">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\pdp">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\perl">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\pgp">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\pkgadd">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\plan9">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\plus5">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\printer">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\project">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\psdbms">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\pulsar">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\pyramid">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\python">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\revision">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\riff">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\rinex">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\rpm">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\rtf">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ruby">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sc">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sccs">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\scientific">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\securitycerts">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\selinux">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sendmail">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sequent">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sgi">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sgml">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sharc">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sinclair">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sisu">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sketch">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\smalltalk">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\smile">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sniffer">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\softquad">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\spec">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\spectrum">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sql">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ssh">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ssl">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sun">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\sysex">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\tcl">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\teapot">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\terminfo">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\tex">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\tgif">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\ti-8x">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\timezone">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\troff">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\tuxedo">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\typeset">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\unicode">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\unknown">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\uuencode">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\vax">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\vicar">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\virtual">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\virtutech">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\visx">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\vms">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\vmware">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\vorbis">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\vxl">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\warc">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\weak">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\windows">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\wireless">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\wordprocessors">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\wsdl">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\xdelta">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\xenix">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\xilinx">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\xo65">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\xwindows">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\zfs">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\zilog">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\zyxel">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\mail.news">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\varied.out">
+      <Filter>magix.db</Filter>
+    </None>
+    <None Include="magix.db\varied.script">
+      <Filter>magix.db</Filter>
+    </None>
+  </ItemGroup>
+</Project>

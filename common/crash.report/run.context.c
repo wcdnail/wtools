@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "run.context.h"
 #ifdef _MSC_VER
 #  pragma warning(disable: 4820) // 4820: 'RUN_CTX': '12' bytes padding added after data member 'skip'

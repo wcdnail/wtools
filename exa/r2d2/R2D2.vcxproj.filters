@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="cpp">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="h">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+    <Filter Include="misc">
+      <UniqueIdentifier>{464a3d8a-c802-437a-b708-615ddb9142c5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Application.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectExtra.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorReport.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaManager.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManagment.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureGenerator.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureGeneratorConf.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMenu.cpp">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="MainLayout.cpp">
+      <Filter>misc</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Application.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="Base.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectExtra.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorReport.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaManager.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="Plasma.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManagment.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="SmartList.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureGenerator.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureGeneratorConf.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureShaderGenerator.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="UI.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMenu.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="MainLayout.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="R2D2.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

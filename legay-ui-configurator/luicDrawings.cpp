@@ -75,8 +75,11 @@ private:
         GetProcAddressEX(USER32, SetSysColorsTemp);
         GetProcAddressEX(USER32, DrawMenuBarTemp);
 
-        const ATL::CStringW runDll32 = L"%SYSTEMROOT%\\System32\\rundll32.dll";
-        m_IconActiveWnd = LoadShellIcon(runDll32);
+        const ATL::CStringW shell32dll = L"%SYSTEMROOT%\\System32\\shell32.dll";
+        HICON tempIcon[1024];
+        ZeroMemory(tempIcon, sizeof(tempIcon));
+        UINT extrNum = ExtractIconExW(shell32dll.GetString(), -1, tempIcon, nullptr, _countof(tempIcon));
+        //m_IconActiveWnd = tempIcon;
     }
 
     ~StaticInit()

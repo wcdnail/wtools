@@ -1,6 +1,7 @@
 #ifndef _crash_report_hxx__
 #define _crash_report_hxx__
 
+#include "run.context.h"
 #include "crash.report.h"
 #include "exception.h"
 
@@ -19,37 +20,37 @@ namespace Crash
 {
     inline void OnException(Exception const& ex, bool terminateProcess = false)
     {
-        ::crash_report(ex.what()
-            , ex.GetSource()
-            , ex.GetLine()
-            , ex.GetErrorCode()
-            , ex.GetRunContext()
-            , terminateProcess ? 1 : 0);
+        crash_report(ex.what(),
+            ex.GetSource(),
+            ex.GetLine(),
+            ex.GetErrorCode(),
+            ex.GetRunContext(),
+            terminateProcess ? 1 : 0);
     }
 
-    inline void OnException(std::exception const& ex, int ec = errno, RUN_CONTEXT const& rc = ::capture_context(), bool terminateProcess = false)
+    inline void OnException(std::exception const& ex, int ec = errno, RUN_CTX_Ptr rcPtr = cxx_capture_run_context(), bool terminateProcess = false)
     {
-        CRASH_REPORT_INT(ex.what(), ec, &rc, terminateProcess ? 1 : 0);
+        CRASH_REPORT_INT(ex.what(), ec, rcPtr.get(), terminateProcess ? 1 : 0);
     }
 
-    inline void OnException(boost::exception const& ex, int ec = errno, RUN_CONTEXT const& rc = ::capture_context(), bool terminateProcess = false)
+    inline void OnException(boost::exception const& ex, int ec = errno, RUN_CTX_Ptr rcPtr = cxx_capture_run_context(), bool terminateProcess = false)
     {
-        CRASH_REPORT_INT(boost::diagnostic_information_what(ex), ec, &rc, terminateProcess ? 1 : 0);
+        CRASH_REPORT_INT(boost::diagnostic_information_what(ex), ec, rcPtr.get(), terminateProcess ? 1 : 0);
     }
 
 #ifdef _WIN32
-    inline void OnException(_com_error const& ex, RUN_CONTEXT const& rc = ::capture_context(), bool terminateProcess = false)
+    inline void OnException(_com_error const& ex, RUN_CTX_Ptr rcPtr = cxx_capture_run_context(), bool terminateProcess = false)
     {
-        CRASH_REPORT_INT(CT2A(ex.ErrorMessage()).m_psz, (int)ex.Error(), &rc, terminateProcess ? 1 : 0);
+        CRASH_REPORT_INT(CT2A(ex.ErrorMessage()).m_psz, (int)ex.Error(), rcPtr.get(), terminateProcess ? 1 : 0);
     }
 #endif
 
-    inline void OnException(int ec = errno, RUN_CONTEXT const& rc = ::capture_context(), bool terminateProcess = false)
+    inline void OnException(int ec = errno, RUN_CTX_Ptr rcPtr = cxx_capture_run_context(), bool terminateProcess = false)
     {
-        CRASH_REPORT_INT("catch (...)", ec, &rc, terminateProcess ? 1 : 0);
+        CRASH_REPORT_INT("catch (...)", ec, rcPtr.get(), terminateProcess ? 1 : 0);
     }
 
-    inline void GenericExceptionHandler(int ec = errno, RUN_CONTEXT const& rc = ::capture_context(), bool terminateProcess = false)
+    inline void GenericExceptionHandler(int ec = errno, RUN_CTX_Ptr rcPtr = cxx_capture_run_context(), bool terminateProcess = false)
     {
         try
         {
@@ -58,7 +59,7 @@ namespace Crash
 #ifdef _WIN32
         catch (_com_error const& ex)
         {
-            OnException(ex, rc, terminateProcess);
+            OnException(ex, std::move(rcPtr), terminateProcess);
         }
 #endif
         catch (Exception const& ex)
@@ -67,15 +68,15 @@ namespace Crash
         }
         catch (std::exception const& ex)
         {
-            OnException(ex, ec, rc, terminateProcess);
+            OnException(ex, ec, std::move(rcPtr), terminateProcess);
         }
         catch (boost::exception const& ex)
         {
-            OnException(ex, ec, rc, terminateProcess);
+            OnException(ex, ec, std::move(rcPtr), terminateProcess);
         }
         catch (...)
         {
-            OnException(ec, rc, terminateProcess);
+            OnException(ec, std::move(rcPtr), terminateProcess);
         }
     }
 }

@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="shelltastix.mainframe.h" />
+    <ClInclude Include="res\resource.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\gdi+.image.ptr.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\windows.resource.custom.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\windows.resource.data.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\windows.uses.com.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\windows.uses.commoncontrols.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\windows.uses.gdi+.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\windows.wtl.buffered.paint.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\windows.wtl.message.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\windows.wtl.tooltip.dialog.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\crash.report\crash.report\crash.report.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\crash.report\crash.report\debug.output.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\crash.report\crash.report\run.context.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\crash.report\crash.report\run.context.info.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\crash.report\crash.report\stack.walker.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\crash.report\crash.report\string.buffer.h">
+      <Filter>crash.report</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\string.locale.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\dh.timer.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="console.view.h" />
+    <ClInclude Include="..\..\libs\common\info\runtime.information.h">
+      <Filter>common\info</Filter>
+    </ClInclude>
+    <ClInclude Include="cp.command.h" />
+    <ClInclude Include="cp.internal.commands.h" />
+    <ClInclude Include="console.buffer.h" />
+    <ClInclude Include="console.command.line.h" />
+    <ClInclude Include="..\..\libs\common\gdi+.paint.args.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\gdi.autopaint.dc.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\rubbish.heap.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\keyboard.extra.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\generic.increment.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="execution.state.h" />
+    <ClInclude Include="filesystem.h" />
+    <ClInclude Include="run.external.h" />
+    <ClInclude Include="targetver.h">
+      <Filter>precompiled</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>precompiled</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\common\dh.tracing.h">
+      <Filter>common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="shelltastix.mainframe.cpp" />
+    <ClCompile Include="..\..\libs\common\gdi+.image.ptr.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\windows.resource.custom.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\windows.resource.data.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\windows.uses.gdi+.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\windows.wtl.buffered.paint.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\crash.report\crash.report\crash.report.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\crash.report\crash.report\crash.report.impl.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\crash.report\crash.report\debug.output.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\crash.report\crash.report\run.context.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\crash.report\crash.report\run.context.info.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\crash.report\crash.report\stack.walker.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\crash.report\crash.report\string.buffer.c">
+      <Filter>crash.report</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\string.locale.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\dh.timer.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="console.view.cpp" />
+    <ClCompile Include="..\..\libs\common\info\runtime.information.cpp">
+      <Filter>common\info</Filter>
+    </ClCompile>
+    <ClCompile Include="cp.command.cpp" />
+    <ClCompile Include="cp.internal.commands.cpp" />
+    <ClCompile Include="winmain.shelltastix.cpp" />
+    <ClCompile Include="console.buffer.cpp" />
+    <ClCompile Include="console.command.line.cpp" />
+    <ClCompile Include="filesystem.cpp" />
+    <ClCompile Include="run.external.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <Filter>precompiled</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\common\dh.tracing.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{754057bd-3b5c-4967-96fd-42d3055bd270}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{29185a80-61f6-4c6b-a6a5-b355e245ed57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="crash.report">
+      <UniqueIdentifier>{bfcac2bf-2560-426e-ab3f-f4a5f2bdf1c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fonts">
+      <UniqueIdentifier>{e55762c4-ce1f-42c0-83e3-e5c8d2f6d4ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fonts\terminus-4.32">
+      <UniqueIdentifier>{55244856-56bb-46b0-a3dd-41327f4ba32c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\info">
+      <UniqueIdentifier>{631890bb-3e76-487c-adb4-64f7906d2c2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="locale">
+      <UniqueIdentifier>{3ad4498e-b3fd-4a2d-b85a-c57ff4eb502c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="locale\en_US.UTF8">
+      <UniqueIdentifier>{2df47827-a525-4505-abbb-cba2814c4cfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="locale\ru_RU.UTF8">
+      <UniqueIdentifier>{ce86f33b-479d-4e86-96bd-3aef6a1e32c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="precompiled">
+      <UniqueIdentifier>{431367a5-e425-4509-84e9-346d0e2a6b14}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\managed.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shelltastix.ico">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\shelltastix.toolbar.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="fonts\terminus-4.32\TerminusBold.ttf">
+      <Filter>fonts\terminus-4.32</Filter>
+    </None>
+    <None Include="fonts\terminus-4.32\TerminusMedium.ttf">
+      <Filter>fonts\terminus-4.32</Filter>
+    </None>
+    <None Include="fonts\terminus-4.32\TerminusMediumItalic.ttf">
+      <Filter>fonts\terminus-4.32</Filter>
+    </None>
+    <None Include="locale\en_US.UTF8\strings.text">
+      <Filter>locale\en_US.UTF8</Filter>
+    </None>
+    <None Include="locale\ru_RU.UTF8\strings.text">
+      <Filter>locale\ru_RU.UTF8</Filter>
+    </None>
+  </ItemGroup>
+</Project>

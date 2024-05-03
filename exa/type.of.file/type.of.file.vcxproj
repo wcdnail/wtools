@@ -1,0 +1,463 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="magix.db.load.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="type.of.file.main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="magix.db.load.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="magix.db\acorn" />
+    <None Include="magix.db\adi" />
+    <None Include="magix.db\adventure" />
+    <None Include="magix.db\allegro" />
+    <None Include="magix.db\alliant" />
+    <None Include="magix.db\amanda" />
+    <None Include="magix.db\amigaos" />
+    <None Include="magix.db\animation" />
+    <None Include="magix.db\apl" />
+    <None Include="magix.db\apple" />
+    <None Include="magix.db\applix" />
+    <None Include="magix.db\archive" />
+    <None Include="magix.db\assembler" />
+    <None Include="magix.db\asterix" />
+    <None Include="magix.db\att3b" />
+    <None Include="magix.db\audio" />
+    <None Include="magix.db\basis" />
+    <None Include="magix.db\bflt" />
+    <None Include="magix.db\blcr" />
+    <None Include="magix.db\blender" />
+    <None Include="magix.db\blit" />
+    <None Include="magix.db\bout" />
+    <None Include="magix.db\bsdi" />
+    <None Include="magix.db\bsi" />
+    <None Include="magix.db\btsnoop" />
+    <None Include="magix.db\c-lang" />
+    <None Include="magix.db\c64" />
+    <None Include="magix.db\cad" />
+    <None Include="magix.db\cafebabe" />
+    <None Include="magix.db\cddb" />
+    <None Include="magix.db\chord" />
+    <None Include="magix.db\cisco" />
+    <None Include="magix.db\citrus" />
+    <None Include="magix.db\clarion" />
+    <None Include="magix.db\claris" />
+    <None Include="magix.db\clipper" />
+    <None Include="magix.db\commands" />
+    <None Include="magix.db\communications" />
+    <None Include="magix.db\compress" />
+    <None Include="magix.db\console" />
+    <None Include="magix.db\convex" />
+    <None Include="magix.db\cracklib" />
+    <None Include="magix.db\ctags" />
+    <None Include="magix.db\cups" />
+    <None Include="magix.db\dact" />
+    <None Include="magix.db\database" />
+    <None Include="magix.db\diamond" />
+    <None Include="magix.db\diff" />
+    <None Include="magix.db\digital" />
+    <None Include="magix.db\dolby" />
+    <None Include="magix.db\dump" />
+    <None Include="magix.db\dyadic" />
+    <None Include="magix.db\ebml" />
+    <None Include="magix.db\editors" />
+    <None Include="magix.db\efi" />
+    <None Include="magix.db\elf" />
+    <None Include="magix.db\encore" />
+    <None Include="magix.db\epoc" />
+    <None Include="magix.db\erlang" />
+    <None Include="magix.db\esri" />
+    <None Include="magix.db\fcs" />
+    <None Include="magix.db\filesystems" />
+    <None Include="magix.db\flash" />
+    <None Include="magix.db\fonts" />
+    <None Include="magix.db\fortran" />
+    <None Include="magix.db\frame" />
+    <None Include="magix.db\freebsd" />
+    <None Include="magix.db\fsav" />
+    <None Include="magix.db\fusecompress" />
+    <None Include="magix.db\games" />
+    <None Include="magix.db\gcc" />
+    <None Include="magix.db\geo" />
+    <None Include="magix.db\geos" />
+    <None Include="magix.db\gimp" />
+    <None Include="magix.db\gnome-keyring" />
+    <None Include="magix.db\gnu" />
+    <None Include="magix.db\gnumeric" />
+    <None Include="magix.db\grace" />
+    <None Include="magix.db\graphviz" />
+    <None Include="magix.db\gringotts" />
+    <None Include="magix.db\guile" />
+    <None Include="magix.db\hitachi-sh" />
+    <None Include="magix.db\hp" />
+    <None Include="magix.db\human68k" />
+    <None Include="magix.db\ibm370" />
+    <None Include="magix.db\ibm6000" />
+    <None Include="magix.db\iff" />
+    <None Include="magix.db\images" />
+    <None Include="magix.db\inform" />
+    <None Include="magix.db\intel" />
+    <None Include="magix.db\interleaf" />
+    <None Include="magix.db\island" />
+    <None Include="magix.db\ispell" />
+    <None Include="magix.db\isz" />
+    <None Include="magix.db\java" />
+    <None Include="magix.db\jpeg" />
+    <None Include="magix.db\karma" />
+    <None Include="magix.db\kde" />
+    <None Include="magix.db\kml" />
+    <None Include="magix.db\lecter" />
+    <None Include="magix.db\lex" />
+    <None Include="magix.db\lif" />
+    <None Include="magix.db\linux" />
+    <None Include="magix.db\lisp" />
+    <None Include="magix.db\llvm" />
+    <None Include="magix.db\lua" />
+    <None Include="magix.db\luks" />
+    <None Include="magix.db\m4" />
+    <None Include="magix.db\mach" />
+    <None Include="magix.db\macintosh" />
+    <None Include="magix.db\magic" />
+    <None Include="magix.db\mail.news" />
+    <None Include="magix.db\make" />
+    <None Include="magix.db\maple" />
+    <None Include="magix.db\marc21" />
+    <None Include="magix.db\mathcad" />
+    <None Include="magix.db\mathematica" />
+    <None Include="magix.db\matroska" />
+    <None Include="magix.db\mcrypt" />
+    <None Include="magix.db\mercurial" />
+    <None Include="magix.db\metastore" />
+    <None Include="magix.db\mime" />
+    <None Include="magix.db\mips" />
+    <None Include="magix.db\mirage" />
+    <None Include="magix.db\misctools" />
+    <None Include="magix.db\mkid" />
+    <None Include="magix.db\mlssa" />
+    <None Include="magix.db\mmdf" />
+    <None Include="magix.db\modem" />
+    <None Include="magix.db\motorola" />
+    <None Include="magix.db\mozilla" />
+    <None Include="magix.db\msdos" />
+    <None Include="magix.db\msooxml" />
+    <None Include="magix.db\msvc" />
+    <None Include="magix.db\mup" />
+    <None Include="magix.db\music" />
+    <None Include="magix.db\natinst" />
+    <None Include="magix.db\ncr" />
+    <None Include="magix.db\netbsd" />
+    <None Include="magix.db\netscape" />
+    <None Include="magix.db\netware" />
+    <None Include="magix.db\news" />
+    <None Include="magix.db\nitpicker" />
+    <None Include="magix.db\oasis" />
+    <None Include="magix.db\ocaml" />
+    <None Include="magix.db\octave" />
+    <None Include="magix.db\ole2compounddocs" />
+    <None Include="magix.db\olf" />
+    <None Include="magix.db\os2" />
+    <None Include="magix.db\os400" />
+    <None Include="magix.db\os9" />
+    <None Include="magix.db\osf1" />
+    <None Include="magix.db\palm" />
+    <None Include="magix.db\parix" />
+    <None Include="magix.db\parrot" />
+    <None Include="magix.db\pascal" />
+    <None Include="magix.db\pbm" />
+    <None Include="magix.db\pdf" />
+    <None Include="magix.db\pdp" />
+    <None Include="magix.db\perl" />
+    <None Include="magix.db\pgp" />
+    <None Include="magix.db\pkgadd" />
+    <None Include="magix.db\plan9" />
+    <None Include="magix.db\plus5" />
+    <None Include="magix.db\printer" />
+    <None Include="magix.db\project" />
+    <None Include="magix.db\psdbms" />
+    <None Include="magix.db\pulsar" />
+    <None Include="magix.db\pyramid" />
+    <None Include="magix.db\python" />
+    <None Include="magix.db\revision" />
+    <None Include="magix.db\riff" />
+    <None Include="magix.db\rinex" />
+    <None Include="magix.db\rpm" />
+    <None Include="magix.db\rtf" />
+    <None Include="magix.db\ruby" />
+    <None Include="magix.db\sc" />
+    <None Include="magix.db\sccs" />
+    <None Include="magix.db\scientific" />
+    <None Include="magix.db\securitycerts" />
+    <None Include="magix.db\selinux" />
+    <None Include="magix.db\sendmail" />
+    <None Include="magix.db\sequent" />
+    <None Include="magix.db\sgi" />
+    <None Include="magix.db\sgml" />
+    <None Include="magix.db\sharc" />
+    <None Include="magix.db\sinclair" />
+    <None Include="magix.db\sisu" />
+    <None Include="magix.db\sketch" />
+    <None Include="magix.db\smalltalk" />
+    <None Include="magix.db\smile" />
+    <None Include="magix.db\sniffer" />
+    <None Include="magix.db\softquad" />
+    <None Include="magix.db\spec" />
+    <None Include="magix.db\spectrum" />
+    <None Include="magix.db\sql" />
+    <None Include="magix.db\ssh" />
+    <None Include="magix.db\ssl" />
+    <None Include="magix.db\sun" />
+    <None Include="magix.db\sysex" />
+    <None Include="magix.db\tcl" />
+    <None Include="magix.db\teapot" />
+    <None Include="magix.db\terminfo" />
+    <None Include="magix.db\tex" />
+    <None Include="magix.db\tgif" />
+    <None Include="magix.db\ti-8x" />
+    <None Include="magix.db\timezone" />
+    <None Include="magix.db\troff" />
+    <None Include="magix.db\tuxedo" />
+    <None Include="magix.db\typeset" />
+    <None Include="magix.db\unicode" />
+    <None Include="magix.db\unknown" />
+    <None Include="magix.db\uuencode" />
+    <None Include="magix.db\varied.out" />
+    <None Include="magix.db\varied.script" />
+    <None Include="magix.db\vax" />
+    <None Include="magix.db\vicar" />
+    <None Include="magix.db\virtual" />
+    <None Include="magix.db\virtutech" />
+    <None Include="magix.db\visx" />
+    <None Include="magix.db\vms" />
+    <None Include="magix.db\vmware" />
+    <None Include="magix.db\vorbis" />
+    <None Include="magix.db\vxl" />
+    <None Include="magix.db\warc" />
+    <None Include="magix.db\weak" />
+    <None Include="magix.db\windows" />
+    <None Include="magix.db\wireless" />
+    <None Include="magix.db\wordprocessors" />
+    <None Include="magix.db\wsdl" />
+    <None Include="magix.db\xdelta" />
+    <None Include="magix.db\xenix" />
+    <None Include="magix.db\xilinx" />
+    <None Include="magix.db\xo65" />
+    <None Include="magix.db\xwindows" />
+    <None Include="magix.db\zfs" />
+    <None Include="magix.db\zilog" />
+    <None Include="magix.db\zyxel" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>type.of.file</ProjectName>
+    <ProjectGuid>{8EC6DFD1-8CAC-46CE-9880-6FB7A8578B0B}</ProjectGuid>
+    <RootNamespace>unittests</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfAtl>Static</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfAtl>Static</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfAtl>Static</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfAtl>Static</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)__bin\$(ProjectName).$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)__obj\$(ProjectName).$(PlatformShortName).$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)__bin\$(ProjectName).$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)__obj\$(ProjectName).$(PlatformShortName).$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)__bin\$(ProjectName).$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)__obj\$(ProjectName).$(PlatformShortName).$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)__bin\$(ProjectName).$(PlatformShortName).$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)__obj\$(ProjectName).$(PlatformShortName).$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</GenerateManifest>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../libs/common;../../../libs/boost_1_50_0_beta1;../../../libs/WTL81_12085/Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../libs/common;../../../libs/boost_1_50_0_beta1;../../../libs/WTL81_12085/Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../libs/common;../../../libs/boost_1_50_0_beta1;../../../libs/WTL81_12085/Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../libs/common;../../../libs/boost_1_50_0_beta1;../../../libs/WTL81_12085/Include;$(IncludePath)</IncludePath>
+    <SourcePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SourcePath)</SourcePath>
+    <SourcePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SourcePath)</SourcePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../libs/boost_1_50_0_beta1/bin32/lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../libs/boost_1_50_0_beta1/bin32/lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../libs/boost_1_50_0_beta1/bin64/lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../libs/boost_1_50_0_beta1/bin64/lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RC_EXEVERSION;WIN32;_DEBUG;_WINDOWS;_PUBLIC=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>../../libs/boost_1_47_0/bin32/lib;../../libs/debug.helpers;../../libs/crash.report;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /F/Y "$(TargetPath)" "\\XP32\BIN0\"
+rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RC_EXEVERSION;WIN32;NDEBUG;_WINDOWS;_PUBLIC=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>../../libs/boost_1_47_0/bin32/lib;../../libs/debug.helpers;../../libs/crash.report;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RC_EXEVERSION;WIN32;_DEBUG;_WINDOWS;_PUBLIC=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>../../libs/boost_1_47_0/bin64/lib;../../libs/debug.helpers;../../libs/crash.report;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RC_EXEVERSION;WIN32;NDEBUG;_WINDOWS;_PUBLIC=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>../../libs/boost_1_47_0/bin64/lib;../../libs/debug.helpers;../../libs/crash.report;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

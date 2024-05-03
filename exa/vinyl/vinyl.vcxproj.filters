@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="gfx.cpp" />
+    <ClCompile Include="StdAfx.cpp" />
+    <ClCompile Include="3dlite.cpp" />
+    <ClCompile Include="printing.cpp" />
+    <ClCompile Include="Vinil.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="gfx.h" />
+    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="3dlite.h" />
+    <ClInclude Include="blin.h" />
+    <ClInclude Include="printing.h" />
+    <ClInclude Include="structs.h" />
+    <ClInclude Include="Vinil.h" />
+    <ClInclude Include="res\resource.h">
+      <Filter>res</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="res">
+      <UniqueIdentifier>{386289c1-94cf-4afa-b8ed-b1fa4a536f0e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\UnI.ico">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\default.bin">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\first.bin">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\robo.bin">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\sans.bin">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\thin.bin">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\wcd.bin">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\vinyl-record.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\vinyl-record.jpg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\vinyl-record.psd">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\vinyl.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
