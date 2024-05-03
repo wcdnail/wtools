@@ -23,7 +23,6 @@
     <ClInclude Include="resource.h">
       <Filter>resz</Filter>
     </ClInclude>
-    <ClInclude Include="luicMainFrame.h" />
     <ClInclude Include="luicMain.h" />
     <ClInclude Include="idl\legay-ui-configurator_i.h">
       <Filter>gen</Filter>
@@ -66,11 +65,12 @@
     <ClInclude Include="luicPageDllIcons.h">
       <Filter>pages</Filter>
     </ClInclude>
+    <ClInclude Include="luicMainFrameWnd.h" />
+    <ClInclude Include="luicMainFrameDlg.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="luicMain.cpp" />
-    <ClCompile Include="luicMainFrame.cpp" />
     <ClCompile Include="idl\legay-ui-configurator_i.c">
       <Filter>gen</Filter>
     </ClCompile>
@@ -111,6 +111,8 @@
     <ClCompile Include="luicPageDllIcons.cpp">
       <Filter>pages</Filter>
     </ClCompile>
+    <ClCompile Include="luicMainFrameWnd.cpp" />
+    <ClCompile Include="luicMainFrameDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resz\legay-ui-configurator.rc">
