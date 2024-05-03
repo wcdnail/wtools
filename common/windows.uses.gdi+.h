@@ -1,10 +1,8 @@
 #pragma once 
 
-#include <boost/noncopyable.hpp>
-
 namespace Initialize
 {
-    struct GdiPlus: boost::noncopyable
+    struct GdiPlus
     {
         GdiPlus(int requiredver = 1);
         ~GdiPlus();

@@ -2,8 +2,9 @@
 #include "luicMain.h"
 #include "dh.tracing.h"
 #include "string.utils.format.h"
-#include "common/windows.uses.ole.h"
-#include "common/windows.uses.commoncontrols.h"
+#include "windows.uses.ole.h"
+#include "windows.uses.commoncontrols.h"
+#include "windows.uses.gdi+.h"
 #include "resz/resource.h"
 
 #if 0
@@ -189,6 +190,7 @@ HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
     try {
         Initialize::OLE               ole;
         Initialize::CommonControls cctrls;
+        Initialize::GdiPlus       gdiPlus;
         CMessageLoop                 loop;
 
         hr = Initialize(nullptr, instHnd);

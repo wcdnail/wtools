@@ -40,6 +40,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="string.utils.format.cpp" />
+    <ClCompile Include="windows.uses.gdi+.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dev.assistance\dev.assist.h" />
@@ -62,6 +63,7 @@
     <ClInclude Include="shell.imagelist.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="string.utils.format.h" />
+    <ClInclude Include="windows.uses.gdi+.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>wccf-minimal-static</ProjectName>

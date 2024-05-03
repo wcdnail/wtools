@@ -4,6 +4,8 @@
 #include "string.utils.format.h"
 #include "UT/debug.assistance.h"
 #include "resz/resource.h"
+#include "windows.uses.gdi+.h"
+#include <gdiplus.h>
 #include <filesystem>
 
 enum : int { LV_MakeInsert = 0 };
@@ -312,7 +314,7 @@ void CPageDllIcons::AttemptToSaveSelected(std::wstring const& filename, UINT cou
         if (-1 == it) {
             break;
         }
-        if (!ExportIcon(it, needBig, *pFileName)) {
+        if (!ExportIconGDIP(it, needBig, *pFileName)) {
             noErrors = false;
             break;
         }
@@ -323,7 +325,7 @@ void CPageDllIcons::AttemptToSaveSelected(std::wstring const& filename, UINT cou
     }
 }
 
-bool CPageDllIcons::ExportIcon(int it, bool needBig, std::wstring const& filename)
+bool CPageDllIcons::ExportIconOLE(int it, bool needBig, std::wstring const& filename)
 {
     HRESULT      code = S_OK;
     CImageList& ilSrc = needBig ? m_ilBig : m_ilSmall;
@@ -351,10 +353,40 @@ bool CPageDllIcons::ExportIcon(int it, bool needBig, std::wstring const& filenam
             Str::ErrorCode<>::SystemMessage(code).GetString());
         return false;
     }
-    code = pPict->SaveAsFile(pStrm, TRUE, &cbSize);
+    code = pPict->SaveAsFile(pStrm, TRUE, &cbSize); // OK, but 4bpp
     if (FAILED(code)) {
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
             Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    return true;
+}
+
+bool CPageDllIcons::ExportIconGDIP(int it, bool needBig, std::wstring const& filename)
+{
+    using GdipBitmapPtr = std::unique_ptr<Gdiplus::Bitmap>;
+
+    HRESULT      code = S_OK;
+    CImageList& ilSrc = needBig ? m_ilBig : m_ilSmall;
+    HICON        icon = ilSrc.GetIcon(it);
+    if (!icon) {
+        code = static_cast<HRESULT>(GetLastError());
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    GdipBitmapPtr pBitmap{ Gdiplus::Bitmap::FromHICON(icon) };
+    if (!pBitmap) {
+        code = static_cast<HRESULT>(GetLastError());
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    //GetEncoderClsid(L"image/jpeg", &encoderClsid);
+    auto status = pBitmap->Save(filename.c_str(), &Gdiplus::ImageFormatIcon);
+    if (Gdiplus::Ok != status) {
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %S", it, filename.c_str(),
+            Initialize::GdiPlus::StatusString(status));
         return false;
     }
     return true;

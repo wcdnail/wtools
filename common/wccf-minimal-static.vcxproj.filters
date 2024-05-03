@@ -16,6 +16,7 @@
     <ClCompile Include="shell.imagelist.cpp" />
     <ClCompile Include="icons.dll.cpp" />
     <ClCompile Include="settings.cpp" />
+    <ClCompile Include="windows.uses.gdi+.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -52,6 +53,7 @@
     <ClInclude Include="shell.imagelist.h" />
     <ClInclude Include="icons.dll.h" />
     <ClInclude Include="settings.h" />
+    <ClInclude Include="windows.uses.gdi+.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

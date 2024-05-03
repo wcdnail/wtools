@@ -31,6 +31,8 @@
 #include <shellapi.h>
 #include <prsht.h>
 
+#include <gdiplus.h>
+
 #include <unordered_map>
 #include <filesystem>
 #include <algorithm>
