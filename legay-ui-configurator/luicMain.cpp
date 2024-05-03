@@ -127,7 +127,7 @@ HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINST
         return code;
     }
     static const ATL::CStringW shell32dll = L"%SYSTEMROOT%\\System32\\shell32.dll";
-    if (!m_ShellIcons.Load(shell32dll.GetString(), false)) {
+    if (!m_ShellIcons.Load(shell32dll.GetString(), true)) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Load DLL '%s' icon collection failed!", shell32dll.GetString()), code, false, MB_ICONWARNING);
     }
@@ -161,7 +161,7 @@ HRESULT CLegacyUIConfigurator::ImListCreate()
         IDI_FOLDER_OPEN,
     };
     HRESULT code = S_FALSE;
-    m_ImList.Create(MaxIconWidth, MaxIconHeight, ILC_MASK, _countof(iconsIDs), 0);
+    m_ImList.Create(MaxIconWidth, MaxIconHeight, ILC_MASK | ILC_COLOR32, _countof(iconsIDs), 0);
     if (!m_ImList.m_hImageList) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(L"Creation of ImageList failed!", code, true, MB_ICONWARNING);

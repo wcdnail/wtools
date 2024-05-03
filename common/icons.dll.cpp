@@ -3,8 +3,6 @@
 #include <shellapi.h>
 #include <vector>
 
-using RawIconArray = std::vector<HICON>;
-
 CIconCollectionFile::~CIconCollectionFile()
 {
 }
@@ -12,39 +10,22 @@ CIconCollectionFile::~CIconCollectionFile()
 CIconCollectionFile::CIconCollectionFile()
     :   m_IconArr{}
     , m_IconArrSm{}
-    ,     m_Count{ 0 }
     ,  m_Filename{}
 {
 }
 
-static CIconCollectionFile::IconArray ConvertToManaged(RawIconArray const& raw, UINT count)
-{
-    using IconArray = CIconCollectionFile::IconArray;
-
-    if (raw.size() < 1) {
-        return {};
-    }
-    IconArray    result = std::make_unique<CIcon[]>(count);
-    HICON const* srcArr = &raw[0];
-    CIcon*       dstArr = result.get();
-
-    for (UINT i=0; i<count; i++) {
-        if (!srcArr[i]) {
-            return {};
-        }
-        dstArr[i].Attach(srcArr[i]);
-    }
-
-    return result;
-}
-
 bool CIconCollectionFile::Load(PCWSTR pathname, bool withSmall)
 {
-    UINT          targetCount = {0};
-    UINT          loadedCount = {0};
+    enum ExtractStep: int
+    {
+        Extract_GetCount = -1,
+        Extract_StartWith = 0,
+    };
+    UINT          targetCount = { 0 };
+    UINT          loadedCount = { 0 };
     HICON*        targetSmPtr = { nullptr };
-    RawIconArray     targetSm = {};
-    RawIconArray       target = {};
+    IconArray        targetSm = {};
+    IconArray          target = {};
     std::wstring tempPathname = {};
     if (!pathname) {
         SetLastError(ERROR_PATH_NOT_FOUND);
@@ -62,16 +43,16 @@ bool CIconCollectionFile::Load(PCWSTR pathname, bool withSmall)
         tempStr.ReleaseBufferSetLength(pathLen);
         tempPathname = std::wstring{ tempStr.GetString(), static_cast<size_t>(tempStr.GetLength()) };
     }
-    targetCount  = ExtractIconExW(tempPathname.c_str(), -1, nullptr, nullptr, 0);
+    targetCount  = ExtractIconExW(tempPathname.c_str(), Extract_GetCount, nullptr, nullptr, 0);
     if (UINT_MAX == targetCount || targetCount < 1) {
         return false;
     }
-    target = RawIconArray(targetCount);
+    target = IconArray(targetCount);
     if (withSmall) {
-        targetSm = RawIconArray(targetCount);
-        targetSmPtr = &targetSm[0];
+        targetSm = IconArray(targetCount);
+        targetSmPtr = reinterpret_cast<HICON*>(&targetSm[0]);
     }
-    loadedCount = ExtractIconExW(pathname, 0, &target[0], targetSmPtr, targetCount);
+    loadedCount = ExtractIconExW(pathname, Extract_StartWith, reinterpret_cast<HICON*>(&target[0]), targetSmPtr, targetCount);
     if (loadedCount != targetCount) {
         const auto code = static_cast<HRESULT>(GetLastError());
         if (ERROR_SUCCESS == code) {
@@ -79,22 +60,31 @@ bool CIconCollectionFile::Load(PCWSTR pathname, bool withSmall)
         }
         return false;
     }
-    IconArray managedSm;
-    if (withSmall) {
-        managedSm = ConvertToManaged(target, loadedCount);
-        if (!managedSm) {
-            SetLastError(ERROR_INVALID_DATA);
-            return false;
-        }
-    }
-    IconArray managed = ConvertToManaged(target, loadedCount);
-    if (!managed) {
-        SetLastError(ERROR_INVALID_DATA);
-        return false;
-    }
-    m_IconArr.swap(managed);
-    m_IconArrSm.swap(managedSm);
+    m_IconArr.swap(target);
+    m_IconArrSm.swap(targetSm);
     m_Filename.swap(tempPathname);
-    m_Count = loadedCount;
     return true;
+}
+
+WTL::CImageList CIconCollectionFile::MakeImageList(bool bigIcons, UINT flags /*= ILC_MASK | ILC_COLOR32*/) const
+{
+    IconArray const& src = GetArray(bigIcons);
+    if (src.size() < 1) {
+        return {};
+    }
+    int icoCx = 16;
+    int icoCy = 16;
+    if (bigIcons) {
+        icoCx = 32;
+        icoCy = 32;
+    }
+    WTL::CImageList result;
+    if (!result.Create(icoCx, icoCy, flags, (int)src.size(), 0)) {
+        return {};
+    }
+    for (const auto it: src) {
+        result.AddIcon(it.m_hIcon);
+    }
+    ATLASSUME(result.GetImageCount() == src.size());
+    return { result.Detach() };
 }

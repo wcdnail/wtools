@@ -230,6 +230,8 @@ void CMainFrame::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
     switch(nID) {
     case IDCANCEL:
+        m_Tab.DeleteAllItems();
+        m_Tab.DestroyWindow();
         DestroyWindow();
         break;
     }

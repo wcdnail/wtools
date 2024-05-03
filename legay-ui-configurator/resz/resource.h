@@ -33,10 +33,14 @@
 #define IDI_EDIT_NAME                   213
 #define IDC_BN_OPEN_DLG                 213
 #define IDI_HATCH_CROSS                 214
+#define IDC_BN_EXPORT_SEL               214
 #define IDI_FOLDER_OPEN                 215
 #define IDD_PAGE_DLL_FILE_ICONS         216
-#define IDC_LIST1                       217
-#define IDC_LB_VIEW                     217
+#define IDC_LV_VIEW                     218
+#define IDC_RADIO1                      219
+#define IDC_RADIO3                      221
+#define IDC_RADIO4                      222
+#define IDC_RADIO5                      223
 #define IDC_APP_DLG_APPEARANCE_START    3000
 #define IDC_APP_THEME_CAP               3001
 #define IDC_APP_THEME_SEL               3002
@@ -88,7 +92,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        217
 #define _APS_NEXT_COMMAND_VALUE         32772
-#define _APS_NEXT_CONTROL_VALUE         218
+#define _APS_NEXT_CONTROL_VALUE         220
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

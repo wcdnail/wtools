@@ -33,6 +33,7 @@ struct CLegacyUIConfigurator: CAppModule,
     HICON GetIcon(int icon) const;
     CMenu const& GetTestMenu() const;
     CIconCollectionFile const& ShellIcons() const;
+    CImageList const& GetImageList() const;
 
     HRESULT Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID = NULL);
     HRESULT Run(HINSTANCE instHnd, int showCmd);
@@ -60,4 +61,9 @@ private:
 inline CIconCollectionFile const& CLegacyUIConfigurator::ShellIcons() const
 {
     return m_ShellIcons;
+}
+
+inline CImageList const& CLegacyUIConfigurator::GetImageList() const
+{
+    return m_ImList;
 }
