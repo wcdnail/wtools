@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "luicMain.h"
+#include "icons.dll.h"
 #include "dh.tracing.h"
-#include "string.utils.format.h"
 #include "windows.uses.ole.h"
 #include "windows.uses.commoncontrols.h"
+#include "string.utils.format.h"
 #include "windows.uses.gdi+.h"
 #include "resz/resource.h"
 
@@ -106,7 +107,7 @@ HICON CLegacyUIConfigurator::GetIcon(int icon) const
     if (icon < 0 || icon >= IconCount) {
         return nullptr;
     }
-    return m_ImList.GetIcon(icon);
+    return m_ImList[IL_Own].GetIcon(icon);
 }
 
 CMenu const& CLegacyUIConfigurator::GetTestMenu() const
@@ -125,10 +126,15 @@ HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINST
     if (FAILED(code)) {
         return code;
     }
-    static const ATL::CStringW shell32dll = L"%SYSTEMROOT%\\System32\\shell32.dll";
-    if (!m_ShellIcons.Load(shell32dll.GetString(), true)) {
+    static const ATL::CStringW shell32dll = SHELL32_PATHNAME;
+    CIconCollectionFile shellIcons;
+    if (!shellIcons.Load(shell32dll.GetString(), true)) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Load DLL '%s' icon collection failed!", shell32dll.GetString()), code, false, MB_ICONWARNING);
+    }
+    else {
+        m_ImList[IL_Shell32] = shellIcons.MakeImageList(true);
+        m_ImList[IL_Shell32Small] = shellIcons.MakeImageList(false);
     }
     code = ImListCreate();
     m_TestMenu.LoadMenuW(IDR_MENU1);
@@ -143,6 +149,16 @@ CLegacyUIConfigurator* CLegacyUIConfigurator::App()
     }
     return g_pApp;
 }
+
+ImageList const& CLegacyUIConfigurator::GetImageList(int index) const
+{
+    if (index < 0 || index >= IL_Count) {
+        static const ImageList dmy;
+        return dmy;
+    }
+    return m_ImList[index];
+}
+
 
 HRESULT CLegacyUIConfigurator::ImListCreate()
 {
@@ -161,8 +177,8 @@ HRESULT CLegacyUIConfigurator::ImListCreate()
         IDI_FOLDER_OPEN,
     };
     HRESULT code = S_FALSE;
-    m_ImList.Create(MaxIconWidth, MaxIconHeight, ILC_MASK | ILC_COLOR32, _countof(iconsIDs), 0);
-    if (!m_ImList.m_hImageList) {
+    m_ImList[IL_Own].Create(MaxIconWidth, MaxIconHeight, ILC_MASK | ILC_COLOR32, _countof(iconsIDs), 0);
+    if (!m_ImList[IL_Own].m_hImageList) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(L"Creation of ImageList failed!", code, true, MB_ICONWARNING);
         return code;
@@ -175,9 +191,9 @@ HRESULT CLegacyUIConfigurator::ImListCreate()
             ReportError(Str::ElipsisW::Format(L"Load icon (%d) failed!", it), code);
             continue;
         }
-        m_ImList.AddIcon(tempIco.Detach());
+        m_ImList[IL_Own].AddIcon(tempIco.Detach());
     }
-    ATLASSUME(IconCount == m_ImList.GetImageCount());
+    ATLASSUME(IconCount == m_ImList[IL_Own].GetImageCount());
     return S_OK;
 }
 

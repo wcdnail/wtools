@@ -46,8 +46,9 @@ struct CDrawRoutine::StaticInit
     SetSysColorsTempFn SetSysColorsTemp;
     DrawMenuBarTempFn   DrawMenuBarTemp;
 
-    CIconHandle   m_IconActiveWnd;
-    CIconHandle m_IconInactiveWnd;
+    CImageList m_ShellIcons;
+    HICON   m_IconActiveWnd;
+    HICON m_IconInactiveWnd;
 
     static StaticInit& instance()
     {
@@ -74,6 +75,14 @@ private:
         GetProcAddressEX(USER32, DrawCaptionTempW);
         GetProcAddressEX(USER32, SetSysColorsTemp);
         GetProcAddressEX(USER32, DrawMenuBarTemp);
+
+        srand(static_cast<int>(time(nullptr)));
+        auto const&     il = CLegacyUIConfigurator::App()->GetImageList(IL_Shell32Small);
+        const int maxCount = il.GetImageCount();
+        const int     dex1 = rand() % maxCount;
+        const int     dex2 = rand() % maxCount;
+        m_IconActiveWnd = il.GetIcon(dex1);
+        m_IconInactiveWnd = il.GetIcon(dex2);
     }
 
     ~StaticInit()
@@ -526,7 +535,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
             int     prevBkMode = dc.SetBkMode(TRANSPARENT);
             CRect       rcText = rcWork;
             rcText.right = rects.m_rcScroll.left - 1;
-            rcText.DeflateRect(rcWork.Width() / 16, 4);
+            rcText.DeflateRect(rcWork.Width() / 16, 10);
             CRect  rcLine = rcText;
             LONG       cy = -(m_Theme.GetLogFont(FONT_Desktop)->lfHeight) + 2;
             rcLine.bottom = rcLine.top + cy;

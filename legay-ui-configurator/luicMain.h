@@ -2,10 +2,21 @@
 
 #include "luicMainFrame.h"
 #include "luicTheme.h"
-#include "icons.dll.h"
 #include "settings.h"
 #include <atlapp.h>
 #include <mutex>
+
+#define SHELL32_PATHNAME L"%SYSTEMROOT%\\System32\\shell32.dll"
+
+using ImageList = WTL::CImageListManaged;
+
+enum ImageListIndex : int
+{
+    IL_Own = 0,
+    IL_Shell32,
+    IL_Shell32Small,
+    IL_Count
+};
 
 enum IconIndex : int
 {
@@ -43,8 +54,7 @@ public:
     CTheme& CurrentTheme() const;
     HICON GetIcon(int icon) const;
     CMenu const& GetTestMenu() const;
-    CIconCollectionFile const& ShellIcons() const;
-    CImageList const& GetImageList() const;
+    ImageList const& GetImageList(int index) const;
     void SetMainFrameStatus(int status, ATL::CStringW&& message);
 
     HRESULT Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID = NULL);
@@ -55,11 +65,10 @@ public:
 private:
     friend Super;
 
-    Conf::Section         m_Settings;
-    CMainFrame           m_MainFrame;
-    CImageList              m_ImList;
-    CMenu                 m_TestMenu;
-    CIconCollectionFile m_ShellIcons;
+    Conf::Section     m_Settings;
+    CMainFrame       m_MainFrame;
+    CMenu             m_TestMenu;
+    ImageList m_ImList[IL_Count];
 
     static CTheme g_ThemeNative;
     static CLegacyUIConfigurator* g_pApp;
@@ -67,13 +76,3 @@ private:
 
     HRESULT ImListCreate();
 };
-
-inline CIconCollectionFile const& CLegacyUIConfigurator::ShellIcons() const
-{
-    return m_ShellIcons;
-}
-
-inline CImageList const& CLegacyUIConfigurator::GetImageList() const
-{
-    return m_ImList;
-}

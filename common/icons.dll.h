@@ -17,7 +17,8 @@ public:
 
     WCDAFX_API bool Load(PCWSTR pathname, bool withSmall);
     std::wstring const& GetFilename() const;
-    IconArray const& GetArray(bool bigIcons) const;
+    IconArray const& GetArray() const;
+    IconArray const& GetArraySm() const;
     size_t GetCount() const;
     WCDAFX_API WTL::CImageList MakeImageList(bool bigIcons, UINT flags = ILC_MASK | ILC_COLOR32) const;
 
@@ -32,10 +33,16 @@ inline std::wstring const& CIconCollectionFile::GetFilename() const
     return m_Filename;
 }
 
-inline IconArray const& CIconCollectionFile::GetArray(bool bigIcons) const
+inline IconArray const& CIconCollectionFile::GetArray() const
 {
-    return bigIcons ? m_IconArr : m_IconArrSm;
+    return m_IconArr;
 }
+
+inline IconArray const& CIconCollectionFile::GetArraySm() const
+{
+    return m_IconArrSm;
+}
+
 
 inline size_t CIconCollectionFile::GetCount() const
 {

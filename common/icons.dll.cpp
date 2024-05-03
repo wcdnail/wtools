@@ -68,7 +68,7 @@ bool CIconCollectionFile::Load(PCWSTR pathname, bool withSmall)
 
 WTL::CImageList CIconCollectionFile::MakeImageList(bool bigIcons, UINT flags /*= ILC_MASK | ILC_COLOR32*/) const
 {
-    IconArray const& src = GetArray(bigIcons);
+    IconArray const& src = bigIcons ? GetArray() : GetArraySm();
     if (src.size() < 1) {
         return {};
     }
@@ -83,8 +83,12 @@ WTL::CImageList CIconCollectionFile::MakeImageList(bool bigIcons, UINT flags /*=
         return {};
     }
     for (const auto it: src) {
-        result.AddIcon(it.m_hIcon);
+        if (-1 == result.AddIcon(it.m_hIcon)) {
+            return {};
+        }
     }
-    ATLASSUME(result.GetImageCount() == src.size());
+    int imListCount = result.GetImageCount();
+    int     vecSize = (int)src.size();
+    ATLASSUME(imListCount == vecSize);
     return { result.Detach() };
 }

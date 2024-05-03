@@ -176,9 +176,9 @@ BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     PagesCreate();
 
 #ifdef _DEBUG
-    const int initialPage = PageDllIcons;
-#else
     const int initialPage = PageAppearance;
+#else
+    const int initialPage = PageBackground;
 #endif
     m_Tab.SetCurSel(initialPage);
     PagesShow(initialPage, true);
