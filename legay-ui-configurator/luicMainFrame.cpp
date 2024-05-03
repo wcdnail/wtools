@@ -30,16 +30,30 @@ BOOL CMainFrame::OnIdle()
     return FALSE;
 }
 
+void CMainFrame::OnResizeNotify()
+{
+    if (!m_View.m_hWnd) {
+        return ;
+    }
+    CRect rcView;
+    CRect rcStatuBar;
+    GetClientRect(rcView);
+    ::GetClientRect(m_hWndStatusBar, rcStatuBar);
+    rcView.bottom -= rcStatuBar.Height();
+    rcView.DeflateRect(1, 1);
+    m_View.MoveWindow(rcView);
+}
+
 int CMainFrame::OnCreate(LPCREATESTRUCT)
 {
     auto const* pApp = CLegacyUIConfigurator::App();
 
-    FromSettings(m_Settings, m_rcMainFrame);
-    MoveWindow(m_rcMainFrame);
-
     HICON tempIco = pApp->GetIcon(IconMain);
     SetIcon(tempIco, FALSE);
     SetIcon(tempIco, TRUE);
+
+    FromSettings(m_Settings, m_rcMainFrame);
+    MoveWindow(m_rcMainFrame);
 
     CreateSimpleStatusBar();
     m_SBar.SubclassWindow(m_hWndStatusBar);
@@ -51,13 +65,21 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
     };
     m_SBar.SetPanes(arrParts, _countof(arrParts), false);
 
+    if (!m_View.CreateDlg(m_hWnd)) {
+        const auto code = static_cast<HRESULT>(GetLastError());
+        ReportError(L"Creation of MainView failed!", code, true, MB_ICONSTOP);
+        return -1;
+    }
+
+    OnResizeNotify();
+    m_View.ShowWindow(SW_SHOW);
 
     CMessageLoop* pLoop = pApp->GetMessageLoop();
     ATLASSERT(pLoop != nullptr);
     pLoop->AddMessageFilter(this);
     pLoop->AddIdleHandler(this);
 
-    DlgResize_Init(false, true);
+    DlgResize_Init(false, false);
     return 0;
 }
 

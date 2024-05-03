@@ -11,11 +11,13 @@
 #define IDD_MF_VIEW                     202
 #define IDD_LEGACY_UI_CONF_TOOL         202
 #define IDC_LABLE1                      202
+#define IDD_LEGACY_UI_MAIN_VIEW         202
 #define IDC_EDIT1                       203
 #define IDC_ED_OPEN_DLL_PATHNAME        203
 #define IDC_TAB1                        205
 #define IDC_BN_APPLY                    206
 #define IDD_PAGE_BACKGROUND             207
+#define IDC_BN_CANCEL                   207
 #define IDC_TEST_STA2                   208
 #define IDD_PAGE_SCREENSAVER            208
 #define IDR_APP_ACCEL                   208

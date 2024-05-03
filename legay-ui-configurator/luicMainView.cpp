@@ -21,9 +21,7 @@ enum PageIndex: int
     PageEffects,
     PageWeb,
     PageSettings,
-#ifdef _DEBUG
     PageDllIcons,
-#endif
     PageEnd
 };
 
@@ -31,9 +29,8 @@ CMainView::~CMainView()
 {
 }
 
-CMainView::CMainView(CLegacyUIConfigurator& app)
-    :      CPageImpl{ IDD_LEGACY_UI_CONF_TOOL }
-    ,         m_App { app }
+CMainView::CMainView()
+    :      CPageImpl{ IDD_LEGACY_UI_MAIN_VIEW }
     ,         m_Tab {}
     ,    m_PagesMap {}
     , m_rcTabClient {}
@@ -92,15 +89,16 @@ void CMainView::PagesGetRect()
 
 void CMainView::PagesCreate()
 {
+    m_Tab.Attach(GetDlgItem(IDC_TAB1));
+    //m_Tab.ModifyStyle(0, WS_TABSTOP);
+
     auto   pBackground = std::make_unique<CPageBackground>();
     auto  pScreenSaver = std::make_unique<CPageScreenSaver>();
     auto   pAppearance = std::make_unique<CPageAppearance>();
     auto  pPageEffects = std::make_unique<CPageEffects>();
     auto      pPageWeb = std::make_unique<CPageWeb>();
     auto pPageSettings = std::make_unique<CPageSettings>();
-
-    m_Tab.Attach(GetDlgItem(IDC_TAB1));
-    m_Tab.ModifyStyle(0, WS_TABSTOP);
+    auto pPageDllIcons = std::make_unique<CPageDllIcons>();
 
     PagesAppend(PageBackground,  L"Background",  std::move(pBackground));
     PagesAppend(PageScreenSaver, L"ScreenSaver", std::move(pScreenSaver));
@@ -108,11 +106,7 @@ void CMainView::PagesCreate()
     PagesAppend(PageEffects,     L"Effects",     std::move(pPageEffects));
     PagesAppend(PageWeb,         L"Web",         std::move(pPageWeb));
     PagesAppend(PageSettings,    L"Settings",    std::move(pPageSettings));
-
-#ifdef _DEBUG
-    auto pPageDllIcons = std::make_unique<CPageDllIcons>();
-    PagesAppend(PageDllIcons, L"DLL Icons", std::move(pPageDllIcons));
-#endif
+    PagesAppend(PageDllIcons,    L"DLL Icons",   std::move(pPageDllIcons));
 }
 
 void CMainView::PagesShow(int numba, bool show)
@@ -178,8 +172,7 @@ BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     ShowWindow(SW_SHOW);
 #endif
 
-    //ModifyStyle(0, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX, SWP_FRAMECHANGED);
-    //SetWindowTextW(L"Display Properties");
+    GetParent().SetWindowTextW(L"Display Properties");
     PagesCreate();
 
 #ifdef _DEBUG
@@ -191,6 +184,7 @@ BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     PagesShow(initialPage, true);
 
     DlgResizeAdd(IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y);
+    DlgResizeAdd(IDC_BN_CANCEL, DLSZ_MOVE_X | DLSZ_MOVE_Y);
     DlgResizeAdd(IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y);
     BOOL rv = CPageImpl::OnInitDialog(wndFocus, lInitParam);
     return rv;
@@ -198,7 +192,6 @@ BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 
 void CMainView::OnDestroy()
 {
-    PostQuitMessage(0);
     CPageImpl::OnDestroy();
 }
 
@@ -229,7 +222,7 @@ void CMainView::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         m_Tab.DeleteAllItems();
         m_Tab.DestroyWindow();
         DestroyWindow();
-        break;
+        return;
     }
     CPageImpl::OnCommand(uNotifyCode, nID, wndCtl);
 }

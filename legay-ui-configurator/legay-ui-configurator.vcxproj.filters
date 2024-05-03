@@ -66,6 +66,7 @@
       <Filter>pages</Filter>
     </ClInclude>
     <ClInclude Include="luicMainFrame.h" />
+    <ClInclude Include="luicMainView.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -111,6 +112,7 @@
       <Filter>pages</Filter>
     </ClCompile>
     <ClCompile Include="luicMainFrame.cpp" />
+    <ClCompile Include="luicMainView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resz\legay-ui-configurator.rc">

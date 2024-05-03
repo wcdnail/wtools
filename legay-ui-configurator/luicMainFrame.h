@@ -1,5 +1,6 @@
 #pragma once
 
+#include "luicMainView.h"
 #include "settings.h"
 #include "resz/resource.h"
 #include <atlwin.h>
@@ -20,6 +21,7 @@ struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
 private:
     CRect            m_rcMainFrame;
     Conf::Section       m_Settings;
+    CMainView               m_View;
     CMultiPaneStatusBarCtrl m_SBar;
 
     friend class Super;
@@ -33,13 +35,17 @@ private:
     BEGIN_MSG_MAP_EX(CMainFrame)
         MSG_WM_CREATE(OnCreate)
         MSG_WM_DESTROY(OnDestroy)
-        CHAIN_MSG_MAP(Resizer)
+        if(Resizer::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
+            OnResizeNotify();
+            return TRUE;
+        }
     END_MSG_MAP()
 
     BEGIN_DLGRESIZE_MAP(CMainFrame)
         DLGRESIZE_CONTROL(ATL_IDW_STATUS_BAR, DLSZ_SIZE_X)
     END_DLGRESIZE_MAP()
 
+    void OnResizeNotify();
     int OnCreate(LPCREATESTRUCT);
     void OnDestroy();
 

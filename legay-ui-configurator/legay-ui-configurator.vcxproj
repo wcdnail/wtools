@@ -242,6 +242,7 @@
     <ClInclude Include="luicMain.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="luicMainFrame.h" />
+    <ClInclude Include="luicMainView.h" />
     <ClInclude Include="luicPageAppearanceSystem.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -282,6 +283,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="luicMainFrame.cpp" />
+    <ClCompile Include="luicMainView.cpp" />
     <ClCompile Include="luicPageAppearanceSystem.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
