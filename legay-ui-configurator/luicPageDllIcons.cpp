@@ -314,7 +314,7 @@ void CPageDllIcons::AttemptToSaveSelected(std::wstring const& filename, UINT cou
         if (-1 == it) {
             break;
         }
-        if (!ExportIconGDIP(it, needBig, *pFileName)) {
+        if (!ExportIconOLE2(it, needBig, *pFileName)) {
             noErrors = false;
             break;
         }
@@ -336,12 +336,18 @@ bool CPageDllIcons::ExportIconOLE(int it, bool needBig, std::wstring const& file
             Str::ErrorCode<>::SystemMessage(code).GetString());
         return false;
     }
-    PICTDESC           sPictDesc = { sizeof(sPictDesc), PICTYPE_ICON };
-    ATL::CComPtr<IPicture> pPict = {};
-    ATL::CComPtr<IStream>  pStrm = {};
-    LONG                  cbSize = 0;
+    //DIBSECTION dibMask = { 0 };
+    //DIBSECTION    dibs = { 0 };
+    //ICONINFO      info = { 0 };
+    //GetIconInfo(icon, &info);
+    //GetObject(info.hbmMask, sizeof(dibMask), &dibMask);
+    //GetObject(info.hbmColor, sizeof(dibs), &dibs);
+    LONG                   cbSize = { 0 };
+    PICTDESC            sPictDesc = { sizeof(sPictDesc), PICTYPE_ICON };
+    ATL::CComPtr<IPicture2> pPict = {};
+    ATL::CComPtr<IStream>   pStrm = {};
     sPictDesc.icon.hicon = icon;
-    code = OleCreatePictureIndirect(&sPictDesc, IID_IPicture, FALSE, reinterpret_cast<void**>(&pPict));
+    code = OleCreatePictureIndirect(&sPictDesc, IID_IPicture2, FALSE, reinterpret_cast<void**>(&pPict));
     if (FAILED(code)) {
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
             Str::ErrorCode<>::SystemMessage(code).GetString());
@@ -353,7 +359,7 @@ bool CPageDllIcons::ExportIconOLE(int it, bool needBig, std::wstring const& file
             Str::ErrorCode<>::SystemMessage(code).GetString());
         return false;
     }
-    code = pPict->SaveAsFile(pStrm, TRUE, &cbSize); // OK, but 4bpp
+    code = pPict->SaveAsFile(pStrm, TRUE, &cbSize);
     if (FAILED(code)) {
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
             Str::ErrorCode<>::SystemMessage(code).GetString());
@@ -389,5 +395,69 @@ bool CPageDllIcons::ExportIconGDIP(int it, bool needBig, std::wstring const& fil
             Initialize::GdiPlus::StatusString(status));
         return false;
     }
+    return true;
+}
+
+bool CPageDllIcons::ExportIconOLE2(int it, bool needBig, std::wstring const& filename)
+{
+    HRESULT      code = S_OK;
+    CImageList& ilSrc = needBig ? m_ilBig : m_ilSmall;
+    HICON        icon = ilSrc.GetIcon(it);
+    if (!icon) {
+        code = static_cast<HRESULT>(GetLastError());
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    LONG                   cbSize = { 0 };
+    PICTDESC            sPictDesc = { sizeof(sPictDesc), PICTYPE_ICON };
+    ATL::CComPtr<IPicture>  pPict = {};
+    ATL::CComPtr<IStream>   pStrm = {};
+    sPictDesc.icon.hicon = icon;
+    code = OleCreatePictureIndirect(&sPictDesc, IID_IPicture2, FALSE, reinterpret_cast<void**>(&pPict));
+    if (FAILED(code)) {
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    code = CreateStreamOnHGlobal(nullptr, TRUE, &pStrm);
+    if (FAILED(code)) {
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    code = pPict->SaveAsFile(pStrm, TRUE, &cbSize);
+    if (FAILED(code)) {
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    LARGE_INTEGER li = { 0 };
+    pStrm->Seek(li, STREAM_SEEK_SET, nullptr);
+    HANDLE hFile = ::CreateFile(filename.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+    if (INVALID_HANDLE_VALUE == hFile) {
+        code = static_cast<HRESULT>(GetLastError());
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    DWORD dwWritten = { 0 };
+    DWORD    dwRead = { 0 };
+    LONG     dwDone = { 0 };
+    BYTE  buf[4096] = { 0 };
+    while (dwDone < cbSize) {
+        if (SUCCEEDED(pStrm->Read(buf, sizeof(buf), &dwRead))) {
+            WriteFile(hFile, buf, dwRead, &dwWritten, nullptr);
+            if (dwWritten != dwRead) {
+                break;
+            }
+            dwDone += static_cast<LONG>(dwRead);
+        }
+        else {
+            break;
+        }
+    }
+    _ASSERTE(dwDone == cbSize);
+    CloseHandle(hFile);
     return true;
 }
