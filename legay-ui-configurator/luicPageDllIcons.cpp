@@ -314,7 +314,7 @@ void CPageDllIcons::AttemptToSaveSelected(std::wstring const& filename, UINT cou
         if (-1 == it) {
             break;
         }
-        if (!ExportIconOLE2(it, needBig, *pFileName)) {
+        if (!ExportIconPLAIN(it, needBig, *pFileName)) {
             noErrors = false;
             break;
         }
@@ -461,3 +461,20 @@ bool CPageDllIcons::ExportIconOLE2(int it, bool needBig, std::wstring const& fil
     CloseHandle(hFile);
     return true;
 }
+
+BOOL SaveIcon3(PCTSTR szIconFile, HICON hIcon[], int nNumIcons);
+
+bool CPageDllIcons::ExportIconPLAIN(int it, bool needBig, std::wstring const& filename)
+{
+    HRESULT      code = S_OK;
+    CImageList& ilSrc = needBig ? m_ilBig : m_ilSmall;
+    HICON        icon = ilSrc.GetIcon(it);
+    if (!icon) {
+        code = static_cast<HRESULT>(GetLastError());
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    return FALSE != SaveIcon3(filename.c_str(), &icon, 1);
+}
+

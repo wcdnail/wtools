@@ -23,6 +23,7 @@
     <ClCompile Include="dh.timer.cpp" />
     <ClCompile Include="dh.tracing.cpp" />
     <ClCompile Include="icons.dll.cpp" />
+    <ClCompile Include="icons.save.m1.cpp" />
     <ClCompile Include="info\runtime.information.cpp" />
     <ClCompile Include="rect.alloc.cpp" />
     <ClCompile Include="rectz.cpp">

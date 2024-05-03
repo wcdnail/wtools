@@ -17,6 +17,7 @@
     <ClCompile Include="icons.dll.cpp" />
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="windows.uses.gdi+.cpp" />
+    <ClCompile Include="icons.save.m1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
