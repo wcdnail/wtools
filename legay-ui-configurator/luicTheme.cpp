@@ -1,11 +1,60 @@
 ﻿#include "stdafx.h"
 #include "luicTheme.h"
 #include "luicAppearance.h"
+#include "luicMain.h"
+#include "string.utils.format.h"
 #include "resz/resource.h"
 
 namespace
 {
-#if WINVER < WINVER_2K
+    enum ELEMENT_NAME : int
+    {
+        EN_Desktop,
+        EN_AppBackground,
+        EN_Window,
+        EN_Menu,             // The width affects the icon and caption buttons of MDI children
+        EN_ActiveCaption,    // Title bar of active windows
+        EN_InactiveCaption,  // Title bar of inactive windows
+        EN_SMCaption,        // Title bar of palette (small) windows
+        EN_ActiveBorder,     // Border of active resizable windows
+        EN_InactiveBorder,   // Border of inactive resizable windows
+        EN_Scrollbar,
+        EN_3DObject,
+        EN_3DShadow,         // Not in official applets
+        EN_3DLight,          // Not in official applets
+        EN_SelectedItem,     // Also used for text selection
+        EN_DisabledItem,
+        EN_Tooltip,
+        EN_MsgBox,
+#if WINVER >= WINVER_2K
+        EN_Hyperlink,
+#endif
+#if WINVER >= WINVER_XP
+        EN_FlatmenuBar,
+#endif
+#if WINVER >= WINVER_VISTA
+        /**
+         * Border of windows, including property sheets for some reason.
+         * If SIZE_PADDEDBORDER is > 0, the windows with fixed borders affected also
+         * include SIZE_BORDER
+         */
+        EN_PaddedBorder,
+#endif
+        ELEMENT_Count
+    };
+
+    struct ElementAssignment
+    {
+        PCWSTR   name;
+        int     size1;
+        int     size2;
+        int    color1;
+        int    color2;
+        int      font;
+        int fontColor;
+    };
+
+    #if WINVER < WINVER_2K
     static const int COLORS_COUNT = 25;
 #elif WINVER < WINVER_XP
     static const int COLORS_COUNT = 29;
@@ -24,6 +73,45 @@ namespace
             ReleaseDC(nullptr, screenDc);
         }
         return static_cast<Res>(temp);
+    }
+
+    ElementAssignment const* GetElementAssignment(int dex)
+    {
+        // Assign the color and metric numbers to each element of the combo box
+        //            Name           Size 1                Size 2               Color 1                 Color 2                         Font            Fontcolor
+        static const ElementAssignment gsl_assignment[ELEMENT_Count] =
+        {
+        /* 0*/ {         L"Desktop", -1,                   -1,                  COLOR_DESKTOP,          -1,                             FONT_Desktop,   -1                          },
+        /* 1*/ {   L"AppBackground", -1,                   -1,                  COLOR_APPWORKSPACE,     -1,                             -1,             -1                          },
+        /* 2*/ {          L"Window", -1,                   -1,                  COLOR_WINDOW,           COLOR_WINDOWFRAME,              -1,             COLOR_WINDOWTEXT            },
+        /* 3*/ {            L"Menu", SIZE_MenuHeight,      SIZE_MenuWidth,      COLOR_MENU,             -1,                             FONT_Menu,      COLOR_MENUTEXT              },
+        /* 4*/ {   L"ActiveCaption", SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_ACTIVECAPTION,    COLOR_GRADIENTACTIVECAPTION,    FONT_Caption,   COLOR_CAPTIONTEXT           },
+        /* 5*/ { L"InactiveCaption", SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_INACTIVECAPTION,  COLOR_GRADIENTINACTIVECAPTION,  FONT_Caption,   COLOR_INACTIVECAPTIONTEXT   },
+        /* 6*/ {       L"SMCaption", SIZE_SMCaptionHeight, SIZE_SMCaptionWidth, -1,                     -1,                             FONT_SMCaption, -1                          },
+        /* 7*/ {    L"ActiveBorder", SIZE_Border,          -1,                  COLOR_ACTIVEBORDER,     -1,                             -1,             -1                          },
+        /* 8*/ {  L"InactiveBorder", SIZE_Border,          -1,                  COLOR_INACTIVEBORDER,   -1,                             -1,             -1                          },
+        /* 9*/ {       L"Scrollbar", SIZE_ScrollWidth,     SIZE_ScrollHeight,   COLOR_SCROLLBAR,        -1,                             -1,             -1                          },
+        /*10*/ {        L"3DObject", -1,                   -1,                  COLOR_3DFACE,           -1,                             -1,             COLOR_BTNTEXT               },
+        /*11*/ {        L"3DShadow", -1,                   -1,                  COLOR_3DSHADOW,         COLOR_3DDKSHADOW,               -1,             -1                          },
+        /*12*/ {         L"3DLight", -1,                   -1,                  COLOR_3DHILIGHT,        COLOR_3DLIGHT,                  -1,             -1                          },
+        /*13*/ {    L"SelectedItem", -1,                   -1,                  COLOR_HIGHLIGHT,        -1,                             -1,             COLOR_HIGHLIGHTTEXT         },
+        /*14*/ {    L"DisabledItem", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_GRAYTEXT              },
+        /*15*/ {         L"Tooltip", -1,                   -1,                  COLOR_INFOBK,           -1,                             FONT_Tooltip,   COLOR_INFOTEXT              },
+        /*16*/ {          L"MsgBox", -1,                   -1,                  -1,                     -1,                             FONT_Message,   COLOR_WINDOWTEXT            },
+#if WINVER >= WINVER_2K
+        /*17*/ {       L"Hyperlink", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_HOTLIGHT              },
+#endif
+#if WINVER >= WINVER_XP
+        /*18*/ {     L"FlatmenuBar", -1,                   -1,                  COLOR_MENUBAR,          COLOR_MENUHILIGHT,              -1,             -1                          },
+#endif
+#if WINVER >= WINVER_VISTA
+        /*19*/ {    L"PaddedBorder", SIZE_PaddedBorder,    -1,                  -1,                     -1,                             -1,             -1                          },
+#endif
+        };
+        if (dex < 0 || dex >= ELEMENT_Count) {
+            return nullptr;
+        }
+        return &gsl_assignment[dex];
     }
 }
 
@@ -156,45 +244,6 @@ PCTSTR CTheme::ColorName(int color)
         return nullptr;
     }
     return gsl_ColorName[color];
-}
-
-ElementAssignment const* CTheme::GetElementAssignment(int dex)
-{
-    // Assign the color and metric numbers to each element of the combo box
-    //       Size 1                Size 2               Color 1                 Color 2                         Font            Fontcolor
-    static const ElementAssignment gsl_assignment[Element_Count] =
-    {
-    /* 0*/ { -1,                   -1,                  COLOR_DESKTOP,          -1,                             FONT_Desktop,   -1                          },
-    /* 1*/ { -1,                   -1,                  COLOR_APPWORKSPACE,     -1,                             -1,             -1                          },
-    /* 2*/ { -1,                   -1,                  COLOR_WINDOW,           COLOR_WINDOWFRAME,              -1,             COLOR_WINDOWTEXT            },
-    /* 3*/ { SIZE_MenuHeight,      SIZE_MenuWidth,      COLOR_MENU,             -1,                             FONT_Menu,      COLOR_MENUTEXT              },
-    /* 4*/ { SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_ACTIVECAPTION,    COLOR_GRADIENTACTIVECAPTION,    FONT_Caption,   COLOR_CAPTIONTEXT           },
-    /* 5*/ { SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_INACTIVECAPTION,  COLOR_GRADIENTINACTIVECAPTION,  FONT_Caption,   COLOR_INACTIVECAPTIONTEXT   },
-    /* 6*/ { SIZE_SMCaptionHeight, SIZE_SMCaptionWidth, -1,                     -1,                             FONT_SMCaption, -1                          },
-    /* 7*/ { SIZE_Border,          -1,                  COLOR_ACTIVEBORDER,     -1,                             -1,             -1                          },
-    /* 8*/ { SIZE_Border,          -1,                  COLOR_INACTIVEBORDER,   -1,                             -1,             -1                          },
-    /* 9*/ { SIZE_ScrollWidth,     SIZE_ScrollHeight,   COLOR_SCROLLBAR,        -1,                             -1,             -1                          },
-    /*10*/ { -1,                   -1,                  COLOR_3DFACE,           -1,                             -1,             COLOR_BTNTEXT               },
-    /*11*/ { -1,                   -1,                  COLOR_3DSHADOW,         COLOR_3DDKSHADOW,               -1,             -1                          },
-    /*12*/ { -1,                   -1,                  COLOR_3DHILIGHT,        COLOR_3DLIGHT,                  -1,             -1                          },
-    /*13*/ { -1,                   -1,                  COLOR_HIGHLIGHT,        -1,                             -1,             COLOR_HIGHLIGHTTEXT         },
-    /*14*/ { -1,                   -1,                  -1,                     -1,                             -1,             COLOR_GRAYTEXT              },
-    /*15*/ { -1,                   -1,                  COLOR_INFOBK,           -1,                             FONT_Tooltip,   COLOR_INFOTEXT              },
-    /*16*/ { -1,                   -1,                  -1,                     -1,                             FONT_Message,   COLOR_WINDOWTEXT            },
-#if WINVER >= WINVER_2K
-    /*17*/ { -1,                   -1,                  -1,                     -1,                             -1,             COLOR_HOTLIGHT              },
-#endif
-#if WINVER >= WINVER_XP
-    /*18*/ { -1,                   -1,                  COLOR_MENUBAR,          COLOR_MENUHILIGHT,              -1,             -1                          },
-#endif
-#if WINVER >= WINVER_VISTA
-    /*19*/ { SIZE_PaddedBorder,    -1,                  -1,                     -1,                             -1,             -1                          },
-#endif
-    };
-    if (dex < 0 || dex >= Element_Count) {
-        return nullptr;
-    }
-    return &gsl_assignment[dex];
 }
 
 static int GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size)
@@ -375,7 +424,14 @@ void CTheme::LoadExistingThemes(WTL::CComboBox& themeSel)
 {
     themeSel.ResetContent();
     int item = themeSel.AddString(m_MyName);
-    // ##TODO: handle -1 == item
+    if (item < 0) {
+        auto code = static_cast<HRESULT>(GetLastError());
+        ReportError(
+            Str::ElipsisW::Format(L"Append listbox [w:%08x] item '%s' failed!", 
+                themeSel.m_hWnd, m_MyName.GetString()
+            ), code);
+        return ;
+    }
     themeSel.SetItemDataPtr(item, (void*)this);
     themeSel.SetCurSel(item);
 }
@@ -383,12 +439,28 @@ void CTheme::LoadExistingThemes(WTL::CComboBox& themeSel)
 void CTheme::LoadExistingElements(WTL::CComboBox& itemSel)
 {
     itemSel.ResetContent();
-    for (int iColor = 0; iColor < CLR_Count; iColor++) {
-        int item = itemSel.AddString(ColorName(iColor));
-        // ##TODO: handle -1 == item
-        itemSel.SetItemData(item, static_cast<DWORD_PTR>(iColor));
+    for (int iElement = 0; iElement < ELEMENT_Count; iElement++) {
+        const auto* assignment = GetElementAssignment(iElement);
+        if (!assignment) {
+            auto code = static_cast<HRESULT>(ERROR_ACCESS_DENIED);
+            ReportError(
+                Str::ElipsisW::Format(L"Append listbox [w:%08x] item [%d] '%s' failed!", 
+                    itemSel.m_hWnd, iElement, L"Element::Assignment == NULL"
+                ), code);
+            continue;
+        }
+        int item = itemSel.AddString(assignment->name);
+        if (item < 0) {
+            auto code = static_cast<HRESULT>(GetLastError());
+            ReportError(
+                Str::ElipsisW::Format(L"Append listbox [w:%08x] item [%d] '%s' failed!", 
+                    itemSel.m_hWnd, iElement, assignment->name
+                ), code);
+            continue;
+        }
+        itemSel.SetItemData(item, static_cast<DWORD_PTR>(iElement));
     }
-    //itemSel.SetCurSel(CLR_Background);
+    itemSel.SetCurSel(EN_Desktop);
 }
 
 void CTheme::InitUI(CPageAppearance& uiPage)
