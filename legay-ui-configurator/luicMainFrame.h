@@ -18,6 +18,8 @@ struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
     ~CMainFrame() override;
     CMainFrame(Conf::Section const& parentSettings);
 
+    void SetStatus(int status, ATL::CStringW&& message);
+
 private:
     CRect            m_rcMainFrame;
     Conf::Section       m_Settings;

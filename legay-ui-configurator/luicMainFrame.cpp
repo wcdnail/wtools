@@ -2,8 +2,11 @@
 #include "luicMainFrame.h"
 #include "luicMain.h"
 #include "rect.putinto.h"
+#include "dh.tracing.defs.h"
 #include "resz/resource.h"
 #include <atlwin.h>
+
+#include "dh.tracing.h"
 
 CMainFrame::~CMainFrame()
 {
@@ -15,6 +18,16 @@ CMainFrame::CMainFrame(Conf::Section const& parentSettings)
     ,    m_Settings{ parentSettings, L"MainFrame" }
 {
     Rc::PutInto(Rc::Screen, m_rcMainFrame, Rc::Center);
+}
+
+void CMainFrame::SetStatus(int status, ATL::CStringW&& message)
+{
+    DH::ThreadPrintf(LTH_STATUS L" [s:%d] %s\n", status, message.GetString());
+    if (!m_SBar.m_hWnd) {
+        return;
+    }
+    m_SBar.SetPaneText(ID_DEFAULT_PANE, message.GetString());
+    m_SBar.Invalidate(TRUE);
 }
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)

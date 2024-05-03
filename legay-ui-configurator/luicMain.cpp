@@ -33,6 +33,15 @@ CTheme CLegacyUIConfigurator::g_ThemeNative{ true };
 CLegacyUIConfigurator* CLegacyUIConfigurator::g_pApp{ nullptr };
 std::recursive_mutex CLegacyUIConfigurator::m_pAppMx{};
 
+void SetMFStatus(int status, PCWSTR format, ...)
+{
+    va_list ap;
+    va_start(ap, format);
+    Str::ElipsisW::String message = Str::ElipsisW::FormatV(format, ap);
+    va_end(ap);
+    CLegacyUIConfigurator::App()->SetMainFrameStatus(status, std::move(message));
+}
+
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
 {
     ATL::CStringA msg = Str::ErrorCode<char>::SystemMessage(code);
@@ -104,6 +113,11 @@ CMenu const& CLegacyUIConfigurator::GetTestMenu() const
     return m_TestMenu;
 }
 
+void CLegacyUIConfigurator::SetMainFrameStatus(int status, ATL::CStringW&& message)
+{
+    m_MainFrame.SetStatus(status, std::move(message));
+}
+
 HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID)
 {
     HRESULT code = CAppModule::Init(pObjMap, hInstance, pLibID);
@@ -122,6 +136,7 @@ HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINST
 
 CLegacyUIConfigurator* CLegacyUIConfigurator::App()
 {
+    std::lock_guard<std::recursive_mutex> guard(m_pAppMx);
     if (!g_pApp) {
         throw std::logic_error("CLegacyUIConfigurator::App is NULL");
     }

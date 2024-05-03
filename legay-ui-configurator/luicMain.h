@@ -19,6 +19,15 @@ enum IconIndex : int
     IconCount
 };
 
+enum MFStatus: int
+{
+    STA_Info = 0,
+    STA_Warning,
+    STA_Error,
+};
+
+void SetMFStatus(int status, PCWSTR format, ...);
+
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 
@@ -36,6 +45,7 @@ public:
     CMenu const& GetTestMenu() const;
     CIconCollectionFile const& ShellIcons() const;
     CImageList const& GetImageList() const;
+    void SetMainFrameStatus(int status, ATL::CStringW&& message);
 
     HRESULT Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID = NULL);
     HRESULT Run(HINSTANCE instHnd, int showCmd);

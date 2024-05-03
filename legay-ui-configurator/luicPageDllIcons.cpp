@@ -4,6 +4,7 @@
 #include "string.utils.format.h"
 #include "UT/debug.assistance.h"
 #include "resz/resource.h"
+#include <filesystem>
 
 enum : int { LV_MakeInsert = 0 };
 
@@ -85,6 +86,7 @@ void CPageDllIcons::OnCollectionLoad(CIconCollectionFile const& collection)
             }
         }
         while (false);
+        SetMFStatus(STA_Info, L"Collection '%s' loaded norm", m_CurrFilename.c_str());
     }
     catch (std::exception const& ex) {
         auto code = static_cast<HRESULT>(GetLastError());
@@ -140,20 +142,42 @@ static HRESULT IFileDialog_GetDisplayName(IFileDialog& dlgImpl, std::wstring& ta
     return S_OK;
 }
 
-void CPageDllIcons::AttemptToLoadNew(std::wstring const& filename)
+void CPageDllIcons::ExportMultiple(UINT count)
 {
-    CIconCollectionFile tempFile;
-    if (!tempFile.Load(filename.c_str(), true)) {
-        auto code = static_cast<HRESULT>(GetLastError());
-        SetError(code, L"Loading new collections from '%s' failed.", filename.c_str());
+    WTL::CFolderDialog dlg{ m_hWnd, L"Choose export dir" };
+    const auto rv = dlg.DoModal(m_hWnd);
+    if (IDOK != rv) {
+        SetMFStatus(STA_Warning, L"Export canceled");
         return ;
     }
-    OnCollectionLoad(tempFile);
+    std::wstring tempFilename = dlg.GetFolderPath();
+    AttemptToSaveSelected(tempFilename, count);
 }
 
-void CPageDllIcons::AttemptToSaveSelected(std::wstring const& filename)
+static void AddExtIfItAbsent(std::wstring& filename, PCWSTR ext)
 {
+    auto n = filename.rfind(L'.');
+    if (std::wstring::npos == n) {
+        filename += ext;
+    }
+}
 
+void CPageDllIcons::ExportSinle()
+{
+    WTL::CShellFileSaveDialog dlg{ nullptr, FOS_FORCESHOWHIDDEN | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_OVERWRITEPROMPT };
+    const auto rv = dlg.DoModal(m_hWnd);
+    if (IDOK != rv) {
+        SetMFStatus(STA_Warning, L"Export canceled");
+        return ;
+    }
+    std::wstring tempFilename;
+    HRESULT code = IFileDialog_GetDisplayName(*dlg.m_spFileDlg, tempFilename);
+    if (FAILED(code)) {
+        SetError(code, L"File dialog failed.");
+        return ;
+    }
+    AddExtIfItAbsent(tempFilename, L".ico");
+    AttemptToSaveSelected(tempFilename, 1);
 }
 
 void CPageDllIcons::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
@@ -161,24 +185,24 @@ void CPageDllIcons::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     DWORD viewType = LV_VIEW_ICON;
     switch (nID) {
     case IDC_BN_EXPORT_SEL: {
-        WTL::CShellFileSaveDialog dlg{};
-        const auto rv = dlg.DoModal(m_hWnd);
-        if (IDOK != rv) {
+        const UINT selCount = m_lvView.GetSelectedCount();
+        if (selCount < 1) {
+            SetMFStatus(STA_Warning, L"Just select item(s) before export");
             return ;
         }
-        std::wstring tempFilename;
-        HRESULT code = IFileDialog_GetDisplayName(*dlg.m_spFileDlg, tempFilename);
-        if (FAILED(code)) {
-            SetError(code, L"File dialog failed.");
-            return ;
+        if (selCount > 1) {
+            ExportMultiple(selCount);
         }
-        AttemptToSaveSelected(tempFilename);
-        return;
+        else {
+            ExportSinle();
+        }
+        return ;
     }
     case IDC_BN_OPEN_DLG: {
-        WTL::CShellFileOpenDialog dlg{ m_CurrFilename.c_str() };
+        WTL::CShellFileOpenDialog dlg{ m_CurrFilename.c_str(), FOS_FORCESHOWHIDDEN | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST };
         const auto rv = dlg.DoModal(m_hWnd);
         if (IDOK != rv) {
+            SetMFStatus(STA_Warning, L"Import canceled");
             return ;
         }
         std::wstring tempFilename;
@@ -213,16 +237,8 @@ namespace
 struct HDropWrapper
 {
     HDROP m_hDrop;
-    HDropWrapper(HDROP hDrop)
-        : m_hDrop { hDrop }
-    {
-    }
-    ~HDropWrapper()
-    {
-        if (m_hDrop) {
-            DragFinish(m_hDrop);
-        }
-    }
+    HDropWrapper(HDROP hDrop): m_hDrop { hDrop } {}
+    ~HDropWrapper() { if (m_hDrop) { DragFinish(m_hDrop); } }
     static BOOL IsInClientRect(HDROP hDrop, HWND hWnd)
     {
         CPoint p;
@@ -231,11 +247,7 @@ struct HDropWrapper
         GetClientRect(hWnd, rc);
         return PtInRect(&rc, p);
     }
-    UINT FileCount(void) const
-    {
-        return DragQueryFileW(m_hDrop, static_cast<UINT>(-1), nullptr, 0);
-    }
-
+    UINT FileCount(void) const { return DragQueryFileW(m_hDrop, static_cast<UINT>(-1), nullptr, 0); }
     ATL::CStringW QueryFile(UINT index)
     {
         ATL::CStringW temp;
@@ -254,12 +266,96 @@ void CPageDllIcons::OnDropFiles(HDROP hDropInfo)
     }
     HDropWrapper drop(hDropInfo);
     UINT count = drop.FileCount();
+    if (count > 1) {
+        SetMFStatus(STA_Warning, L"Dropped more than one file (%d), load first", count);
+    }
     for (UINT i = 0; i < count; i++) {
         auto pathname = drop.QueryFile(i);
         if (!pathname.IsEmpty()) {
             AttemptToLoadNew(std::wstring{ pathname.GetString(), static_cast<size_t>(pathname.GetLength()) });
+            // ##TODO: handle multiple files
             break; // https://www.codeproject.com/Articles/6166/Dropping-Files-into-a-WTL-Window-The-Easy-Way
             // Вместо break; в оригинале было i = count + 10 )))
         }
     }
+}
+
+void CPageDllIcons::AttemptToLoadNew(std::wstring const& filename)
+{
+    CIconCollectionFile tempFile;
+    if (!tempFile.Load(filename.c_str(), true)) {
+        auto code = static_cast<HRESULT>(GetLastError());
+        SetError(code, L"Loading new collections from '%s' failed.", filename.c_str());
+        return ;
+    }
+    OnCollectionLoad(tempFile);
+}
+
+void CPageDllIcons::AttemptToSaveSelected(std::wstring const& filename, UINT count)
+{
+    SetMFStatus(STA_Info, L"Begin export #%d item(s) to '%s'", count, filename.c_str());
+
+    bool needBig = false;
+    switch (m_lvView.GetView()) {
+    case LV_VIEW_ICON:
+    case LV_VIEW_TILE:
+        needBig = true;
+        break;
+    }
+    std::wstring const* pFileName = &filename;
+    std::wstring nextFilename;
+
+    bool noErrors = true;
+    int it = -1;
+    for (UINT n = 0; n < count; n++) {
+        it = m_lvView.GetNextItem(it, LVIS_SELECTED);
+        if (-1 == it) {
+            break;
+        }
+        if (!ExportIcon(it, needBig, *pFileName)) {
+            noErrors = false;
+            break;
+        }
+    }
+
+    if (noErrors) {
+        SetMFStatus(STA_Info, L"Export #%d item(s) to '%s' done", count, filename.c_str());
+    }
+}
+
+bool CPageDllIcons::ExportIcon(int it, bool needBig, std::wstring const& filename)
+{
+    HRESULT      code = S_OK;
+    CImageList& ilSrc = needBig ? m_ilBig : m_ilSmall;
+    HICON        icon = ilSrc.GetIcon(it);
+    if (!icon) {
+        code = static_cast<HRESULT>(GetLastError());
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    PICTDESC           sPictDesc = { sizeof(sPictDesc), PICTYPE_ICON };
+    ATL::CComPtr<IPicture> pPict = {};
+    ATL::CComPtr<IStream>  pStrm = {};
+    LONG                  cbSize = 0;
+    sPictDesc.icon.hicon = icon;
+    code = OleCreatePictureIndirect(&sPictDesc, IID_IPicture, FALSE, reinterpret_cast<void**>(&pPict));
+    if (FAILED(code)) {
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    code = SHCreateStreamOnFileW(filename.c_str(), STGM_WRITE | STGM_CREATE, &pStrm);
+    if (FAILED(code)) {
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    code = pPict->SaveAsFile(pStrm, TRUE, &cbSize);
+    if (FAILED(code)) {
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
+            Str::ErrorCode<>::SystemMessage(code).GetString());
+        return false;
+    }
+    return true;
 }
