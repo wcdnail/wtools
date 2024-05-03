@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "luicMainFrameDlg.h"
+#include "luicMainView.h"
 #include "luicMain.h"
 #include "luicBackground.h"
 #include "luicScreenSaver.h"

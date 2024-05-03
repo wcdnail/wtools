@@ -65,7 +65,7 @@
     <ClInclude Include="luicPageDllIcons.h">
       <Filter>pages</Filter>
     </ClInclude>
-    <ClInclude Include="luicMainFrameWnd.h" />
+    <ClInclude Include="luicMainFrame.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -110,7 +110,7 @@
     <ClCompile Include="luicPageDllIcons.cpp">
       <Filter>pages</Filter>
     </ClCompile>
-    <ClCompile Include="luicMainFrameWnd.cpp" />
+    <ClCompile Include="luicMainFrame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resz\legay-ui-configurator.rc">
