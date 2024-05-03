@@ -127,7 +127,7 @@ HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINST
         return code;
     }
     static const ATL::CStringW shell32dll = L"%SYSTEMROOT%\\System32\\shell32.dll";
-    if (!m_ShellIcons.Load(shell32dll.GetString())) {
+    if (!m_ShellIcons.Load(shell32dll.GetString(), false)) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Load DLL '%s' icon collection failed!", shell32dll.GetString()), code, false, MB_ICONWARNING);
     }

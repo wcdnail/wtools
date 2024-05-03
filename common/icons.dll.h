@@ -15,7 +15,7 @@ public:
     WCDAFX_API ~CIconCollectionFile();
     WCDAFX_API CIconCollectionFile();
 
-    WCDAFX_API bool Load(PCWSTR pathname);
+    WCDAFX_API bool Load(PCWSTR pathname, bool withSmall);
     std::wstring const& GetFilename() const;
 
 private:

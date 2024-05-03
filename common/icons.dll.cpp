@@ -38,16 +38,14 @@ static CIconCollectionFile::IconArray ConvertToManaged(RawIconArray const& raw, 
     return result;
 }
 
-using TempModPtr = std::shared_ptr<void>;
-
-bool CIconCollectionFile::Load(PCWSTR pathname)
+bool CIconCollectionFile::Load(PCWSTR pathname, bool withSmall)
 {
     UINT          targetCount = {0};
     UINT          loadedCount = {0};
-    RawIconArray       target = {};
+    HICON*        targetSmPtr = { nullptr };
     RawIconArray     targetSm = {};
+    RawIconArray       target = {};
     std::wstring tempPathname = {};
-    TempModPtr         module = {};
     if (!pathname) {
         SetLastError(ERROR_PATH_NOT_FOUND);
         return false;
@@ -64,17 +62,16 @@ bool CIconCollectionFile::Load(PCWSTR pathname)
         tempStr.ReleaseBufferSetLength(pathLen);
         tempPathname = std::wstring{ tempStr.GetString(), static_cast<size_t>(tempStr.GetLength()) };
     }
-    module = TempModPtr(LoadLibraryExW(tempPathname.c_str(), nullptr, LOAD_LIBRARY_AS_IMAGE_RESOURCE), FreeLibrary);
-    if (!module) {
-        return false;
-    }
     targetCount  = ExtractIconExW(tempPathname.c_str(), -1, nullptr, nullptr, 0);
     if (UINT_MAX == targetCount || targetCount < 1) {
         return false;
     }
-    target      = RawIconArray(targetCount);
-    targetSm    = RawIconArray(targetCount);
-    loadedCount = ExtractIconExW(pathname, -1, &target[0], &targetSm[0], targetCount);
+    target = RawIconArray(targetCount);
+    if (withSmall) {
+        targetSm = RawIconArray(targetCount);
+        targetSmPtr = &targetSm[0];
+    }
+    loadedCount = ExtractIconExW(pathname, 0, &target[0], targetSmPtr, targetCount);
     if (loadedCount != targetCount) {
         const auto code = static_cast<HRESULT>(GetLastError());
         if (ERROR_SUCCESS == code) {
@@ -82,8 +79,15 @@ bool CIconCollectionFile::Load(PCWSTR pathname)
         }
         return false;
     }
-    IconArray managedSm = ConvertToManaged(target, loadedCount);
-    IconArray   managed = ConvertToManaged(target, loadedCount);
+    IconArray managedSm;
+    if (withSmall) {
+        managedSm = ConvertToManaged(target, loadedCount);
+        if (!managedSm) {
+            SetLastError(ERROR_INVALID_DATA);
+            return false;
+        }
+    }
+    IconArray managed = ConvertToManaged(target, loadedCount);
     if (!managed) {
         SetLastError(ERROR_INVALID_DATA);
         return false;

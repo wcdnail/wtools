@@ -21,11 +21,12 @@ void CPageDllIcons::OnFileLoaded(CIconCollectionFile const& collection)
 
     try {
         if (collection.GetFilename().empty()) {
-            m_bnBrowse.SetWindowTextW(L"error...");
+            m_edPath.SetWindowTextW(L"error loading icons...");
         }
         else {
-            m_bnBrowse.SetWindowTextW(collection.GetFilename().c_str());
+            m_edPath.SetWindowTextW(collection.GetFilename().c_str());
         }
+
     }
     catch (std::exception const& ex) {
         auto code = static_cast<HRESULT>(GetLastError());
