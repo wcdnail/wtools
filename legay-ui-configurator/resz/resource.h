@@ -19,6 +19,7 @@
 #define IDC_TEST_STA2                   208
 #define IDD_PAGE_SCREENSAVER            208
 #define IDR_APP_ACCEL                   208
+#define IDR_CLEGACYUI_MAINFRAME         208
 #define IDC_TEST_STA3                   209
 #define IDD_PAGE_EFFECTS                209
 #define IDI_MON_BRUSH                   209

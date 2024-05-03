@@ -15,6 +15,7 @@
     <ClCompile Include="rect.alloc.cpp" />
     <ClCompile Include="shell.imagelist.cpp" />
     <ClCompile Include="icons.dll.cpp" />
+    <ClCompile Include="settings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -50,6 +51,7 @@
     <ClInclude Include="rect.screen.h" />
     <ClInclude Include="shell.imagelist.h" />
     <ClInclude Include="icons.dll.h" />
+    <ClInclude Include="settings.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

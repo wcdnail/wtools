@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "luicMainFrameWnd.h"
+#include "luicMainFrame.h"
 #include "luicMain.h"
+#include "rect.putinto.h"
 #include "resz/resource.h"
 #include <atlwin.h>
 
@@ -8,9 +9,12 @@ CMainFrame::~CMainFrame()
 {
 }
 
-CMainFrame::CMainFrame()
-    : Super()
+CMainFrame::CMainFrame(Conf::Section const& parentSettings)
+    :         Super{}
+    , m_rcMainFrame{ 0, 0, 600, 800 }
+    ,    m_Settings{ parentSettings, L"MainFrame" }
 {
+    Rc::PutInto(Rc::Screen, m_rcMainFrame, Rc::Center);
 }
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
@@ -18,9 +22,6 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
     if (Super::PreTranslateMessage(pMsg)) {
         return TRUE;
     }
-  //if (m_pView && m_pView->PreTranslateMessage(pMsg)) {
-  //    return TRUE;
-  //}
     return FALSE;
 }
 
@@ -32,6 +33,9 @@ BOOL CMainFrame::OnIdle()
 int CMainFrame::OnCreate(LPCREATESTRUCT)
 {
     auto const* pApp = CLegacyUIConfigurator::App();
+
+    FromSettings(m_Settings, m_rcMainFrame);
+    MoveWindow(m_rcMainFrame);
 
     HICON tempIco = pApp->GetIcon(IconMain);
     SetIcon(tempIco, FALSE);
@@ -47,16 +51,13 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
     };
     m_SBar.SetPanes(arrParts, _countof(arrParts), false);
 
-    CRect rc;
-    GetClientRect(rc);
-    rc.InflateRect(1, 1);
 
     CMessageLoop* pLoop = pApp->GetMessageLoop();
     ATLASSERT(pLoop != nullptr);
     pLoop->AddMessageFilter(this);
     pLoop->AddIdleHandler(this);
 
-    DlgResize_Init(false, false);
+    DlgResize_Init(false, true);
     return 0;
 }
 
@@ -69,9 +70,7 @@ void CMainFrame::OnDestroy()
 
     bool isMaximized = (TRUE == IsZoomed());
     if(!isMaximized) {
-        CRect rc;
-        GetWindowRect(rc);
-        // TODO: save rc
+        GetWindowRect(m_rcMainFrame);
     }
 
     PostQuitMessage(0);

@@ -2,7 +2,6 @@
 #include "settings.h"
 #include <dh.tracing.h>
 #include <info/runtime.information.h>
-#include <boost/scoped_array.hpp>
 #include <iomanip>
 #include <string_view>
 

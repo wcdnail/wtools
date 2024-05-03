@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "crash.report.static", "comm
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "afx", "afx", "{35068A65-9871-4EF2-95FA-A9C78EC89BEE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "exa", "exa", "{F694488A-5AC2-411E-9B1F-9BA107E43530}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Console|x64 = Debug Console|x64
@@ -108,6 +110,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{8D82B44E-3068-464B-80F3-EA456AEC7351} = {35068A65-9871-4EF2-95FA-A9C78EC89BEE}
 		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3} = {35068A65-9871-4EF2-95FA-A9C78EC89BEE}
+		{A2D9E803-0EFB-43EF-81B8-7B2EECF1F5B9} = {F694488A-5AC2-411E-9B1F-9BA107E43530}
 		{5674E577-A52F-4283-9D88-F0957298D298} = {35068A65-9871-4EF2-95FA-A9C78EC89BEE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

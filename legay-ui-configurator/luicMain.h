@@ -1,8 +1,9 @@
 #pragma once
 
-#include "luicMainFrameWnd.h"
+#include "luicMainFrame.h"
 #include "luicTheme.h"
 #include "icons.dll.h"
+#include "settings.h"
 #include <atlapp.h>
 #include <mutex>
 
@@ -21,13 +22,15 @@ enum IconIndex : int
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 
-struct CLegacyUIConfigurator: CAppModule
+class CLegacyUIConfigurator: public CAppModule
 {
+public:
     using Super = CAppModule;
 
     ~CLegacyUIConfigurator() override;
     CLegacyUIConfigurator();
 
+    Conf::Section& GetSettings();
     CTheme& CurrentTheme() const;
     HICON GetIcon(int icon) const;
     CMenu const& GetTestMenu() const;
@@ -40,8 +43,9 @@ struct CLegacyUIConfigurator: CAppModule
     static CLegacyUIConfigurator* App();
 
 private:
-    //friend Super;
+    friend Super;
 
+    Conf::Section         m_Settings;
     CMainFrame           m_MainFrame;
     CImageList              m_ImList;
     CMenu                 m_TestMenu;

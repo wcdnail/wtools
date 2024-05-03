@@ -76,7 +76,8 @@ CLegacyUIConfigurator::~CLegacyUIConfigurator()
 
 CLegacyUIConfigurator::CLegacyUIConfigurator()
     :       Super{}
-    , m_MainFrame{}
+    ,  m_Settings{ L"CLegacyUIConfigurator" }
+    , m_MainFrame{ m_Settings }
     ,    m_ImList{}
 {
     {
@@ -173,7 +174,6 @@ HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
     try {
         Initialize::OLE               ole;
         Initialize::CommonControls cctrls;
-        HWND                         hwnd;
         CMessageLoop                 loop;
 
         hr = Initialize(nullptr, instHnd);
@@ -182,13 +182,12 @@ HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
             return hr;
         }
         if (!AddMessageLoop(&loop)) {
-            hr = GetLastError();
+            hr = static_cast<HRESULT>(GetLastError());
             ReportError(L"MessageLoop append failure!", hr, true);
             return hr;
         }
-        hwnd = m_MainFrame.Create(::GetActiveWindow());
-        if (!hwnd) {
-            hr = ::GetLastError();
+        if (!m_MainFrame.CreateEx(GetActiveWindow())) {
+            hr = static_cast<HRESULT>(GetLastError());
             ReportError(L"MainFrame creation failure!", hr, true);
             return hr;
         }

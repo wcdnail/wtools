@@ -7,7 +7,6 @@
 #include "wcdafx.api.h"
 #include "rectz.h"
 #include "settings.details.h"
-#include <boost/noncopyable.hpp>
 #include <unordered_map>
 #include <string>
 #include <memory>
@@ -35,8 +34,9 @@ namespace Conf
     // Under MS Windows - it's a registry.
     // Under *nix it's mau be a usual text file.
     //
-    class Storage: boost::noncopyable
+    class Storage
     {
+        DELETE_COPY_MOVE_OF(Storage);
     public:
         WCDAFX_API virtual ~Storage();
         virtual bool Open(std::wstring_view name, int flags = ConfCurrentUser) = 0;
@@ -57,8 +57,10 @@ namespace Conf
     //
     // VarBase
     //
-    struct VarBase: boost::noncopyable
+    struct VarBase
     {
+        DELETE_COPY_MOVE_OF(VarBase);
+
         WCDAFX_API virtual ~VarBase();
         virtual void Assign(std::wstring_view) = 0;
         virtual std::wstring const& GetName() const = 0;
@@ -190,8 +192,10 @@ namespace Conf
     // Связывает обычные переменные
     // с их конфигурационным представлением 
     //
-    class Section: boost::noncopyable
+    class Section
     {
+        DELETE_COPY_MOVE_OF(Section);
+
     public:
         WCDAFX_API Section(std::string const& name, unsigned flags = ConfCurrentUser | ConfAutosave);
         WCDAFX_API Section(std::wstring const& name, unsigned flags = ConfCurrentUser | ConfAutosave);
@@ -225,8 +229,10 @@ namespace Conf
         mutable SectionVec Sections;
     };
 
-    class WatchDog: boost::noncopyable
+    class WatchDog
     {
+        DELETE_COPY_MOVE_OF(WatchDog);
+
     public:
         WCDAFX_API ~WatchDog();
         WCDAFX_API WatchDog(Section& client);
