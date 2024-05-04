@@ -13,27 +13,31 @@ enum : int { LV_MakeInsert = 0 };
 
 CPageDllIcons::~CPageDllIcons()
 {
+    DetachImageLists();
 }
 
 CPageDllIcons::CPageDllIcons()
-    : CPageImpl(IDD_PAGE_DLL_FILE_ICONS)
+    :      CPageImpl{ IDD_PAGE_DLL_FILE_ICONS }
+    ,       m_edPath{}
+    ,     m_bnBrowse{}
+    ,     m_bnExport{}
+    ,       m_lvView{}
+    ,        m_il32x32{}
+    ,      m_il16x16{}
+    , m_CurrFilename{}
+    ,   m_bManagedIl{ false }
 {
 }
 
 void CPageDllIcons::DetachImageLists()
 {
-    auto const* app = CLegacyUIConfigurator::App();
-    if (m_ilSmall.m_hImageList != app->GetImageList(IL_Shell32Small).m_hImageList) {
-        m_ilSmall.Attach(nullptr);
+    if (m_bManagedIl) {
+        WTL::CImageListManaged ilSmall = m_il16x16.Detach();
+        WTL::CImageListManaged   ilBig = m_il32x32.Detach();
     }
     else {
-        m_ilSmall.m_hImageList = nullptr;
-    }
-    if (m_ilBig.m_hImageList != app->GetImageList(IL_Shell32).m_hImageList) {
-        m_ilBig.Attach(nullptr);
-    }
-    else {
-        m_ilBig.m_hImageList = nullptr;
+        m_il16x16.Attach(nullptr);
+        m_il32x32.Attach(nullptr);
     }
 }
 
@@ -81,18 +85,19 @@ void CPageDllIcons::SetError(HRESULT code, PCWSTR format, ...)
     }
 }
 
-void CPageDllIcons::OnCollectionLoad(CIconCollectionFile const& collection)
+void CPageDllIcons::OnCollectionLoad(CIconCollectionFile& collection)
 {
     Reset();
-    WTL::CImageList tempIl = collection.MakeImageList(true);
+    WTL::CImageListManaged tempIl = collection.MakeImageList(32, 32);
     if (!tempIl.m_hImageList) {
         const auto code = static_cast<HRESULT>(GetLastError());
         SetError(code, L"ImageList creation from collection '%s' failed", collection.GetFilename().c_str());
         return ;
     }
-    WTL::CImageList tempIlSm = collection.MakeImageList(false);
-    m_ilSmall.Attach(tempIlSm.Detach());
-    m_ilBig.Attach(tempIl.Detach());
+    WTL::CImageListManaged tempIlSm = collection.MakeImageList(16, 16);
+    m_il16x16.Attach(tempIlSm.Detach());
+    m_il32x32.Attach(tempIl.Detach());
+    m_bManagedIl = true;
     m_CurrFilename = collection.GetFilename();
     PopulateViews();
 }
@@ -105,13 +110,13 @@ void CPageDllIcons::PopulateViews()
 
     try {
         do {
-            m_lvView.SetImageList(m_ilBig, LVSIL_NORMAL);
-            if (m_ilSmall.GetImageCount() > 0) {
-                m_lvView.SetImageList(m_ilSmall, LVSIL_SMALL);
+            m_lvView.SetImageList(m_il32x32, LVSIL_NORMAL);
+            if (m_il16x16.GetImageCount() > 0) {
+                m_lvView.SetImageList(m_il16x16, LVSIL_SMALL);
             }
             m_edPath.SetWindowTextW(m_CurrFilename.c_str());
             ATL::CStringW itemStr;
-            for (int i = 0; i < m_ilBig.GetImageCount(); i++) {
+            for (int i = 0; i < m_il32x32.GetImageCount(); i++) {
                 itemStr.Format(L"#%3d", i);
                 m_lvView.AddItem(i, LV_MakeInsert, itemStr, i);
             }
@@ -146,8 +151,9 @@ BOOL CPageDllIcons::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_bnExport.SetIcon(app->GetIcon(IconFloppy));
 
     m_CurrFilename = SHELL32_PATHNAME;
-    m_ilSmall.m_hImageList = app->GetImageList(IL_Shell32Small);
-    m_ilBig.m_hImageList = app->GetImageList(IL_Shell32);
+    m_il16x16.Attach(app->GetImageList(IL_SHELL_16x16));
+    m_il32x32.Attach(app->GetImageList(IL_SHELL_32x32));
+    m_bManagedIl = false;
     PopulateViews();
     DragAcceptFiles(m_hWnd, TRUE);
 
@@ -364,9 +370,9 @@ void CPageDllIcons::AttemptToSaveSelected(std::wstring const& filename, UINT cou
 
 bool CPageDllIcons::ExportIconOLE(int it, bool needBig, std::wstring const& filename)
 {
-    HRESULT     code = S_OK;
-    ImageList& ilSrc = needBig ? m_ilBig : m_ilSmall;
-    HICON       icon = ilSrc.GetIcon(it);
+    HRESULT      code = S_OK;
+    CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
+    HICON        icon = ilSrc.GetIcon(it);
     if (!icon) {
         code = static_cast<HRESULT>(GetLastError());
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
@@ -403,9 +409,9 @@ bool CPageDllIcons::ExportIconGDIP(int it, bool needBig, std::wstring const& fil
 {
     using GdipBitmapPtr = std::unique_ptr<Gdiplus::Bitmap>;
 
-    HRESULT     code = S_OK;
-    ImageList& ilSrc = needBig ? m_ilBig : m_ilSmall;
-    HICON       icon = ilSrc.GetIcon(it);
+    HRESULT      code = S_OK;
+    CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
+    HICON        icon = ilSrc.GetIcon(it);
     if (!icon) {
         code = static_cast<HRESULT>(GetLastError());
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
@@ -431,9 +437,9 @@ bool CPageDllIcons::ExportIconGDIP(int it, bool needBig, std::wstring const& fil
 
 bool CPageDllIcons::ExportIconOLE2(int it, bool needBig, std::wstring const& filename)
 {
-    HRESULT     code = S_OK;
-    ImageList& ilSrc = needBig ? m_ilBig : m_ilSmall;
-    HICON       icon = ilSrc.GetIcon(it);
+    HRESULT      code = S_OK;
+    CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
+    HICON        icon = ilSrc.GetIcon(it);
     if (!icon) {
         code = static_cast<HRESULT>(GetLastError());
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
@@ -497,9 +503,9 @@ BOOL SaveIcon3(PCTSTR szIconFile, HICON hIcon[], int nNumIcons);
 
 bool CPageDllIcons::ExportIconPLAIN(int it, bool needBig, std::wstring const& filename)
 {
-    HRESULT     code = S_OK;
-    ImageList& ilSrc = needBig ? m_ilBig : m_ilSmall;
-    HICON       icon = ilSrc.GetIcon(it, ILD_TRANSPARENT);
+    HRESULT      code = S_OK;
+    CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
+    HICON        icon = ilSrc.GetIcon(it, ILD_TRANSPARENT);
     if (!icon) {
         code = static_cast<HRESULT>(GetLastError());
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),

@@ -37,6 +37,16 @@ CIconHandle LoadShellIcon(ATL::CStringW const& entry, UINT flags = SHGFI_SMALLIC
 
 struct CDrawRoutine::StaticInit
 {
+    enum : int
+    {
+        ICON_InactiveWnd = 0,
+        ICON_ActiveWnd,
+        ICON_Desktop1,
+        ICON_Desktop2,
+        ICON_Desktop3,
+        ICON_Count
+    };
+
     using DrawCaptionTempWFn = BOOL(WINAPI*)(HWND hWnd, HDC dc, const RECT* pRect, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags);
     using SetSysColorsTempFn = DWORD_PTR(WINAPI*)(const COLORREF* pPens, const HBRUSH* pBrushes, DWORD_PTR n);
     using  DrawMenuBarTempFn = int(WINAPI*)(HWND hWnd, HDC dc, RECT* pRect, HMENU hMenu, HFONT hFont);
@@ -45,10 +55,7 @@ struct CDrawRoutine::StaticInit
     DrawCaptionTempWFn DrawCaptionTempW;
     SetSysColorsTempFn SetSysColorsTemp;
     DrawMenuBarTempFn   DrawMenuBarTemp;
-
-    CImageList m_ShellIcons;
-    HICON   m_IconActiveWnd;
-    HICON m_IconInactiveWnd;
+    HICON           m_hIcon[ICON_Count];
 
     static StaticInit& instance()
     {
@@ -77,12 +84,13 @@ private:
         GetProcAddressEX(USER32, DrawMenuBarTemp);
 
         srand(static_cast<int>(time(nullptr)));
-        auto const&     il = CLegacyUIConfigurator::App()->GetImageList(IL_Shell32Small);
+        auto const&     il = CLegacyUIConfigurator::App()->GetImageList(IL_SHELL_16x16);
         const int maxCount = il.GetImageCount();
-        const int     dex1 = rand() % maxCount;
-        const int     dex2 = rand() % maxCount;
-        m_IconActiveWnd = il.GetIcon(dex1);
-        m_IconInactiveWnd = il.GetIcon(dex2);
+
+        for (int i=0; i<ICON_Count; i++) {
+            const int sellIconIndex = rand() % maxCount;
+            m_hIcon[i] = il.GetIcon(sellIconIndex);
+        }
     }
 
     ~StaticInit()
@@ -97,9 +105,8 @@ private:
         ,  DrawCaptionTempW{ nullptr }
         ,  SetSysColorsTemp{ nullptr }
         ,   DrawMenuBarTemp{ nullptr }
-        ,   m_IconActiveWnd{}
-        , m_IconInactiveWnd{}
     {
+        ZeroMemory(&m_hIcon, sizeof(m_hIcon));
         Init();
     }
 };
@@ -478,6 +485,7 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
 
 void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
 {
+    HICON const*          icons = StaticInit::instance().m_hIcon;
     WindowRects const&    rects = params.rects;
     HFONT              menuFont = m_Theme.GetFont(FONT_Menu);
     HFONT              captFont = m_Theme.GetFont(FONT_Caption);
@@ -489,8 +497,8 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
     const bool         isActive = (0 != (DC_ACTIVE & params.captFlags));
 
     if (!isToolWnd) {
-        if (isActive) { captIcon = StaticInit::instance().m_IconActiveWnd; }
-        else          { captIcon = StaticInit::instance().m_IconInactiveWnd; }
+        if (isActive) { captIcon = icons[StaticInit::ICON_ActiveWnd]; }
+        else          { captIcon = icons[StaticInit::ICON_InactiveWnd]; }
         if (captIcon) { captFlags |= DC_ICON; }
     }
     if (m_Theme.IsGradientCaptions()) {

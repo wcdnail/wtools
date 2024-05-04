@@ -66,29 +66,32 @@ bool CIconCollectionFile::Load(PCWSTR pathname, bool withSmall)
     return true;
 }
 
-WTL::CImageList CIconCollectionFile::MakeImageList(bool bigIcons, UINT flags /*= ILC_MASK | ILC_COLOR32*/) const
+WTL::CImageListManaged CIconCollectionFile::MakeImageList(int icoCx, int icoCy, UINT flags /*= ILC_MASK | ILC_COLOR32*/)
 {
-    IconArray const& src = bigIcons ? GetArray() : GetArraySm();
-    if (src.size() < 1) {
+    const bool  bigIcons = (icoCx > 16) && (icoCy > 16);
+    IconArray& sourceVec = bigIcons ? m_IconArr : m_IconArrSm;
+    const int sourceSize = (int)sourceVec.size();
+    if (sourceSize < 1) {
         return {};
-    }
-    int icoCx = 16;
-    int icoCy = 16;
-    if (bigIcons) {
-        icoCx = 32;
-        icoCy = 32;
     }
     WTL::CImageList result;
-    if (!result.Create(icoCx, icoCy, flags, (int)src.size(), 0)) {
+    if (!result.Create(icoCx, icoCy, flags, (int)sourceVec.size(), 0)) {
         return {};
     }
-    for (const auto it: src) {
-        if (-1 == result.AddIcon(it.m_hIcon)) {
-            return {};
+    for (auto it: sourceVec) {
+        HICON hIcon = it.Detach();
+        if (-1 == result.AddIcon(hIcon)) {
+            it.Attach(hIcon);
+            break;
         }
     }
     int imListCount = result.GetImageCount();
-    int     vecSize = (int)src.size();
-    ATLASSUME(imListCount == vecSize);
+    if (imListCount < sourceSize) {
+        SetLastError(ERROR_INVALID_DATA);
+        IconArray{ sourceVec.begin() + imListCount, sourceVec.end() }.swap(sourceVec);
+    }
+    else {
+        IconArray{}.swap(sourceVec);
+    }
     return { result.Detach() };
 }

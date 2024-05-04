@@ -13,8 +13,8 @@ using ImageList = WTL::CImageListManaged;
 enum ImageListIndex : int
 {
     IL_Own = 0,
-    IL_Shell32,
-    IL_Shell32Small,
+    IL_SHELL_32x32,
+    IL_SHELL_16x16,
     IL_Count
 };
 

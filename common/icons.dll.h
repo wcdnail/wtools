@@ -20,7 +20,7 @@ public:
     IconArray const& GetArray() const;
     IconArray const& GetArraySm() const;
     size_t GetCount() const;
-    WCDAFX_API WTL::CImageList MakeImageList(bool bigIcons, UINT flags = ILC_MASK | ILC_COLOR32) const;
+    WCDAFX_API WTL::CImageListManaged MakeImageList(int icoCx, int icoCy, UINT flags = ILC_MASK | ILC_COLOR32);
 
 private:
     IconArray     m_IconArr;

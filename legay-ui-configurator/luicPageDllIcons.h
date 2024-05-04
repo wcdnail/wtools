@@ -8,8 +8,6 @@ class CIconCollectionFile;
 
 struct CPageDllIcons: CPageImpl
 {
-    using ImageList = WTL::CImageListManaged;
-
     ~CPageDllIcons() override;
     CPageDllIcons();
 
@@ -18,16 +16,17 @@ private:
     WTL::CButton     m_bnBrowse;
     WTL::CButton     m_bnExport;
     WTL::CListViewCtrl m_lvView;
-    ImageList           m_ilBig;
-    ImageList         m_ilSmall;
+    CImageList          m_il32x32;
+    CImageList        m_il16x16;
     std::wstring m_CurrFilename;
+    bool           m_bManagedIl;
 
     void OnDestroy() override;
     void DetachImageLists();
     void Reset();
     void ResetView();
     void SetError(HRESULT code, PCWSTR format, ...);
-    void OnCollectionLoad(CIconCollectionFile const& collection);
+    void OnCollectionLoad(CIconCollectionFile& collection);
     void PopulateViews();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;

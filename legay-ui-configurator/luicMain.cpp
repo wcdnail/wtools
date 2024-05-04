@@ -133,8 +133,10 @@ HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINST
         ReportError(Str::ElipsisW::Format(L"Load DLL '%s' icon collection failed!", shell32dll.GetString()), code, false, MB_ICONWARNING);
     }
     else {
-        m_ImList[IL_Shell32] = shellIcons.MakeImageList(true);
-        m_ImList[IL_Shell32Small] = shellIcons.MakeImageList(false);
+        const auto shellIconCount = shellIcons.GetArray().size();
+        m_ImList[IL_SHELL_32x32].Attach(shellIcons.MakeImageList(32, 32).Detach());
+        m_ImList[IL_SHELL_16x16].Attach(shellIcons.MakeImageList(16, 16).Detach());
+        ATLASSUME(m_ImList[IL_SHELL_32x32].GetImageCount() == shellIconCount);
     }
     code = ImListCreate();
     m_TestMenu.LoadMenuW(IDR_MENU1);
