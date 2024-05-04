@@ -35,7 +35,7 @@ private:
     void OnDropFiles(HDROP hDropInfo) override;
     void AttemptToLoadNew(std::wstring const& filename);
     void ExportMultiple(UINT count);
-    void ExportSinle();
+    void ExportSingle();
     bool ExportIconOLE(int it, bool needBig, std::wstring const& filename); // OK, 4bpp
     bool ExportIconGDIP(int it, bool needBig, std::wstring const& filename); // error, need investigate
     bool ExportIconOLE2(int it, bool needBig, std::wstring const& filename);  // OK, 4bpp

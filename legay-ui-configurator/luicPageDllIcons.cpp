@@ -189,7 +189,7 @@ static HRESULT IFileDialog_GetDisplayName(IFileDialog& dlgImpl, std::wstring& ta
 
 void CPageDllIcons::ExportMultiple(UINT count)
 {
-    WTL::CFolderDialog dlg{ m_hWnd, L"Choose export dir" };
+    WTL::CFolderDialog dlg{ m_hWnd, L"Choose export dir", BIF_RETURNONLYFSDIRS | BIF_USENEWUI };
     const auto rv = dlg.DoModal(m_hWnd);
     if (IDOK != rv) {
         SetMFStatus(STA_Warning, L"Export canceled");
@@ -207,7 +207,7 @@ static void AddExtIfItAbsent(std::wstring& filename, PCWSTR ext)
     }
 }
 
-void CPageDllIcons::ExportSinle()
+void CPageDllIcons::ExportSingle()
 {
     WTL::CShellFileSaveDialog dlg{ nullptr, FOS_FORCESHOWHIDDEN | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_OVERWRITEPROMPT };
     const auto rv = dlg.DoModal(m_hWnd);
@@ -239,7 +239,7 @@ void CPageDllIcons::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
             ExportMultiple(selCount);
         }
         else {
-            ExportSinle();
+            ExportSingle();
         }
         return ;
     }
