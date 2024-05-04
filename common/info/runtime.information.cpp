@@ -170,7 +170,7 @@ namespace Runtime
                 if (pVerQueryValueW(lpData, section, reinterpret_cast<PVOID*>(&value), &uSize)) {
                     *(it.destStringPtr) = value;
                 }
-#ifdef _DEBUG
+#ifdef _DEBUG_XTRA
                 else {
                     wchar_t traceMsg[128] = { 0 };
                     swprintf_s(traceMsg, L"\t>>>> VerQueryValue fails with '%s' '%s'\n", it.varName, section);

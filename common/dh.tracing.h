@@ -30,7 +30,7 @@ namespace DH
     public:
         DELETE_COPY_MOVE_OF(TraceCategory);
 
-        WCDAFX_API TraceCategory(wchar_t const* name);
+        WCDAFX_API TraceCategory(PCWSTR name);
         WCDAFX_API ~TraceCategory();
         WString const& GetName() const;
 
@@ -42,8 +42,8 @@ namespace DH
     {
         DELETE_COPY_MOVE_OF(ScopedThreadLog);
 
-        WCDAFX_API ScopedThreadLog(wchar_t const* message);
-        WCDAFX_API ScopedThreadLog(int, wchar_t const* format, ...);
+        WCDAFX_API ScopedThreadLog(PCWSTR message);
+        WCDAFX_API ScopedThreadLog(int, PCWSTR format, ...);
         WCDAFX_API ~ScopedThreadLog();
 
     private:

@@ -54,6 +54,11 @@ void CPageDllIcons::OnDestroy()
     CPageImpl::OnDestroy();
 }
 
+void CPageDllIcons::SelectAll()
+{
+    m_lvView.SelectAllItems();
+}
+
 void CPageDllIcons::ResetView()
 {
     m_lvView.DeleteAllItems();

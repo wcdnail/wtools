@@ -22,6 +22,7 @@ struct CPageImpl: ATL::CDialogImpl<CPageImpl>,
 
     BOOL PreTranslateMessage(MSG* pMsg) override;
     virtual HWND CreateDlg(HWND hWndParent, LPARAM dwInitParam = NULL);
+    virtual void SelectAll();
     PCWSTR GetCaption() const;
 
 protected:
@@ -36,27 +37,29 @@ protected:
     void DlgResizeAdd(int nCtlID, DWORD dwResizeFlags);
     void DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count);
 
+    HBRUSH OnCtlColorStatic(CDCHandle dc, HWND wndStatic);
+    HBRUSH OnEraseBkgnd(CDCHandle dc);
+
     virtual void OnResizeNotify();
     virtual BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
+    virtual void OnDestroy();
     virtual void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl);
     virtual LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
     virtual void OnDropFiles(HDROP hDropInfo);
-    virtual void OnDestroy();
-
-    HBRUSH OnCtlColorStatic(CDCHandle dc, HWND wndStatic);
-    HBRUSH OnEraseBkgnd(CDCHandle dc);
+    virtual void OnSetFocus(HWND hWndOld);
 
 private:
     ResizeVec m_ResiseMap;
 
     BEGIN_MSG_MAP_EX(CColorsPage)
-        MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
         MSG_WM_ERASEBKGND(OnEraseBkgnd)
+        MSG_WM_INITDIALOG(OnInitDialog)
+        MSG_WM_DESTROY(OnDestroy)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_DROPFILES(OnDropFiles)
-        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_SETFOCUS(OnSetFocus)
         if (Resizer::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
             OnResizeNotify();
             return TRUE;

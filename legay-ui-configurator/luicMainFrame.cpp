@@ -14,9 +14,10 @@ CMainFrame::~CMainFrame()
 }
 
 CMainFrame::CMainFrame(Conf::Section const& parentSettings)
-    :         Super{}
-    , m_rcMainFrame{ 0, 0, 600, 800 }
-    ,    m_Settings{ parentSettings, L"MainFrame" }
+    :          Super{}
+    ,  m_rcMainFrame{ 0, 0, 600, 800 }
+    ,     m_Settings{ parentSettings, L"MainFrame" }
+    , m_bInitialized{ false }
 {
     Rc::PutInto(Rc::Screen, m_rcMainFrame, Rc::Center);
 }
@@ -33,13 +34,13 @@ void CMainFrame::SetStatus(int status, ATL::CStringW&& message)
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
+    if (Super::PreTranslateMessage(pMsg)) {
+        return TRUE;
+    }
     if (m_View.PreTranslateMessage(pMsg)) {
         return TRUE;
     }
     DBG_DUMP_WMESSAGE(LTH_MAINFRAME, L"Main", pMsg);
-    if (Super::PreTranslateMessage(pMsg)) {
-        return TRUE;
-    }
     return FALSE;
 }
 
@@ -100,6 +101,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
     pLoop->AddIdleHandler(this);
 
     DlgResize_Init(false, false);
+
+    m_bInitialized = true;
+    m_View.SetFocus();
     return 0;
 }
 
@@ -116,5 +120,54 @@ void CMainFrame::OnDestroy()
     }
 
     PostQuitMessage(0);
+    SetMsgHandled(FALSE);
+}
+
+void CMainFrame::OnSetFocus(HWND hWndOld)
+{
+    UNREFERENCED_PARAMETER(hWndOld);
+    if (!m_bInitialized) {
+        return;
+    }
+    if (hWndOld != m_View.m_hWnd) {
+        m_View.SetFocus();
+    }
+}
+
+void CMainFrame::OnMenuCommand(int nID)
+{
+    UNREFERENCED_PARAMETER(nID);
+}
+
+void CMainFrame::OnAccelerator(int nID)
+{
+    switch (nID) {
+    case ID_ACC_CTRL_TAB:       m_View.TabShift(1); break;
+    case ID_ACC_CTRL_SHIFT_TAB: m_View.TabShift(-1); break;
+    case ID_ACC_SELECT_ALL:     m_View.SelectAll(); break;
+    }
+    //DebugThreadPrintf(LTH_MAINFRAME L" ACCELERATOR: %d %p\n", nID);
+}
+
+void CMainFrame::OnCommand(UINT uNotifyCode, int nID, HWND hWndCtl)
+{
+    //
+    // https://learn.microsoft.com/en-us/windows/win32/menurc/wm-command
+    //
+    //              uNotifyCode        nID         hWndCtrl
+    // Menu               0         ID_<menu>         0
+    // Accelerator        1         ID_<accel>        0
+    // Control           xxx          CtlId        hWndCtrl
+    //
+
+    switch (uNotifyCode) {
+    case 0: // Menu -------------------------
+        OnMenuCommand(nID);
+        return ;
+    case 1: // Accelerator ------------------
+        OnAccelerator(nID);
+        return ;
+    }
+
     SetMsgHandled(FALSE);
 }

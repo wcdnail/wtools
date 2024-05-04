@@ -25,6 +25,7 @@ private:
     Conf::Section       m_Settings;
     CMainView               m_View;
     CMultiPaneStatusBarCtrl m_SBar;
+    bool            m_bInitialized;
 
     friend class Super;
     friend class Resizer;
@@ -34,9 +35,14 @@ private:
                                CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS,
                                COLOR_APPWORKSPACE)
 
+    BOOL PreTranslateMessage(MSG* pMsg) override;
+    BOOL OnIdle() override;
+
     BEGIN_MSG_MAP_EX(CMainFrame)
         MSG_WM_CREATE(OnCreate)
         MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_SETFOCUS(OnSetFocus)
+        MSG_WM_COMMAND(OnCommand)
         if(Resizer::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
             OnResizeNotify();
             return TRUE;
@@ -50,9 +56,10 @@ private:
     void OnResizeNotify();
     int OnCreate(LPCREATESTRUCT);
     void OnDestroy();
-
-    BOOL PreTranslateMessage(MSG* pMsg) override;
-    BOOL OnIdle() override;
+    void OnSetFocus(HWND hWndOld);
+    void OnMenuCommand(int nID);
+    void OnAccelerator(int nID);
+    void OnCommand(UINT uNotifyCode, int nID, HWND hWndCtl);
 
 private:
     CMainFrame(CMainFrame const&) = delete;

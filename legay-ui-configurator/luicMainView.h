@@ -11,6 +11,8 @@ struct CMainView: CPageImpl
     CMainView();
 
     BOOL PreTranslateMessage(MSG* pMsg) override;
+    void TabShift(int num);
+    void SelectAll();
 
 private:
     WTL::CTabCtrl m_Tab;
@@ -21,13 +23,14 @@ private:
     CPageImplPtr const& PagesGetCurrent() const;
     
     void PagesGetRect();
-    void PagesAppend(int desiredIndex, CPageImplPtr&& pagePtr);
+    void PagesAppend(CPageImplPtr&& pagePtr);
     void PagesCreate();
     void PagesShow(int numba, bool show);
 
     void OnResizeNotify() override;
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
+    void OnDestroy() override;
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh) override;
-    void OnDestroy() override;
+    void OnSetFocus(HWND hWndOld) override;
 };

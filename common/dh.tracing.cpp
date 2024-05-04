@@ -27,7 +27,7 @@ namespace DH
         static constexpr UINT  LOG_DEF_CODEPAGE = CP_UTF8;
         static const wchar_t   LOG_MODULE_NPH[] = L"_MY_EXE_NAME_PLACEHOLDER";
 
-#ifdef _DEBUG
+#ifdef _DEBUG_XTRA
         class DebugNotifyOnce
         {
             DebugNotifyOnce(PCWSTR message) { OutputDebugStringW(message); }
@@ -266,11 +266,15 @@ namespace DH
         }
     }
 
-    TraceCategory::TraceCategory(wchar_t const* name)
+    TraceCategory::TraceCategory(PCWSTR name)
         : Name()
     {
         if (0 == ::_wcsnicmp(name, LOG_MODULE_NPH, std::size(LOG_MODULE_NPH) / sizeof(LOG_MODULE_NPH[0]))) {
-            std::filesystem::path tempath = Runtime::Info().Executable.Filename;
+            Runtime::InfoStore::String const* name = &Runtime::Info().Executable.Version.ProductName;
+            if (name->empty()) {
+                name = &Runtime::Info().Executable.Filename;
+            }
+            std::filesystem::path tempath = *name;
             Name = tempath.filename().replace_extension().wstring();
         }
         else {

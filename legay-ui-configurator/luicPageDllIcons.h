@@ -22,6 +22,7 @@ private:
     bool           m_bManagedIl;
 
     void OnDestroy() override;
+    void SelectAll() override;
     void DetachImageLists();
     void Reset();
     void ResetView();

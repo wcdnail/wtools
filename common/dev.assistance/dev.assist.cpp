@@ -30,8 +30,7 @@ namespace DH
                     return it.n;
                 }
             }
-
-          //ATLTRACE(_T("Unknown class `%s` of %x\n"), className, winHandle);
+          ATLTRACE(_T("Unknown class '%s' of %p\n"), cls, winHandle);
         }
         return UnknownCtl;
     }
@@ -40,61 +39,51 @@ namespace DH
 // Multibyte group
 
 #define _ON_CONST(X) case X: return #X
-
-    PCSTR WM_C2SA(UINT x)
-    {
-        switch (x) 
-        {
+    PCSTR WM_C2SA(UINT inspected) {
+        switch (inspected) {
 #include "window.messages.consts.h"
         }
         return "";
     }
-
-    PCSTR VK_C2SA(UINT x)
-    {
-        switch (x) 
-        {
+    PCSTR VK_C2SA(UINT inspected) {
+        switch (inspected) {
 #include "virtual.keys.consts.h"
         }
-
         return "";
     }
-
-#define _BEG_CONST_GROUP(X)     \
-        if (0 != (winType & X)) \
-        {                       \
-            switch (code)       \
-            {                   \
-
-#define _END_CONST_GROUP()      \
-            };                  \
+#define _BEG_CONST_GROUP(X)         \
+        if (0 != (winType & X)) {    \
+            switch (code) {
+#define _END_CONST_GROUP()            \
+            };                         \
         }
-
-    PCSTR WM_NC_C2SA(UINT code, HWND win)
-    {
+    PCSTR WM_NC_C2SA(UINT code, HWND win) {
         uint64_t winType = GetWindowType(win);
 #include "notify.codes.h"
         return "";
     }
-
-#undef _ON_CONST
-
-#define _ON_BITMASK(mask) \
-    if (0 != (mask & style)) \
-    { \
-        if (!result.empty()) \
-            result += " "; \
-        result += #mask; \
+    PCSTR WM_NC_C2SA(UINT inspected) {
+        switch (inspected) {
+#include "notify.codes.plain.h"
+        }
+        return "";
     }
-
-    LString WCDAFX_API LvStyleStringA(DWORD style)
+#undef _ON_CONST
+#define _ON_BITMASK(mask)       \
+    if (0 != (mask & style)) {   \
+        if (!result.empty()) {    \
+            result += " ";         \
+        }                           \
+        result += #mask;             \
+    }
+    LString LvStyleStringA(DWORD style)
     {
         LString result;
 #include "list.view.styles.h"
         return result;
     }
 
-    LString WCDAFX_API LvStyleExStringA(DWORD style)
+    LString LvStyleExStringA(DWORD style)
     {
         LString result;
 #include "list.view.exstyles.h"
@@ -107,59 +96,51 @@ namespace DH
 // Wide group
 
 #define _ON_CONST(X) case X: return L#X
-
-    PCWSTR WM_C2SW(UINT x)
-    {
-        switch (x) 
-        {
+    PCWSTR WM_C2SW(UINT inspected) {
+        switch (inspected) {
 #include "window.messages.consts.h"
         }
-                
         return L"";
     }
-
-    PCWSTR VK_C2SW(UINT x)
-    {
-        switch (x) 
-        {
+    PCWSTR VK_C2SW(UINT inspected) {
+        switch (inspected) {
 #include "virtual.keys.consts.h"
         }
-
         return L"";
     }
-
-    PCWSTR WM_NC_C2SW(UINT code, HWND win)
-    {
+    PCWSTR WM_NC_C2SW(UINT code, HWND win) {
         uint64_t winType = GetWindowType(win);
 #include "notify.codes.h"
         return L"";
     }
-
+    PCWSTR WM_NC_C2SW(UINT inspected) {
+        switch (inspected) {
+#include "notify.codes.plain.h"
+        }
+        return L"";
+    }
 #undef _ON_CONST
 
-
-#define _ON_BITMASK(mask) \
-    if (0 != (mask & style)) \
-    { \
-        if (!result.empty()) \
-            result += L" "; \
-        result += L#mask; \
+#define _ON_BITMASK(mask)       \
+    if (0 != (mask & style)) {   \
+        if (!result.empty()) {    \
+            result += L" ";        \
+        }                           \
+        result += L#mask;            \
     }
 
-    WString WCDAFX_API LvStyleStringW(DWORD style)
+    WString LvStyleStringW(DWORD style)
     {
         WString result;
 #include "list.view.styles.h"
         return result;
     }
-
-    WString WCDAFX_API LvStyleExStringW(DWORD style)
+    WString LvStyleExStringW(DWORD style)
     {
         WString result;
 #include "list.view.exstyles.h"
         return result;
     }
-
 #undef _ON_BITMASK
 
     WString MessageToStrignW(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

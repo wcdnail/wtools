@@ -32,7 +32,9 @@ namespace DH
 
     // Window notify code constant to string...
     WCDAFX_API PCSTR WM_NC_C2SA(UINT, HWND);
+    WCDAFX_API PCSTR WM_NC_C2SA(UINT);
     WCDAFX_API PCWSTR WM_NC_C2SW(UINT, HWND);
+    WCDAFX_API PCWSTR WM_NC_C2SW(UINT);
 
     // List view styles constants to string...
     WCDAFX_API LString LvStyleStringA(DWORD);

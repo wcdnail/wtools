@@ -14,16 +14,37 @@
 
 enum PageIndex: int
 {
-    PageBegin = -1,
-    PageBackground,
-    PageScreenSaver,
+    PageBeforBegin = -1,
+  //PageBackground,
+  //PageScreenSaver,
     PageAppearance,
-    PageEffects,
-    PageWeb,
-    PageSettings,
+  //PageEffects,
+  //PageWeb,
     PageDllIcons,
+    PageSettings,
     PageEnd
 };
+
+void CMainView::PagesCreate()
+{
+    m_Tab.Attach(GetDlgItem(IDC_TAB1));
+
+  //auto   pBackground = std::make_unique<CPageBackground> (L"Background");
+  //auto  pScreenSaver = std::make_unique<CPageScreenSaver>(L"Screen Saver");
+    auto   pAppearance = std::make_unique<CPageAppearance> (L"Appearance");
+  //auto  pPageEffects = std::make_unique<CPageEffects>    (L"Effects");
+  //auto      pPageWeb = std::make_unique<CPageWeb>        (L"Web");
+    auto pPageDllIcons = std::make_unique<CPageDllIcons>   (L"DLL Icons");
+    auto pPageSettings = std::make_unique<CPageSettings>   (L"Settings");
+
+  //PagesAppend(PageBackground,  std::move(pBackground));
+  //PagesAppend(PageScreenSaver, std::move(pScreenSaver));
+    PagesAppend(std::move(pAppearance));
+  //PagesAppend(PageEffects,     std::move(pPageEffects));
+  //PagesAppend(PageWeb,         std::move(pPageWeb));
+    PagesAppend(std::move(pPageDllIcons));
+    PagesAppend(std::move(pPageSettings));
+}
 
 CMainView::~CMainView()
 {
@@ -47,11 +68,36 @@ BOOL CMainView::PreTranslateMessage(MSG* pMsg)
     return CPageImpl::PreTranslateMessage(pMsg);
 }
 
+void CMainView::TabShift(int num)
+{
+    const int count = m_Tab.GetItemCount() - 1;
+    const int  curr = m_Tab.GetCurSel();
+    int next = curr + num;
+    if (next < 0) {
+        next = count;
+    }
+    else if (next > count) {
+        next = 0;
+    }
+    m_Tab.SetCurSel(next);
+    PagesShow(curr, false);
+    PagesShow(next, true);
+}
+
+void CMainView::SelectAll()
+{
+    switch (m_Tab.GetCurSel()) {
+    case PageDllIcons:
+        PagesGetCurrent()->SelectAll();
+        break;
+    }
+}
+
 CPageImplPtr const& CMainView::PagesGet(int numba) const
 {
     const auto& it = m_PagesMap.find(numba);
     if (it == m_PagesMap.cend()) {
-        DH::ThreadPrintfc(DH::Category::Module(), L"Page #%d does not EXIST!\n", numba);
+        DebugThreadPrintf(LTH_CONTROL L" Page #%d does not EXIST!\n", numba);
         static const CPageImplPtr dmyPtr;
         return dmyPtr;
     }
@@ -97,57 +143,27 @@ void CMainView::PagesGetRect()
 #endif
 }
 
-void CMainView::PagesCreate()
-{
-    m_Tab.Attach(GetDlgItem(IDC_TAB1));
-
-    auto   pBackground = std::make_unique<CPageBackground> (L"Background");
-    auto  pScreenSaver = std::make_unique<CPageScreenSaver>(L"Screen Saver");
-    auto   pAppearance = std::make_unique<CPageAppearance> (L"Appearance");
-    auto  pPageEffects = std::make_unique<CPageEffects>    (L"Effects");
-    auto      pPageWeb = std::make_unique<CPageWeb>        (L"Web");
-    auto pPageSettings = std::make_unique<CPageSettings>   (L"Settings");
-    auto pPageDllIcons = std::make_unique<CPageDllIcons>   (L"DLL Icons");
-
-    PagesAppend(PageBackground,  std::move(pBackground));
-    PagesAppend(PageScreenSaver, std::move(pScreenSaver));
-    PagesAppend(PageAppearance,  std::move(pAppearance));
-    PagesAppend(PageEffects,     std::move(pPageEffects));
-    PagesAppend(PageWeb,         std::move(pPageWeb));
-    PagesAppend(PageSettings,    std::move(pPageSettings));
-    PagesAppend(PageDllIcons,    std::move(pPageDllIcons));
-}
-
 void CMainView::PagesShow(int numba, bool show)
 {
     const auto& page = PagesGet(numba);
     if (page) {
-        page->ShowWindow(show ? SW_SHOW : SW_HIDE);
+        if (!show) {
+            page->ShowWindow(SW_HIDE);
+        }
+        else {
+            page->ShowWindow(SW_SHOW);
+            page->SetFocus();
+        }
     }
 }
 
-void CMainView::PagesAppend(int desiredIndex, CPageImplPtr&& pagePtr)
+void CMainView::PagesAppend(CPageImplPtr&& pagePtr)
 {
     HRESULT code = S_FALSE;
-    int  tabIcon = desiredIndex;
-    UINT tabMask = TCIF_TEXT;
-    if (0 /*&& tabIcon < m_ImList.GetImageCount()*/) { // ##FIXME: tab control has icons?
-        tabIcon = desiredIndex;
-        tabMask |= TCIF_IMAGE;
-    }
-    int number = m_Tab.InsertItem(m_Tab.GetItemCount(), tabMask, pagePtr->GetCaption(), tabIcon, 0l);
+    int number = m_Tab.InsertItem(m_Tab.GetItemCount(), TCIF_TEXT, pagePtr->GetCaption(), 0, 0l);
     if (number < 0) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", pagePtr->GetCaption()), code, true, MB_ICONERROR);
-        return ;
-    }
-    if (desiredIndex != number) {
-        code = ERROR_REVISION_MISMATCH;
-        ReportError(Str::ElipsisW::Format(
-                        L"Append dialog page '%s' failed!\r\n"
-                        L"Desired index %d != %d actual index\r\n",
-                        pagePtr->GetCaption(), desiredIndex, number),
-                    code, true, MB_ICONSTOP);
         return ;
     }
     if (!pagePtr->CreateDlg(m_Tab.m_hWnd)) {
@@ -184,11 +200,7 @@ BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     GetParent().SetWindowTextW(L"Display Properties");
     PagesCreate();
 
-#ifdef _DEBUG
-    const int initialPage = PageAppearance;
-#else
-    const int initialPage = PageBackground;
-#endif
+    const int initialPage = 0;
     m_Tab.SetCurSel(initialPage);
     PagesShow(initialPage, true);
 
@@ -204,6 +216,11 @@ void CMainView::OnDestroy()
     m_Tab.DeleteAllItems();
     m_Tab.DestroyWindow();
     CPageImpl::OnDestroy();
+}
+
+void CMainView::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
+{
+    CPageImpl::OnCommand(uNotifyCode, nID, wndCtl);
 }
 
 LRESULT CMainView::OnNotify(int idCtrl, LPNMHDR pnmh)
@@ -226,7 +243,12 @@ LRESULT CMainView::OnNotify(int idCtrl, LPNMHDR pnmh)
     return 0;
 }
 
-void CMainView::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
+void CMainView::OnSetFocus(HWND hWndOld)
 {
-    CPageImpl::OnCommand(uNotifyCode, nID, wndCtl);
+    CPageImplPtr const& current = PagesGetCurrent();
+    if (!current) {
+        CPageImpl::OnSetFocus(hWndOld);
+        return ;
+    }
+    current->SetFocus();
 }
