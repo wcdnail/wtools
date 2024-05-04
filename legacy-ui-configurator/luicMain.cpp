@@ -97,16 +97,18 @@ CLUIApp::~CLUIApp()
 }
 
 CLUIApp::CLUIApp()
-    :        Super{}
-    ,   m_Settings{ L"CLUIApp" }
-    ,  m_MainFrame{ m_Settings }
-    ,   m_TestMenu{}
-    , m_pWallpaper{}
+    :                   Super{}
+    ,              m_Settings{L"CLUIApp"}
+    ,             m_MainFrame{m_Settings}
+    ,              m_TestMenu{}
+    ,            m_pWallpaper{}
+    , m_bShowDesktopWallpaper{true}
 {
     {
         std::lock_guard<std::recursive_mutex> guard(g_pAppMx);
         g_pApp = this;
     }
+
 }
 
 CTheme& CLUIApp::CurrentTheme() const
@@ -145,6 +147,7 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
     if (FAILED(code)) {
         return code;
     }
+    FromSettings(m_Settings, m_bShowDesktopWallpaper);
 
     static const ATL::CStringW shell32dll = SHELL32_PATHNAME;
     CIconCollectionFile shellIcons;

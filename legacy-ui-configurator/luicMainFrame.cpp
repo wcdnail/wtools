@@ -15,9 +15,9 @@ CMainFrame::~CMainFrame()
 
 CMainFrame::CMainFrame(Conf::Section const& parentSettings)
     :          Super{}
-    ,  m_rcMainFrame{ 0, 0, 600, 800 }
-    ,     m_Settings{ parentSettings, L"MainFrame" }
-    , m_bInitialized{ false }
+    ,  m_rcMainFrame{0, 0, 600, 800}
+    ,     m_Settings{parentSettings, L"MainFrame"}
+    , m_bInitialized{false }
 {
     Rc::PutInto(Rc::Screen, m_rcMainFrame, Rc::Center);
 }

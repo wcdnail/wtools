@@ -74,6 +74,7 @@ private:
     CMainFrame                    m_MainFrame;
     CMenu                          m_TestMenu;
     IDesktopWallpaperPtr         m_pWallpaper;
+    bool              m_bShowDesktopWallpaper;
     WTL::CImageListManaged m_ImList[IL_Count];
 
     static CTheme               g_ThemeNative;
@@ -91,5 +92,5 @@ inline IDesktopWallpaper* CLUIApp::GetWallpaperMan()
 
 inline bool CLUIApp::ShowDesktopWallpaper() const
 {
-    return true; // ##TODO: m_bShowDesktopWallpaper to settings
+    return m_bShowDesktopWallpaper; // ##TODO: m_bShowDesktopWallpaper to settings
 }
