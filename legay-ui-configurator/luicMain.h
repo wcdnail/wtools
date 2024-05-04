@@ -14,6 +14,7 @@ using IDesktopWallpaperPtr = ATL::CComPtr<IDesktopWallpaper>;
 enum ImageListIndex : int
 {
     IL_Own = 0,
+    IL_OwnBig,
     IL_SHELL_32x32,
     IL_SHELL_16x16,
     IL_Count
@@ -71,14 +72,14 @@ private:
     Conf::Section                  m_Settings;
     CMainFrame                    m_MainFrame;
     CMenu                          m_TestMenu;
-    IDesktopWallpaperPtr        m_pWallpaper;
+    IDesktopWallpaperPtr         m_pWallpaper;
     WTL::CImageListManaged m_ImList[IL_Count];
 
-    static CTheme g_ThemeNative;
-    static CLUIApp* g_pApp;
-    static std::recursive_mutex m_pAppMx;
+    static CTheme               g_ThemeNative;
+    static CLUIApp*                    g_pApp;
+    static std::recursive_mutex      g_pAppMx;
 
-    HRESULT ImListCreate();
+    HRESULT ImListCreate(int index, int cx, int cy);
     void SetMainFrameStatus(int status, ATL::CStringW&& message);
 };
 

@@ -35,7 +35,7 @@ return _AtlModule.WinMain(showCmd);
 CTheme CLUIApp::g_ThemeNative{ true };
 
 CLUIApp* CLUIApp::g_pApp{ nullptr };
-std::recursive_mutex CLUIApp::m_pAppMx{};
+std::recursive_mutex CLUIApp::g_pAppMx{};
 
 void SetMFStatus(int status, PCWSTR format, ...)
 {
@@ -91,7 +91,7 @@ int WINAPI _tWinMain(HINSTANCE instHnd, HINSTANCE, LPTSTR, int showCmd)
 CLUIApp::~CLUIApp()
 {
     {
-        std::lock_guard<std::recursive_mutex> guard(m_pAppMx);
+        std::lock_guard<std::recursive_mutex> guard(g_pAppMx);
         g_pApp = nullptr;
     }
 }
@@ -104,7 +104,7 @@ CLUIApp::CLUIApp()
     , m_pWallpaper{}
 {
     {
-        std::lock_guard<std::recursive_mutex> guard(m_pAppMx);
+        std::lock_guard<std::recursive_mutex> guard(g_pAppMx);
         g_pApp = this;
     }
 }
@@ -158,14 +158,15 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
         m_ImList[IL_SHELL_16x16].Attach(shellIcons.MakeImageList(16, 16).Detach());
         ATLASSUME(m_ImList[IL_SHELL_32x32].GetImageCount() == shellIconCount);
     }
-    code = ImListCreate();
+    ImListCreate(IL_Own, 16, 16);
+    ImListCreate(IL_OwnBig, 64, 64);
     m_TestMenu.LoadMenuW(IDR_MENU1);
     return code;
 }
 
 CLUIApp* CLUIApp::App()
 {
-    std::lock_guard<std::recursive_mutex> guard(m_pAppMx);
+    std::lock_guard<std::recursive_mutex> guard(g_pAppMx);
     if (!g_pApp) {
         throw std::logic_error("CLUIApp::App is NULL");
     }
@@ -181,13 +182,8 @@ WTL::CImageListManaged const& CLUIApp::GetImageList(int index) const
     return m_ImList[index];
 }
 
-HRESULT CLUIApp::ImListCreate()
+HRESULT CLUIApp::ImListCreate(int index, int cx, int cy)
 {
-    enum : int
-    {
-        MaxIconWidth = 16,
-        MaxIconHeight = 16,
-    };
     static const int iconsIDs[] = {
         IDI_COMP,
         IDI_MON_BRUSH,
@@ -198,23 +194,23 @@ HRESULT CLUIApp::ImListCreate()
         IDI_FOLDER_OPEN,
     };
     HRESULT code = S_FALSE;
-    m_ImList[IL_Own].Create(MaxIconWidth, MaxIconHeight, ILC_MASK | ILC_COLOR32, _countof(iconsIDs), 0);
-    if (!m_ImList[IL_Own].m_hImageList) {
+    m_ImList[index].Create(cx, cy, ILC_MASK | ILC_COLOR32, _countof(iconsIDs), 0);
+    if (!m_ImList[index].m_hImageList) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(L"Creation of ImageList failed!", code, true, MB_ICONWARNING);
         return code;
     }
     CIconHandle tempIco;
     for (const auto it : iconsIDs) {
-        tempIco.LoadIconW(it, MaxIconWidth, MaxIconHeight);
+        tempIco.LoadIconW(it, cx, cy);
         if (!tempIco.m_hIcon) {
             code = static_cast<HRESULT>(GetLastError());
             ReportError(Str::ElipsisW::Format(L"Load icon (%d) failed!", it), code);
             continue;
         }
-        m_ImList[IL_Own].AddIcon(tempIco.Detach());
+        m_ImList[index].AddIcon(tempIco.Detach());
     }
-    ATLASSUME(IconCount == m_ImList[IL_Own].GetImageCount());
+    ATLASSUME(IconCount == m_ImList[index].GetImageCount());
     return S_OK;
 }
 

@@ -4,6 +4,7 @@
 #include "luicMain.h"
 #include "dh.tracing.h"
 #include "dh.tracing.defs.h"
+#include "rect.putinto.h"
 #include "string.utils.error.code.h"
 
 //
@@ -100,8 +101,6 @@ struct CDrawRoutine::StaticInit
         ICON_InactiveWnd = 0,
         ICON_ActiveWnd,
         ICON_Desktop1,
-        ICON_Desktop2,
-        ICON_Desktop3,
         ICON_Count
     };
 
@@ -162,13 +161,12 @@ private:
         GetProcAddressEX(USER32, DrawMenuBarTemp);
 
         srand(static_cast<int>(time(nullptr)));
-        auto const&     il = CLUIApp::App()->GetImageList(IL_SHELL_16x16);
-        const int maxCount = il.GetImageCount();
-
-        for (int i=0; i<ICON_Count; i++) {
-            const int sellIconIndex = rand() % maxCount;
-            m_hIcon[i] = il.GetIcon(sellIconIndex);
-        }
+        auto const&   ilBig = CLUIApp::App()->GetImageList(IL_OwnBig);
+        auto const& ilSmall = CLUIApp::App()->GetImageList(IL_SHELL_16x16);
+        const int  maxCount = ilSmall.GetImageCount() - 1;
+        m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
+        m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
+        m_hIcon[ICON_Desktop1] = ilBig.GetIcon(IconMain);
     }
 
     ~StaticInit()
@@ -817,28 +815,61 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
 
 void CDrawRoutine::DrawToolTip(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& tooltip) const
 {
-    CSize size;
-    CRect rc = rcParam;
-    if (rc.left < 0) {
+    CSize szText;
+    CRect rcText = rcParam;
+    if (rcText.left < 0) {
         return ;
     }
     int   prevMode = SetBkMode(dc, TRANSPARENT);
     HFONT prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Tooltip));
-    if (!GetTextExtentPoint32(dc, tooltip.GetString(), tooltip.GetLength(), &size)) {
-        size.cx = ScaleForDpi(45);
-        size.cy = ScaleForDpi(14);
+    if (!GetTextExtentPoint32(dc, tooltip.GetString(), tooltip.GetLength(), &szText)) {
+        szText.cx = ScaleForDpi(45);
+        szText.cy = ScaleForDpi(14);
     }
-    rc.top    = rc.bottom - size.cy;
-    rc.right  = rc.left   + size.cx;
-    rc.InflateRect(3, 3);
-    DrawBorder(dc, rc, 1, m_Theme.GetBrush(COLOR_INFOTEXT));
-    InflateRect(rc, -1, -1);
-    FillRect(dc, rc, m_Theme.GetBrush(COLOR_INFOBK));
+    rcText.top    = rcText.bottom - szText.cy;
+    rcText.right  = rcText.left   + szText.cx;
+    rcText.InflateRect(3, 3);
+    DrawBorder(dc, rcText, 1, m_Theme.GetBrush(COLOR_INFOTEXT));
+    InflateRect(rcText, -1, -1);
+    FillRect(dc, rcText, m_Theme.GetBrush(COLOR_INFOBK));
     SetTextColor(dc, m_Theme.GetColor(COLOR_INFOTEXT));
-    dc.DrawTextW(tooltip.GetString(), tooltip.GetLength(), rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+    dc.DrawTextW(tooltip.GetString(), tooltip.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
     dc.SetBkMode(prevMode);
     dc.SelectFont(prevFont);
 }
+
+void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text) const
+{
+    bool bShadow = true;
+    HICON  hIcon = StaticInit::instance().m_hIcon[StaticInit::ICON_Desktop1];
+
+    FillRect(dc, rcParam, m_Theme.GetBrush(COLOR_INFOBK)); // DEBUG
+
+    CRect rcIcon{0, 0, 64, 64}; // ##TODO: get desktop icon dimensions
+    Rc::PutInto(rcParam, rcIcon, Rc::Center);
+    //DrawBorder(dc, rcIcon, 1, m_Theme.GetBrush(COLOR_INFOTEXT)); // DEBUG
+    dc.DrawIconEx(rcIcon.TopLeft(), hIcon, rcIcon.Size(), 0, nullptr, DI_NORMAL);
+
+    CSize szText;
+    CRect rcText = rcIcon;
+    rcText.DeflateRect(4, 4);
+    if (rcText.left < 0) {
+        return ;
+    }
+    int   prevMode = SetBkMode(dc, TRANSPARENT);
+    HFONT prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Tooltip));
+    if (!GetTextExtentPoint32(dc, text.GetString(), text.GetLength(), &szText)) {
+        szText.cx = ScaleForDpi(45);
+        szText.cy = ScaleForDpi(14);
+    }
+    rcText.top = rcIcon.bottom + 4;
+    rcText.bottom = rcText.top + szText.cy + 4;
+    SetTextColor(dc, m_Theme.GetColor(COLOR_INFOTEXT));
+    dc.DrawTextW(text.GetString(), text.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+    dc.SetBkMode(prevMode);
+    dc.SelectFont(prevFont);
+}
+
 
 void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
 {
