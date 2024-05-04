@@ -7,17 +7,16 @@ struct CTheme;
 
 struct WindowRects
 {
-    int     m_BorderSize = {0};
-    CRect     m_rcBorder = {};
-    CRect      m_rcFrame = {};
-    CRect       m_rcCapt = {};
-    CRect       m_rcMenu = {};
-    CRect  m_rcWorkspace = {};
-    CRect     m_rcScroll = {};
-    CRect    m_rcMessage = {};
-    CRect        m_rcURL = {};
-    CRect     m_rcButton = {};
-    CRect    m_rcTooltip = {};
+    CRect     WR_Border = {};
+    CRect      WR_Frame = {};
+    CRect    WR_Caption = {};
+    CRect       WR_Menu = {};
+    CRect  WR_Workspace = {};
+    CRect     WR_Scroll = {};
+    CRect    WR_Message = {};
+    CRect  WR_Hyperlink = {};
+    CRect     WR_Button = {};
+    CRect    WR_Tooltip = {};
 };
 
 enum WinTextFalgs : UINT
@@ -57,7 +56,7 @@ public:
     ~CDrawRoutine();
     CDrawRoutine(CTheme const& theme);
 
-    void CalcRects(CRect const& rc, UINT captFlags, WindowRects& target) const;
+    void CalcRects(CRect const& rc, UINT captFlags, WindowRects& target);
 
     void DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const;
     void DrawEdge(CDCHandle dc, CRect& pRect, UINT edge, UINT uFlags) const;
@@ -79,4 +78,5 @@ private:
     struct StaticInit;
 
     CTheme const& m_Theme;
+    int      m_BorderSize;
 };

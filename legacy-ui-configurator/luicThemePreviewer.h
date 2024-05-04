@@ -41,13 +41,15 @@ private:
                           DRect&                       rcAux1,
                           DRect&                       rcAux2
     );
+    void DrawDesktop(CDCHandle dc, CRect const& rc);
 
     int OnCreate(LPCREATESTRUCT pCS);
     void OnPaint(CDCHandle dc);
-    void DrawDesktop(CDCHandle dc, CRect const& rc);
+    void OnLButtonDown(UINT nFlags, CPoint point);
 
     BEGIN_MSG_MAP_EX(PanelView)
-      //MSG_WM_CREATE(OnCreate) // Subclassed
+        MSG_WM_CREATE(OnCreate) // Subclassed
         MSG_WM_PAINT(OnPaint)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
     END_MSG_MAP()
 };

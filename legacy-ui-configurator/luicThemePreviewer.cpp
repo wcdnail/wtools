@@ -7,9 +7,8 @@
 #include "string.utils.format.h"
 #include "windows.uses.gdi+.h"
 #include "rect.gdi+.h"
-#include "rect.putinto.h"
 
-#include <random>
+//#include <random>
     //std::random_device rd;
     //std::uniform_int_distribution<int> dist(0, static_cast<int>(m_Wallpaper.size()) - 1);
     //std::default_random_engine gen(rd());
@@ -223,5 +222,12 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
         drawings.CalcRects(ToCRect<double>(it.drect), it.captFlags, it.rects);
         drawings.DrawWindow(dc, it);
     }
-    drawings.DrawToolTip(dc, m_WndRect[WND_MsgBox].m_rcTooltip, L"TooTip Hint");
+    drawings.DrawToolTip(dc, m_WndRect[WND_MsgBox].WR_Tooltip, L"TooTip Hint");
+}
+
+void CThemePreviewer::OnLButtonDown(UINT nFlags, CPoint point)
+{
+    for (auto const& it: m_WndRect) {
+        
+    }
 }

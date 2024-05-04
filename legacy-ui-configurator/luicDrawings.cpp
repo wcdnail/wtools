@@ -220,7 +220,8 @@ CDrawRoutine::~CDrawRoutine()
 }
 
 CDrawRoutine::CDrawRoutine(CTheme const& theme)
-    : m_Theme{ theme }
+    :      m_Theme{theme}
+    , m_BorderSize{0}
 {
     UNREFERENCED_PARAMETER(StaticInit::instance());
 }
@@ -767,7 +768,7 @@ void CDrawRoutine::DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enable
     }
 }
 
-void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& target) const
+void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& target)
 {
   //long        dpiScale = ScaleForDpi<long>(8);
     const bool isToolWnd = (0 != (DC_SMALLCAP & captFlags));
@@ -780,44 +781,45 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
     LRect       rcScroll;
     LRect      rcMessage;
     LRect       rcButton;
+    LRect      rcTooltip;
 
-    target.m_rcBorder = ToCRect(rcBorder);
+    target.WR_Border = ToCRect(rcBorder);
 
-    target.m_BorderSize = m_Theme.GetNcMetrcs().iBorderWidth + 1;
+    m_BorderSize = m_Theme.GetNcMetrcs().iBorderWidth + 1;
 #if WINVER >= WINVER_VISTA
-    target.m_BorderSize += m_Theme.GetNcMetrcs().iPaddedBorderWidth;
+    m_BorderSize += m_Theme.GetNcMetrcs().iPaddedBorderWidth;
 #endif
 
     rcFrame = rcBorder;
-    rcFrame.Shrink(target.m_BorderSize, target.m_BorderSize);
+    rcFrame.Shrink(m_BorderSize, m_BorderSize);
     rcFrame.PutInto(rcBorder, PutAt::Center);
-    target.m_rcFrame = ToCRect(rcFrame);
+    target.WR_Frame = ToCRect(rcFrame);
     rcWork = rcFrame;
 
     rcCapt = rcFrame;
     rcCapt.cy = m_Theme.GetNcMetrcs().iCaptionHeight + 2;
     rcWork.cy -= rcCapt.cy;
     rcCapt.Shrink(1, 1);
-    target.m_rcCapt = ToCRect(rcCapt);
+    target.WR_Caption = ToCRect(rcCapt);
 
     rcMenu = rcCapt;
     if (!isToolWnd) {
         rcMenu.y  = rcCapt.Bottom() + 1;
         rcMenu.cy = m_Theme.GetNcMetrcs().iMenuHeight + 1;
-        target.m_rcMenu = ToCRect(rcMenu);
+        target.WR_Menu = ToCRect(rcMenu);
         rcWork.cy -= rcCapt.cy;
     }
 
     rcWork.Shrink(2, 2);
     rcWork.y = rcMenu.Bottom() + 1;
-    target.m_rcWorkspace = ToCRect(rcWork);
+    target.WR_Workspace = ToCRect(rcWork);
 
     if (!isToolWnd) {
         rcScroll = rcWork;
         rcScroll.Shrink(0, 2);
         rcScroll.cx = m_Theme.GetNcMetrcs().iScrollWidth;
         rcScroll.x = rcWork.Right() - rcScroll.cx - 2;
-        target.m_rcScroll = ToCRect(rcScroll);
+        target.WR_Scroll = ToCRect(rcScroll);
     }
     else {
         long sx = ScaleForDpi<long>(4);
@@ -825,19 +827,20 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
         rcMessage = rcWork;
         rcMessage.Shrink(sx, sx - 1);
         rcMessage.cy = cy;
-        target.m_rcMessage = ToCRect(rcMessage);
+        target.WR_Message = ToCRect(rcMessage);
         rcMessage.y += cy + 2;
-        target.m_rcURL = ToCRect(rcMessage);
-        rcMessage.x += rcMessage.Width() / 2;
-        rcMessage.y += rcMessage.Height() + 6;
-        target.m_rcTooltip = ToCRect(rcMessage);
-        target.m_rcTooltip.InflateRect(3, 3);
+        target.WR_Hyperlink = ToCRect(rcMessage);
         rcButton = rcWork;
         rcButton.cx = rcWork.Width() / 2;
         rcButton.cy = cy * 2;
         rcButton.PutInto(rcWork, PutAt::Bottom | PutAt::XCenter);
         rcButton.y -= sx;
-        target.m_rcButton = ToCRect(rcButton);
+        target.WR_Button = ToCRect(rcButton);
+        rcTooltip = rcButton;
+        rcTooltip.x = rcButton.Right() + 2;
+        rcTooltip.y += rcButton.Height() / 2;
+        target.WR_Tooltip = ToCRect(rcTooltip);
+        target.WR_Tooltip.InflateRect(3, 3);
     }
 }
 
@@ -952,28 +955,28 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
     }
 
     if (isToolWnd) {
-        dc.FillSolidRect(rects.m_rcFrame, m_Theme.GetColor(COLOR_MENU));
-        CRect rcEdge(rects.m_rcFrame);
+        dc.FillSolidRect(rects.WR_Frame, m_Theme.GetColor(COLOR_MENU));
+        CRect rcEdge(rects.WR_Frame);
         dc.DrawEdge(rcEdge, EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
         rcEdge.InflateRect(1, 1);
         dc.DrawEdge(rcEdge, EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
     }
     else {
-        DrawBorder(dc, rects.m_rcBorder, rects.m_BorderSize, m_Theme.GetBrush(borderColorIndex));
-        dc.DrawEdge(CRect(rects.m_rcBorder), EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
-        dc.FillSolidRect(rects.m_rcFrame, m_Theme.GetColor(COLOR_MENU));
+        DrawBorder(dc, rects.WR_Border, m_BorderSize, m_Theme.GetBrush(borderColorIndex));
+        dc.DrawEdge(CRect(rects.WR_Border), EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
+        dc.FillSolidRect(rects.WR_Frame, m_Theme.GetColor(COLOR_MENU));
     }
 
-    CRect rcCapt = rects.m_rcCapt;
+    CRect rcCapt = rects.WR_Caption;
     rcCapt.right = DrawCaptionButtons(dc, rcCapt, !isToolWnd, captFlags);
     DrawCaption(dc, rcCapt, captFont, captIcon, params.caption, captFlags);
 
     if (!isToolWnd) {
         if (params.hMenu) {
-            DrawMenuBar(dc, rects.m_rcMenu, params.hMenu, menuFont, params.selectedMenu);
+            DrawMenuBar(dc, rects.WR_Menu, params.hMenu, menuFont, params.selectedMenu);
         }
 
-        CRect rcWork = rects.m_rcWorkspace;
+        CRect rcWork = rects.WR_Workspace;
         dc.FillSolidRect(rcWork, m_Theme.GetColor(workspaceColorIndex));
         dc.DrawEdge(rcWork, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
 
@@ -984,7 +987,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
             COLORREF prevBkClr = dc.SetBkColor(m_Theme.GetColor(workspaceColorIndex));
             int     prevBkMode = dc.SetBkMode(TRANSPARENT);
             CRect       rcText = rcWork;
-            rcText.right = rects.m_rcScroll.left - 1;
+            rcText.right = rects.WR_Scroll.left - 1;
             rcText.DeflateRect(rcWork.Width() / 16, 10);
             CRect  rcLine = rcText;
             LONG       cy = -(m_Theme.GetLogFont(FONT_Desktop)->lfHeight) + 2;
@@ -1016,13 +1019,13 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
             dc.SelectFont(prevFnt);
         }
 
-        DrawScrollbar(dc, rects.m_rcScroll, isActive);
+        DrawScrollbar(dc, rects.WR_Scroll, isActive);
     }
     else {
         if (params.text.lineCount < 3) {
             return;
         }
-        CRect rc = rects.m_rcMessage;
+        CRect rc = rects.WR_Message;
         if (rc.top >= rc.bottom) {
             return ;
         }
@@ -1035,7 +1038,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
         dc.DrawTextW(line0.GetString(), line0.GetLength(), rc, DT_LEFT | DT_SINGLELINE | DT_WORD_ELLIPSIS);
         dc.SelectFont(prevFont);
 #if WINVER >= WINVER_2K
-        rc = rects.m_rcURL;
+        rc = rects.WR_Hyperlink;
         if (rc.top >= rc.bottom) {
             return ;
         }
@@ -1044,7 +1047,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
         dc.DrawTextW(line1.GetString(), line1.GetLength(), rc, DT_LEFT | DT_SINGLELINE | DT_WORD_ELLIPSIS);
         dc.SelectFont(prevFont);
 #endif
-        rc = rects.m_rcButton;
+        rc = rects.WR_Button;
         if (rc.top >= rc.bottom) {
             return ;
         }
