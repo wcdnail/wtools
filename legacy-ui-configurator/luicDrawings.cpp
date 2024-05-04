@@ -887,9 +887,8 @@ void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStr
     if (rcText.left < 0) {
         return ;
     }
-    int         prevMode = SetBkMode(dc, TRANSPARENT);
-    COLORREF prevBkColor = SetBkColor(dc, m_Theme.GetColor(COLOR_BACKGROUND));
-    HFONT       prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Desktop));
+    int   prevMode = SetBkMode(dc, TRANSPARENT);
+    HFONT prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Desktop));
 
     if (!GetTextExtentPoint32(dc, text.GetString(), text.GetLength(), &szText)) {
         szText.cx = ScaleForDpi(45);
@@ -916,9 +915,7 @@ void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStr
     SetTextColor(dc, color);
     dc.DrawTextW(text.GetString(), text.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
     dc.SelectFont(prevFont);
-    dc.SetBkColor(prevBkColor);
     dc.SetBkMode(prevMode);
-
     if (drawCursor) {
         HICON hCursor = StaticInit::instance().m_hIcon[StaticInit::ICON_Cursor1];
         CRect rcCursor{rcIcon.right + 8, rcIcon.bottom - 16, 0, 0};
@@ -927,7 +924,6 @@ void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStr
         dc.DrawIconEx(rcCursor.TopLeft(), hCursor, rcCursor.Size(), 0, nullptr, DI_NORMAL);
     }
 }
-
 
 void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
 {
