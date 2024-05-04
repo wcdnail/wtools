@@ -1,16 +1,24 @@
 #pragma once
 
-#ifdef _DEBUG
-#include "dh.tracing.h"
-#include "dh.tracing.defs.h"
-#include "dev.assistance/dev.assist.h"
+#define _NEED_WMESSAGE_DUMP 0
 
-#define DBG_DUMP_WMESSAGE(CAPT, pMsg)                         \
-    do {                                                       \
-        auto msgStr = DH::MessageToStrignW(pMsg);               \
-        DebugThreadPrintf(CAPT L" [[ %s ]]\n", msgStr.c_str());  \
-    }                                                             \
+#if defined(_DEBUG) && (_NEED_WMESSAGE_DUMP)
+#  include "dh.tracing.h"
+#  include "dh.tracing.defs.h"
+#  include "dev.assistance/dev.assist.h"
+#  define DBG_DUMP_WMESSAGE(HDR, CAPT, pMsg)                            \
+    do {                                                                 \
+        auto msgStr = DH::MessageToStrignW(pMsg);                         \
+        DebugThreadPrintf(HDR L" %12s [[ %s ]]\n", CAPT, msgStr.c_str());  \
+    }                                                                       \
+    while (false)
+#  define DBG_DUMP_WMESSAGE_EXT(HDR, CAPT, hWnd, uMsg, wParam, lParam)  \
+    do {                                                                 \
+        auto msgStr = DH::MessageToStrignW(hWnd, uMsg, wParam, lParam);   \
+        DebugThreadPrintf(HDR L" %12s [[ %s ]]\n", CAPT, msgStr.c_str());  \
+    }                                                                       \
     while (false)
 #else
-#define DBG_DUMP_WMESSAGE(CAPT, pMsg)
+#  define DBG_DUMP_WMESSAGE(...)      do {} while (false)
+#  define DBG_DUMP_WMESSAGE_EXT(...)  do {} while (false)
 #endif

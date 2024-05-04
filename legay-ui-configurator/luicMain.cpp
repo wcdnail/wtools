@@ -152,15 +152,14 @@ CLegacyUIConfigurator* CLegacyUIConfigurator::App()
     return g_pApp;
 }
 
-ImageList const& CLegacyUIConfigurator::GetImageList(int index) const
+WTL::CImageListManaged const& CLegacyUIConfigurator::GetImageList(int index) const
 {
     if (index < 0 || index >= IL_Count) {
-        static const ImageList dmy;
+        static const WTL::CImageListManaged dmy;
         return dmy;
     }
     return m_ImList[index];
 }
-
 
 HRESULT CLegacyUIConfigurator::ImListCreate()
 {

@@ -10,6 +10,8 @@ struct CMainView: CPageImpl
     ~CMainView() override;
     CMainView();
 
+    BOOL PreTranslateMessage(MSG* pMsg) override;
+
 private:
     WTL::CTabCtrl m_Tab;
     PagesMap m_PagesMap;

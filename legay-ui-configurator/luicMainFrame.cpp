@@ -9,8 +9,6 @@
 #include "resz/resource.h"
 #include <atlwin.h>
 
-#include "debug.dump.msg.h"
-
 CMainFrame::~CMainFrame()
 {
 }
@@ -33,36 +31,12 @@ void CMainFrame::SetStatus(int status, ATL::CStringW&& message)
     m_SBar.Invalidate(TRUE);
 }
 
-static bool MyIsDialogMessage(HWND hFrameWnd, LPMSG pMsg)
-{
-    if ((pMsg->message < WM_KEYFIRST   || pMsg->message > WM_KEYLAST) &&
-        (pMsg->message < WM_MOUSEFIRST || pMsg->message > WM_MOUSELAST)) {
-        return false;
-    }
-    // find a direct child of the dialog from the window that has focus
-    HWND hWndCtl = ::GetFocus();
-    if (::IsChild(hFrameWnd, hWndCtl) && ::GetParent(hWndCtl) != hFrameWnd) {
-        do {
-            hWndCtl = ::GetParent(hWndCtl);
-        }
-        while (::GetParent(hWndCtl) != hFrameWnd);
-    }
-    // give controls a chance to translate this message
-    LRESULT lr = SendMessage(hWndCtl, WM_FORWARDMSG, 0, reinterpret_cast<LPARAM>(pMsg));
-    DBG_DUMP_WMESSAGE(LTH_CONTROL, pMsg);
-    // ##TODO: DO NOT do the Windows default thing
-    return false; //CDialogImplBaseT<TBase>::IsDialogMessage(pMsg);
-}
-
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
-    if (m_View.IsDialogMessageW(pMsg)) {
-        DBG_DUMP_WMESSAGE(LTH_CONTROL, pMsg);
+    if (m_View.PreTranslateMessage(pMsg)) {
         return TRUE;
     }
-    else {
-        DBG_DUMP_WMESSAGE(LTH_MAINFRAME, pMsg);
-    }
+    DBG_DUMP_WMESSAGE(LTH_MAINFRAME, L"Main", pMsg);
     if (Super::PreTranslateMessage(pMsg)) {
         return TRUE;
     }
@@ -90,17 +64,9 @@ void CMainFrame::OnResizeNotify()
 
 int CMainFrame::OnCreate(LPCREATESTRUCT)
 {
-    auto const* pApp = CLegacyUIConfigurator::App();
+    DBG_DUMP_WMESSAGE_EXT(LTH_MAINFRAME, L"Main", m_hWnd, WM_CREATE, 0, 0);
 
-#ifdef _DEBUG
-    {
-        wchar_t  _text[256] = {0};
-        wchar_t _class[256] = {0};
-        int clen = GetClassNameW(m_hWnd, _class, _countof(_class) - 1);
-        int tlen = GetWindowTextW(_text, _countof(_text) - 1);
-        DebugThreadPrintf(LTH_MAINFRAME L" WM_CREATE w:%p class:'%s' %s\n", m_hWnd, _class, _text);
-    }
-#endif
+    auto const* pApp = CLegacyUIConfigurator::App();
 
     HICON tempIco = pApp->GetIcon(IconMain);
     SetIcon(tempIco, FALSE);

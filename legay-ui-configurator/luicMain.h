@@ -8,8 +8,6 @@
 
 #define SHELL32_PATHNAME L"%SYSTEMROOT%\\System32\\shell32.dll"
 
-using ImageList = WTL::CImageListManaged;
-
 enum ImageListIndex : int
 {
     IL_Own = 0,
@@ -54,7 +52,7 @@ public:
     CTheme& CurrentTheme() const;
     HICON GetIcon(int icon) const;
     CMenu const& GetTestMenu() const;
-    ImageList const& GetImageList(int index) const;
+    WTL::CImageListManaged const& GetImageList(int index) const;
     void SetMainFrameStatus(int status, ATL::CStringW&& message);
 
     HRESULT Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID = NULL);
@@ -65,10 +63,10 @@ public:
 private:
     friend Super;
 
-    Conf::Section     m_Settings;
-    CMainFrame       m_MainFrame;
-    CMenu             m_TestMenu;
-    ImageList m_ImList[IL_Count];
+    Conf::Section                  m_Settings;
+    CMainFrame                    m_MainFrame;
+    CMenu                          m_TestMenu;
+    WTL::CImageListManaged m_ImList[IL_Count];
 
     static CTheme g_ThemeNative;
     static CLegacyUIConfigurator* g_pApp;

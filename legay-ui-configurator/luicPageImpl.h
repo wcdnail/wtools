@@ -11,7 +11,8 @@ struct CPageImpl;
 using  CPageImplPtr = std::unique_ptr<CPageImpl>;
 
 struct CPageImpl: ATL::CDialogImpl<CPageImpl>,
-                  WTL::CDialogResize<CPageImpl>
+                  WTL::CDialogResize<CPageImpl>,
+                  CMessageFilter
 {
     using     Super = ATL::CDialogImpl<CPageImpl>;
     using   Resizer = WTL::CDialogResize<CPageImpl>;
@@ -19,6 +20,7 @@ struct CPageImpl: ATL::CDialogImpl<CPageImpl>,
 
     ~CPageImpl() override;
 
+    BOOL PreTranslateMessage(MSG* pMsg) override;
     virtual HWND CreateDlg(HWND hWndParent, LPARAM dwInitParam = NULL);
     PCWSTR GetCaption() const;
 

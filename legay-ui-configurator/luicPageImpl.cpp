@@ -1,13 +1,8 @@
 #include "stdafx.h"
 #include "luicPageImpl.h"
 #include "luicMain.h"
-#include "UT/debug.assistance.h"
-
-#ifdef _DEBUG
-#  define DEBUG_FALSE false
-#else
-#  define DEBUG_FALSE true
-#endif
+#include "dh.tracing.h"
+#include "debug.dump.msg.h"
 
 CPageImpl::~CPageImpl()
 {
@@ -18,6 +13,15 @@ CPageImpl::CPageImpl(UINT idd, std::wstring&& caption)
     ,   m_Caption{ std::move(caption) }
     , m_ResiseMap{}
 {
+}
+
+BOOL CPageImpl::PreTranslateMessage(MSG* pMsg)
+{
+    if (IsDialogMessageW(pMsg)) {
+        DBG_DUMP_WMESSAGE(LTH_CONTROL, m_Caption.c_str(), pMsg);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 HWND CPageImpl::CreateDlg(HWND hWndParent, LPARAM dwInitParam)
@@ -48,12 +52,12 @@ void CPageImpl::DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count)
 
 BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-    DebugThreadPrintf(LTH_CONTROL L" WM_INITDIALOG w:%p '%s'\n", m_hWnd, m_Caption.c_str());
+    DBG_DUMP_WMESSAGE_EXT(LTH_CONTROL, m_Caption.c_str(), m_hWnd, WM_INITDIALOG, 0, lInitParam);
 
     UNREFERENCED_ARG(wndFocus);
     UNREFERENCED_ARG(lInitParam);
     m_ResiseMap.emplace_back(_AtlDlgResizeMap{ -1, 0 });
-    DlgResize_Init(false, DEBUG_FALSE);
+    DlgResize_Init(false, false);
     return TRUE;
 }
 
@@ -64,8 +68,16 @@ void CPageImpl::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     UNREFERENCED_ARG(uNotifyCode);
     UNREFERENCED_ARG(nID);
     UNREFERENCED_ARG(wndCtl);
+    switch(nID) {
+    case IDCANCEL:
+        DBG_DUMP_WMESSAGE_EXT(LTH_CANCEL, m_Caption.c_str(), m_hWnd, 0, 0, 0);
+        //DestroyWindow();
+        return;
+    default:
+        //DebugThreadPrintf(LTH_WM_COMMAND L" Unknown: n:%4d c:%4d w:%08x\n", uNotifyCode, nID, wndCtl);
+        break;
+    }
     SetMsgHandled(FALSE);
-    //DebugThreadPrintf(LTH_WM_COMMAND L" Unknown: n:%4d c:%4d w:%08x\n", uNotifyCode, nID, wndCtl);
 }
 
 LRESULT CPageImpl::OnNotify(int idCtrl, LPNMHDR pnmh)

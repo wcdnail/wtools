@@ -37,6 +37,16 @@ CMainView::CMainView()
 {
 }
 
+BOOL CMainView::PreTranslateMessage(MSG* pMsg)
+{
+    for (const auto& it: m_PagesMap) {
+        if (it.second->PreTranslateMessage(pMsg)) {
+            return TRUE;
+        }
+    }
+    return CPageImpl::PreTranslateMessage(pMsg);
+}
+
 CPageImplPtr const& CMainView::PagesGet(int numba) const
 {
     const auto& it = m_PagesMap.find(numba);
@@ -191,6 +201,8 @@ BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 
 void CMainView::OnDestroy()
 {
+    m_Tab.DeleteAllItems();
+    m_Tab.DestroyWindow();
     CPageImpl::OnDestroy();
 }
 
@@ -216,12 +228,5 @@ LRESULT CMainView::OnNotify(int idCtrl, LPNMHDR pnmh)
 
 void CMainView::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
-    switch(nID) {
-    case IDCANCEL:
-        m_Tab.DeleteAllItems();
-        m_Tab.DestroyWindow();
-        DestroyWindow();
-        return;
-    }
     CPageImpl::OnCommand(uNotifyCode, nID, wndCtl);
 }
