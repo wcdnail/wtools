@@ -57,10 +57,7 @@ private:
     WindowRects   m_WndRect[WND_Count];
 
     HRESULT InitWallpapers();
-    static void CalcRects(DrawWindowArgs (&params)[WND_Count],
-                          CRect const&               rcClient,
-                          DRect&                       rcAux1,
-                          DRect&                       rcAux2);
+    static void CalcRects(DrawWindowArgs (&params)[WND_Count], CRect const& rcClient, DRect& rcAux);
     void DrawDesktop(CDCHandle dc, CRect const& rc);
     void HighLightSeletced(CDCHandle dc, CRect const& rcClient);
     int OnCreate(LPCREATESTRUCT pCS);

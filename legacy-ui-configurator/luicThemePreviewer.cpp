@@ -171,11 +171,7 @@ void CThemePreviewer::OnPaint(CDCHandle dcParam)
     HighLightSeletced(dc, bufferedPaint.GetRect());
 }
 
-void CThemePreviewer::CalcRects(DrawWindowArgs (&params)[WND_Count],
-                                CRect const&               rcClient,
-                                DRect&                       rcAux1,
-                                DRect&                       rcAux2
-)
+void CThemePreviewer::CalcRects(DrawWindowArgs (&params)[WND_Count], CRect const& rcClient, DRect& rcAux)
 {
     const double   sx = 5.;
     const double   sy = 5.;
@@ -186,11 +182,12 @@ void CThemePreviewer::CalcRects(DrawWindowArgs (&params)[WND_Count],
     const double fCX = rcFull.Width();
     const double fCY = rcFull.Height();
 
-    rcAux1 = rcAlloc.Next(fCX / 3., fCY / 3., sx, sy);
+    DRect rcAux1 = rcAlloc.Next(fCX / 3., fCY / 3., sx, sy);
+    rcAux = rcAux1;
     params[WND_Front].drect = rcAlloc.NextFromRight(fCX, fCY / 1.2, sx, sy);
 
     rcAlloc.Shift(0, -(params[WND_Front].drect.Height() - rcAux1.Height()));
-    rcAux2 = rcAlloc.Next(fCX / 5., fCY / 2., sx, sy);
+    DRect rcAux2 = rcAlloc.Next(fCX / 5., fCY / 2., sx, sy);
     params[WND_Back].drect = rcAlloc.Next(fCX, fCY, sx, sy);
 
     rcAlloc.Shift(0, -(params[WND_Back].drect.Height() - rcAux2.Height()));
@@ -259,8 +256,7 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
         { m_WndRect[WND_MsgBox], {}, L"Tool window", DC_ACTIVE | DC_SMALLCAP, nullptr, -1, { MsgBoxText, _countof(MsgBoxText), 0 } },
     };
     DRect rcAux1;
-    DRect rcAux2;
-    CalcRects(params, rcClient, rcAux1, rcAux2);
+    CalcRects(params, rcClient, rcAux1);
 
     dc.FillSolidRect(rcClient, theme.GetColor(COLOR_BACKGROUND));
 
