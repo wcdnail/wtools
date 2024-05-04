@@ -66,7 +66,7 @@ bool CIconCollectionFile::Load(PCWSTR pathname, bool withSmall)
     return true;
 }
 
-WTL::CImageListManaged CIconCollectionFile::MakeImageList(int icoCx, int icoCy, UINT flags /*= ILC_MASK | ILC_COLOR32*/)
+WTL::CImageList CIconCollectionFile::MakeImageList(int icoCx, int icoCy, UINT flags /*= ILC_MASK | ILC_COLOR32*/)
 {
     const bool  bigIcons = (icoCx > 16) && (icoCy > 16);
     IconArray& sourceVec = bigIcons ? m_IconArr : m_IconArrSm;

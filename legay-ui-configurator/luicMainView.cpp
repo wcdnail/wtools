@@ -27,7 +27,7 @@ enum PageIndex: int
 
 void CMainView::PagesCreate()
 {
-    m_Tab.Attach(GetDlgItem(IDC_TAB1));
+    m_TabCtrl.Attach(GetDlgItem(IDC_TAB1));
 
   //auto   pBackground = std::make_unique<CPageBackground> (L"Background");
   //auto  pScreenSaver = std::make_unique<CPageScreenSaver>(L"Screen Saver");
@@ -51,10 +51,10 @@ CMainView::~CMainView()
 }
 
 CMainView::CMainView()
-    :      CPageImpl{ IDD_LEGACY_UI_MAIN_VIEW, L"MainView" }
-    ,         m_Tab {}
-    ,    m_PagesMap {}
-    , m_rcTabClient {}
+    :     CPageImpl{IDD_LEGACY_UI_MAIN_VIEW, L"MainView"}
+    ,     m_TabCtrl{}
+    ,    m_PagesMap{}
+    , m_rcTabClient{}
 {
 }
 
@@ -70,8 +70,8 @@ BOOL CMainView::PreTranslateMessage(MSG* pMsg)
 
 void CMainView::TabShift(int num)
 {
-    const int count = m_Tab.GetItemCount() - 1;
-    const int  curr = m_Tab.GetCurSel();
+    const int count = m_TabCtrl.GetItemCount() - 1;
+    const int  curr = m_TabCtrl.GetCurSel();
     int next = curr + num;
     if (next < 0) {
         next = count;
@@ -79,17 +79,18 @@ void CMainView::TabShift(int num)
     else if (next > count) {
         next = 0;
     }
-    m_Tab.SetCurSel(next);
+    m_TabCtrl.SetCurSel(next);
     PagesShow(curr, false);
     PagesShow(next, true);
 }
 
 void CMainView::SelectAll()
 {
-    switch (m_Tab.GetCurSel()) {
-    case PageDllIcons:
+    switch (m_TabCtrl.GetCurSel()) {
+    case PageDllIcons: {
         PagesGetCurrent()->SelectAll();
         break;
+    }
     }
 }
 
@@ -106,27 +107,27 @@ CPageImplPtr const& CMainView::PagesGet(int numba) const
 
 CPageImplPtr const& CMainView::PagesGetCurrent() const
 {
-    return PagesGet(m_Tab.GetCurSel());
+    return PagesGet(m_TabCtrl.GetCurSel());
 }
 
 void CMainView::PagesGetRect()
 {
     CRect rcTab;
-    if (0) { // ##FIXME: is m_Tab owns page ?
+    if (0) { // ##FIXME: is m_TabCtrl owns page ?
         CRect rcMy;
         GetWindowRect(rcMy);
-        m_Tab.GetWindowRect(rcTab);
+        m_TabCtrl.GetWindowRect(rcTab);
         OffsetRect(rcTab, -rcMy.left, -rcMy.top);
     }
     else {
-        m_Tab.GetClientRect(rcTab);
+        m_TabCtrl.GetClientRect(rcTab);
     }
     m_rcTabClient = rcTab;
 #if !defined(_DEBUG_TAB_RECT)
-    TabCtrl_AdjustRect(m_Tab.m_hWnd, FALSE, m_rcTabClient);
+    TabCtrl_AdjustRect(m_TabCtrl.m_hWnd, FALSE, m_rcTabClient);
     m_rcTabClient.InflateRect(4, 4);
 #else
-    m_Tab.ShowWindow(SW_HIDE);
+    m_TabCtrl.ShowWindow(SW_HIDE);
     {
         CWindowDC dc(m_hWnd);
         CRect rcEdge = m_rcTabClient;
@@ -134,12 +135,12 @@ void CMainView::PagesGetRect()
         dc.FillSolidRect(rcEdge, 0x005f5fff);
 
         CRect rcAdj = m_rcTabClient;
-        TabCtrl_AdjustRect(m_Tab.m_hWnd, FALSE, rcAdj);
+        TabCtrl_AdjustRect(m_TabCtrl.m_hWnd, FALSE, rcAdj);
         dc.FillSolidRect(m_rcTabClient, 0x001f1f1f);
         dc.FillSolidRect(rcAdj, 0x003f3f1f);
     }
-    m_Tab.Invalidate(TRUE);
-    m_Tab.ShowWindow(SW_SHOW);
+    m_TabCtrl.Invalidate(TRUE);
+    m_TabCtrl.ShowWindow(SW_SHOW);
 #endif
 }
 
@@ -160,13 +161,13 @@ void CMainView::PagesShow(int numba, bool show)
 void CMainView::PagesAppend(CPageImplPtr&& pagePtr)
 {
     HRESULT code = S_FALSE;
-    int number = m_Tab.InsertItem(m_Tab.GetItemCount(), TCIF_TEXT, pagePtr->GetCaption(), 0, 0l);
+    int number = m_TabCtrl.InsertItem(m_TabCtrl.GetItemCount(), TCIF_TEXT, pagePtr->GetCaption(), 0, 0l);
     if (number < 0) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", pagePtr->GetCaption()), code, true, MB_ICONERROR);
         return ;
     }
-    if (!pagePtr->CreateDlg(m_Tab.m_hWnd)) {
+    if (!pagePtr->CreateDlg(m_TabCtrl.m_hWnd)) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", pagePtr->GetCaption()), code, true, MB_ICONERROR);
         return ;
@@ -181,7 +182,7 @@ void CMainView::PagesAppend(CPageImplPtr&& pagePtr)
 
 void CMainView::OnResizeNotify()
 {
-    if (!m_Tab.m_hWnd) {
+    if (!m_TabCtrl.m_hWnd) {
         return ;
     }
     PagesGetRect();
@@ -201,10 +202,11 @@ BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     PagesCreate();
 
     const int initialPage = 0;
-    m_Tab.SetCurSel(initialPage);
+    m_TabCtrl.SetCurSel(initialPage);
     PagesShow(initialPage, true);
 
     DlgResizeAdd(IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y);
+    DlgResizeAdd(IDC_BN_OK, DLSZ_MOVE_X | DLSZ_MOVE_Y);
     DlgResizeAdd(IDC_BN_CANCEL, DLSZ_MOVE_X | DLSZ_MOVE_Y);
     DlgResizeAdd(IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y);
     BOOL rv = CPageImpl::OnInitDialog(wndFocus, lInitParam);
@@ -213,8 +215,8 @@ BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 
 void CMainView::OnDestroy()
 {
-    m_Tab.DeleteAllItems();
-    m_Tab.DestroyWindow();
+    m_TabCtrl.DeleteAllItems();
+    m_TabCtrl.DestroyWindow();
     CPageImpl::OnDestroy();
 }
 

@@ -7,26 +7,36 @@ struct CTheme;
 
 struct WindowRects
 {
-    int     m_BorderSize = { 0 };
+    int     m_BorderSize = {0};
     CRect     m_rcBorder = {};
     CRect      m_rcFrame = {};
     CRect       m_rcCapt = {};
     CRect       m_rcMenu = {};
     CRect  m_rcWorkspace = {};
     CRect     m_rcScroll = {};
+    CRect    m_rcMessage = {};
+    CRect        m_rcURL = {};
+    CRect     m_rcButton = {};
+};
+
+enum WinTextFalgs : UINT
+{
+     WT_Usual = 0x00000000,
+    WT_Select = 0x00000001,
+       WT_URL = 0x00000002,
 };
 
 struct WinText
 {
-    bool        selected = { false };
+    UINT           flags = {WT_Usual};
     ATL::CStringW   text = {};
 };
 
 struct WindowText
 {
-    WinText const*  line = { nullptr };
-    int        lineCount = { 0 };
-    UINT           flags = { 0 };
+    WinText const*  line = {nullptr};
+    int        lineCount = {0};
+    UINT           flags = {0};
 };
 
 struct DrawWindowArgs
@@ -49,6 +59,11 @@ public:
     void CalcRects(CRect const& rc, UINT captFlags, WindowRects& target) const;
 
     void DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const;
+    void DrawEdge(CDCHandle dc, CRect& pRect, UINT edge, UINT uFlags) const;
+    void DrawFrameButton(CDCHandle dc, CRect& rcParam, UINT uState) const;
+    void DrawFrameCaption(CDCHandle dc, CRect& rcParam, UINT uFlags, CFont& fnMarlett) const;
+    void DrawFrameScroll(CDCHandle dc, CRect& rcParam, UINT uFlags, CFont& fnMarlett) const;
+    void DrawFrameControl(CDCHandle dc, CRect& rcParam, UINT uType, UINT uState, CFont& fnMarlett) const;
     LONG DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags) const;
     void DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags) const;
     void DrawMenuText(CDCHandle hdc, PCWSTR text, CRect& rc, UINT format, int color) const;

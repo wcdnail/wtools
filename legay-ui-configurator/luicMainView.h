@@ -15,9 +15,9 @@ struct CMainView: CPageImpl
     void SelectAll();
 
 private:
-    WTL::CTabCtrl m_Tab;
-    PagesMap m_PagesMap;
-    CRect m_rcTabClient;
+    WTL::CTabCtrl m_TabCtrl;
+    PagesMap     m_PagesMap;
+    CRect     m_rcTabClient;
 
     CPageImplPtr const& PagesGet(int numba) const;
     CPageImplPtr const& PagesGetCurrent() const;

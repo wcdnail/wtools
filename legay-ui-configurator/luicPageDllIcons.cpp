@@ -93,13 +93,13 @@ void CPageDllIcons::SetError(HRESULT code, PCWSTR format, ...)
 void CPageDllIcons::OnCollectionLoad(CIconCollectionFile& collection)
 {
     Reset();
-    WTL::CImageListManaged tempIl = collection.MakeImageList(32, 32);
+    WTL::CImageListManaged tempIl = collection.MakeImageList(32, 32).Detach();
     if (!tempIl.m_hImageList) {
         const auto code = static_cast<HRESULT>(GetLastError());
         SetError(code, L"ImageList creation from collection '%s' failed", collection.GetFilename().c_str());
         return ;
     }
-    WTL::CImageListManaged tempIlSm = collection.MakeImageList(16, 16);
+    WTL::CImageListManaged tempIlSm = collection.MakeImageList(16, 16).Detach();
     m_il16x16.Attach(tempIlSm.Detach());
     m_il32x32.Attach(tempIl.Detach());
     m_bManagedIl = true;

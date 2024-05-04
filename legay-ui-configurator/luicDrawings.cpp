@@ -10,6 +10,10 @@
 // https://stackoverflow.com/questions/14994012/how-draw-caption-in-alttab-switcher-when-paint-custom-captionframe
 //
 
+namespace
+{
+
+#if 0
 CIconHandle LoadShellIcon(ATL::CStringW const& entry, UINT flags = SHGFI_SMALLICON | SHGFI_ADDOVERLAYS, unsigned attrs = INVALID_FILE_ATTRIBUTES)
 {
     if (INVALID_FILE_ATTRIBUTES == attrs) {
@@ -34,6 +38,60 @@ CIconHandle LoadShellIcon(ATL::CStringW const& entry, UINT flags = SHGFI_SMALLIC
     }
     return CIconHandle(info.hIcon);
 }
+#endif
+
+/*
+ * Borders:
+ * (None),                        BDR_RAISEDOUTER,                                 BDR_SUNKENOUTER,               BDR_RAISEDOUTER | BDR_SUNKENOUTER
+ * BDR_RAISEDINNER,               EDGE_RAISED,                                     EDGE_ETCHED,                   BDR_RAISEDOUTER | EDGE_ETCHED
+ * BDR_SUNKENINNER,               EDGE_BUMP,                                       EDGE_SUNKEN,                   BDR_RAISEDOUTER | EDGE_SUNKEN
+ * BDR_SUNKENOUTER | EDGE_SUNKEN, BDR_RAISEDOUTER | BDR_SUNKENOUTER | EDGE_SUNKEN, BDR_RAISEDINNER | EDGE_SUNKEN, BDR_RAISEDOUTER | BDR_RAISEDINNER | EDGE_SUNKEN
+ *
+ */
+
+static const signed char LTInnerNormal[] = {
+    -1,               -1,                -1,                -1,
+    -1,               COLOR_3DHILIGHT,   COLOR_3DHILIGHT,   -1,
+    -1,               COLOR_3DDKSHADOW,  COLOR_3DDKSHADOW,  -1,
+    -1,               -1,                -1,                -1
+};
+
+static const signed char LTOuterNormal[] = {
+    -1,               COLOR_3DLIGHT,     COLOR_3DSHADOW,    -1,
+    COLOR_3DHILIGHT,  COLOR_3DLIGHT,     COLOR_3DSHADOW,    -1,
+    COLOR_3DDKSHADOW, COLOR_3DLIGHT,     COLOR_3DSHADOW,    -1,
+    -1,               COLOR_3DLIGHT,     COLOR_3DSHADOW,    -1
+};
+
+static const signed char RBInnerNormal[] = {
+    -1,               -1,                -1,                -1,
+    -1,               COLOR_3DSHADOW,    COLOR_3DSHADOW,    -1,
+    -1,               COLOR_3DLIGHT,     COLOR_3DLIGHT,     -1,
+    -1,               -1,                -1,                -1
+};
+
+static const signed char RBOuterNormal[] = {
+    -1,               COLOR_3DDKSHADOW,  COLOR_3DHILIGHT,   -1,
+    COLOR_3DSHADOW,   COLOR_3DDKSHADOW,  COLOR_3DHILIGHT,   -1,
+    COLOR_3DLIGHT,    COLOR_3DDKSHADOW,  COLOR_3DHILIGHT,   -1,
+    -1,               COLOR_3DDKSHADOW,  COLOR_3DHILIGHT,   -1
+};
+
+static const signed char LTRBOuterMono[] = {
+    -1,               COLOR_WINDOWFRAME, COLOR_WINDOWFRAME, COLOR_WINDOWFRAME,
+    COLOR_WINDOW,     COLOR_WINDOWFRAME, COLOR_WINDOWFRAME, COLOR_WINDOWFRAME,
+    COLOR_WINDOW,     COLOR_WINDOWFRAME, COLOR_WINDOWFRAME, COLOR_WINDOWFRAME,
+    COLOR_WINDOW,     COLOR_WINDOWFRAME, COLOR_WINDOWFRAME, COLOR_WINDOWFRAME,
+};
+
+static const signed char LTRBInnerMono[] = {
+    -1,               -1,                -1,                -1,
+    -1,               COLOR_WINDOW,      COLOR_WINDOW,      COLOR_WINDOW,
+    -1,               COLOR_WINDOW,      COLOR_WINDOW,      COLOR_WINDOW,
+    -1,               COLOR_WINDOW,      COLOR_WINDOW,      COLOR_WINDOW,
+};
+
+} // namespace
 
 struct CDrawRoutine::StaticInit
 {
@@ -47,9 +105,9 @@ struct CDrawRoutine::StaticInit
         ICON_Count
     };
 
-    using DrawCaptionTempWFn = BOOL(WINAPI*)(HWND hWnd, HDC dc, const RECT* pRect, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags);
+    using DrawCaptionTempWFn = BOOL(WINAPI*)(HWND hWnd, HDC dc, const RECT* rcParam, HFONT fnMarlet, HICON hIcon, PCWSTR str, UINT uFlags);
     using SetSysColorsTempFn = DWORD_PTR(WINAPI*)(const COLORREF* pPens, const HBRUSH* pBrushes, DWORD_PTR n);
-    using  DrawMenuBarTempFn = int(WINAPI*)(HWND hWnd, HDC dc, RECT* pRect, HMENU hMenu, HFONT hFont);
+    using  DrawMenuBarTempFn = int(WINAPI*)(HWND hWnd, HDC dc, RECT* rcParam, HMENU hMenu, HFONT fnMarlet);
 
     HMODULE                      USER32;
     DrawCaptionTempWFn DrawCaptionTempW;
@@ -63,13 +121,33 @@ struct CDrawRoutine::StaticInit
         return inst;
     }
 
+    static CFontHandle CreateMarlettFont(LONG height)
+    {
+        LOGFONT lf = { 0 };
+        lstrcpy(lf.lfFaceName, TEXT("Marlett"));
+        lf.lfHeight = height;
+        lf.lfWidth = 0;
+        lf.lfEscapement = 0;
+        lf.lfOrientation = 0;
+        lf.lfWeight = FW_NORMAL;
+        lf.lfItalic = FALSE;
+        lf.lfUnderline = FALSE;
+        lf.lfStrikeOut = FALSE;
+        lf.lfCharSet = SYMBOL_CHARSET;
+        lf.lfOutPrecision = OUT_DEFAULT_PRECIS;
+        lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+        lf.lfQuality = DEFAULT_QUALITY;
+        lf.lfPitchAndFamily = DEFAULT_PITCH;
+        return {CreateFontIndirect(&lf)};
+    }
+
 private:
     template <typename T>
     static bool GetProcAddressEx(HMODULE hMod, T& routine, PCSTR routineName, PCSTR modAlias)
     {
         *reinterpret_cast<FARPROC*>(&routine) = GetProcAddress(hMod, routineName);
         if (!routine) {
-            DH::ThreadPrintf("%14s| '%s' is NULL\n", modAlias, routineName);
+            DH::ThreadPrintf("%14s| '%s' is nullptr\n", modAlias, routineName);
         }
         return nullptr != routine;
     }
@@ -140,12 +218,247 @@ void CDrawRoutine::DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidt
     }
 }
 
+void CDrawRoutine::DrawEdge(CDCHandle dc, CRect& rcParam, UINT edge, UINT uFlags) const
+{
+    CRect rcInner = rcParam;
+    HPEN  prevPen = nullptr;
+    POINT savePoint;
+    savePoint.x = 0;
+    savePoint.y = 0;
+    /* Determine the colors of the edges */
+    unsigned char edgeIndex = edge & (BDR_INNER | BDR_OUTER);
+    signed char LTInnerI, LTOuterI, RBInnerI, RBOuterI;
+    if (uFlags & BF_SOFT) {
+        LTInnerI = LTOuterNormal[edgeIndex];
+        LTOuterI = LTInnerNormal[edgeIndex];
+    }
+    else {
+        LTInnerI = LTInnerNormal[edgeIndex];
+        LTOuterI = LTOuterNormal[edgeIndex];
+    }
+    RBInnerI = RBInnerNormal[edgeIndex];
+    RBOuterI = RBOuterNormal[edgeIndex];
+
+    int iPenLBPlus = (uFlags & BF_BOTTOMLEFT)  == BF_BOTTOMLEFT  ? 1 : 0;
+    int iPenRTPlus = (uFlags & BF_TOPRIGHT)    == BF_TOPRIGHT    ? 1 : 0;
+    int iPenRBPlus = (uFlags & BF_BOTTOMRIGHT) == BF_BOTTOMRIGHT ? 1 : 0;
+    int iPenLTPlus = (uFlags & BF_TOPLEFT)     == BF_TOPLEFT     ? 1 : 0;
+
+#if WINVER >= WINVER_2K && !defined(WINVER_IS_98)
+#define SetPenColor(border) \
+    SetDCPenColor(dc, m_Theme.GetColor(border))
+    prevPen = dc.SelectPen(AtlGetStockPen(DC_PEN));
+    SetPenColor(LTOuterI);
+#else
+    HPEN hPen = CreatePen(PS_SOLID, 1, m_Theme.GetColor(LTOuterI);
+    prevPen = (HPEN)SelectObject(dc, hPen);
+#define SetPenColor(border)                              \
+    SelectObject(dc, prevPen);                            \
+    DeleteObject(hPen);                                    \
+    hPen = CreatePen(PS_SOLID, 1, m_Theme.GetColor(border); \
+    SelectObject(dc, hPen)
+#endif
+    if (uFlags & BF_MIDDLE) {
+        FillRect(dc, &rcInner, m_Theme.GetBrush(COLOR_3DFACE));
+    }
+    MoveToEx(dc, 0, 0, &savePoint);
+    /* Draw the outer edge */
+    if (LTOuterI >= 0) {
+        if (uFlags & BF_TOP) {
+            MoveToEx(dc, rcInner.left, rcInner.top, nullptr);
+            LineTo(dc, rcInner.right, rcInner.top);
+        }
+        if (uFlags & BF_LEFT) {
+            MoveToEx(dc, rcInner.left, rcInner.top, nullptr);
+            LineTo(dc, rcInner.left, rcInner.bottom);
+        }
+    }
+    if (RBOuterI >= 0) {
+        SetPenColor(RBOuterI);
+        if (uFlags & BF_BOTTOM) {
+            MoveToEx(dc, rcInner.left, rcInner.bottom - 1, nullptr);
+            LineTo(dc, rcInner.right, rcInner.bottom - 1);
+        }
+        if (uFlags & BF_RIGHT) {
+            MoveToEx(dc, rcInner.right - 1, rcInner.top, nullptr);
+            LineTo(dc, rcInner.right - 1, rcInner.bottom);
+        }
+    }
+    /* Draw the inner edge */
+    if (LTInnerI >= 0) {
+        SetPenColor(LTInnerI);
+        if (uFlags & BF_TOP) {
+            MoveToEx(dc, rcInner.left + iPenLTPlus, rcInner.top + 1, nullptr);
+            LineTo(dc, rcInner.right - iPenRTPlus, rcInner.top + 1);
+        }
+        if (uFlags & BF_LEFT) {
+            MoveToEx(dc, rcInner.left + 1, rcInner.top + iPenLTPlus, nullptr);
+            LineTo(dc, rcInner.left + 1, rcInner.bottom - iPenLBPlus);
+        }
+    }
+    if (RBInnerI >= 0) {
+        SetPenColor(RBInnerI);
+        if (uFlags & BF_BOTTOM) {
+            MoveToEx(dc, rcInner.left + iPenLBPlus, rcInner.bottom - 2, nullptr);
+            LineTo(dc, rcInner.right - iPenRBPlus, rcInner.bottom - 2);
+        }
+        if (uFlags & BF_RIGHT) {
+            MoveToEx(dc, rcInner.right - 2, rcInner.top + iPenRTPlus, nullptr);
+            LineTo(dc, rcInner.right - 2, rcInner.bottom - iPenRBPlus);
+        }
+    }
+    if (uFlags & BF_ADJUST) {
+        const int add = (LTRBInnerMono[edgeIndex] >= 0 ? 1 : 0) +
+                        (LTRBOuterMono[edgeIndex] >= 0 ? 1 : 0);
+        if (uFlags & BF_LEFT) {
+            rcInner.left += add;
+        }
+        if (uFlags & BF_RIGHT) {
+            rcInner.right -= add;
+        }
+        if (uFlags & BF_TOP) {
+            rcInner.top += add;
+        }
+        if (uFlags & BF_BOTTOM) {
+            rcInner.bottom -= add;
+        }
+        if (uFlags & BF_ADJUST) {
+            rcParam = rcInner;
+        }
+    }
+    MoveToEx(dc, savePoint.x, savePoint.y, nullptr);
+    SelectObject(dc, prevPen);
+#if WINVER < WINVER_2K
+    DeleteObject(hPen);
+#endif
+}
+
+void CDrawRoutine::DrawFrameButton(CDCHandle dc, CRect& rcParam, UINT uState) const
+{
+    UINT edge;
+    if (uState & (DFCS_PUSHED | DFCS_CHECKED | DFCS_FLAT)) {
+        edge = EDGE_SUNKEN;
+    }
+    else {
+        edge = EDGE_RAISED;
+    }
+    return DrawEdge(dc, rcParam, edge, (uState & DFCS_FLAT) | BF_RECT | BF_SOFT | BF_MIDDLE);
+}
+
+static CRect MakeSquareRect(CRect const& rcSrc)
+{
+    int     width = rcSrc.right - rcSrc.left;
+    int    height = rcSrc.bottom - rcSrc.top;
+    int smallDiam = ((width > height) ? height : width);
+    CRect   rcDst = rcSrc;
+    /* Make it a square box */
+    if (width < height)       /* smallDiam == width */ {
+        rcDst.top += (height - width) / 2;
+        rcDst.bottom = rcDst.top + smallDiam;
+    }
+    else if (width > height)  /* smallDiam == height */ {
+        rcDst.left += (width - height) / 2;
+        rcDst.right = rcDst.left + smallDiam;
+    }
+    return rcDst;
+}
+
+void CDrawRoutine::DrawFrameCaption(CDCHandle dc, CRect& rcParam, UINT uFlags, CFont& fnMarlett) const
+{
+    TCHAR symbol = 0;
+    switch (uFlags & 0xff) {
+    case DFCS_CAPTIONCLOSE:   symbol = TEXT('r'); break;
+    case DFCS_CAPTIONHELP:    symbol = TEXT('s'); break;
+    case DFCS_CAPTIONMIN:     symbol = TEXT('0'); break;
+    case DFCS_CAPTIONMAX:     symbol = TEXT('1'); break;
+    case DFCS_CAPTIONRESTORE: symbol = TEXT('2'); break;
+    default: break;
+    }
+    DrawEdge(dc, rcParam, static_cast<UINT>((uFlags & DFCS_PUSHED) ? EDGE_SUNKEN : EDGE_RAISED), BF_RECT | BF_MIDDLE | BF_SOFT);
+    CRect myRect = MakeSquareRect(rcParam);
+    myRect.left += 2;
+    myRect.top += 2;
+    myRect.right -= 1;
+    myRect.bottom -= 2;
+    if (uFlags & DFCS_PUSHED) {
+        OffsetRect(&myRect, 1, 1);
+    }
+    if (0 == symbol) {
+        return ;
+    }
+    if (!fnMarlett.m_hFont) {
+        fnMarlett = StaticInit::CreateMarlettFont(myRect.bottom - myRect.top);
+    }
+    HFONT prevFont = dc.SelectFont(fnMarlett);
+    int   prevMode = dc.SetBkMode(TRANSPARENT);
+    if (uFlags & DFCS_INACTIVE) { // Draw shadow
+        SetTextColor(dc, m_Theme.GetColor(COLOR_3DHILIGHT));
+        TextOut(dc, myRect.left + 1, myRect.top + 1, &symbol, 1);
+    }
+    SetTextColor(dc, m_Theme.GetColor((uFlags & DFCS_INACTIVE) ? COLOR_3DSHADOW : COLOR_BTNTEXT));
+    TextOut(dc, myRect.left, myRect.top, &symbol, 1);
+    dc.SetBkMode(prevMode);
+    dc.SelectFont(prevFont);
+}
+
+void CDrawRoutine::DrawFrameScroll(CDCHandle dc, CRect& rcParam, UINT uFlags, CFont& fnMarlett) const
+{
+    TCHAR symbol = 0;
+    switch (uFlags & 0xff) {
+    case DFCS_SCROLLCOMBOBOX:
+    case DFCS_SCROLLDOWN:       symbol = TEXT('6'); break;
+    case DFCS_SCROLLUP:         symbol = TEXT('5'); break;
+    case DFCS_SCROLLLEFT:       symbol = TEXT('3'); break;
+    case DFCS_SCROLLRIGHT:      symbol = TEXT('4'); break;
+    default: break;
+    }
+    DrawEdge(dc, rcParam,
+        (uFlags & DFCS_PUSHED) ? (UINT)EDGE_SUNKEN : (UINT)EDGE_RAISED,
+        (uFlags & DFCS_FLAT) | BF_MIDDLE | BF_RECT);
+    CRect myRect = MakeSquareRect(rcParam);
+    myRect.left += 2;
+    myRect.top += 2;
+    myRect.right -= 2;
+    myRect.bottom -= 2;
+    if (uFlags & DFCS_PUSHED) {
+        OffsetRect(&myRect, 1, 1);
+    }
+    if (0 == symbol) {
+        return ;
+    }
+    if (!fnMarlett.m_hFont) {
+        fnMarlett = StaticInit::CreateMarlettFont(myRect.bottom - myRect.top);
+    }
+    HFONT prevFont = dc.SelectFont(fnMarlett);
+    int   prevMode = dc.SetBkMode(TRANSPARENT);
+    if (uFlags & DFCS_INACTIVE) {
+        SetTextColor(dc, m_Theme.GetColor(COLOR_3DHILIGHT));
+        dc.TextOutW(myRect.left + 1, myRect.top + 1, &symbol, 1);
+    }
+    dc.SetTextColor(m_Theme.GetColor((uFlags & DFCS_INACTIVE) ? COLOR_3DSHADOW : COLOR_BTNTEXT));
+    dc.TextOutW(myRect.left, myRect.top, &symbol, 1);
+    dc.SetBkMode(prevMode);
+    dc.SelectFont(prevFont);
+}
+
+
+void CDrawRoutine::DrawFrameControl(CDCHandle dc, CRect& rcParam, UINT uType, UINT uState, CFont& fnMarlett) const
+{
+    switch (uType) {
+    case DFC_CAPTION: DrawFrameCaption(dc, rcParam, uState, fnMarlett); break;
+    case DFC_SCROLL:  DrawFrameScroll(dc, rcParam, uState, fnMarlett); break;
+    case DFC_BUTTON:
+    default:
+        DrawFrameButton(dc, rcParam, uState);
+        break;
+    }
+}
+
 LONG CDrawRoutine::DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags) const
 {
     static const int margin = 2;
     int         buttonWidth = m_Theme.GetNcMetrcs().iCaptionWidth;
     buttonWidth -= margin;
-
     int iColor;
 #if WINVER >= WINVER_2K
     if (uFlags & DC_GRADIENT) {
@@ -171,24 +484,25 @@ LONG CDrawRoutine::DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool
     CRect rc;
     rc.top = rcCaption.top + margin;
     rc.bottom = rcCaption.bottom - margin;
-
     rc.right = rcCaption.right - margin;
     rc.left = rc.right - buttonWidth;
-    dc.DrawFrameControl(rc, DFC_CAPTION, DFCS_CAPTIONCLOSE);
+
+    CFont fnMarlett;
+    DrawFrameControl(dc, rc, DFC_CAPTION, DFCS_CAPTIONCLOSE, fnMarlett);
 
     if (withMinMax) {
         rc.right = rc.left - margin;
         rc.left = rc.right - buttonWidth;
-        dc.DrawFrameControl(rc, DFC_CAPTION, DFCS_CAPTIONMAX);
+        DrawFrameControl(dc, rc, DFC_CAPTION, DFCS_CAPTIONMAX, fnMarlett);
 
         rc.right = rc.left;
         rc.left = rc.right - buttonWidth;
-        dc.DrawFrameControl(rc, DFC_CAPTION, DFCS_CAPTIONMIN);
+        DrawFrameControl(dc, rc, DFC_CAPTION, DFCS_CAPTIONMIN, fnMarlett);
     }
     return rc.left;
 }
 
-void CDrawRoutine::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags) const
+void CDrawRoutine::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT fnMarlet, HICON hIcon, PCWSTR str, UINT uFlags) const
 {
     CRect rcTmp = rcParam;
     int iColor1 = COLOR_INACTIVECAPTION;
@@ -243,7 +557,7 @@ void CDrawRoutine::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, 
         dc.FillRect(rcTmp, m_Theme.GetBrush(iColor1));
     }
 
-    HFONT prevFont = dc.SelectFont(hFont);
+    HFONT prevFont = dc.SelectFont(fnMarlet);
     if (uFlags & DC_ACTIVE) {
         SetTextColor(dc, m_Theme.GetColor(COLOR_CAPTIONTEXT));
     }
@@ -258,10 +572,10 @@ void CDrawRoutine::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, 
     }
 }
 
-void CDrawRoutine::DrawMenuText(CDCHandle hdc, PCWSTR text, CRect& rc, UINT format, int color) const
+void CDrawRoutine::DrawMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UINT format, int color) const
 {
-    SetTextColor(hdc, m_Theme.GetColor(color));
-    DrawTextW(hdc, text, -1, rc, format);
+    SetTextColor(dc, m_Theme.GetColor(color));
+    DrawTextW(dc, text, -1, rc, format);
 }
 
 void CDrawRoutine::DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UINT format) const
@@ -272,7 +586,7 @@ void CDrawRoutine::DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UI
     DrawMenuText(dc, text, rc, format, COLOR_3DSHADOW);
 }
 
-void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selectedItem) const
+void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT fnMarlet, int selectedItem) const
 {
     int backColorIndex = COLOR_MENU;
 #if WINVER >= WINVER_XP
@@ -282,12 +596,12 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
 #endif
     dc.FillRect(rc, m_Theme.GetBrush(backColorIndex));
 
-    if (!hMenu || !hFont) {
+    if (!hMenu || !fnMarlet) {
         return ;
     }
 
     int    spacing = 10;
-    HFONT  prevFnt = dc.SelectFont(hFont);
+    HFONT  prevFnt = dc.SelectFont(fnMarlet);
     UINT txtFormat = DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOCLIP;
     CRect   rcItem = rc;
     CRect   rcText;
@@ -376,37 +690,33 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
 
 void CDrawRoutine::DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled) const
 {
+    CFont        fnMarlett;
     CRect               rc;
     int       buttonHeight = m_Theme.GetNcMetrcs().iScrollHeight;
     UINT frameControlFlags = (enabled ? 0 : DFCS_INACTIVE);
     HBRUSH     hbrScrollBk = m_Theme.GetBrush(COLOR_SCROLLBAR);
-
     rc.left = rcParam.left;
     rc.right = rcParam.right;
-
     if (rcParam.bottom - rcParam.top - buttonHeight * 2 <= 0) {
         buttonHeight = (rcParam.bottom - rcParam.top) / 2;
     }
     if (buttonHeight >= 5) {
         rc.top = rcParam.top;
         rc.bottom = rcParam.top + buttonHeight;
-        dc.DrawFrameControl(rc, DFC_SCROLL, DFCS_SCROLLUP | frameControlFlags);
-
+        DrawFrameControl(dc, rc, DFC_SCROLL, DFCS_SCROLLUP | frameControlFlags, fnMarlett);
         rc.top = rcParam.bottom - buttonHeight;
         rc.bottom = rcParam.bottom;
-        dc.DrawFrameControl(&rc, DFC_SCROLL, DFCS_SCROLLDOWN | frameControlFlags);
+        DrawFrameControl(dc, rc, DFC_SCROLL, DFCS_SCROLLDOWN | frameControlFlags, fnMarlett);
     }
     else {
         buttonHeight = 0;
     }
-
     /* Background */
     rc.top = rcParam.top + buttonHeight;
     rc.bottom = rcParam.bottom - buttonHeight;
     if (rc.top >= rc.bottom) {
         return ;
     }
-
     /* The configured scrollbar color is only used by the OS for the scrollbar
      * background IF it is the same as the first 3D light color, for some
      * obscure reason...
@@ -442,6 +752,8 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
     LRect         rcMenu;
     LRect         rcWork;
     LRect       rcScroll;
+    LRect      rcMessage;
+    LRect       rcButton;
 
     target.m_rcBorder = ToCRect(rcBorder);
 
@@ -470,16 +782,32 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
         rcWork.cy -= rcCapt.cy;
     }
 
-    if (!isToolWnd) {
-        rcWork.Shrink(2, 2);
-        rcWork.y = rcMenu.Bottom() + 1;
-        target.m_rcWorkspace = ToCRect(rcWork);
+    rcWork.Shrink(2, 2);
+    rcWork.y = rcMenu.Bottom() + 1;
+    target.m_rcWorkspace = ToCRect(rcWork);
 
+    if (!isToolWnd) {
         rcScroll = rcWork;
         rcScroll.Shrink(0, 2);
         rcScroll.cx = m_Theme.GetNcMetrcs().iScrollWidth;
         rcScroll.x = rcWork.Right() - rcScroll.cx - 2;
         target.m_rcScroll = ToCRect(rcScroll);
+    }
+    else {
+        long sx = ScaleForDpi<long>(4);
+        long cy = -(m_Theme.GetLogFont(FONT_Message)->lfHeight) + 2;
+        rcMessage = rcWork;
+        rcMessage.Shrink(sx, sx - 1);
+        rcMessage.cy = cy;
+        target.m_rcMessage = ToCRect(rcMessage);
+        rcMessage.y += cy + 2;
+        target.m_rcURL = ToCRect(rcMessage);
+        rcButton = rcWork;
+        rcButton.cx = rcWork.Width() / 2;
+        rcButton.cy = cy * 2;
+        rcButton.PutInto(rcWork, PutAt::Bottom | PutAt::XCenter);
+        rcButton.y -= sx;
+        target.m_rcButton = ToCRect(rcButton);
     }
 }
 
@@ -553,7 +881,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
                     break;
                 }
                 const auto& line = params.text.line[i];
-                if (line.selected) {
+                if (line.flags & WT_Select) {
                     CRect rcSel = rcLine;
                     rcSel.top += 1;
                     rcSel.InflateRect(3, 2);
@@ -576,5 +904,40 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
 
         DrawScrollbar(dc, rects.m_rcScroll, isActive);
     }
-}
+    else {
+        if (params.text.lineCount < 3) {
+            return;
+        }
+        CRect rc = rects.m_rcMessage;
+        if (rc.top >= rc.bottom) {
+            return ;
+        }
+        ATL::CStringW const& line0 = params.text.line[0].text;
+        ATL::CStringW const& line1 = params.text.line[1].text;
+        ATL::CStringW const& line2 = params.text.line[2].text;
 
+        int prevBkMode = dc.SetBkMode(TRANSPARENT);
+        HFONT prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Message));
+        SetTextColor(dc, m_Theme.GetColor(COLOR_WINDOWTEXT));
+        dc.DrawTextW(line0.GetString(), line0.GetLength(), rc, DT_LEFT | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+        prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Message));
+
+#if WINVER >= WINVER_2K
+        rc = rects.m_rcURL;
+        //dc.SelectFont(prevFont);
+        //prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Hyperlink));
+        SetTextColor(dc, m_Theme.GetColor(COLOR_HOTLIGHT));
+        dc.DrawTextW(line1.GetString(), line1.GetLength(), rc, DT_LEFT | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+        //dc.SelectFont(prevFont);
+#endif
+        rc = rects.m_rcButton;
+        InflateRect(rc, 1, 1);
+        DrawBorder(dc, rc, 1, m_Theme.GetBrush(COLOR_WINDOWFRAME));
+        DrawFrameButton(dc, rc, DFCS_BUTTONPUSH);
+        rc.bottom--;
+        dc.SetTextColor(m_Theme.GetColor(COLOR_BTNTEXT));
+        dc.DrawTextW(line2.GetString(), line2.GetLength(), rc, DT_VCENTER | DT_CENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+        dc.SelectFont(prevFont);
+        dc.SetBkMode(prevBkMode);
+    }
+}
