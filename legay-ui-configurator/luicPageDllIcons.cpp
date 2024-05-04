@@ -16,13 +16,13 @@ CPageDllIcons::~CPageDllIcons()
     DetachImageLists();
 }
 
-CPageDllIcons::CPageDllIcons()
-    :      CPageImpl{ IDD_PAGE_DLL_FILE_ICONS }
+CPageDllIcons::CPageDllIcons(std::wstring&& caption)
+    :      CPageImpl{ IDD_PAGE_DLL_FILE_ICONS, std::move(caption) }
     ,       m_edPath{}
     ,     m_bnBrowse{}
     ,     m_bnExport{}
     ,       m_lvView{}
-    ,        m_il32x32{}
+    ,      m_il32x32{}
     ,      m_il16x16{}
     , m_CurrFilename{}
     ,   m_bManagedIl{ false }

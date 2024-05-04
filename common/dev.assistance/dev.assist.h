@@ -40,7 +40,8 @@ namespace DH
     WCDAFX_API WString LvStyleStringW(DWORD);
     WCDAFX_API WString LvStyleExStringW(DWORD);
 
-    WCDAFX_API WString MessageToStrignW(MSG const* message);
+    WCDAFX_API WString MessageToStrignW(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    WCDAFX_API WString MessageToStrignW(const PMSG pMsg);
 }
 
 #ifndef __PRETTY_FUNCTION__

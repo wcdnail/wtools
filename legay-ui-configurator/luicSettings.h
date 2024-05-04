@@ -5,7 +5,7 @@
 struct CPageSettings: CPageImpl
 {
     ~CPageSettings() override;
-    CPageSettings();
+    CPageSettings(std::wstring&& caption);
 
 private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;

@@ -8,6 +8,7 @@
 #define LTH_COLORIZER       L"      Colorize|"
 #define LTH_COLORIZED_CTRL  L" ColorizedCtrl|"
 #define LTH_CONTROL         L"       Control|"
-#define LTH_STATUS          L"        STATUS|"
+#define LTH_MAINFRAME       L"     MainFrame|"
+#define LTH_STATUS          L"        Status|"
 #define LTH_SHELL_ICON      L"     ShellIcon|"
 

@@ -9,14 +9,14 @@ class CIconCollectionFile;
 struct CPageDllIcons: CPageImpl
 {
     ~CPageDllIcons() override;
-    CPageDllIcons();
+    CPageDllIcons(std::wstring&& caption);
 
 private:
     WTL::CEdit         m_edPath;
     WTL::CButton     m_bnBrowse;
     WTL::CButton     m_bnExport;
     WTL::CListViewCtrl m_lvView;
-    CImageList          m_il32x32;
+    CImageList        m_il32x32;
     CImageList        m_il16x16;
     std::wstring m_CurrFilename;
     bool           m_bManagedIl;

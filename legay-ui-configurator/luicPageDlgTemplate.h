@@ -5,7 +5,7 @@
 struct CPageDlgTemplate: CPageImpl
 {
     ~CPageDlgTemplate() override;
-    CPageDlgTemplate();
+    CPageDlgTemplate(std::wstring&& caption);
 
 private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;

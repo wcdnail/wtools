@@ -7,8 +7,8 @@ CPageBackground::~CPageBackground()
 {
 }
 
-CPageBackground::CPageBackground()
-    : CPageImpl(IDD_PAGE_BACKGROUND)
+CPageBackground::CPageBackground(std::wstring&& caption)
+    : CPageImpl(IDD_PAGE_BACKGROUND, std::move(caption))
 {
 }
 

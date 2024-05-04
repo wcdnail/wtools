@@ -19,7 +19,7 @@ private:
     CPageImplPtr const& PagesGetCurrent() const;
     
     void PagesGetRect();
-    void PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&& pagePtr);
+    void PagesAppend(int desiredIndex, CPageImplPtr&& pagePtr);
     void PagesCreate();
     void PagesShow(int numba, bool show);
 

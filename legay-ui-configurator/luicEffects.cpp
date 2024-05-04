@@ -7,8 +7,8 @@ CPageEffects::~CPageEffects()
 {
 }
 
-CPageEffects::CPageEffects()
-    : CPageImpl(IDD_PAGE_EFFECTS)
+CPageEffects::CPageEffects(std::wstring&& caption)
+    : CPageImpl(IDD_PAGE_EFFECTS, std::move(caption))
 {
 }
 

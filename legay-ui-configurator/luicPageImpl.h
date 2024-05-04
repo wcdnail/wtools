@@ -17,17 +17,19 @@ struct CPageImpl: ATL::CDialogImpl<CPageImpl>,
     using   Resizer = WTL::CDialogResize<CPageImpl>;
     using ResizeVec = std::vector<WTL::_AtlDlgResizeMap>;
 
-    virtual HWND CreateDlg(HWND hWndParent, LPARAM dwInitParam = NULL);
-
     ~CPageImpl() override;
+
+    virtual HWND CreateDlg(HWND hWndParent, LPARAM dwInitParam = NULL);
+    PCWSTR GetCaption() const;
 
 protected:
     friend class Super;
     friend class Resizer;
 
-    UINT IDD;
+    UINT               IDD;
+    std::wstring m_Caption;
 
-    CPageImpl(UINT idd);
+    CPageImpl(UINT idd, std::wstring&& caption);
 
     void DlgResizeAdd(int nCtlID, DWORD dwResizeFlags);
     void DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count);
@@ -66,3 +68,6 @@ private:
     CPageImpl& operator = (CPageImpl const&) = delete;
     CPageImpl& operator = (CPageImpl&&) = delete;
 };
+
+inline PCWSTR CPageImpl::GetCaption() const { return m_Caption.c_str(); }
+

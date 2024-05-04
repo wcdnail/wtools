@@ -5,7 +5,7 @@
 struct CPageWeb: CPageImpl
 {
     ~CPageWeb() override;
-    CPageWeb();
+    CPageWeb(std::wstring&& caption);
 
 private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;

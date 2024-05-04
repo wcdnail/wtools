@@ -44,6 +44,7 @@
     <ClCompile Include="windows.uses.gdi+.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="debug.dump.msg.h" />
     <ClInclude Include="dev.assistance\dev.assist.h" />
     <ClInclude Include="dev.assistance\list.view.exstyles.h" />
     <ClInclude Include="dev.assistance\list.view.styles.h" />

@@ -7,8 +7,8 @@ CPageSettings::~CPageSettings()
 {
 }
 
-CPageSettings::CPageSettings()
-    : CPageImpl(IDD_PAGE_SETTINGS)
+CPageSettings::CPageSettings(std::wstring&& caption)
+    : CPageImpl(IDD_PAGE_SETTINGS, std::move(caption))
 {
 }
 

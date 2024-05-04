@@ -15,6 +15,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="resz\iconz">
+      <UniqueIdentifier>{752194b8-58ae-4ad0-a95a-9bee63459322}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -126,43 +129,43 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resz\rom-0.ico">
-      <Filter>resz</Filter>
+      <Filter>resz\iconz</Filter>
     </Image>
     <Image Include="resz\rom-1.ico">
-      <Filter>resz</Filter>
-    </Image>
-    <Image Include="resz\rom-2.ico">
-      <Filter>resz</Filter>
+      <Filter>resz\iconz</Filter>
     </Image>
     <Image Include="rom-1.ico">
-      <Filter>resz</Filter>
+      <Filter>resz\iconz</Filter>
+    </Image>
+    <Image Include="resz\rom-2.ico">
+      <Filter>resz\iconz</Filter>
     </Image>
     <Image Include="rom-2.ico">
-      <Filter>resz</Filter>
-    </Image>
-    <Image Include="rom-save.ico">
-      <Filter>resz</Filter>
-    </Image>
-    <Image Include="resz\rom-save.ico">
-      <Filter>resz</Filter>
-    </Image>
-    <Image Include="rom-rename.ico">
-      <Filter>resz</Filter>
-    </Image>
-    <Image Include="resz\rom-rename.ico">
-      <Filter>resz</Filter>
-    </Image>
-    <Image Include="rom-delete.ico">
-      <Filter>resz</Filter>
+      <Filter>resz\iconz</Filter>
     </Image>
     <Image Include="resz\rom-delete.ico">
-      <Filter>resz</Filter>
+      <Filter>resz\iconz</Filter>
     </Image>
-    <Image Include="rom-open.ico">
-      <Filter>resz</Filter>
+    <Image Include="rom-delete.ico">
+      <Filter>resz\iconz</Filter>
     </Image>
     <Image Include="resz\rom-open.ico">
-      <Filter>resz</Filter>
+      <Filter>resz\iconz</Filter>
+    </Image>
+    <Image Include="rom-open.ico">
+      <Filter>resz\iconz</Filter>
+    </Image>
+    <Image Include="resz\rom-rename.ico">
+      <Filter>resz\iconz</Filter>
+    </Image>
+    <Image Include="rom-rename.ico">
+      <Filter>resz\iconz</Filter>
+    </Image>
+    <Image Include="resz\rom-save.ico">
+      <Filter>resz\iconz</Filter>
+    </Image>
+    <Image Include="rom-save.ico">
+      <Filter>resz\iconz</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

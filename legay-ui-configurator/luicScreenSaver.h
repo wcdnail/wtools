@@ -5,7 +5,7 @@
 struct CPageScreenSaver: CPageImpl
 {
     ~CPageScreenSaver() override;
-    CPageScreenSaver();
+    CPageScreenSaver(std::wstring&& caption);
 
 private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;

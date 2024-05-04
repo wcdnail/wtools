@@ -55,6 +55,7 @@
     <ClInclude Include="icons.dll.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="windows.uses.gdi+.h" />
+    <ClInclude Include="debug.dump.msg.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

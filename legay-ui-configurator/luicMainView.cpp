@@ -30,7 +30,7 @@ CMainView::~CMainView()
 }
 
 CMainView::CMainView()
-    :      CPageImpl{ IDD_LEGACY_UI_MAIN_VIEW }
+    :      CPageImpl{ IDD_LEGACY_UI_MAIN_VIEW, L"MainView" }
     ,         m_Tab {}
     ,    m_PagesMap {}
     , m_rcTabClient {}
@@ -90,23 +90,22 @@ void CMainView::PagesGetRect()
 void CMainView::PagesCreate()
 {
     m_Tab.Attach(GetDlgItem(IDC_TAB1));
-    //m_Tab.ModifyStyle(0, WS_TABSTOP);
 
-    auto   pBackground = std::make_unique<CPageBackground>();
-    auto  pScreenSaver = std::make_unique<CPageScreenSaver>();
-    auto   pAppearance = std::make_unique<CPageAppearance>();
-    auto  pPageEffects = std::make_unique<CPageEffects>();
-    auto      pPageWeb = std::make_unique<CPageWeb>();
-    auto pPageSettings = std::make_unique<CPageSettings>();
-    auto pPageDllIcons = std::make_unique<CPageDllIcons>();
+    auto   pBackground = std::make_unique<CPageBackground> (L"Background");
+    auto  pScreenSaver = std::make_unique<CPageScreenSaver>(L"Screen Saver");
+    auto   pAppearance = std::make_unique<CPageAppearance> (L"Appearance");
+    auto  pPageEffects = std::make_unique<CPageEffects>    (L"Effects");
+    auto      pPageWeb = std::make_unique<CPageWeb>        (L"Web");
+    auto pPageSettings = std::make_unique<CPageSettings>   (L"Settings");
+    auto pPageDllIcons = std::make_unique<CPageDllIcons>   (L"DLL Icons");
 
-    PagesAppend(PageBackground,  L"Background",  std::move(pBackground));
-    PagesAppend(PageScreenSaver, L"ScreenSaver", std::move(pScreenSaver));
-    PagesAppend(PageAppearance,  L"Appearance",  std::move(pAppearance));
-    PagesAppend(PageEffects,     L"Effects",     std::move(pPageEffects));
-    PagesAppend(PageWeb,         L"Web",         std::move(pPageWeb));
-    PagesAppend(PageSettings,    L"Settings",    std::move(pPageSettings));
-    PagesAppend(PageDllIcons,    L"DLL Icons",   std::move(pPageDllIcons));
+    PagesAppend(PageBackground,  std::move(pBackground));
+    PagesAppend(PageScreenSaver, std::move(pScreenSaver));
+    PagesAppend(PageAppearance,  std::move(pAppearance));
+    PagesAppend(PageEffects,     std::move(pPageEffects));
+    PagesAppend(PageWeb,         std::move(pPageWeb));
+    PagesAppend(PageSettings,    std::move(pPageSettings));
+    PagesAppend(PageDllIcons,    std::move(pPageDllIcons));
 }
 
 void CMainView::PagesShow(int numba, bool show)
@@ -117,7 +116,7 @@ void CMainView::PagesShow(int numba, bool show)
     }
 }
 
-void CMainView::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&& pagePtr)
+void CMainView::PagesAppend(int desiredIndex, CPageImplPtr&& pagePtr)
 {
     HRESULT code = S_FALSE;
     int  tabIcon = desiredIndex;
@@ -126,10 +125,10 @@ void CMainView::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&
         tabIcon = desiredIndex;
         tabMask |= TCIF_IMAGE;
     }
-    int number = m_Tab.InsertItem(m_Tab.GetItemCount(), tabMask, str.GetString(), tabIcon, 0l);
+    int number = m_Tab.InsertItem(m_Tab.GetItemCount(), tabMask, pagePtr->GetCaption(), tabIcon, 0l);
     if (number < 0) {
         code = static_cast<HRESULT>(GetLastError());
-        ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", str.GetString()), code, true, MB_ICONERROR);
+        ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", pagePtr->GetCaption()), code, true, MB_ICONERROR);
         return ;
     }
     if (desiredIndex != number) {
@@ -137,13 +136,13 @@ void CMainView::PagesAppend(int desiredIndex, ATL::CStringW&& str, CPageImplPtr&
         ReportError(Str::ElipsisW::Format(
                         L"Append dialog page '%s' failed!\r\n"
                         L"Desired index %d != %d actual index\r\n",
-                        str.GetString(), desiredIndex, number),
+                        pagePtr->GetCaption(), desiredIndex, number),
                     code, true, MB_ICONSTOP);
         return ;
     }
     if (!pagePtr->CreateDlg(m_Tab.m_hWnd)) {
         code = static_cast<HRESULT>(GetLastError());
-        ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", str.GetString()), code, true, MB_ICONERROR);
+        ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", pagePtr->GetCaption()), code, true, MB_ICONERROR);
         return ;
     }
     if (m_rcTabClient.IsRectEmpty()) {

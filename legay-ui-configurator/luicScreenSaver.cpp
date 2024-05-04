@@ -7,8 +7,8 @@ CPageScreenSaver::~CPageScreenSaver()
 {
 }
 
-CPageScreenSaver::CPageScreenSaver()
-    : CPageImpl(IDD_PAGE_SCREENSAVER)
+CPageScreenSaver::CPageScreenSaver(std::wstring&& caption)
+    : CPageImpl(IDD_PAGE_SCREENSAVER, std::move(caption))
 {
 }
 

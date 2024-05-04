@@ -13,9 +13,10 @@ CPageImpl::~CPageImpl()
 {
 }
 
-CPageImpl::CPageImpl(UINT idd)
-    :         IDD(idd)
-    , m_ResiseMap()
+CPageImpl::CPageImpl(UINT idd, std::wstring&& caption)
+    :         IDD{ idd }
+    ,   m_Caption{ std::move(caption) }
+    , m_ResiseMap{}
 {
 }
 
@@ -47,6 +48,8 @@ void CPageImpl::DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count)
 
 BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
+    DebugThreadPrintf(LTH_CONTROL L" WM_INITDIALOG w:%p '%s'\n", m_hWnd, m_Caption.c_str());
+
     UNREFERENCED_ARG(wndFocus);
     UNREFERENCED_ARG(lInitParam);
     m_ResiseMap.emplace_back(_AtlDlgResizeMap{ -1, 0 });
@@ -62,7 +65,7 @@ void CPageImpl::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     UNREFERENCED_ARG(nID);
     UNREFERENCED_ARG(wndCtl);
     SetMsgHandled(FALSE);
-    DebugThreadPrintf(LTH_WM_COMMAND L" Unknown: n:%4d c:%4d w:%08x\n", uNotifyCode, nID, wndCtl);
+    //DebugThreadPrintf(LTH_WM_COMMAND L" Unknown: n:%4d c:%4d w:%08x\n", uNotifyCode, nID, wndCtl);
 }
 
 LRESULT CPageImpl::OnNotify(int idCtrl, LPNMHDR pnmh)

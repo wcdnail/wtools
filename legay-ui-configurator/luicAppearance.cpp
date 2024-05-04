@@ -9,9 +9,9 @@ CPageAppearance::~CPageAppearance()
 {
 }
 
-CPageAppearance::CPageAppearance()
-    : CPageImpl(IDD_PAGE_APPEARANCE)
-    , m_Preview()
+CPageAppearance::CPageAppearance(std::wstring&& caption)
+    : CPageImpl{ IDD_PAGE_APPEARANCE, std::move(caption) }
+    , m_Preview{}
 {
 }
 
@@ -68,7 +68,7 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     auto const* app = CLegacyUIConfigurator::App();
 
     if (!m_Preview.SubclassWindow(GetDlgItem(IDC_APP_PREVIEW))) {
-        HRESULT code = static_cast<HRESULT>(GetLastError());
+        const auto code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Previewer SubclassWindow failure!"), code, true, MB_ICONERROR);
     }
         m_ThemeSel.Attach(GetDlgItem(IDC_APP_THEME_SEL));

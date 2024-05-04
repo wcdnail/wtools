@@ -9,7 +9,7 @@ struct CTheme;
 struct CPageAppearance: CPageImpl
 {
     ~CPageAppearance() override;
-    CPageAppearance();
+    CPageAppearance(std::wstring&& caption);
 
 private:
     friend struct CTheme;

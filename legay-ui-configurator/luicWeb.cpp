@@ -7,8 +7,8 @@ CPageWeb::~CPageWeb()
 {
 }
 
-CPageWeb::CPageWeb()
-    : CPageImpl(IDD_PAGE_WEB)
+CPageWeb::CPageWeb(std::wstring&& caption)
+    : CPageImpl(IDD_PAGE_WEB, std::move(caption))
 {
 }
 

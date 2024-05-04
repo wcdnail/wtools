@@ -7,8 +7,8 @@ CPageDlgTemplate::~CPageDlgTemplate()
 {
 }
 
-CPageDlgTemplate::CPageDlgTemplate()
-    : CPageImpl(0)
+CPageDlgTemplate::CPageDlgTemplate(std::wstring&& caption)
+    : CPageImpl{ 0, std::move(caption) }
 {
 }
 

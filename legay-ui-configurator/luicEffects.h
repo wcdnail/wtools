@@ -5,7 +5,7 @@
 struct CPageEffects: CPageImpl
 {
     ~CPageEffects() override;
-    CPageEffects();
+    CPageEffects(std::wstring&& caption);
 
 private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;

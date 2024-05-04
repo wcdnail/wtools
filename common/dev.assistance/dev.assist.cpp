@@ -162,17 +162,22 @@ namespace DH
 
 #undef _ON_BITMASK
 
-    WString MessageToStrignW(MSG const* message)
+    WString MessageToStrignW(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
-        wchar_t buffer[512] = {0};
-        _snwprintf_s(buffer, _countof(buffer),
+        wchar_t buffer[512] = { 0 };
+        int destLen = _snwprintf_s(buffer, _countof(buffer),
             L"%p %08x %08x%08x %32s %04x",
-            message->hwnd,
-            static_cast<uint32_t>(message->wParam),
-            static_cast<uint32_t>(message->lParam >> 32),
-            static_cast<uint32_t>(message->lParam & 0xffffffff),
-            WM_C2SW(message->message), message->message
+            hWnd,
+            static_cast<uint32_t>(wParam),
+            static_cast<uint32_t>(lParam >> 32),
+            static_cast<uint32_t>(lParam & 0xffffffff),
+            WM_C2SW(uMsg), uMsg
         );
-        return buffer;
+        return WString{ buffer, static_cast<size_t>(destLen) };
+    }
+
+    WString MessageToStrignW(const PMSG pMsg)
+    {
+        return MessageToStrignW(pMsg->hwnd, pMsg->message, pMsg->wParam, pMsg->lParam);
     }
 }

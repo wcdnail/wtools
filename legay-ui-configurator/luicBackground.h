@@ -5,7 +5,7 @@
 struct CPageBackground: CPageImpl
 {
     ~CPageBackground() override;
-    CPageBackground();
+    CPageBackground(std::wstring&& caption);
 
 private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
