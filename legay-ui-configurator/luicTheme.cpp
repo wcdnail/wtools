@@ -180,12 +180,15 @@ PCTSTR CTheme::SizeName(int size)
 PCTSTR CTheme::FontName(int font)
 {
     static const PCTSTR gsl_fontNames[FONTS_Count] = {
-        TEXT("CaptionFont"),            // 0 = FONT_CAPTION
-        TEXT("SmCaptionFont"),          // 1 = FONT_SMCAPTION
-        TEXT("MenuFont"),               // 2 = FONT_MENU
-        TEXT("StatusFont"),             // 3 = FONT_TOOLTIP
-        TEXT("MessageFont"),            // 4 = FONT_MESSAGE
-        TEXT("IconFont")                // 5 = FONT_DESKTOP
+        TEXT("Caption Font"),           // 0 = FONT_Caption
+        TEXT("Small Caption Font"),     // 1 = FONT_SMCaption
+        TEXT("Menu Font"),              // 2 = FONT_Menu
+        TEXT("Status Font"),            // 3 = FONT_Tooltip
+        TEXT("Message Font"),           // 4 = FONT_Message
+        TEXT("Desktop Font"),           // 5 = FONT_Desktop
+#if WINVER >= WINVER_2K
+        TEXT("Hyperlink Font"),         // 8 = FONT_Hyperlink
+#endif
     };
     if (font < 0 || font >= FONTS_Count) {
         return nullptr;
@@ -265,7 +268,6 @@ static int GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size)
     return -1;
 }
 
-_Ret_maybenull_
 LOGFONT const* CTheme::GetNcMetricFont(CTheme const& theme, int font)
 {
     switch (font) {
@@ -274,9 +276,11 @@ LOGFONT const* CTheme::GetNcMetricFont(CTheme const& theme, int font)
     case FONT_Menu:      return &theme.m_ncMetrics.lfMenuFont;
     case FONT_Tooltip:   return &theme.m_ncMetrics.lfStatusFont;
     case FONT_Message:   return &theme.m_ncMetrics.lfMessageFont;
-    case FONT_Desktop:   return &theme.m_lfIconFont;
+    case FONT_Desktop:
+    default:
+        break;
     }
-    return nullptr;
+    return &theme.m_lfIconFont;
 }
 
 bool CTheme::RefreshBrushes()
@@ -305,6 +309,11 @@ bool CTheme::RefreshFonts()
             continue;
         }
         CLogFont lfObj(*lf);
+#if WINVER >= WINVER_2K
+        if (FONT_Hyperlink == iFont) {
+            lfObj.lfUnderline = TRUE;
+        }
+#endif
         tmpFont[iFont] = lfObj.CreateFontIndirectW();
     }
     for (int iFont = 0; iFont < FONTS_Count; iFont++) {

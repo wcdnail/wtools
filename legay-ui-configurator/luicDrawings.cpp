@@ -915,26 +915,30 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
         ATL::CStringW const& line0 = params.text.line[0].text;
         ATL::CStringW const& line1 = params.text.line[1].text;
         ATL::CStringW const& line2 = params.text.line[2].text;
-
         int prevBkMode = dc.SetBkMode(TRANSPARENT);
         HFONT prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Message));
         SetTextColor(dc, m_Theme.GetColor(COLOR_WINDOWTEXT));
         dc.DrawTextW(line0.GetString(), line0.GetLength(), rc, DT_LEFT | DT_SINGLELINE | DT_WORD_ELLIPSIS);
-        prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Message));
-
+        dc.SelectFont(prevFont);
 #if WINVER >= WINVER_2K
         rc = rects.m_rcURL;
-        //dc.SelectFont(prevFont);
-        //prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Hyperlink));
+        if (rc.top >= rc.bottom) {
+            return ;
+        }
+        prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Hyperlink));
         SetTextColor(dc, m_Theme.GetColor(COLOR_HOTLIGHT));
         dc.DrawTextW(line1.GetString(), line1.GetLength(), rc, DT_LEFT | DT_SINGLELINE | DT_WORD_ELLIPSIS);
-        //dc.SelectFont(prevFont);
+        dc.SelectFont(prevFont);
 #endif
         rc = rects.m_rcButton;
+        if (rc.top >= rc.bottom) {
+            return ;
+        }
         InflateRect(rc, 1, 1);
         DrawBorder(dc, rc, 1, m_Theme.GetBrush(COLOR_WINDOWFRAME));
         DrawFrameButton(dc, rc, DFCS_BUTTONPUSH);
         rc.bottom--;
+        prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Message));
         dc.SetTextColor(m_Theme.GetColor(COLOR_BTNTEXT));
         dc.DrawTextW(line2.GetString(), line2.GetLength(), rc, DT_VCENTER | DT_CENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
         dc.SelectFont(prevFont);

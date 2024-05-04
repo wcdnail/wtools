@@ -39,6 +39,9 @@ enum FONT_NAMES : int
     FONT_Tooltip,
     FONT_Message,
     FONT_Desktop,
+#if WINVER >= WINVER_2K
+    FONT_Hyperlink,
+#endif
     FONTS_Count
 };
 
