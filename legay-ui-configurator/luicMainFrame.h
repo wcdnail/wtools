@@ -21,11 +21,11 @@ struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
     void SetStatus(int status, ATL::CStringW&& message);
 
 private:
-    CRect            m_rcMainFrame;
-    Conf::Section       m_Settings;
-    CMainView               m_View;
-    CMultiPaneStatusBarCtrl m_SBar;
-    bool            m_bInitialized;
+    CRect                 m_rcMainFrame;
+    Conf::Section            m_Settings;
+    CMainView                    m_View;
+    CMultiPaneStatusBarCtrl m_StatusBar;
+    bool                 m_bInitialized;
 
     friend class Super;
     friend class Resizer;

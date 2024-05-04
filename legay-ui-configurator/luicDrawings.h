@@ -17,6 +17,7 @@ struct WindowRects
     CRect    m_rcMessage = {};
     CRect        m_rcURL = {};
     CRect     m_rcButton = {};
+    CRect    m_rcTooltip = {};
 };
 
 enum WinTextFalgs : UINT
@@ -71,6 +72,7 @@ public:
     void DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selectedItem) const;
     void DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled) const;
     void DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const;
+    void DrawToolTip(CDCHandle dc, CRect const& rc, ATL::CStringW&& tooltip) const;
 
 private:
     struct StaticInit;

@@ -58,10 +58,6 @@ namespace
         {    WT_URL, L"https://www.hyperlink.my" },
         {    WT_URL, L"Button" },
     };
-
-   const WinText HintText[] = {
-        {  WT_Usual, L"TooTip hint" },
-    };
 }
 
 CThemePreviewer::~CThemePreviewer()
@@ -204,7 +200,7 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
 
     dc.FillSolidRect(rcClient, theme.GetColor(COLOR_BACKGROUND));
 
-    if (m_Wallpaper.size() > 0) {
+    if (CLUIApp::App()->ShowDesktopWallpaper() && (m_Wallpaper.size() > 0)) {
         GdipImagePtr const& imPtr = m_Wallpaper[0];
 
         Gdiplus::RectF rcfImage;
@@ -226,4 +222,5 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
         drawings.CalcRects(ToCRect<double>(it.drect), it.captFlags, it.rects);
         drawings.DrawWindow(dc, it);
     }
+    drawings.DrawToolTip(dc, m_WndRect[WND_MsgBox].m_rcTooltip, L"TooTip hint");
 }

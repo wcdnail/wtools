@@ -802,6 +802,10 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
         target.m_rcMessage = ToCRect(rcMessage);
         rcMessage.y += cy + 2;
         target.m_rcURL = ToCRect(rcMessage);
+        rcMessage.x += rcMessage.Width() / 2;
+        rcMessage.y += rcMessage.Height() + 6;
+        target.m_rcTooltip = ToCRect(rcMessage);
+        target.m_rcTooltip.InflateRect(3, 3);
         rcButton = rcWork;
         rcButton.cx = rcWork.Width() / 2;
         rcButton.cy = cy * 2;
@@ -809,6 +813,31 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
         rcButton.y -= sx;
         target.m_rcButton = ToCRect(rcButton);
     }
+}
+
+void CDrawRoutine::DrawToolTip(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& tooltip) const
+{
+    CSize size;
+    CRect rc = rcParam;
+    if (rc.left < 0) {
+        return ;
+    }
+    int   prevMode = SetBkMode(dc, TRANSPARENT);
+    HFONT prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Tooltip));
+    if (!GetTextExtentPoint32(dc, tooltip.GetString(), tooltip.GetLength(), &size)) {
+        size.cx = ScaleForDpi(45);
+        size.cy = ScaleForDpi(14);
+    }
+    rc.top    = rc.bottom - size.cy;
+    rc.right  = rc.left   + size.cx;
+    rc.InflateRect(3, 3);
+    DrawBorder(dc, rc, 1, m_Theme.GetBrush(COLOR_INFOTEXT));
+    InflateRect(rc, -1, -1);
+    FillRect(dc, rc, m_Theme.GetBrush(COLOR_INFOBK));
+    SetTextColor(dc, m_Theme.GetColor(COLOR_INFOTEXT));
+    dc.DrawTextW(tooltip.GetString(), tooltip.GetLength(), rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+    dc.SetBkMode(prevMode);
+    dc.SelectFont(prevFont);
 }
 
 void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const

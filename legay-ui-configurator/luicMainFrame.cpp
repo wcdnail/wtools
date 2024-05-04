@@ -25,11 +25,11 @@ CMainFrame::CMainFrame(Conf::Section const& parentSettings)
 void CMainFrame::SetStatus(int status, ATL::CStringW&& message)
 {
     DH::ThreadPrintf(LTH_STATUS L" [s:%d] %s\n", status, message.GetString());
-    if (!m_SBar.m_hWnd) {
+    if (!m_StatusBar.m_hWnd) {
         return;
     }
-    m_SBar.SetPaneText(ID_DEFAULT_PANE, message.GetString());
-    m_SBar.Invalidate(TRUE);
+    m_StatusBar.SetPaneText(ID_DEFAULT_PANE, message.GetString());
+    m_StatusBar.Invalidate(TRUE);
 }
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
@@ -61,6 +61,7 @@ void CMainFrame::OnResizeNotify()
     rcView.bottom -= rcStatuBar.Height();
     rcView.DeflateRect(1, 1);
     m_View.MoveWindow(rcView);
+    m_StatusBar.Invalidate();
 }
 
 int CMainFrame::OnCreate(LPCREATESTRUCT)
@@ -77,14 +78,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
     MoveWindow(m_rcMainFrame);
 
     CreateSimpleStatusBar();
-    m_SBar.SubclassWindow(m_hWndStatusBar);
+    m_StatusBar.SubclassWindow(m_hWndStatusBar);
     int arrParts[] =
     {
+        ID_DEFAULT_PANE + 1,
+        ID_SEPARATOR,
         ID_DEFAULT_PANE,
-      //ID_DEFAULT_PANE + 1,
-      //ID_DEFAULT_PANE + 2
     };
-    m_SBar.SetPanes(arrParts, _countof(arrParts), false);
+    m_StatusBar.SetPanes(arrParts, _countof(arrParts), false);
 
     if (!m_View.CreateDlg(m_hWnd)) {
         const auto code = static_cast<HRESULT>(GetLastError());

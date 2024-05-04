@@ -59,6 +59,7 @@ public:
     CMenu const& GetTestMenu() const;
     WTL::CImageListManaged const& GetImageList(int index) const;
     IDesktopWallpaper* GetWallpaperMan();
+    bool ShowDesktopWallpaper() const;
 
     HRESULT Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID = nullptr);
     HRESULT Run(HINSTANCE instHnd, int showCmd);
@@ -84,4 +85,9 @@ private:
 inline IDesktopWallpaper* CLUIApp::GetWallpaperMan()
 {
     return m_pWallpaper;
+}
+
+inline bool CLUIApp::ShowDesktopWallpaper() const
+{
+    return false; // ##TODO: m_bShowDesktopWallpaper to settings
 }
