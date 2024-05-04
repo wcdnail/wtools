@@ -5,18 +5,24 @@
 
 struct CTheme;
 
+enum WindowRectIndex: int
+{
+    WR_Border = 0,
+    WR_Frame,
+    WR_Caption,
+    WR_Menu,
+    WR_Workspace,
+    WR_Scroll,
+    WR_Message,
+    WR_Hyperlink,
+    WR_Button,
+    WR_Tooltip,
+    WR_Count
+};
+
 struct WindowRects
 {
-    CRect     WR_Border = {};
-    CRect      WR_Frame = {};
-    CRect    WR_Caption = {};
-    CRect       WR_Menu = {};
-    CRect  WR_Workspace = {};
-    CRect     WR_Scroll = {};
-    CRect    WR_Message = {};
-    CRect  WR_Hyperlink = {};
-    CRect     WR_Button = {};
-    CRect    WR_Tooltip = {};
+    CRect rect[WR_Count];
 };
 
 enum WinTextFalgs : UINT

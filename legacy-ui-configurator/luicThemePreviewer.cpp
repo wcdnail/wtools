@@ -222,7 +222,7 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
         drawings.CalcRects(ToCRect<double>(it.drect), it.captFlags, it.rects);
         drawings.DrawWindow(dc, it);
     }
-    drawings.DrawToolTip(dc, m_WndRect[WND_MsgBox].WR_Tooltip, L"TooTip Hint");
+    drawings.DrawToolTip(dc, m_WndRect[WND_MsgBox].rect[WR_Tooltip], L"TooTip Hint");
 }
 
 void CThemePreviewer::OnLButtonDown(UINT nFlags, CPoint point)
