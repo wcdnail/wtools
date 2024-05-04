@@ -7,6 +7,7 @@ struct CTheme;
 
 enum WindowRectIndex: int
 {
+    WR_Invalid = -1,
     WR_Border = 0,
     WR_Frame,
     WR_Caption,

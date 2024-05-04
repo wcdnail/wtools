@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "luicMain.h"
+#include "luicThemePreviewer.h"
 #include "icons.dll.h"
 #include "dh.tracing.h"
 #include "windows.uses.ole.h"
@@ -148,6 +149,11 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
         return code;
     }
     FromSettings(m_Settings, m_bShowDesktopWallpaper);
+
+    ATOM previewClassAtom = CThemePreviewer::Register(code);
+    if (!previewClassAtom) {
+        return code;
+    }
 
     static const ATL::CStringW shell32dll = SHELL32_PATHNAME;
     CIconCollectionFile shellIcons;

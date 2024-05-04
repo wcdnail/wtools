@@ -8,55 +8,75 @@
 #include "windows.uses.gdi+.h"
 #include "rect.gdi+.h"
 
-//#include <random>
-    //std::random_device rd;
-    //std::uniform_int_distribution<int> dist(0, static_cast<int>(m_Wallpaper.size()) - 1);
-    //std::default_random_engine gen(rd());
-    //int wIndex = gen();
-
-namespace 
+namespace
 {
-    const WinText Il_DL_Begin[] = {
-        {  WT_Usual, L"  Логика — наука о формах и закономерностях мышления, теория" },
-        {  WT_Usual, L"мышления. В настоящее время  термином «логика»  обозначаются" },
-        {  WT_Usual, L"теории, различающиеся  не только по способу разработки одних" },
-        {  WT_Usual, L"и  тех же  вопросов, но и по предмету  исследования.  Термин" },
-        {  WT_Usual, L"«логика»   употребляется   поэтому  обычно  с  тем или  иным" },
-        {  WT_Usual, L"прилагательным    («формальная    логика»,   «математическая" },
-        {  WT_Usual, L"логика», «индуктивная», «модальная» и т.д.)." },
-        { WT_Select, L"  Решение  вопроса  о  предмете логики как науки по существу" },
-        { WT_Select, L"зависит  от решения основного вопроса философии и отражает в" },
-        {  WT_Usual, L"себе     теоретические,    мировоззренческие,    философские" },
-        {  WT_Usual, L"установки, в том числе представление о природе мышления, об" },
-        {  WT_Usual, L"отношении мышления к его предмету, о движущих силах," },
-        {  WT_Usual, L"стимулах развития мышления и т.д. Не случайно поэтому логика" },
-        {  WT_Usual, L"всегда была и остаётся объектом острой идейной борьбы" },
-        {  WT_Usual, L"основных философских направлений — материализма и" },
-        {  WT_Usual, L"идеализма, диалектики и метафизики." },
-        {  WT_Usual, L"  Марксистско-ленинское решение вопроса о предмете логики," },
-        {  WT_Usual, L"представляющее собой итог всей истории философской мысли," },
-        {  WT_Usual, L"разработано Марксом, Энгельсом и Лениным в ходе критической" },
-        {  WT_Usual, L"и материалистической переработки высших достижений" },
-        {  WT_Usual, L"предшествующей философии в области теории мышления." },
-        {  WT_Usual, L"Логика, разработанная на основе диалектико-" },
-        {  WT_Usual, L"материалистического понимания и решения проблемы мышления" },
-        {  WT_Usual, L"и соответствующая современному уровню развития человеческой" },
-        {  WT_Usual, L"культуры, науки и техники, обычно именуется диалектической" },
-        {  WT_Usual, L"логикой." },
-        {  WT_Usual, L"  # Диалектическая логика" },
-        {  WT_Usual, L"  Логика диалектическая — наука об объективных формах и" },
-        {  WT_Usual, L"законах развития человеческого мышления, понимаемого как" },
-        {  WT_Usual, L"исторический процесс отражения внешнего мира в знании" },
-        {  WT_Usual, L"людей, как объективная истина в её развитии. В этом понимании" },
-        {  WT_Usual, L"логика диалектическая совпадает с диалектикой и теорией" },
-        {  WT_Usual, L"познания материализма." },
-    };
+const WinText Il_DL_Begin[] = {
+    {  WT_Usual, L"  Логика — наука о формах и закономерностях мышления, теория" },
+    {  WT_Usual, L"мышления. В настоящее время  термином «логика»  обозначаются" },
+    {  WT_Usual, L"теории, различающиеся  не только по способу разработки одних" },
+    {  WT_Usual, L"и  тех же  вопросов, но и по предмету  исследования.  Термин" },
+    {  WT_Usual, L"«логика»   употребляется   поэтому  обычно  с  тем или  иным" },
+    {  WT_Usual, L"прилагательным    («формальная    логика»,   «математическая" },
+    {  WT_Usual, L"логика», «индуктивная», «модальная» и т.д.)." },
+    { WT_Select, L"  Решение  вопроса  о  предмете логики как науки по существу" },
+    { WT_Select, L"зависит  от решения основного вопроса философии и отражает в" },
+    {  WT_Usual, L"себе     теоретические,    мировоззренческие,    философские" },
+    {  WT_Usual, L"установки, в том числе представление о природе мышления, об" },
+    {  WT_Usual, L"отношении мышления к его предмету, о движущих силах," },
+    {  WT_Usual, L"стимулах развития мышления и т.д. Не случайно поэтому логика" },
+    {  WT_Usual, L"всегда была и остаётся объектом острой идейной борьбы" },
+    {  WT_Usual, L"основных философских направлений — материализма и" },
+    {  WT_Usual, L"идеализма, диалектики и метафизики." },
+    {  WT_Usual, L"  Марксистско-ленинское решение вопроса о предмете логики," },
+    {  WT_Usual, L"представляющее собой итог всей истории философской мысли," },
+    {  WT_Usual, L"разработано Марксом, Энгельсом и Лениным в ходе критической" },
+    {  WT_Usual, L"и материалистической переработки высших достижений" },
+    {  WT_Usual, L"предшествующей философии в области теории мышления." },
+    {  WT_Usual, L"Логика, разработанная на основе диалектико-" },
+    {  WT_Usual, L"материалистического понимания и решения проблемы мышления" },
+    {  WT_Usual, L"и соответствующая современному уровню развития человеческой" },
+    {  WT_Usual, L"культуры, науки и техники, обычно именуется диалектической" },
+    {  WT_Usual, L"логикой." },
+    {  WT_Usual, L"  # Диалектическая логика" },
+    {  WT_Usual, L"  Логика диалектическая — наука об объективных формах и" },
+    {  WT_Usual, L"законах развития человеческого мышления, понимаемого как" },
+    {  WT_Usual, L"исторический процесс отражения внешнего мира в знании" },
+    {  WT_Usual, L"людей, как объективная истина в её развитии. В этом понимании" },
+    {  WT_Usual, L"логика диалектическая совпадает с диалектикой и теорией" },
+    {  WT_Usual, L"познания материализма." },
+};
 
-    const WinText MsgBoxText[] = {
-        {  WT_Usual, L"Message Text" },
-        {    WT_URL, L"https://www.hyperlink.my" },
-        {    WT_URL, L"Button" },
-    };
+const WinText MsgBoxText[] = {
+    {  WT_Usual, L"Message Text" },
+    {    WT_URL, L"https://www.hyperlink.my" },
+    {    WT_URL, L"Button" },
+};
+} // namespace
+
+
+ATOM CThemePreviewer::Register(HRESULT& code)
+{
+    WNDCLASSEXW wc;
+
+    wc.cbSize = sizeof(WNDCLASSEX);
+    wc.style = 0;
+    wc.lpfnWndProc = CThemePreviewer::WndProc;
+    wc.cbClsExtra = 0;
+    wc.cbWndExtra = 0;
+    wc.hInstance = GetModuleHandleW(nullptr);
+    wc.hIcon = nullptr;
+    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wc.hbrBackground = static_cast<HBRUSH>(nullptr);
+    wc.lpszMenuName = nullptr;
+    wc.lpszClassName = L"CThemePreviewer";
+    wc.hIconSm = nullptr;
+
+    ATOM atom = RegisterClassExW(&wc);
+    if (!atom) {
+        code = static_cast<HRESULT>(GetLastError());
+        ReportError(Str::ElipsisW::Format(L"Register WCLASS '%s' failure!", wc.lpszClassName), code, true, MB_ICONERROR);
+    }
+    return atom;
 }
 
 CThemePreviewer::~CThemePreviewer()
@@ -64,16 +84,69 @@ CThemePreviewer::~CThemePreviewer()
 }
 
 CThemePreviewer::CThemePreviewer()
-    :       Super{}
-    , m_Wallpaper{}
+    :         m_hWnd{nullptr}
+    ,    m_Wallpaper{}
+    , m_SelectedRect{-1, -1}
+    ,  m_bUserSelect{false}
+{
+}
+
+void CThemePreviewer::SubclassIt(HWND hWnd)
+{
+    ATLASSUME(hWnd != nullptr);
+    const auto CThemePreviewer_pUserData = reinterpret_cast<void*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+    ATLASSUME(CThemePreviewer_pUserData == nullptr);
+    SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    m_hWnd = hWnd;
+    InitWallpapers();
+}
+
+LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    LONG_PTR tempLP = GetWindowLongPtrW(hWnd, GWLP_USERDATA);
+    if (tempLP) {
+        auto* self = reinterpret_cast<CThemePreviewer*>(tempLP);
+        switch (uMsg) {
+        case WM_PAINT:{
+            self->OnPaint({reinterpret_cast<HDC>(wParam)});
+            return 0;
+        }
+        case WM_LBUTTONDOWN:
+        case WM_LBUTTONDBLCLK:{
+            self->OnLButton(static_cast<UINT>(wParam), ::CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+            return 0;
+        }
+        }
+    }
+    return DefWindowProcW(hWnd, uMsg, wParam, lParam);
+}
+
+
+#if 0
+//#include <random>
+    //std::random_device rd;
+    //std::uniform_int_distribution<int> dist(0, static_cast<int>(m_Wallpaper.size()) - 1);
+    //std::default_random_engine gen(rd());
+    //int wIndex = gen();
+
+CThemePreviewer::~CThemePreviewer()
+{
+}
+
+CThemePreviewer::CThemePreviewer()
+    :          Super{}
+    ,    m_Wallpaper{}
+    , m_SelectedRect{-1, -1}
+    ,  m_bUserSelect{false}
 {
     auto& classInfo = GetWndClassInfo();
     ATOM atom = classInfo.Register(&this->m_pfnSuperWindowProc);
     if (!atom) {
-        HRESULT code = static_cast<HRESULT>(GetLastError());
+        const auto code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Register WCLASS '%s' failure!", classInfo.m_wc.lpszClassName), code, true, MB_ICONERROR);
     }
 }
+#endif
 
 HRESULT CThemePreviewer::InitWallpapers()
 {
@@ -147,8 +220,10 @@ void CThemePreviewer::OnPaint(CDCHandle dcParam)
     // ##TODO: later via CreateCompatibleDC || WTL::CDoubleBufferWindowImpl
 
     CRect rcClient;
-    GetClientRect(rcClient);
+    GetClientRect(m_hWnd, rcClient);
     DrawDesktop(dc, rcClient);
+
+    HighLightSeletced(dc, rcClient);
 }
 
 void CThemePreviewer::CalcRects(DrawWindowArgs (&params)[WND_Count],
@@ -225,9 +300,36 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
     drawings.DrawToolTip(dc, m_WndRect[WND_MsgBox].rect[WR_Tooltip], L"TooTip Hint");
 }
 
-void CThemePreviewer::OnLButtonDown(UINT nFlags, CPoint point)
+void CThemePreviewer::HighLightSeletced(CDCHandle dc, CRect const& rcClient)
 {
-    for (auto const& it: m_WndRect) {
-        
+    if (m_bUserSelect) {
+        m_bUserSelect = false;
+        const int wi = m_SelectedRect.first;
+        const int ri = m_SelectedRect.second;
+        if (wi < 0 || wi > WND_Count - 1) {
+            return ;
+        }
+        if (ri < 0 || ri > WR_Count - 1) {
+            return ;
+        }
+        CRect const& rc = m_WndRect[wi].rect[ri];
+        dc.InvertRect(rc);
     }
 }
+
+void CThemePreviewer::OnLButton(UINT nFlags, CPoint point)
+{
+    for (int j = 0; j < WND_Count; j++) {
+        WindowRects const& wr = m_WndRect[j];
+        for (int i = 0; i < WR_Count; i++) {
+            CRect const& rc = wr.rect[i];
+            if (!rc.IsRectEmpty() && rc.PtInRect(point)) {
+                m_SelectedRect = std::make_pair(j, i);
+                m_bUserSelect = true;
+                ::InvalidateRect(m_hWnd, nullptr, FALSE);
+                break;
+            }
+        }
+    }
+}
+
