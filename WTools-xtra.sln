@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "legay-ui-configurator", "legay-ui-configurator\legay-ui-configurator.vcxproj", "{87E7753F-DB66-4F70-A70D-1042428D4676}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "legacy-ui-configurator", "legacy-ui-configurator\legacy-ui-configurator.vcxproj", "{87E7753F-DB66-4F70-A70D-1042428D4676}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Franco-Tortoriello-WinClassicThemeConfig", "3rd-party\Franco-Tortoriello-WinClassicThemeConfig\Franco-Tortoriello-WinClassicThemeConfig.vcxproj", "{8D82B44E-3068-464B-80F3-EA456AEC7351}"
 EndProject

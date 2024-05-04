@@ -72,7 +72,7 @@ public:
     void DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selectedItem) const;
     void DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled) const;
     void DrawToolTip(CDCHandle dc, CRect const& rc, ATL::CStringW&& tooltip) const;
-    void DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text) const;
+    void DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const;
     void DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const;
 
 private:

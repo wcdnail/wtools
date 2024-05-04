@@ -218,7 +218,7 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
     }
 
     CDrawRoutine drawings(theme);
-    drawings.DrawDesktopIcon(dc, ToCRect(rcAux1), L"Icon Text");
+    drawings.DrawDesktopIcon(dc, ToCRect(rcAux1), L"Icon Text", true);
     for (auto& it : params) {
         drawings.CalcRects(ToCRect<double>(it.drect), it.captFlags, it.rects);
         drawings.DrawWindow(dc, it);

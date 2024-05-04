@@ -23,6 +23,7 @@ enum ImageListIndex : int
 enum IconIndex : int
 {
     IconMain = 0,
+    IconMyComp,
     IconAppearance,
     IconStartmenu,
     IconFloppy,
@@ -90,5 +91,5 @@ inline IDesktopWallpaper* CLUIApp::GetWallpaperMan()
 
 inline bool CLUIApp::ShowDesktopWallpaper() const
 {
-    return false; // ##TODO: m_bShowDesktopWallpaper to settings
+    return true; // ##TODO: m_bShowDesktopWallpaper to settings
 }

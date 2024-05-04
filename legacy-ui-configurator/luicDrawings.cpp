@@ -101,6 +101,7 @@ struct CDrawRoutine::StaticInit
         ICON_InactiveWnd = 0,
         ICON_ActiveWnd,
         ICON_Desktop1,
+        ICON_Cursor1,
         ICON_Count
     };
 
@@ -112,6 +113,7 @@ struct CDrawRoutine::StaticInit
     DrawCaptionTempWFn DrawCaptionTempW;
     SetSysColorsTempFn SetSysColorsTemp;
     DrawMenuBarTempFn   DrawMenuBarTemp;
+    bool            m_bIconLabelShadows;
     HICON           m_hIcon[ICON_Count];
 
     static StaticInit& instance()
@@ -164,10 +166,35 @@ private:
         auto const&   ilBig = CLUIApp::App()->GetImageList(IL_OwnBig);
         auto const& ilSmall = CLUIApp::App()->GetImageList(IL_SHELL_16x16);
         const int  maxCount = ilSmall.GetImageCount() - 1;
+        m_hIcon[ICON_ActiveWnd]   = ilSmall.GetIcon(rand() % maxCount);
         m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
-        m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
-        m_hIcon[ICON_Desktop1] = ilBig.GetIcon(IconMain);
+        m_hIcon[ICON_Desktop1]    = ilBig.GetIcon(IconMyComp);
+        m_hIcon[ICON_Cursor1]     = (HICON)LoadCursorW(nullptr, IDC_APPSTARTING);
+
+        LoadExplorerSettings();
     }
+
+    void LoadExplorerSettings()
+    {
+        HKEY hKey;
+        LSTATUS status = RegOpenKeyExW(HKEY_CURRENT_USER,
+            L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", 0,
+            KEY_QUERY_VALUE, &hKey
+        );
+        if (status != ERROR_SUCCESS) {
+            return;
+        }
+        DWORD  dwType = 0;
+        DWORD  cbData = sizeof(DWORD);
+        DWORD dwValue = 0;
+        if (ERROR_SUCCESS == RegQueryValueExW(hKey, L"ListviewShadow", nullptr, &dwType, reinterpret_cast<BYTE*>(&dwValue), &cbData)) {
+            if (REG_DWORD == dwType) {
+                m_bIconLabelShadows = dwValue != 0;
+            }
+        }
+        RegCloseKey(hKey);
+    }
+
 
     ~StaticInit()
     {
@@ -177,10 +204,11 @@ private:
     }
 
     StaticInit()
-        :            USER32{ LoadLibraryW(L"USER32") }
-        ,  DrawCaptionTempW{ nullptr }
-        ,  SetSysColorsTemp{ nullptr }
-        ,   DrawMenuBarTemp{ nullptr }
+        :              USER32{LoadLibraryW(L"USER32")}
+        ,    DrawCaptionTempW{nullptr}
+        ,    SetSysColorsTemp{nullptr}
+        ,     DrawMenuBarTemp{nullptr}
+        , m_bIconLabelShadows{true}
     {
         ZeroMemory(&m_hIcon, sizeof(m_hIcon));
         Init();
@@ -838,12 +866,15 @@ void CDrawRoutine::DrawToolTip(CDCHandle dc, CRect const& rcParam, ATL::CStringW
     dc.SelectFont(prevFont);
 }
 
-void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text) const
+#define IsDarkColor(color) \
+    ((GetRValue(color) * 2 + GetGValue(color) * 5 + GetBValue(color)) <= 128 * 8)
+
+void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const
 {
-    bool bShadow = true;
+    bool bShadow = StaticInit::instance().m_bIconLabelShadows;
     HICON  hIcon = StaticInit::instance().m_hIcon[StaticInit::ICON_Desktop1];
 
-    FillRect(dc, rcParam, m_Theme.GetBrush(COLOR_INFOBK)); // DEBUG
+    //FillRect(dc, rcParam, m_Theme.GetBrush(COLOR_APPWORKSPACE)); // DEBUG
 
     CRect rcIcon{0, 0, 64, 64}; // ##TODO: get desktop icon dimensions
     Rc::PutInto(rcParam, rcIcon, Rc::Center);
@@ -856,18 +887,45 @@ void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStr
     if (rcText.left < 0) {
         return ;
     }
-    int   prevMode = SetBkMode(dc, TRANSPARENT);
-    HFONT prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Tooltip));
+    int         prevMode = SetBkMode(dc, TRANSPARENT);
+    COLORREF prevBkColor = SetBkColor(dc, m_Theme.GetColor(COLOR_BACKGROUND));
+    HFONT       prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Desktop));
+
     if (!GetTextExtentPoint32(dc, text.GetString(), text.GetLength(), &szText)) {
         szText.cx = ScaleForDpi(45);
         szText.cy = ScaleForDpi(14);
     }
     rcText.top = rcIcon.bottom + 4;
     rcText.bottom = rcText.top + szText.cy + 4;
-    SetTextColor(dc, m_Theme.GetColor(COLOR_INFOTEXT));
+    if (bShadow) {
+        CRect rcShadow = rcText;
+        dc.SetTextColor(RGB(0, 0, 0));
+        OffsetRect(rcShadow, 2, 2);
+        dc.DrawTextW(text.GetString(), text.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+        OffsetRect(rcShadow, -1, -1);
+        dc.DrawTextW(text.GetString(), text.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+        OffsetRect(rcShadow, -1, -1);
+    }
+    COLORREF color;
+    if (IsDarkColor(m_Theme.GetColor(COLOR_DESKTOP)) && bShadow) {
+        color = RGB(0xFF, 0xFF, 0xFF);
+    }
+    else {
+        color = RGB(0, 0, 0);
+    }
+    SetTextColor(dc, color);
     dc.DrawTextW(text.GetString(), text.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
-    dc.SetBkMode(prevMode);
     dc.SelectFont(prevFont);
+    dc.SetBkColor(prevBkColor);
+    dc.SetBkMode(prevMode);
+
+    if (drawCursor) {
+        HICON hCursor = StaticInit::instance().m_hIcon[StaticInit::ICON_Cursor1];
+        CRect rcCursor{rcIcon.right + 8, rcIcon.bottom - 16, 0, 0};
+        rcCursor.right = rcCursor.left + 32; // ##TODO: GetSystemMetrics for cursor painting
+        rcCursor.bottom = rcCursor.top + 32;
+        dc.DrawIconEx(rcCursor.TopLeft(), hCursor, rcCursor.Size(), 0, nullptr, DI_NORMAL);
+    }
 }
 
 

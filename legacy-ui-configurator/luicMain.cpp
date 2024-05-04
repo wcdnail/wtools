@@ -186,6 +186,7 @@ HRESULT CLUIApp::ImListCreate(int index, int cx, int cy)
 {
     static const int iconsIDs[] = {
         IDI_COMP,
+        IDI_MY_COMP,
         IDI_MON_BRUSH,
         IDI_START_MENU,
         IDI_SAVE,

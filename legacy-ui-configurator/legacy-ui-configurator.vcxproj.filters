@@ -23,14 +23,10 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="resource.h">
-      <Filter>resz</Filter>
-    </ClInclude>
     <ClInclude Include="luicMain.h" />
-    <ClInclude Include="idl\legay-ui-configurator_i.h">
+    <ClInclude Include="idl\legacy-ui-configurator_i.h">
       <Filter>gen</Filter>
     </ClInclude>
-    <ClInclude Include="resz\resource.h" />
     <ClInclude Include="luicPageImpl.h" />
     <ClInclude Include="luicAppearance.h">
       <Filter>pages</Filter>
@@ -70,11 +66,14 @@
     </ClInclude>
     <ClInclude Include="luicMainFrame.h" />
     <ClInclude Include="luicMainView.h" />
+    <ClInclude Include="resz\resource.h">
+      <Filter>resz</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="luicMain.cpp" />
-    <ClCompile Include="idl\legay-ui-configurator_i.c">
+    <ClCompile Include="idl\legacy-ui-configurator_i.c">
       <Filter>gen</Filter>
     </ClCompile>
     <ClCompile Include="luicPageImpl.cpp" />
@@ -118,12 +117,12 @@
     <ClCompile Include="luicMainView.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="resz\legay-ui-configurator.rc">
+    <ResourceCompile Include="resz\legacy-ui-configurator.rc">
       <Filter>resz</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resz\legay-ui-configurator.rgs">
+    <None Include="resz\legacy-ui-configurator.rgs">
       <Filter>resz</Filter>
     </None>
   </ItemGroup>
@@ -167,14 +166,20 @@
     <Image Include="rom-save.ico">
       <Filter>resz\iconz</Filter>
     </Image>
+    <Image Include="rom-my-comp.ico">
+      <Filter>resz\iconz</Filter>
+    </Image>
+    <Image Include="resz\rom-my-comp.ico">
+      <Filter>resz\iconz</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
-    <Midl Include="idl\legay-ui-configurator.idl">
+    <Midl Include="idl\legacy-ui-configurator.idl">
       <Filter>gen</Filter>
     </Midl>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="resz\legay-ui-configurator.exe.manifest">
+    <Manifest Include="resz\legacy-ui-configurator.exe.manifest">
       <Filter>resz</Filter>
     </Manifest>
   </ItemGroup>
