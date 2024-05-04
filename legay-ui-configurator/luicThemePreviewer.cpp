@@ -6,6 +6,14 @@
 #include "rect.alloc.h"
 #include "string.utils.format.h"
 #include "windows.uses.gdi+.h"
+#include "rect.gdi+.h"
+#include "rect.putinto.h"
+
+#include <random>
+    //std::random_device rd;
+    //std::uniform_int_distribution<int> dist(0, static_cast<int>(m_Wallpaper.size()) - 1);
+    //std::default_random_engine gen(rd());
+    //int wIndex = gen();
 
 namespace 
 {
@@ -18,7 +26,7 @@ namespace
         {  WT_Usual, L"прилагательным    («формальная    логика»,   «математическая" },
         {  WT_Usual, L"логика», «индуктивная», «модальная» и т.д.)." },
         { WT_Select, L"  Решение  вопроса  о  предмете логики как науки по существу" },
-        {  WT_Usual, L"зависит  от решения основного вопроса философии и отражает в" },
+        { WT_Select, L"зависит  от решения основного вопроса философии и отражает в" },
         {  WT_Usual, L"себе     теоретические,    мировоззренческие,    философские" },
         {  WT_Usual, L"установки, в том числе представление о природе мышления, об" },
         {  WT_Usual, L"отношении мышления к его предмету, о движущих силах," },
@@ -49,6 +57,10 @@ namespace
         {  WT_Usual, L"Message Text" },
         {    WT_URL, L"https://www.hyperlink.my" },
         {    WT_URL, L"Button" },
+    };
+
+   const WinText HintText[] = {
+        {  WT_Usual, L"TooTip hint" },
     };
 }
 
@@ -114,8 +126,10 @@ HRESULT CThemePreviewer::InitWallpapers()
         Gdiplus::RectF rcImage;
         Gdiplus::Unit units;
         image->GetBounds(&rcImage, &units);
-        DebugThreadPrintf(LTH_DESK_WALLPPR L" Wallpaper: %fx%f %d\n", rcImage.Width, rcImage.Height, units);
+        CRect rcWallpaper = FromRectF(rcImage);
+        DebugThreadPrintf(LTH_DESK_WALLPPR L" Wallpaper: %d x %d [%d]\n", rcWallpaper.Width(), rcWallpaper.Height(), units);
         imageVec.emplace_back(std::move(image));
+        break; // ##TODO: only one will be enough
     }
     m_Wallpaper.swap(imageVec);
     return m_Wallpaper.size() > 0 ? S_OK : code;
@@ -123,7 +137,9 @@ HRESULT CThemePreviewer::InitWallpapers()
 
 int CThemePreviewer::OnCreate(LPCREATESTRUCT pCS)
 {
-    /* InitWallpapers(); */ 
+    if (m_Wallpaper.empty()) {
+        InitWallpapers();
+    }
     return 0;
 }
 
@@ -131,48 +147,83 @@ void CThemePreviewer::OnPaint(CDCHandle dcParam)
 {
     UNREFERENCED_PARAMETER(dcParam);
 
-    const auto& theme = CLUIApp::App()->CurrentTheme();
-    const auto  hMenu = CLUIApp::App()->GetTestMenu();
-    const double   sx = 5.;
-    const double   sy = 5.;
-
     CPaintDC dcPaint(m_hWnd);
     CDCHandle dc(dcPaint.m_hDC);
     // ##TODO: later via CreateCompatibleDC || WTL::CDoubleBufferWindowImpl
 
     CRect rcClient;
     GetClientRect(rcClient);
+    DrawDesktop(dc, rcClient);
+}
 
+void CThemePreviewer::CalcRects(DrawWindowArgs (&params)[WND_Count],
+                                CRect const&               rcClient,
+                                DRect&                       rcAux1,
+                                DRect&                       rcAux2
+)
+{
+    const double   sx = 5.;
+    const double   sy = 5.;
     DRect rcFull = FromCRect<double>(rcClient);
     rcFull.Shrink(sx, sy);
 
     CF::RectzAllocator<double> rcAlloc{ rcFull };
     const double fCX = rcFull.Width();
     const double fCY = rcFull.Height();
-    DRect rcIcon1 = rcAlloc.Next(fCX / 3., fCY / 3., sx, sy);
-    DRect  rcWin1 = rcAlloc.NextFromRight(fCX, fCY / 1.2, sx, sy);
-    rcAlloc.Shift(0, -(rcWin1.Height() - rcIcon1.Height()));
-    DRect rcIcon2 = rcAlloc.Next(fCX / 5., fCY / 2., sx, sy);
-    DRect  rcWin2 = rcAlloc.Next(fCX, fCY, sx, sy);
-    rcAlloc.Shift(0, -(rcWin2.Height() - rcIcon2.Height()));
-    DRect rcIcon3 = rcAlloc.Next(fCX / 5., fCY, sx, sy);
-    rcWin1.cy -= fCY / 6.;
-    rcWin2.cx -= fCX / 15.;
-    rcIcon3.y -= fCY / 3.5;
-    rcIcon3.cx += fCX / 18.;
-    rcIcon3.cy += fCY / 5.5;
+
+    rcAux1 = rcAlloc.Next(fCX / 3., fCY / 3., sx, sy);
+    params[WND_Front].drect = rcAlloc.NextFromRight(fCX, fCY / 1.2, sx, sy);
+
+    rcAlloc.Shift(0, -(params[WND_Front].drect.Height() - rcAux1.Height()));
+    rcAux2 = rcAlloc.Next(fCX / 5., fCY / 2., sx, sy);
+    params[WND_Back].drect = rcAlloc.Next(fCX, fCY, sx, sy);
+
+    rcAlloc.Shift(0, -(params[WND_Back].drect.Height() - rcAux2.Height()));
+    params[WND_MsgBox].drect = rcAlloc.Next(fCX / 5., fCY, sx, sy);
+
+    params[WND_Front].drect.cy -= fCY / 6.;
+    params[WND_Back].drect.cx -= fCX / 15.;
+
+    params[WND_MsgBox].drect.y -= fCY / 3.5;
+    params[WND_MsgBox].drect.cx += fCX / 18.;
+    params[WND_MsgBox].drect.cy += fCY / 5.5;
+}
+
+void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
+{
+    const auto& theme = CLUIApp::App()->CurrentTheme();
+    const auto  hMenu = CLUIApp::App()->GetTestMenu();
+    DrawWindowArgs params[WND_Count] = {
+        {   m_WndRect[WND_Back], {}, L"Inactive window", 0, nullptr, -1, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
+        {  m_WndRect[WND_Front], {}, L"Active window", DC_ACTIVE, hMenu, 2, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
+        { m_WndRect[WND_MsgBox], {}, L"Tool window", DC_ACTIVE | DC_SMALLCAP, nullptr, -1, { MsgBoxText, _countof(MsgBoxText), 0 } },
+    };
+    DRect rcAux1;
+    DRect rcAux2;
+    CalcRects(params, rcClient, rcAux1, rcAux2);
 
     dc.FillSolidRect(rcClient, theme.GetColor(COLOR_BACKGROUND));
 
-    const DrawWindowArgs params[WND_Count] = {
-        {   m_WndRect[WND_Back],  rcWin1, L"Inactive window", 0, nullptr, -1, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
-        {  m_WndRect[WND_Front],  rcWin2, L"Active window", DC_ACTIVE, hMenu, 2, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
-        { m_WndRect[WND_MsgBox], rcIcon3, L"Tool window", DC_ACTIVE | DC_SMALLCAP, nullptr, -1, { MsgBoxText, _countof(MsgBoxText), 0 } },
-    };
+    if (m_Wallpaper.size() > 0) {
+        GdipImagePtr const& imPtr = m_Wallpaper[0];
+
+        Gdiplus::RectF rcfImage;
+        Gdiplus::Unit     units;
+        imPtr->GetBounds(&rcfImage, &units);
+
+        Gdiplus::ImageAttributes *attrs = nullptr;
+
+        Gdiplus::Graphics graphics(dc);
+        graphics.DrawImage(imPtr.get(),
+            ToRect(rcClient),
+            rcClient.left,    rcClient.top,
+            rcClient.Width(), rcClient.Height(),
+            units, attrs);
+    }
 
     CDrawRoutine drawings(theme);
     for (auto& it : params) {
-        drawings.CalcRects(ToCRect<double>(it.rcSrc), it.captFlags, it.rects);
+        drawings.CalcRects(ToCRect<double>(it.drect), it.captFlags, it.rects);
         drawings.DrawWindow(dc, it);
     }
 }

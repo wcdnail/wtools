@@ -36,8 +36,15 @@ private:
     GdipImageVec         m_Wallpaper;
     WindowRects m_WndRect[WND_Count];
 
+    static void CalcRects(DrawWindowArgs (&params)[WND_Count],
+                          CRect const&               rcClient,
+                          DRect&                       rcAux1,
+                          DRect&                       rcAux2
+    );
+
     int OnCreate(LPCREATESTRUCT pCS);
     void OnPaint(CDCHandle dc);
+    void DrawDesktop(CDCHandle dc, CRect const& rc);
 
     BEGIN_MSG_MAP_EX(PanelView)
       //MSG_WM_CREATE(OnCreate) // Subclassed

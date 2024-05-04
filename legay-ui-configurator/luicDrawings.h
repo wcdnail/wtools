@@ -42,7 +42,7 @@ struct WindowText
 struct DrawWindowArgs
 {
     WindowRects&    rects;
-    DRect const&    rcSrc;
+    DRect           drect;
     ATL::CStringW caption;
     UINT        captFlags;
     HMENU           hMenu;
