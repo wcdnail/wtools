@@ -899,12 +899,12 @@ void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStr
     rcText.bottom = rcText.top + szText.cy + 4;
     if (bShadow) {
         CRect rcShadow = rcText;
-        dc.SetTextColor(RGB(0, 0, 0));
-        OffsetRect(rcShadow, 2, 2);
-        dc.DrawTextW(text.GetString(), text.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
-        OffsetRect(rcShadow, -1, -1);
-        dc.DrawTextW(text.GetString(), text.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
-        OffsetRect(rcShadow, -1, -1);
+        for (int i=0; i<3; i++) {
+            int c = i * 50;
+            dc.SetTextColor(RGB(c, c, c));
+            OffsetRect(rcShadow, 1, 1);
+            dc.DrawTextW(text.GetString(), text.GetLength(), rcShadow, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+        }
     }
     COLORREF color;
     if (IsDarkColor(m_Theme.GetColor(COLOR_DESKTOP)) && bShadow) {
