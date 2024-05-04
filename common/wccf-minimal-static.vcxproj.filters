@@ -18,6 +18,7 @@
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="windows.uses.gdi+.cpp" />
     <ClCompile Include="icons.save.m1.cpp" />
+    <ClCompile Include="windows.wtl.buffered.paint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -56,6 +57,7 @@
     <ClInclude Include="settings.h" />
     <ClInclude Include="windows.uses.gdi+.h" />
     <ClInclude Include="debug.dump.msg.h" />
+    <ClInclude Include="windows.wtl.buffered.paint.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

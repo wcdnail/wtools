@@ -8,52 +8,6 @@
 #include "windows.uses.gdi+.h"
 #include "rect.gdi+.h"
 
-namespace
-{
-const WinText Il_DL_Begin[] = {
-    {  WT_Usual, L"  Логика — наука о формах и закономерностях мышления, теория" },
-    {  WT_Usual, L"мышления. В настоящее время  термином «логика»  обозначаются" },
-    {  WT_Usual, L"теории, различающиеся  не только по способу разработки одних" },
-    {  WT_Usual, L"и  тех же  вопросов, но и по предмету  исследования.  Термин" },
-    {  WT_Usual, L"«логика»   употребляется   поэтому  обычно  с  тем или  иным" },
-    {  WT_Usual, L"прилагательным    («формальная    логика»,   «математическая" },
-    {  WT_Usual, L"логика», «индуктивная», «модальная» и т.д.)." },
-    { WT_Select, L"  Решение  вопроса  о  предмете логики как науки по существу" },
-    { WT_Select, L"зависит  от решения основного вопроса философии и отражает в" },
-    {  WT_Usual, L"себе     теоретические,    мировоззренческие,    философские" },
-    {  WT_Usual, L"установки, в том числе представление о природе мышления, об" },
-    {  WT_Usual, L"отношении мышления к его предмету, о движущих силах," },
-    {  WT_Usual, L"стимулах развития мышления и т.д. Не случайно поэтому логика" },
-    {  WT_Usual, L"всегда была и остаётся объектом острой идейной борьбы" },
-    {  WT_Usual, L"основных философских направлений — материализма и" },
-    {  WT_Usual, L"идеализма, диалектики и метафизики." },
-    {  WT_Usual, L"  Марксистско-ленинское решение вопроса о предмете логики," },
-    {  WT_Usual, L"представляющее собой итог всей истории философской мысли," },
-    {  WT_Usual, L"разработано Марксом, Энгельсом и Лениным в ходе критической" },
-    {  WT_Usual, L"и материалистической переработки высших достижений" },
-    {  WT_Usual, L"предшествующей философии в области теории мышления." },
-    {  WT_Usual, L"Логика, разработанная на основе диалектико-" },
-    {  WT_Usual, L"материалистического понимания и решения проблемы мышления" },
-    {  WT_Usual, L"и соответствующая современному уровню развития человеческой" },
-    {  WT_Usual, L"культуры, науки и техники, обычно именуется диалектической" },
-    {  WT_Usual, L"логикой." },
-    {  WT_Usual, L"  # Диалектическая логика" },
-    {  WT_Usual, L"  Логика диалектическая — наука об объективных формах и" },
-    {  WT_Usual, L"законах развития человеческого мышления, понимаемого как" },
-    {  WT_Usual, L"исторический процесс отражения внешнего мира в знании" },
-    {  WT_Usual, L"людей, как объективная истина в её развитии. В этом понимании" },
-    {  WT_Usual, L"логика диалектическая совпадает с диалектикой и теорией" },
-    {  WT_Usual, L"познания материализма." },
-};
-
-const WinText MsgBoxText[] = {
-    {  WT_Usual, L"Message Text" },
-    {    WT_URL, L"https://www.hyperlink.my" },
-    {    WT_URL, L"Button" },
-};
-} // namespace
-
-
 ATOM CThemePreviewer::Register(HRESULT& code)
 {
     WNDCLASSEXW wc;
@@ -101,7 +55,8 @@ CThemePreviewer::CThemePreviewer()
 #endif
 
 CThemePreviewer::CThemePreviewer()
-    :         m_hWnd{nullptr}
+    : DoubleBuffered{true}
+    ,         m_hWnd{nullptr}
     ,    m_Wallpaper{}
     , m_SelectedRect{-1, -1}
     ,  m_bUserSelect{false}
@@ -122,7 +77,7 @@ LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 {
     LONG_PTR tempLP = GetWindowLongPtrW(hWnd, GWLP_USERDATA);
     if (tempLP) {
-        auto* self = reinterpret_cast<CThemePreviewer*>(tempLP);
+        auto*   self = reinterpret_cast<CThemePreviewer*>(tempLP);
         switch (uMsg) {
         case WM_PAINT:{
             self->OnPaint({reinterpret_cast<HDC>(wParam)});
@@ -133,6 +88,11 @@ LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             self->OnLButton(static_cast<UINT>(wParam), ::CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
             return 0;
         }
+        }
+        /// CHAIN_MSG_MAP(Cf::DoubleBuffered)
+        LRESULT lRes = 0;
+        if (self->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lRes, 0)) {
+            return lRes;
         }
     }
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
@@ -204,16 +164,11 @@ int CThemePreviewer::OnCreate(LPCREATESTRUCT pCS)
 void CThemePreviewer::OnPaint(CDCHandle dcParam)
 {
     UNREFERENCED_PARAMETER(dcParam);
-
     CPaintDC dcPaint(m_hWnd);
-    CDCHandle dc(dcPaint.m_hDC);
-    // ##TODO: later via CreateCompatibleDC || WTL::CDoubleBufferWindowImpl
-
-    CRect rcClient;
-    GetClientRect(m_hWnd, rcClient);
-    DrawDesktop(dc, rcClient);
-
-    HighLightSeletced(dc, rcClient);
+    CF::BufferedPaint bufferedPaint(dcPaint, GetSecondDc(), IsDoubleBuffered(), m_hWnd);
+    CDCHandle dc = bufferedPaint.GetCurrentDc();
+    DrawDesktop(dc, bufferedPaint.GetRect());
+    HighLightSeletced(dc, bufferedPaint.GetRect());
 }
 
 void CThemePreviewer::CalcRects(DrawWindowArgs (&params)[WND_Count],
@@ -248,6 +203,51 @@ void CThemePreviewer::CalcRects(DrawWindowArgs (&params)[WND_Count],
     params[WND_MsgBox].drect.cx += fCX / 18.;
     params[WND_MsgBox].drect.cy += fCY / 5.5;
 }
+
+namespace
+{
+const WinText Il_DL_Begin[] = {
+    {  WT_Usual, L"  Логика — наука о формах и закономерностях мышления, теория" },
+    {  WT_Usual, L"мышления. В настоящее время  термином «логика»  обозначаются" },
+    {  WT_Usual, L"теории, различающиеся  не только по способу разработки одних" },
+    {  WT_Usual, L"и  тех же  вопросов, но и по предмету  исследования.  Термин" },
+    {  WT_Usual, L"«логика»   употребляется   поэтому  обычно  с  тем или  иным" },
+    {  WT_Usual, L"прилагательным    («формальная    логика»,   «математическая" },
+    {  WT_Usual, L"логика», «индуктивная», «модальная» и т.д.)." },
+    { WT_Select, L"  Решение  вопроса  о  предмете логики как науки по существу" },
+    { WT_Select, L"зависит  от решения основного вопроса философии и отражает в" },
+    {  WT_Usual, L"себе     теоретические,    мировоззренческие,    философские" },
+    {  WT_Usual, L"установки, в том числе представление о природе мышления, об" },
+    {  WT_Usual, L"отношении мышления к его предмету, о движущих силах," },
+    {  WT_Usual, L"стимулах развития мышления и т.д. Не случайно поэтому логика" },
+    {  WT_Usual, L"всегда была и остаётся объектом острой идейной борьбы" },
+    {  WT_Usual, L"основных философских направлений — материализма и" },
+    {  WT_Usual, L"идеализма, диалектики и метафизики." },
+    {  WT_Usual, L"  Марксистско-ленинское решение вопроса о предмете логики," },
+    {  WT_Usual, L"представляющее собой итог всей истории философской мысли," },
+    {  WT_Usual, L"разработано Марксом, Энгельсом и Лениным в ходе критической" },
+    {  WT_Usual, L"и материалистической переработки высших достижений" },
+    {  WT_Usual, L"предшествующей философии в области теории мышления." },
+    {  WT_Usual, L"Логика, разработанная на основе диалектико-" },
+    {  WT_Usual, L"материалистического понимания и решения проблемы мышления" },
+    {  WT_Usual, L"и соответствующая современному уровню развития человеческой" },
+    {  WT_Usual, L"культуры, науки и техники, обычно именуется диалектической" },
+    {  WT_Usual, L"логикой." },
+    {  WT_Usual, L"  # Диалектическая логика" },
+    {  WT_Usual, L"  Логика диалектическая — наука об объективных формах и" },
+    {  WT_Usual, L"законах развития человеческого мышления, понимаемого как" },
+    {  WT_Usual, L"исторический процесс отражения внешнего мира в знании" },
+    {  WT_Usual, L"людей, как объективная истина в её развитии. В этом понимании" },
+    {  WT_Usual, L"логика диалектическая совпадает с диалектикой и теорией" },
+    {  WT_Usual, L"познания материализма." },
+};
+
+const WinText MsgBoxText[] = {
+    {  WT_Usual, L"Message Text" },
+    {    WT_URL, L"https://www.hyperlink.my" },
+    {    WT_URL, L"Button" },
+};
+} // namespace
 
 void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
 {

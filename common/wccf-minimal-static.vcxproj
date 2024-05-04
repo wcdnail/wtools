@@ -42,6 +42,7 @@
     </ClCompile>
     <ClCompile Include="string.utils.format.cpp" />
     <ClCompile Include="windows.uses.gdi+.cpp" />
+    <ClCompile Include="windows.wtl.buffered.paint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="debug.dump.msg.h" />
@@ -66,6 +67,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="string.utils.format.h" />
     <ClInclude Include="windows.uses.gdi+.h" />
+    <ClInclude Include="windows.wtl.buffered.paint.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>wccf-minimal-static</ProjectName>
