@@ -3,10 +3,13 @@
 #include "luicMainFrame.h"
 #include "luicTheme.h"
 #include "settings.h"
+#include <atlcomcli.h>
 #include <atlapp.h>
 #include <mutex>
 
 #define SHELL32_PATHNAME L"%SYSTEMROOT%\\System32\\shell32.dll"
+
+using IDesktopWallpaperPtr = ATL::CComPtr<IDesktopWallpaper>;
 
 enum ImageListIndex : int
 {
@@ -40,37 +43,45 @@ void SetMFStatus(int status, PCWSTR format, ...);
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 
-class CLegacyUIConfigurator: public CAppModule
+class CLUIApp: public CAppModule
 {
 public:
     using Super = CAppModule;
 
-    ~CLegacyUIConfigurator() override;
-    CLegacyUIConfigurator();
+    static CLUIApp* App();
+
+    ~CLUIApp() override;
+    CLUIApp();
 
     Conf::Section& GetSettings();
     CTheme& CurrentTheme() const;
     HICON GetIcon(int icon) const;
     CMenu const& GetTestMenu() const;
     WTL::CImageListManaged const& GetImageList(int index) const;
-    void SetMainFrameStatus(int status, ATL::CStringW&& message);
+    IDesktopWallpaper* GetWallpaperMan();
 
-    HRESULT Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID = NULL);
+    HRESULT Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID = nullptr);
     HRESULT Run(HINSTANCE instHnd, int showCmd);
-
-    static CLegacyUIConfigurator* App();
 
 private:
     friend Super;
+    friend void SetMFStatus(int status, PCWSTR format, ...);
 
     Conf::Section                  m_Settings;
     CMainFrame                    m_MainFrame;
     CMenu                          m_TestMenu;
+    IDesktopWallpaperPtr        m_pWallpaper;
     WTL::CImageListManaged m_ImList[IL_Count];
 
     static CTheme g_ThemeNative;
-    static CLegacyUIConfigurator* g_pApp;
+    static CLUIApp* g_pApp;
     static std::recursive_mutex m_pAppMx;
 
     HRESULT ImListCreate();
+    void SetMainFrameStatus(int status, ATL::CStringW&& message);
 };
+
+inline IDesktopWallpaper* CLUIApp::GetWallpaperMan()
+{
+    return m_pWallpaper;
+}

@@ -67,7 +67,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
 {
     DBG_DUMP_WMESSAGE_EXT(LTH_MAINFRAME, L"Main", m_hWnd, WM_CREATE, 0, 0);
 
-    auto const* pApp = CLegacyUIConfigurator::App();
+    auto const* pApp = CLUIApp::App();
 
     HICON tempIco = pApp->GetIcon(IconMain);
     SetIcon(tempIco, FALSE);
@@ -109,7 +109,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
 
 void CMainFrame::OnDestroy()
 {
-    CMessageLoop* pLoop = CLegacyUIConfigurator::App()->GetMessageLoop();
+    CMessageLoop* pLoop = CLUIApp::App()->GetMessageLoop();
     ATLASSERT(pLoop != nullptr);
     pLoop->RemoveIdleHandler(this);
     pLoop->RemoveMessageFilter(this);

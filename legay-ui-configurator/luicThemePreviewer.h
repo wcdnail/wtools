@@ -2,6 +2,12 @@
 
 #include "luicDrawings.h"
 #include <atlwin.h>
+#include <gdiplusheaders.h>
+#include <memory>
+#include <vector>
+
+using GdipImagePtr = std::unique_ptr<Gdiplus::Image>;
+using GdipImageVec = std::vector<GdipImagePtr>;
 
 using CThemePreviewerTraits = ATL::CWinTraits<WS_CHILD | WS_VISIBLE | WS_BORDER, 0>;
 
@@ -14,6 +20,8 @@ struct CThemePreviewer: ATL::CWindowImpl<CThemePreviewer, ATL::CWindow, CThemePr
     ~CThemePreviewer() override;
     CThemePreviewer();
 
+    HRESULT InitWallpapers();
+
 private:
     enum WND_Index : int
     {
@@ -25,11 +33,14 @@ private:
 
     friend Super;
 
+    GdipImageVec         m_Wallpaper;
     WindowRects m_WndRect[WND_Count];
 
+    int OnCreate(LPCREATESTRUCT pCS);
     void OnPaint(CDCHandle dc);
 
     BEGIN_MSG_MAP_EX(PanelView)
+      //MSG_WM_CREATE(OnCreate) // Subclassed
         MSG_WM_PAINT(OnPaint)
     END_MSG_MAP()
 };

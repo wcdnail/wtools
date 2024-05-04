@@ -12,4 +12,5 @@
 #define LTH_MAINFRAME       L"     MainFrame|"
 #define LTH_STATUS          L"        Status|"
 #define LTH_SHELL_ICON      L"     ShellIcon|"
+#define LTH_DESK_WALLPPR    L"DesktopWallppr|"
 

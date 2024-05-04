@@ -81,7 +81,7 @@ void CPageDllIcons::SetError(HRESULT code, PCWSTR format, ...)
         m_edPath.SetWindowTextW(message.GetString());
     }
     {
-        auto const* app = CLegacyUIConfigurator::App();
+        auto const* app = CLUIApp::App();
         m_lvView.SetImageList(app->GetImageList(IL_Own), LVSIL_NORMAL);
         m_lvView.AddItem(0, LV_MakeInsert, Str::ErrorCode<>::SystemMessage(code).GetString(), IconHatchCross);
         WTL::CButton(GetDlgItem(IDC_RADIO1)).SetCheck(FALSE);
@@ -145,7 +145,7 @@ void CPageDllIcons::PopulateViews()
 
 BOOL CPageDllIcons::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-    auto const* app = CLegacyUIConfigurator::App();
+    auto const* app = CLUIApp::App();
 
     m_edPath.Attach(GetDlgItem(IDC_ED_OPEN_DLL_PATHNAME));
     m_bnBrowse.Attach(GetDlgItem(IDC_BN_OPEN_DLG));
@@ -433,8 +433,7 @@ bool CPageDllIcons::ExportIconGDIP(int it, bool needBig, std::wstring const& fil
     //GetEncoderClsid(L"image/jpeg", &encoderClsid);
     auto status = pBitmap->Save(filename.c_str(), &Gdiplus::ImageFormatIcon);
     if (Gdiplus::Ok != status) {
-        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %S", it, filename.c_str(),
-            Initialize::GdiPlus::StatusString(status));
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %S", it, filename.c_str(), GdiPlus::StatusString(status));
         return false;
     }
     return true;

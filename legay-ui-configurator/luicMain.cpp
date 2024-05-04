@@ -7,6 +7,8 @@
 #include "string.utils.format.h"
 #include "windows.uses.gdi+.h"
 #include "resz/resource.h"
+#include <combaseapi.h>
+#include <ShObjIdl_core.h>
 
 #if 0
 // TODO: GENERATED CODE, reserved for future use, DO NOT EARSE!!!!
@@ -20,7 +22,7 @@ struct CAtlApp: ATL::CAtlExeModuleT<CAtlApp>
 private:
     friend Super;
     friend SuperMod;
-    CLegacyUIConfigurator m_App;
+    CLUIApp m_App;
     DECLARE_LIBID(LIBID_ClAppearanceLib)
     DECLARE_REGISTRY_APPID_RESOURCEID(IDR_CLAPPEARANCE, "{a189a989-5210-498e-9326-eadb11ad6d14}")
     HRESULT Run(int showCmd);
@@ -30,10 +32,10 @@ return _AtlModule.WinMain(showCmd);
 // TODO: GENERATED CODE, reserved for future use, DO NOT EARSE!!!!
 #endif
 
-CTheme CLegacyUIConfigurator::g_ThemeNative{ true };
+CTheme CLUIApp::g_ThemeNative{ true };
 
-CLegacyUIConfigurator* CLegacyUIConfigurator::g_pApp{ nullptr };
-std::recursive_mutex CLegacyUIConfigurator::m_pAppMx{};
+CLUIApp* CLUIApp::g_pApp{ nullptr };
+std::recursive_mutex CLUIApp::m_pAppMx{};
 
 void SetMFStatus(int status, PCWSTR format, ...)
 {
@@ -41,7 +43,7 @@ void SetMFStatus(int status, PCWSTR format, ...)
     va_start(ap, format);
     Str::ElipsisW::String message = Str::ElipsisW::FormatV(format, ap);
     va_end(ap);
-    CLegacyUIConfigurator::App()->SetMainFrameStatus(status, std::move(message));
+    CLUIApp::App()->SetMainFrameStatus(status, std::move(message));
 }
 
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
@@ -71,13 +73,22 @@ void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox/* = false*
 extern "C"
 int WINAPI _tWinMain(HINSTANCE instHnd, HINSTANCE, LPTSTR, int showCmd)
 {
+    HRESULT hr = S_FALSE;
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
-    CLegacyUIConfigurator app;
-    HRESULT hr = app.Run(instHnd, showCmd);
+    try {
+        OLE               ole;
+        CommonControls cctrls;
+        GdiPlus          gdip;
+        CLUIApp           app;
+        hr = app.Run(instHnd, showCmd);
+    }
+    catch(std::exception const& ex) {
+        MessageBoxA(nullptr, ex.what(), "epic FAIL", MB_ICONERROR);
+    }
     return static_cast<int>(hr);
 }
 
-CLegacyUIConfigurator::~CLegacyUIConfigurator()
+CLUIApp::~CLUIApp()
 {
     {
         std::lock_guard<std::recursive_mutex> guard(m_pAppMx);
@@ -85,11 +96,12 @@ CLegacyUIConfigurator::~CLegacyUIConfigurator()
     }
 }
 
-CLegacyUIConfigurator::CLegacyUIConfigurator()
-    :       Super{}
-    ,  m_Settings{ L"CLegacyUIConfigurator" }
-    , m_MainFrame{ m_Settings }
-    ,    m_ImList{}
+CLUIApp::CLUIApp()
+    :        Super{}
+    ,   m_Settings{ L"CLUIApp" }
+    ,  m_MainFrame{ m_Settings }
+    ,   m_TestMenu{}
+    , m_pWallpaper{}
 {
     {
         std::lock_guard<std::recursive_mutex> guard(m_pAppMx);
@@ -97,12 +109,12 @@ CLegacyUIConfigurator::CLegacyUIConfigurator()
     }
 }
 
-CTheme& CLegacyUIConfigurator::CurrentTheme() const
+CTheme& CLUIApp::CurrentTheme() const
 {
     return g_ThemeNative;
 }
 
-HICON CLegacyUIConfigurator::GetIcon(int icon) const
+HICON CLUIApp::GetIcon(int icon) const
 {
     if (icon < 0 || icon >= IconCount) {
         return nullptr;
@@ -110,22 +122,30 @@ HICON CLegacyUIConfigurator::GetIcon(int icon) const
     return m_ImList[IL_Own].GetIcon(icon);
 }
 
-CMenu const& CLegacyUIConfigurator::GetTestMenu() const
+CMenu const& CLUIApp::GetTestMenu() const
 {
     return m_TestMenu;
 }
 
-void CLegacyUIConfigurator::SetMainFrameStatus(int status, ATL::CStringW&& message)
+void CLUIApp::SetMainFrameStatus(int status, ATL::CStringW&& message)
 {
     m_MainFrame.SetStatus(status, std::move(message));
 }
 
-HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID)
+HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID)
 {
     HRESULT code = CAppModule::Init(pObjMap, hInstance, pLibID);
     if (FAILED(code)) {
         return code;
     }
+    code = CoCreateInstance(CLSID_DesktopWallpaper, nullptr, CLSCTX_ALL,
+                            IID_IDesktopWallpaper, 
+                            reinterpret_cast<void**>(&m_pWallpaper)
+    );
+    if (FAILED(code)) {
+        return code;
+    }
+
     static const ATL::CStringW shell32dll = SHELL32_PATHNAME;
     CIconCollectionFile shellIcons;
     if (!shellIcons.Load(shell32dll.GetString(), true)) {
@@ -143,16 +163,16 @@ HRESULT CLegacyUIConfigurator::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINST
     return code;
 }
 
-CLegacyUIConfigurator* CLegacyUIConfigurator::App()
+CLUIApp* CLUIApp::App()
 {
     std::lock_guard<std::recursive_mutex> guard(m_pAppMx);
     if (!g_pApp) {
-        throw std::logic_error("CLegacyUIConfigurator::App is NULL");
+        throw std::logic_error("CLUIApp::App is NULL");
     }
     return g_pApp;
 }
 
-WTL::CImageListManaged const& CLegacyUIConfigurator::GetImageList(int index) const
+WTL::CImageListManaged const& CLUIApp::GetImageList(int index) const
 {
     if (index < 0 || index >= IL_Count) {
         static const WTL::CImageListManaged dmy;
@@ -161,7 +181,7 @@ WTL::CImageListManaged const& CLegacyUIConfigurator::GetImageList(int index) con
     return m_ImList[index];
 }
 
-HRESULT CLegacyUIConfigurator::ImListCreate()
+HRESULT CLUIApp::ImListCreate()
 {
     enum : int
     {
@@ -198,18 +218,14 @@ HRESULT CLegacyUIConfigurator::ImListCreate()
     return S_OK;
 }
 
-HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
+HRESULT CLUIApp::Run(HINSTANCE instHnd, int showCmd)
 {
     static constexpr int MF_Initial_CX = 1000;
     static constexpr int MF_Initial_CY = 600;
 
     HRESULT hr = S_FALSE;
     try {
-        Initialize::OLE               ole;
-        Initialize::CommonControls cctrls;
-        Initialize::GdiPlus       gdiPlus;
-        CMessageLoop                 loop;
-
+        CMessageLoop  loop;
         hr = Initialize(nullptr, instHnd);
         if (FAILED(hr)) {
             ReportError(L"Initialization failure!", hr, true);
@@ -233,6 +249,5 @@ HRESULT CLegacyUIConfigurator::Run(HINSTANCE instHnd, int showCmd)
     catch(std::exception const& ex) {
         MessageBoxA(nullptr, ex.what(), "epic FAIL", MB_ICONERROR);
     }
-
     return hr;
 }

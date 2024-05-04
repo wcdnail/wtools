@@ -139,10 +139,10 @@ CTheme::~CTheme()
 }
 
 CTheme::CTheme(bool loadSystemTheme)
-    :            m_MyName("Native")
-    ,        m_lfIconFont()
-    , m_bGradientCaptions(true)
-    ,        m_bFlatMenus(false)
+    :            m_MyName{"Native"}
+    ,        m_lfIconFont{}
+    , m_bGradientCaptions{true}
+    ,        m_bFlatMenus{false}
 {
     ZeroMemory(&m_ncMetrics, sizeof(m_ncMetrics));
     ZeroMemory(&m_Color, sizeof(m_Color));

@@ -162,7 +162,7 @@ private:
         GetProcAddressEX(USER32, DrawMenuBarTemp);
 
         srand(static_cast<int>(time(nullptr)));
-        auto const&     il = CLegacyUIConfigurator::App()->GetImageList(IL_SHELL_16x16);
+        auto const&     il = CLUIApp::App()->GetImageList(IL_SHELL_16x16);
         const int maxCount = il.GetImageCount();
 
         for (int i=0; i<ICON_Count; i++) {

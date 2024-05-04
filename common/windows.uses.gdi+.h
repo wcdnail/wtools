@@ -1,15 +1,12 @@
 #pragma once 
 
-namespace Initialize
+struct GdiPlus
 {
-    struct GdiPlus
-    {
-        GdiPlus(int requiredver = 1);
-        ~GdiPlus();
+    GdiPlus(int requiredver = 1);
+    ~GdiPlus();
 
-        static char const* StatusString(int status);
+    static PCSTR StatusString(int status);
 
-    private:
-        ULONG_PTR Id;
-    };
-}
+private:
+    ULONG_PTR Id;
+};

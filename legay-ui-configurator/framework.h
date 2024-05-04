@@ -31,6 +31,13 @@
 #include <shellapi.h>
 #include <prsht.h>
 
+#include <atlcomcli.h>
+#include <combaseapi.h>
+#include <ShObjIdl_core.h>
+#include <comdef.h>
+#include <comip.h>
+#include <comutil.h>
+
 #include <gdiplus.h>
 
 #include <unordered_map>

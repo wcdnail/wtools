@@ -5,29 +5,27 @@
 #include <sstream>
 #include <ole2.h>
 
-namespace Initialize
+struct OLE
 {
-    struct OLE
-    {
-        OLE(); /* throw(std::runtime_error) */
-        ~OLE(); /* throw() */
-    };
+    OLE(); /* throw(std::runtime_error) */
+    ~OLE(); /* throw() */
+};
 
-    inline OLE::OLE() /* throw(std::runtime_error) */
+inline OLE::OLE() /* throw(std::runtime_error) */
+{
+    HRESULT hr = ::OleInitialize(NULL);
+    if (FAILED(hr))
     {
-        HRESULT hr = ::OleInitialize(NULL);
-        if (FAILED(hr))
-        {
-            std::stringstream message;
-            message << "OleInitialize failed: " << std::hex << hr << " " 
-                    << Str::ErrorCode<char>::SystemMessage(hr);
+        std::stringstream message;
+        message << "OleInitialize failed: " << std::hex << hr << " " 
+                << Str::ErrorCode<char>::SystemMessage(hr);
 
-            throw std::runtime_error(message.str());
-        }
-    }
-
-    inline OLE::~OLE() /* throw() */
-    {
-        ::OleUninitialize();
+        throw std::runtime_error(message.str());
     }
 }
+
+inline OLE::~OLE() /* throw() */
+{
+    ::OleUninitialize();
+}
+

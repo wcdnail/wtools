@@ -59,7 +59,7 @@ void CPageImpl::DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count)
 
 HBRUSH CPageImpl::OnCtlColorStatic(CDCHandle dc, HWND wndStatic)
 {
-    CTheme& theme = CLegacyUIConfigurator::App()->CurrentTheme();
+    CTheme& theme = CLUIApp::App()->CurrentTheme();
     dc.SetTextColor(theme.GetColor(COLOR_CAPTIONTEXT));
     dc.SetBkColor(theme.GetColor(COLOR_MENU));
     return theme.GetBrush(COLOR_MENU);
@@ -67,7 +67,7 @@ HBRUSH CPageImpl::OnCtlColorStatic(CDCHandle dc, HWND wndStatic)
 
 HBRUSH CPageImpl::OnEraseBkgnd(CDCHandle dc)
 {
-    CTheme& theme = CLegacyUIConfigurator::App()->CurrentTheme();
+    CTheme& theme = CLUIApp::App()->CurrentTheme();
     CRect rc;
     GetClientRect(rc);
     dc.FillSolidRect(rc, theme.GetColor(COLOR_MENU));
