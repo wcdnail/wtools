@@ -317,9 +317,11 @@ void CThemePreviewer::OnLButton(UINT nFlags, CPoint point)
                 m_SelectedRect = std::make_pair(j, i);
                 m_bUserSelect = true;
                 ::InvalidateRect(m_hWnd, nullptr, FALSE);
-                break;
+                return ;
             }
         }
     }
+    m_SelectedRect = std::make_pair(-1, -1);
+    ::InvalidateRect(m_hWnd, nullptr, FALSE);
 }
 
