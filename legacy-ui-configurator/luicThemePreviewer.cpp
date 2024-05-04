@@ -83,6 +83,23 @@ CThemePreviewer::~CThemePreviewer()
 {
 }
 
+// ##TODO: решить проблему регистрации класса при использовании ATL/WTL
+#if 0
+CThemePreviewer::CThemePreviewer()
+    :          Super{}
+    ,    m_Wallpaper{}
+    , m_SelectedRect{-1, -1}
+    ,  m_bUserSelect{false}
+{
+    auto& classInfo = GetWndClassInfo();
+    ATOM atom = classInfo.Register(&this->m_pfnSuperWindowProc);
+    if (!atom) {
+        const auto code = static_cast<HRESULT>(GetLastError());
+        ReportError(Str::ElipsisW::Format(L"Register WCLASS '%s' failure!", classInfo.m_wc.lpszClassName), code, true, MB_ICONERROR);
+    }
+}
+#endif
+
 CThemePreviewer::CThemePreviewer()
     :         m_hWnd{nullptr}
     ,    m_Wallpaper{}
@@ -120,33 +137,6 @@ LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     }
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
-
-
-#if 0
-//#include <random>
-    //std::random_device rd;
-    //std::uniform_int_distribution<int> dist(0, static_cast<int>(m_Wallpaper.size()) - 1);
-    //std::default_random_engine gen(rd());
-    //int wIndex = gen();
-
-CThemePreviewer::~CThemePreviewer()
-{
-}
-
-CThemePreviewer::CThemePreviewer()
-    :          Super{}
-    ,    m_Wallpaper{}
-    , m_SelectedRect{-1, -1}
-    ,  m_bUserSelect{false}
-{
-    auto& classInfo = GetWndClassInfo();
-    ATOM atom = classInfo.Register(&this->m_pfnSuperWindowProc);
-    if (!atom) {
-        const auto code = static_cast<HRESULT>(GetLastError());
-        ReportError(Str::ElipsisW::Format(L"Register WCLASS '%s' failure!", classInfo.m_wc.lpszClassName), code, true, MB_ICONERROR);
-    }
-}
-#endif
 
 HRESULT CThemePreviewer::InitWallpapers()
 {

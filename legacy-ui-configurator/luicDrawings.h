@@ -8,16 +8,16 @@ struct CTheme;
 enum WindowRectIndex: int
 {
     WR_Invalid = -1,
-    WR_Border = 0,
-    WR_Frame,
-    WR_Caption,
-    WR_Menu,
-    WR_Workspace,
-    WR_Scroll,
-    WR_Message,
-    WR_Hyperlink,
+    WR_Tooltip = 0,
     WR_Button,
-    WR_Tooltip,
+    WR_Hyperlink,
+    WR_Message,
+    WR_Scroll,
+    WR_Workspace,
+    WR_Menu,
+    WR_Caption,
+    WR_Frame,
+    WR_Border,
     WR_Count
 };
 
