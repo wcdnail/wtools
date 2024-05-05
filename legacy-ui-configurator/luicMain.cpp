@@ -33,7 +33,7 @@ return _AtlModule.WinMain(showCmd);
 // TODO: GENERATED CODE, reserved for future use, DO NOT EARSE!!!!
 #endif
 
-CTheme CLUIApp::g_ThemeNative{ true };
+CTheme CLUIApp::g_CurrentTheme{ true };
 
 CLUIApp* CLUIApp::g_pApp{ nullptr };
 std::recursive_mutex CLUIApp::g_pAppMx{};
@@ -115,7 +115,7 @@ CLUIApp::CLUIApp()
 
 CTheme& CLUIApp::CurrentTheme() const
 {
-    return g_ThemeNative;
+    return g_CurrentTheme;
 }
 
 HICON CLUIApp::GetIcon(int icon) const

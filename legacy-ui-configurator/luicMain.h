@@ -79,7 +79,7 @@ private:
     bool              m_bShowDesktopWallpaper;
     WTL::CImageListManaged m_ImList[IL_Count];
 
-    static CTheme               g_ThemeNative;
+    static CTheme               g_CurrentTheme;
     static CLUIApp*                    g_pApp;
     static std::recursive_mutex      g_pAppMx;
 

@@ -113,7 +113,7 @@ struct CTheme
     bool IsFlatMenus() const;
     NONCLIENTMETRICS const& GetNcMetrcs() const;
 
-    void InitUI(CPageAppearance& uiPage);
+    static void PerformStaticInit(CPageAppearance& uiPage, CTheme& initialTheme);
 
 private:
     static const SizeRange g_DefaultSizeRange[SIZES_Count];
@@ -138,27 +138,16 @@ private:
     bool LoadSysGradientCaptionsSetting();
     bool LoadSysFlatMenusSetting();
 
-    void LoadExistingThemes(WTL::CComboBox& themeSel);
-    void LoadExistingElements(WTL::CComboBox& themeSel);
+    static void LoadExistingThemes(CPageAppearance& uiPage, CTheme& initialTheme);
+    static void LoadExistingElements(CPageAppearance& uiPage);
 };
+
+inline bool             CTheme::IsGradientCaptions() const { return m_bGradientCaptions; }
+inline bool                    CTheme::IsFlatMenus() const { return m_bFlatMenus; }
+inline NONCLIENTMETRICS const& CTheme::GetNcMetrcs() const { return m_ncMetrics; }
 
 template <typename Res>
 inline Res ScaleForDpi(Res n)
 {
     return MulDiv(static_cast<int>(n), CTheme::g_DPI, USER_DEFAULT_SCREEN_DPI);
-}
-
-inline bool CTheme::IsGradientCaptions() const
-{
-    return m_bGradientCaptions;
-}
-
-inline bool CTheme::IsFlatMenus() const
-{
-    return m_bFlatMenus;
-}
-
-inline NONCLIENTMETRICS const& CTheme::GetNcMetrcs() const
-{
-    return m_ncMetrics;
 }

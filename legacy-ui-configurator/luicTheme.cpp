@@ -433,24 +433,26 @@ LOGFONT const* CTheme::GetLogFont(int font) const
     return GetNcMetricFont(*this, font);
 }
 
-void CTheme::LoadExistingThemes(WTL::CComboBox& themeSel)
+void CTheme::LoadExistingThemes(CPageAppearance& uiPage, CTheme& initialTheme)
 {
+    WTL::CComboBox& themeSel = uiPage.m_ThemeSel;
     themeSel.ResetContent();
-    int item = themeSel.AddString(m_MyName);
+    int item = themeSel.AddString(initialTheme.m_MyName);
     if (item < 0) {
         auto code = static_cast<HRESULT>(GetLastError());
         ReportError(
             Str::ElipsisW::Format(L"Append listbox [w:%08x] item '%s' failed!", 
-                themeSel.m_hWnd, m_MyName.GetString()
+                themeSel.m_hWnd, initialTheme.m_MyName.GetString()
             ), code);
         return ;
     }
-    themeSel.SetItemDataPtr(item, (void*)this);
+    themeSel.SetItemDataPtr(item, reinterpret_cast<void*>(&initialTheme));
     themeSel.SetCurSel(item);
 }
 
-void CTheme::LoadExistingElements(WTL::CComboBox& itemSel)
+void CTheme::LoadExistingElements(CPageAppearance& uiPage)
 {
+    WTL::CComboBox& itemSel = uiPage.m_ElementSel;
     itemSel.ResetContent();
     for (int iElement = 0; iElement < ELEMENT_Count; iElement++) {
         const auto* assignment = GetElementAssignment(iElement);
@@ -472,15 +474,15 @@ void CTheme::LoadExistingElements(WTL::CComboBox& itemSel)
             continue;
         }
         itemSel.SetItemData(item, static_cast<DWORD_PTR>(iElement));
+        if (EN_Desktop == iElement) {
+            itemSel.SetCurSel(iElement);
+        }
     }
     itemSel.SetCurSel(EN_Desktop);
 }
 
-void CTheme::InitUI(CPageAppearance& uiPage)
+void CTheme::PerformStaticInit(CPageAppearance& uiPage, CTheme& initialTheme)
 {
-    LoadExistingThemes(uiPage.m_ThemeSel);
-    uiPage.m_ThemeSizeSel.EnableWindow(FALSE);
-    uiPage.m_ThemeDelete.EnableWindow(FALSE);
-
-    LoadExistingElements(uiPage.m_ElementSel);
+    LoadExistingThemes(uiPage, initialTheme);
+    LoadExistingElements(uiPage);
 }

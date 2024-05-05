@@ -3,6 +3,7 @@
 #include <atlwin.h>
 #include <atlframe.h>
 #include <atlcrack.h>
+#include <functional>
 #include <vector>
 #include <memory>
 
@@ -17,6 +18,7 @@ struct CPageImpl: ATL::CDialogImpl<CPageImpl>,
     using     Super = ATL::CDialogImpl<CPageImpl>;
     using   Resizer = WTL::CDialogResize<CPageImpl>;
     using ResizeVec = std::vector<WTL::_AtlDlgResizeMap>;
+    using ForeachFn = std::function<bool(HWND)>;
 
     ~CPageImpl() override;
 
@@ -33,6 +35,10 @@ protected:
     std::wstring m_Caption;
 
     CPageImpl(UINT idd, std::wstring&& caption);
+
+    static bool CtlDisable(HWND hWndCtl);
+    static BOOL DoForEachImpl(HWND hWndCtl, ForeachFn const& routine);
+    void DoForEach(ForeachFn const& routine);
 
     void DlgResizeAdd(int nCtlID, DWORD dwResizeFlags);
     void DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count);

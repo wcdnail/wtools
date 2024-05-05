@@ -55,8 +55,8 @@ CThemePreviewer::CThemePreviewer()
 #endif
 
 CThemePreviewer::CThemePreviewer()
-    : DoubleBuffered{true}
-    ,         m_hWnd{nullptr}
+    :   ATL::CWindow{}
+    , DoubleBuffered{true}
     ,    m_Wallpaper{}
     , m_SelectedRect{-1, -1}
     ,  m_bUserSelect{false}
@@ -66,33 +66,38 @@ CThemePreviewer::CThemePreviewer()
 void CThemePreviewer::SubclassIt(HWND hWnd)
 {
     ATLASSUME(hWnd != nullptr);
-    const auto CThemePreviewer_pUserData = reinterpret_cast<void*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+    const auto CThemePreviewer_pUserData = reinterpret_cast<void*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
     ATLASSUME(CThemePreviewer_pUserData == nullptr);
-    SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
     m_hWnd = hWnd;
     InitWallpapers();
 }
 
 LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    LONG_PTR tempLP = GetWindowLongPtrW(hWnd, GWLP_USERDATA);
-    if (tempLP) {
-        auto*   self = reinterpret_cast<CThemePreviewer*>(tempLP);
-        switch (uMsg) {
-        case WM_PAINT:{
-            self->OnPaint({reinterpret_cast<HDC>(wParam)});
-            return 0;
-        }
-        case WM_LBUTTONDOWN:
-        case WM_LBUTTONDBLCLK:{
-            self->OnLButton(static_cast<UINT>(wParam), ::CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
-            return 0;
-        }
-        }
-        /// CHAIN_MSG_MAP(Cf::DoubleBuffered)
-        LRESULT lRes = 0;
-        if (self->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lRes, 0)) {
-            return lRes;
+    if (WM_NCDESTROY == uMsg) {
+        ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(nullptr));
+    }
+    else {
+        LONG_PTR tempLP = ::GetWindowLongPtrW(hWnd, GWLP_USERDATA);
+        if (tempLP) {
+            auto*   self = reinterpret_cast<CThemePreviewer*>(tempLP);
+            switch (uMsg) {
+            case WM_PAINT:{
+                self->OnPaint({reinterpret_cast<HDC>(wParam)});
+                return 0;
+            }
+            case WM_LBUTTONDOWN:
+            case WM_LBUTTONDBLCLK:{
+                self->OnLButton(static_cast<UINT>(wParam), ::CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+                return 0;
+            }
+            }
+            /// CHAIN_MSG_MAP(Cf::DoubleBuffered)
+            LRESULT lRes = 0;
+            if (self->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lRes, 0)) {
+                return lRes;
+            }
         }
     }
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);

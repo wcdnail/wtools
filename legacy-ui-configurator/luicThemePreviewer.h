@@ -30,7 +30,8 @@ using GdipImagePtr = std::unique_ptr<Gdiplus::Image>;
 using GdipImageVec = std::vector<GdipImagePtr>;
 using SelectedPair = std::pair<int, int>;
 
-struct CThemePreviewer: CF::DoubleBuffered
+struct CThemePreviewer: ATL::CWindow,
+                        CF::DoubleBuffered
 {
     static ATOM Register(HRESULT& code);
 
@@ -51,7 +52,6 @@ private:
         WND_Count
     };
 
-    HWND                      m_hWnd;
     GdipImageVec         m_Wallpaper;
     SelectedPair      m_SelectedRect;
     bool               m_bUserSelect;

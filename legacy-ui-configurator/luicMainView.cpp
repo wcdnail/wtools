@@ -150,8 +150,10 @@ void CMainView::PagesShow(int numba, bool show)
     if (page) {
         if (!show) {
             page->ShowWindow(SW_HIDE);
+            page->EnableWindow(FALSE);
         }
         else {
+            page->EnableWindow(TRUE);
             page->ShowWindow(SW_SHOW);
             page->SetFocus();
         }
@@ -197,20 +199,21 @@ BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     MoveToMonitor{}.Move(m_hWnd, 3);
     ShowWindow(SW_SHOW);
 #endif
+    DoForEach(CtlDisable);
 
     GetParent().SetWindowTextW(L"Display Properties");
     PagesCreate();
 
     const int initialPage = 0;
     m_TabCtrl.SetCurSel(initialPage);
+    m_TabCtrl.EnableWindow(TRUE);
     PagesShow(initialPage, true);
 
     DlgResizeAdd(IDC_TAB1, DLSZ_SIZE_X | DLSZ_SIZE_Y);
     DlgResizeAdd(IDC_BN_OK, DLSZ_MOVE_X | DLSZ_MOVE_Y);
     DlgResizeAdd(IDC_BN_CANCEL, DLSZ_MOVE_X | DLSZ_MOVE_Y);
     DlgResizeAdd(IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y);
-    BOOL rv = CPageImpl::OnInitDialog(wndFocus, lInitParam);
-    return rv;
+    return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }
 
 void CMainView::OnDestroy()

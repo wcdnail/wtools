@@ -66,17 +66,10 @@ void CPageAppearance::InitResizeMap()
 BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
     auto const* app = CLUIApp::App();
+    DoForEach(CtlDisable);
 
-  //HRESULT code = S_OK;
-  //if (!m_Preview.SubclassWindow(GetDlgItem(IDC_APP_PREVIEW))) {
-  //    code = static_cast<HRESULT>(GetLastError());
-  //    ReportError(Str::ElipsisW::Format(L"Previewer SubclassWindow failed!"), code, true, MB_ICONERROR);
-  //}
-  //code = m_Preview.InitWallpapers();
-  //if (FAILED(code)) {
-  //    ReportError(Str::ElipsisW::Format(L"Previewer InitWallpapers failed!"), code, true, MB_ICONWARNING);
-  //}
     m_Preview.SubclassIt(GetDlgItem(IDC_APP_PREVIEW));
+    m_Preview.EnableWindow(TRUE);
 
     m_ThemeSel.Attach(GetDlgItem(IDC_APP_THEME_SEL));
     m_ThemeSizeSel.Attach(GetDlgItem(IDC_APP_SIZE_SEL));
@@ -92,15 +85,13 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_ThemeSizeSel.AddString(L"Normal");
     m_ThemeSizeSel.SetCurSel(0);
 
-    CLUIApp::App()->CurrentTheme().InitUI(*this);
+    CTheme::PerformStaticInit(*this, CLUIApp::App()->CurrentTheme());
+
     InitResizeMap();
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }
 
 void CPageAppearance::OnDestroy()
 {
-    //if (m_Preview.DestroyWindow()) {
-    //    m_Preview.m_hWnd = nullptr;
-    //}
     CPageImpl::OnDestroy();
 }

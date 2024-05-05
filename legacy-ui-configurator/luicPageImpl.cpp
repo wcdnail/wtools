@@ -17,6 +17,25 @@ CPageImpl::CPageImpl(UINT idd, std::wstring&& caption)
 {
 }
 
+bool CPageImpl::CtlDisable(HWND hWndCtl)
+{
+    ::EnableWindow(hWndCtl, FALSE);
+    return true;
+}
+
+BOOL CPageImpl::DoForEachImpl(HWND hWndCtl, ForeachFn const& routine)
+{
+    if (!routine(hWndCtl)) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+void CPageImpl::DoForEach(ForeachFn const& routine)
+{
+    EnumChildWindows(m_hWnd, reinterpret_cast<WNDENUMPROC>(DoForEachImpl), reinterpret_cast<LPARAM>(&routine));
+}
+
 BOOL CPageImpl::PreTranslateMessage(MSG* pMsg)
 {
     if (IsDialogMessageW(pMsg)) {
