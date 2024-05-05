@@ -65,7 +65,7 @@ void CPageAppearance::InitResizeMap()
 
 BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-    auto const* app = CLUIApp::App();
+    auto const* pApp = CLUIApp::App();
     DoForEach(CtlDisable);
 
     m_Preview.SubclassIt(GetDlgItem(IDC_APP_PREVIEW));
@@ -78,14 +78,16 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_ThemeRename.Attach(GetDlgItem(IDC_APP_THEME_BN_RENAME));
     m_ThemeDelete.Attach(GetDlgItem(IDC_APP_THEME_BN_REMOVE));
     m_ElementSel.Attach(GetDlgItem(IDC_APP_ITEM_SEL));
-    m_ThemeSave.SetIcon(app->GetIcon(IconFloppy));
-    m_ThemeRename.SetIcon(app->GetIcon(IconEditField));
-    m_ThemeDelete.SetIcon(app->GetIcon(IconHatchCross));
-    m_ThemeImport.SetIcon(app->GetIcon(IconFolderOpen));
+    m_FontSel.Attach(GetDlgItem(IDC_APP_FONT_SEL));
+
+    m_ThemeSave.SetIcon(pApp->GetIcon(IconFloppy));
+    m_ThemeRename.SetIcon(pApp->GetIcon(IconEditField));
+    m_ThemeDelete.SetIcon(pApp->GetIcon(IconHatchCross));
+    m_ThemeImport.SetIcon(pApp->GetIcon(IconFolderOpen));
     m_ThemeSizeSel.AddString(L"Normal");
     m_ThemeSizeSel.SetCurSel(0);
 
-    CTheme::PerformStaticInit(*this, CLUIApp::App()->CurrentTheme());
+    CTheme::PerformStaticInit(*this, pApp);
 
     InitResizeMap();
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);

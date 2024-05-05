@@ -433,56 +433,75 @@ LOGFONT const* CTheme::GetLogFont(int font) const
     return GetNcMetricFont(*this, font);
 }
 
-void CTheme::LoadExistingThemes(CPageAppearance& uiPage, CTheme& initialTheme)
+void CTheme::LoadThemes(CPageAppearance& uiPage, CTheme& initialTheme)
 {
-    WTL::CComboBox& themeSel = uiPage.m_ThemeSel;
-    themeSel.ResetContent();
-    int item = themeSel.AddString(initialTheme.m_MyName);
+    WTL::CComboBox& lbCtl = uiPage.m_ThemeSel;
+    lbCtl.ResetContent();
+    int item = lbCtl.AddString(initialTheme.m_MyName);
     if (item < 0) {
         auto code = static_cast<HRESULT>(GetLastError());
         ReportError(
             Str::ElipsisW::Format(L"Append listbox [w:%08x] item '%s' failed!", 
-                themeSel.m_hWnd, initialTheme.m_MyName.GetString()
+                lbCtl.m_hWnd, initialTheme.m_MyName.GetString()
             ), code);
         return ;
     }
-    themeSel.SetItemDataPtr(item, reinterpret_cast<void*>(&initialTheme));
-    themeSel.SetCurSel(item);
+    lbCtl.SetItemDataPtr(item, reinterpret_cast<void*>(&initialTheme));
+    lbCtl.SetCurSel(item);
 }
 
-void CTheme::LoadExistingElements(CPageAppearance& uiPage)
+void CTheme::LoadElements(CPageAppearance& uiPage)
 {
-    WTL::CComboBox& itemSel = uiPage.m_ElementSel;
-    itemSel.ResetContent();
+    WTL::CComboBox& lbCtl = uiPage.m_ElementSel;
+    lbCtl.ResetContent();
     for (int iElement = 0; iElement < ELEMENT_Count; iElement++) {
         const auto* assignment = GetElementAssignment(iElement);
         if (!assignment) {
             auto code = static_cast<HRESULT>(ERROR_ACCESS_DENIED);
             ReportError(
                 Str::ElipsisW::Format(L"Append listbox [w:%08x] item [%d] '%s' failed!", 
-                    itemSel.m_hWnd, iElement, L"Element::Assignment == NULL"
+                    lbCtl.m_hWnd, iElement, L"Element::Assignment == NULL"
                 ), code);
             continue;
         }
-        int item = itemSel.AddString(assignment->name);
+        int item = lbCtl.AddString(assignment->name);
         if (item < 0) {
             auto code = static_cast<HRESULT>(GetLastError());
             ReportError(
                 Str::ElipsisW::Format(L"Append listbox [w:%08x] item [%d] '%s' failed!", 
-                    itemSel.m_hWnd, iElement, assignment->name
+                    lbCtl.m_hWnd, iElement, assignment->name
                 ), code);
             continue;
         }
-        itemSel.SetItemData(item, static_cast<DWORD_PTR>(iElement));
+        lbCtl.SetItemData(item, static_cast<DWORD_PTR>(iElement));
         if (EN_Desktop == iElement) {
-            itemSel.SetCurSel(iElement);
+            lbCtl.SetCurSel(iElement);
         }
     }
-    itemSel.SetCurSel(EN_Desktop);
+    lbCtl.SetCurSel(EN_Desktop);
 }
 
-void CTheme::PerformStaticInit(CPageAppearance& uiPage, CTheme& initialTheme)
+void CTheme::LoadFonts(CPageAppearance& uiPage, FontMap const& mapFont)
 {
-    LoadExistingThemes(uiPage, initialTheme);
-    LoadExistingElements(uiPage);
+    WTL::CComboBox& lbCtl = uiPage.m_FontSel;
+    lbCtl.ResetContent();
+    for (auto const& it: mapFont) {
+        int item = lbCtl.AddString(it.first.c_str());
+        if (item < 0) {
+            auto code = static_cast<HRESULT>(GetLastError());
+            ReportError(
+                Str::ElipsisW::Format(L"Append listbox [w:%08x] item '%s' failed!", 
+                    lbCtl.m_hWnd, it.first.c_str()
+                ), code);
+            continue;
+        }
+    }
+    lbCtl.SetCurSel(0);
+}
+
+void CTheme::PerformStaticInit(CPageAppearance& uiPage, CLUIApp const* pApp)
+{
+    LoadThemes(uiPage, pApp->CurrentTheme());
+    LoadElements(uiPage);
+    LoadFonts(uiPage, pApp->GetFontMap());
 }

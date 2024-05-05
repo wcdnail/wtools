@@ -22,6 +22,7 @@ private:
     WTL::CButton    m_ThemeRename;
     WTL::CButton    m_ThemeDelete;
     WTL::CComboBox   m_ElementSel;
+    WTL::CComboBox      m_FontSel;
 
     void InitResizeMap();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;

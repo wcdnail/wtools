@@ -150,7 +150,8 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
         return code;
     }
     FromSettings(m_Settings, m_bShowDesktopWallpaper);
-    ATOM previewClassAtom = CThemePreviewer::Register(code);
+    const ATOM previewClassAtom = CThemePreviewer::Register(code);
+    ATLASSUME(previewClassAtom != 0);
     if (!previewClassAtom) {
         return code;
     }
@@ -170,6 +171,7 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
     ImListCreate(IL_OwnBig, 64, 64);
     m_TestMenu.LoadMenuW(IDR_MENU1);
     code = CFontDef::LoadAll(m_FontMap);
+    ATLASSUME(m_FontMap.size() > 0);
     if (FAILED(code)) {
         return code;
     }

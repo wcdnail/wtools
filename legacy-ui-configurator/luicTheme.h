@@ -1,11 +1,13 @@
 #pragma once
 
+#include "luicFontDef.h"
 #include <SDKDDKVER.h>
 #include <WinUser.h>
 #include <atluser.h>
 #include <atlgdi.h>
 
 struct CPageAppearance;
+class CLUIApp;
 
 enum SIZE_NAMES : int
 {
@@ -113,7 +115,7 @@ struct CTheme
     bool IsFlatMenus() const;
     NONCLIENTMETRICS const& GetNcMetrcs() const;
 
-    static void PerformStaticInit(CPageAppearance& uiPage, CTheme& initialTheme);
+    static void PerformStaticInit(CPageAppearance& uiPage, CLUIApp const* pApp);
 
 private:
     static const SizeRange g_DefaultSizeRange[SIZES_Count];
@@ -138,8 +140,9 @@ private:
     bool LoadSysGradientCaptionsSetting();
     bool LoadSysFlatMenusSetting();
 
-    static void LoadExistingThemes(CPageAppearance& uiPage, CTheme& initialTheme);
-    static void LoadExistingElements(CPageAppearance& uiPage);
+    static void LoadThemes(CPageAppearance& uiPage, CTheme& initialTheme);
+    static void LoadElements(CPageAppearance& uiPage);
+    static void LoadFonts(CPageAppearance& uiPage, FontMap const&);
 };
 
 inline bool             CTheme::IsGradientCaptions() const { return m_bGradientCaptions; }
