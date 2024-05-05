@@ -6,6 +6,10 @@
 #include <memory>
 #include <vector>
 
+using GdipImagePtr = std::unique_ptr<Gdiplus::Image>;
+using GdipImageVec = std::vector<GdipImagePtr>;
+using SelectedPair = std::pair<int, int>;
+
 #if 0 // ##TODO: решить проблему регистрации класса при использовании ATL/WTL
 #include <atlwin.h>
 using CThemePreviewerTraits = ATL::CWinTraits<WS_CHILD | WS_VISIBLE | WS_BORDER, 0>;
@@ -21,14 +25,10 @@ struct CThemePreviewer: ATL::CWindowImpl<CThemePreviewer, ATL::CWindow, CThemePr
         MSG_WM_CREATE(OnCreate) // Subclassed
         MSG_WM_PAINT(OnPaint)
         MSG_WM_LBUTTONDBLCLK(OnLButton)
-        CHAIN_MSG_MAP(Cf::DoubleBuffered)
+        CHAIN_MSG_MAP(CF::DoubleBuffered)
     END_MSG_MAP()
 };
 #endif
-
-using GdipImagePtr = std::unique_ptr<Gdiplus::Image>;
-using GdipImageVec = std::vector<GdipImagePtr>;
-using SelectedPair = std::pair<int, int>;
 
 struct CThemePreviewer: ATL::CWindow,
                         CF::DoubleBuffered

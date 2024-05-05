@@ -37,7 +37,6 @@ CThemePreviewer::~CThemePreviewer()
 {
 }
 
-// ##TODO: решить проблему регистрации класса при использовании ATL/WTL
 #if 0
 CThemePreviewer::CThemePreviewer()
     :          Super{}
@@ -45,11 +44,21 @@ CThemePreviewer::CThemePreviewer()
     , m_SelectedRect{-1, -1}
     ,  m_bUserSelect{false}
 {
-    auto& classInfo = GetWndClassInfo();
-    ATOM atom = classInfo.Register(&this->m_pfnSuperWindowProc);
+    HRESULT code;
+    const ATOM atom = ATL::AtlModuleRegisterClassExW(nullptr, &GetWndClassInfo().m_wc);
     if (!atom) {
-        const auto code = static_cast<HRESULT>(GetLastError());
-        ReportError(Str::ElipsisW::Format(L"Register WCLASS '%s' failure!", classInfo.m_wc.lpszClassName), code, true, MB_ICONERROR);
+        code = static_cast<HRESULT>(GetLastError());
+        ReportError(Str::ElipsisW::Format(L"Register WCLASS '%s' failure!", 
+            GetWndClassInfo().m_wc.lpszClassName), code, true, MB_ICONERROR
+        );
+    }
+    else { 
+        if (!m_thunk.Init(nullptr, nullptr)) {
+            SetLastError(ERROR_OUTOFMEMORY);
+        }
+        else {
+            ATL::_AtlWinModule.AddCreateWndData(&m_thunk.cd, this);
+        }
     }
 }
 #endif
@@ -76,7 +85,11 @@ void CThemePreviewer::SubclassIt(HWND hWnd)
 LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (WM_NCDESTROY == uMsg) {
-        ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(nullptr));
+        LONG_PTR tempLP = ::GetWindowLongPtrW(hWnd, GWLP_USERDATA);
+        if (tempLP) {
+            reinterpret_cast<CThemePreviewer*>(tempLP)->m_hWnd = nullptr;
+            ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(nullptr));
+        }
     }
     else {
         LONG_PTR tempLP = ::GetWindowLongPtrW(hWnd, GWLP_USERDATA);
@@ -245,7 +258,7 @@ const WinText Il_DL_Begin[] = {
     {  WT_Usual, L"познания материализма." },
 };
 
-const WinText MsgBoxText[] = {
+const WinText MsgBox_Text[] = {
     {  WT_Usual, L"Message Text" },
     {    WT_URL, L"https://www.hyperlink.my" },
     {    WT_URL, L"Button" },
@@ -271,7 +284,7 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
     const DrawWindowArgs wparam[WND_Count] = {
         { L"Inactive window",                       0,   hMenu, -1, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
         {   L"Active window",               DC_ACTIVE,   hMenu,  2, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
-        {     L"Tool window", DC_ACTIVE | DC_SMALLCAP, nullptr, -1, { MsgBoxText, _countof(MsgBoxText), 0 } },
+        {     L"Tool window", DC_ACTIVE | DC_SMALLCAP, nullptr, -1, { MsgBox_Text, _countof(MsgBox_Text), 0 } },
     };
     DrawWindowRects wrect[WND_Count] = {
         {   m_WndRect[WND_Back],  rcBack },
