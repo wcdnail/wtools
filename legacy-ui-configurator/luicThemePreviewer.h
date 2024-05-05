@@ -44,9 +44,9 @@ private:
     enum WND_Index : int
     {
         WND_Invalid = -1,
-        WND_Front = 0,
-        WND_Back,
         WND_MsgBox,
+        WND_Front,
+        WND_Back,
         WND_Count
     };
 
