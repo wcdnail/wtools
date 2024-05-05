@@ -21,10 +21,7 @@ enum WindowRectIndex: int
     WR_Count
 };
 
-struct WindowRects
-{
-    CRect rect[WR_Count];
-};
+using WindowRects = CRect[WR_Count];
 
 enum WinTextFalgs : UINT
 {
@@ -49,7 +46,7 @@ struct WindowText
 struct DrawWindowArgs
 {
     WindowRects&    rects;
-    DRect           drect;
+    DRect const&    drect;
     ATL::CStringW caption;
     UINT        captFlags;
     HMENU           hMenu;
@@ -77,7 +74,7 @@ public:
     void DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UINT format) const;
     void DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selectedItem) const;
     void DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled) const;
-    void DrawToolTip(CDCHandle dc, CRect const& rc, ATL::CStringW&& tooltip) const;
+    void DrawToolTip(CDCHandle dc, CRect& rcParam, ATL::CStringW&& tooltip) const;
     void DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const;
     void DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const;
 

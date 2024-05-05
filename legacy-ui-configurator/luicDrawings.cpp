@@ -613,8 +613,12 @@ void CDrawRoutine::DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UI
     DrawMenuText(dc, text, rc, format, COLOR_3DSHADOW);
 }
 
-void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT fnMarlet, int selectedItem) const
+void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT fnMarlett, int selectedItem) const
 {
+    if (!hMenu || !fnMarlett) {
+        return ;
+    }
+
     int backColorIndex = COLOR_MENU;
 #if WINVER >= WINVER_XP
     if (m_Theme.IsFlatMenus()) {
@@ -623,12 +627,8 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
 #endif
     dc.FillRect(rc, m_Theme.GetBrush(backColorIndex));
 
-    if (!hMenu || !fnMarlet) {
-        return ;
-    }
-
     int    spacing = 10;
-    HFONT  prevFnt = dc.SelectFont(fnMarlet);
+    HFONT  prevFnt = dc.SelectFont(fnMarlett);
     UINT txtFormat = DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOCLIP;
     CRect   rcItem = rc;
     CRect   rcText;
@@ -642,7 +642,7 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
     }
 #endif
     TEXTMETRIC tm;
-    if (GetTextMetrics(dc, &tm)) {
+    if (dc.GetTextMetricsW(&tm)) {
         spacing = tm.tmAveCharWidth;
     }
     margin = spacing / 2;
@@ -685,24 +685,22 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
 #if WINVER >= WINVER_2K
 #if WINVER >= WINVER_XP
             if (m_Theme.IsFlatMenus()) {
-                FrameRect(dc, &rcItem, m_Theme.GetBrush(COLOR_HIGHLIGHT));
-
-                InflateRect(&rcItem, -1, -1);
-                FillRect(dc, &rcItem, m_Theme.GetBrush(COLOR_MENUHILIGHT));
-                InflateRect(&rcItem, 1, 1);
-
+                FrameRect(dc, rcItem, m_Theme.GetBrush(COLOR_HIGHLIGHT));
+                InflateRect(rcItem, -1, -1);
+                dc.FillRect(rcItem, m_Theme.GetBrush(COLOR_MENUHILIGHT));
+                InflateRect(rcItem, 1, 1);
                 DrawMenuText(dc, text, rcText, txtFormat, COLOR_HIGHLIGHTTEXT);
             }
             else
 #endif
             {
-                dc.DrawEdge(rcItem, BDR_SUNKENOUTER, BF_RECT);
+                DrawEdge(dc, rcItem, BDR_SUNKENOUTER, BF_RECT);
 
                 OffsetRect(&rcText, 1, 1);
                 DrawMenuText(dc, text, rcText, txtFormat, COLOR_MENUTEXT);
             }
 #else  /* WINVER < WINVER_2K */
-            FillRect(dc, rect, m_Theme.GetBrush(COLOR_HIGHLIGHT));
+            dc.FillRect(rect, m_Theme.GetBrush(COLOR_HIGHLIGHT));
             DrawMenuText(dc, text, rcText, textFormat, COLOR_HIGHLIGHTTEXT);
 #endif
         }
@@ -711,8 +709,7 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
         }
         rcItem.left = rcItem.right;
     }
-
-    SelectObject(dc, prevFnt);
+    dc.SelectFont(prevFnt);
 }
 
 void CDrawRoutine::DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled) const
@@ -783,7 +780,7 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
     LRect       rcButton;
     LRect      rcTooltip;
 
-    target.rect[WR_Border] = ToCRect(rcBorder);
+    target[WR_Border] = ToCRect(rcBorder);
 
     m_BorderSize = m_Theme.GetNcMetrcs().iBorderWidth + 1;
 #if WINVER >= WINVER_VISTA
@@ -793,33 +790,33 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
     rcFrame = rcBorder;
     rcFrame.Shrink(m_BorderSize, m_BorderSize);
     rcFrame.PutInto(rcBorder, PutAt::Center);
-    target.rect[WR_Frame] = ToCRect(rcFrame);
+    target[WR_Frame] = ToCRect(rcFrame);
     rcWork = rcFrame;
 
     rcCapt = rcFrame;
     rcCapt.cy = m_Theme.GetNcMetrcs().iCaptionHeight + 2;
     rcWork.cy -= rcCapt.cy;
     rcCapt.Shrink(1, 1);
-    target.rect[WR_Caption] = ToCRect(rcCapt);
+    target[WR_Caption] = ToCRect(rcCapt);
 
     rcMenu = rcCapt;
     if (!isToolWnd) {
         rcMenu.y  = rcCapt.Bottom() + 1;
         rcMenu.cy = m_Theme.GetNcMetrcs().iMenuHeight + 1;
-        target.rect[WR_Menu] = ToCRect(rcMenu);
+        target[WR_Menu] = ToCRect(rcMenu);
         rcWork.cy -= rcCapt.cy;
     }
 
     rcWork.Shrink(2, 2);
     rcWork.y = rcMenu.Bottom() + 1;
-    target.rect[WR_Workspace] = ToCRect(rcWork);
+    target[WR_Workspace] = ToCRect(rcWork);
 
     if (!isToolWnd) {
         rcScroll = rcWork;
         rcScroll.Shrink(0, 2);
         rcScroll.cx = m_Theme.GetNcMetrcs().iScrollWidth;
         rcScroll.x = rcWork.Right() - rcScroll.cx - 2;
-        target.rect[WR_Scroll] = ToCRect(rcScroll);
+        target[WR_Scroll] = ToCRect(rcScroll);
     }
     else {
         long sx = ScaleForDpi<long>(4);
@@ -827,27 +824,27 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
         rcMessage = rcWork;
         rcMessage.Shrink(sx, sx - 1);
         rcMessage.cy = cy;
-        target.rect[WR_Message] = ToCRect(rcMessage);
+        target[WR_Message] = ToCRect(rcMessage);
         rcMessage.y += cy + 2;
-        target.rect[WR_Hyperlink] = ToCRect(rcMessage);
+        target[WR_Hyperlink] = ToCRect(rcMessage);
         rcButton = rcWork;
         rcButton.cx = rcWork.Width() / 2;
         rcButton.cy = cy * 2;
         rcButton.PutInto(rcWork, PutAt::Bottom | PutAt::XCenter);
         rcButton.y -= sx;
-        target.rect[WR_Button] = ToCRect(rcButton);
+        target[WR_Button] = ToCRect(rcButton);
         rcTooltip = rcButton;
         rcTooltip.x = rcButton.Right() + 2;
         rcTooltip.y += rcButton.Height() / 2;
-        target.rect[WR_Tooltip] = ToCRect(rcTooltip);
-        target.rect[WR_Tooltip].InflateRect(3, 3);
+        target[WR_Tooltip] = ToCRect(rcTooltip);
+        target[WR_Tooltip].InflateRect(3, 3);
     }
 }
 
-void CDrawRoutine::DrawToolTip(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& tooltip) const
+void CDrawRoutine::DrawToolTip(CDCHandle dc, CRect& rcParam, ATL::CStringW&& tooltip) const
 {
-    CSize szText;
-    CRect rcText = rcParam;
+    CSize  szText;
+    CRect& rcText = rcParam;
     if (rcText.left < 0) {
         return ;
     }
@@ -955,28 +952,28 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
     }
 
     if (isToolWnd) {
-        dc.FillSolidRect(rects.rect[WR_Frame], m_Theme.GetColor(COLOR_MENU));
-        CRect rcEdge(rects.rect[WR_Frame]);
+        dc.FillSolidRect(rects[WR_Frame], m_Theme.GetColor(COLOR_MENU));
+        CRect rcEdge(rects[WR_Frame]);
         dc.DrawEdge(rcEdge, EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
         rcEdge.InflateRect(1, 1);
         dc.DrawEdge(rcEdge, EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
     }
     else {
-        DrawBorder(dc, rects.rect[WR_Border], m_BorderSize, m_Theme.GetBrush(borderColorIndex));
-        dc.DrawEdge(CRect(rects.rect[WR_Border]), EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
-        dc.FillSolidRect(rects.rect[WR_Frame], m_Theme.GetColor(COLOR_MENU));
+        DrawBorder(dc, rects[WR_Border], m_BorderSize, m_Theme.GetBrush(borderColorIndex));
+        dc.DrawEdge(CRect(rects[WR_Border]), EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
+        dc.FillSolidRect(rects[WR_Frame], m_Theme.GetColor(COLOR_MENU));
     }
 
-    CRect rcCapt = rects.rect[WR_Caption];
+    CRect rcCapt = rects[WR_Caption];
     rcCapt.right = DrawCaptionButtons(dc, rcCapt, !isToolWnd, captFlags);
     DrawCaption(dc, rcCapt, captFont, captIcon, params.caption, captFlags);
 
     if (!isToolWnd) {
         if (params.hMenu) {
-            DrawMenuBar(dc, rects.rect[WR_Menu], params.hMenu, menuFont, params.selectedMenu);
+            DrawMenuBar(dc, rects[WR_Menu], params.hMenu, menuFont, params.selectedMenu);
         }
 
-        CRect rcWork = rects.rect[WR_Workspace];
+        CRect rcWork = rects[WR_Workspace];
         dc.FillSolidRect(rcWork, m_Theme.GetColor(workspaceColorIndex));
         dc.DrawEdge(rcWork, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
 
@@ -987,7 +984,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
             COLORREF prevBkClr = dc.SetBkColor(m_Theme.GetColor(workspaceColorIndex));
             int     prevBkMode = dc.SetBkMode(TRANSPARENT);
             CRect       rcText = rcWork;
-            rcText.right = rects.rect[WR_Scroll].left - 1;
+            rcText.right = rects[WR_Scroll].left - 1;
             rcText.DeflateRect(rcWork.Width() / 16, 10);
             CRect  rcLine = rcText;
             LONG       cy = -(m_Theme.GetLogFont(FONT_Desktop)->lfHeight) + 2;
@@ -1019,13 +1016,13 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
             dc.SelectFont(prevFnt);
         }
 
-        DrawScrollbar(dc, rects.rect[WR_Scroll], isActive);
+        DrawScrollbar(dc, rects[WR_Scroll], isActive);
     }
     else {
         if (params.text.lineCount < 3) {
             return;
         }
-        CRect rc = rects.rect[WR_Message];
+        CRect rc = rects[WR_Message];
         if (rc.top >= rc.bottom) {
             return ;
         }
@@ -1038,7 +1035,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
         dc.DrawTextW(line0.GetString(), line0.GetLength(), rc, DT_LEFT | DT_SINGLELINE | DT_WORD_ELLIPSIS);
         dc.SelectFont(prevFont);
 #if WINVER >= WINVER_2K
-        rc = rects.rect[WR_Hyperlink];
+        rc = rects[WR_Hyperlink];
         if (rc.top >= rc.bottom) {
             return ;
         }
@@ -1047,7 +1044,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
         dc.DrawTextW(line1.GetString(), line1.GetLength(), rc, DT_LEFT | DT_SINGLELINE | DT_WORD_ELLIPSIS);
         dc.SelectFont(prevFont);
 #endif
-        rc = rects.rect[WR_Button];
+        rc = rects[WR_Button];
         if (rc.top >= rc.bottom) {
             return ;
         }

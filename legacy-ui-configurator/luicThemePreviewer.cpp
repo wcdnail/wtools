@@ -168,37 +168,38 @@ void CThemePreviewer::OnPaint(CDCHandle dcParam)
     CF::BufferedPaint bufferedPaint(dcPaint, GetSecondDc(), IsDoubleBuffered(), m_hWnd);
     CDCHandle dc = bufferedPaint.GetCurrentDc();
     DrawDesktop(dc, bufferedPaint.GetRect());
-    HighLightSeletced(dc, bufferedPaint.GetRect());
 }
 
-void CThemePreviewer::CalcRects(DrawWindowArgs (&params)[WND_Count], CRect const& rcClient, DRect& rcAux)
+void CThemePreviewer::CalcRects(CRect const& rcClient, DRect& rcFront, DRect& rcBack, DRect& rcMsg, DRect& rcIcon)
 {
     const double   sx = 5.;
     const double   sy = 5.;
     DRect rcFull = FromCRect<double>(rcClient);
     rcFull.Shrink(sx, sy);
-
-    CF::RectzAllocator<double> rcAlloc{ rcFull };
     const double fCX = rcFull.Width();
     const double fCY = rcFull.Height();
 
-    DRect rcAux1 = rcAlloc.Next(fCX / 3., fCY / 3., sx, sy);
-    rcAux = rcAux1;
-    params[WND_Front].drect = rcAlloc.NextFromRight(fCX, fCY / 1.2, sx, sy);
+    CF::RectzAllocator<double> rcAlloc{ rcFull };
+    DRect rcIcon1 = rcAlloc.Next(fCX / 3., fCY / 3., sx, sy);
+    DRect  rcWin1 = rcAlloc.NextFromRight(fCX, fCY / 1.2, sx, sy);
 
-    rcAlloc.Shift(0, -(params[WND_Front].drect.Height() - rcAux1.Height()));
-    DRect rcAux2 = rcAlloc.Next(fCX / 5., fCY / 2., sx, sy);
-    params[WND_Back].drect = rcAlloc.Next(fCX, fCY, sx, sy);
+    rcAlloc.Shift(0, -(rcWin1.Height() - rcIcon1.Height()));
+    DRect rcIcon2 = rcAlloc.Next(fCX / 5., fCY / 2., sx, sy);
+    DRect  rcWin2 = rcAlloc.Next(fCX, fCY, sx, sy);
 
-    rcAlloc.Shift(0, -(params[WND_Back].drect.Height() - rcAux2.Height()));
-    params[WND_MsgBox].drect = rcAlloc.Next(fCX / 5., fCY, sx, sy);
+    rcAlloc.Shift(0, -(rcWin2.Height() - rcIcon2.Height()));
+    DRect rcIcon3 = rcAlloc.Next(fCX / 5., fCY, sx, sy);
 
-    params[WND_Front].drect.cy -= fCY / 6.;
-    params[WND_Back].drect.cx -= fCX / 15.;
+    rcWin1.cy -= fCY / 6.;
+    rcWin2.cx -= fCX / 15.;
+    rcIcon3.y -= fCY / 3.5;
+    rcIcon3.cx += fCX / 15.;
+    rcIcon3.cy += fCY / 5.5;
 
-    params[WND_MsgBox].drect.y -= fCY / 3.5;
-    params[WND_MsgBox].drect.cx += fCX / 18.;
-    params[WND_MsgBox].drect.cy += fCY / 5.5;
+    rcFront = rcWin2;
+    rcBack  = rcWin1;
+    rcMsg   = rcIcon3;
+    rcIcon  = rcIcon1;
 }
 
 namespace
@@ -250,16 +251,18 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
 {
     const auto& theme = CLUIApp::App()->CurrentTheme();
     const auto  hMenu = CLUIApp::App()->GetTestMenu();
-    DrawWindowArgs params[WND_Count] = {
-        {   m_WndRect[WND_Back], {}, L"Inactive window", 0, nullptr, -1, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
-        {  m_WndRect[WND_Front], {}, L"Active window", DC_ACTIVE, hMenu, 2, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
-        { m_WndRect[WND_MsgBox], {}, L"Tool window", DC_ACTIVE | DC_SMALLCAP, nullptr, -1, { MsgBoxText, _countof(MsgBoxText), 0 } },
+
+    DRect rcFront;
+    DRect  rcBack;
+    DRect   rcMsg;
+    DRect  rcIcon;
+    CalcRects(rcClient, rcFront, rcBack, rcMsg, rcIcon);
+    const DrawWindowArgs params[WND_Count] = {
+        {   m_WndRect[WND_Back],  rcBack, L"Inactive window",                       0,   hMenu, -1, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
+        {  m_WndRect[WND_Front], rcFront,   L"Active window",               DC_ACTIVE,   hMenu,  2, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
+        { m_WndRect[WND_MsgBox],   rcMsg,     L"Tool window", DC_ACTIVE | DC_SMALLCAP, nullptr, -1, { MsgBoxText, _countof(MsgBoxText), 0 } },
     };
-    DRect rcAux1;
-    CalcRects(params, rcClient, rcAux1);
-
     dc.FillSolidRect(rcClient, theme.GetColor(COLOR_BACKGROUND));
-
     if (CLUIApp::App()->ShowDesktopWallpaper() && (m_Wallpaper.size() > 0)) {
         GdipImagePtr const& imPtr = m_Wallpaper[0];
 
@@ -276,31 +279,35 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
             rcClient.Width(), rcClient.Height(),
             units, attrs);
     }
-
     CDrawRoutine drawings(theme);
-    drawings.DrawDesktopIcon(dc, ToCRect(rcAux1), L"Icon Text", true);
+    drawings.DrawDesktopIcon(dc, ToCRect(rcIcon), L"Icon Text", true);
     for (auto& it : params) {
         drawings.CalcRects(ToCRect<double>(it.drect), it.captFlags, it.rects);
         drawings.DrawWindow(dc, it);
     }
-    drawings.DrawToolTip(dc, m_WndRect[WND_MsgBox].rect[WR_Tooltip], L"TooTip Hint");
+    drawings.DrawToolTip(dc, m_WndRect[WND_MsgBox][WR_Tooltip], L"TooTip Hint");
+    auto rcSel = GetSeletcedRect();
+    if (!rcSel.IsRectEmpty()) {
+        rcSel.InflateRect(2, 2);
+        dc.DrawFocusRect(rcSel);
+    }
 }
 
-void CThemePreviewer::HighLightSeletced(CDCHandle dc, CRect const& rcClient)
+CRect CThemePreviewer::GetSeletcedRect()
 {
-    if (m_bUserSelect) {
-        m_bUserSelect = false;
-        const int wi = m_SelectedRect.first;
-        const int ri = m_SelectedRect.second;
-        if (wi < 0 || wi > WND_Count - 1) {
-            return ;
-        }
-        if (ri < 0 || ri > WR_Count - 1) {
-            return ;
-        }
-        CRect const& rc = m_WndRect[wi].rect[ri];
-        dc.InvertRect(rc);
+    if (!m_bUserSelect) {
+        return {};
     }
+    m_bUserSelect = false;
+    const int wi = m_SelectedRect.first;
+    const int ri = m_SelectedRect.second;
+    if (wi < 0 || wi > WND_Count - 1) {
+        return {};
+    }
+    if (ri < 0 || ri > WR_Count - 1) {
+        return {};
+    }
+    return m_WndRect[wi][ri];
 }
 
 void CThemePreviewer::OnLButton(UINT nFlags, CPoint point)
@@ -308,7 +315,7 @@ void CThemePreviewer::OnLButton(UINT nFlags, CPoint point)
     for (int j = 0; j < WND_Count; j++) {
         WindowRects const& wr = m_WndRect[j];
         for (int i = 0; i < WR_Count; i++) {
-            CRect const& rc = wr.rect[i];
+            CRect const& rc = wr[i];
             if (!rc.IsRectEmpty() && rc.PtInRect(point)) {
                 m_SelectedRect = std::make_pair(j, i);
                 m_bUserSelect = true;
@@ -320,4 +327,3 @@ void CThemePreviewer::OnLButton(UINT nFlags, CPoint point)
     m_SelectedRect = std::make_pair(-1, -1);
     ::InvalidateRect(m_hWnd, nullptr, FALSE);
 }
-
