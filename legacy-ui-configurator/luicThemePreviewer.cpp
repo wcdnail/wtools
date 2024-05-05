@@ -299,9 +299,13 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
     drawings.DrawToolTip(dc, m_WndRect[WND_MsgBox][WR_Tooltip], L"TooTip Hint");
     auto rcSel = GetSeletcedRect();
     if (!rcSel.IsRectEmpty()) {
-        //rcSel.InflateRect(2, 2);
-        //dc.DrawFocusRect(rcSel);
-        dc.InvertRect(rcSel);
+        if (1) { // ##TODO: configure selection type
+            rcSel.DeflateRect(1, 1);
+            dc.DrawFocusRect(rcSel);
+        }
+        else {
+            dc.InvertRect(rcSel);
+        }
     }
 }
 

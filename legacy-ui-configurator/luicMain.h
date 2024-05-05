@@ -2,6 +2,7 @@
 
 #include "luicMainFrame.h"
 #include "luicTheme.h"
+#include "luicFontDef.h"
 #include "settings.h"
 #include <atlcomcli.h>
 #include <atlapp.h>
@@ -73,6 +74,7 @@ private:
     Conf::Section                  m_Settings;
     CMainFrame                    m_MainFrame;
     CMenu                          m_TestMenu;
+    FontMap                         m_FontMap;
     IDesktopWallpaperPtr         m_pWallpaper;
     bool              m_bShowDesktopWallpaper;
     WTL::CImageListManaged m_ImList[IL_Count];
@@ -81,8 +83,8 @@ private:
     static CLUIApp*                    g_pApp;
     static std::recursive_mutex      g_pAppMx;
 
-    HRESULT ImListCreate(int index, int cx, int cy);
     void SetMainFrameStatus(int status, ATL::CStringW&& message);
+    HRESULT ImListCreate(int index, int cx, int cy);
 };
 
 inline IDesktopWallpaper* CLUIApp::GetWallpaperMan()

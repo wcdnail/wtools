@@ -69,6 +69,9 @@
     <ClInclude Include="resz\resource.h">
       <Filter>resz</Filter>
     </ClInclude>
+    <ClInclude Include="luicFontDef.h">
+      <Filter>theme</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -115,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="luicMainFrame.cpp" />
     <ClCompile Include="luicMainView.cpp" />
+    <ClCompile Include="luicFontDef.cpp">
+      <Filter>theme</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resz\legacy-ui-configurator.rc">

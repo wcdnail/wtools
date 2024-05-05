@@ -239,6 +239,7 @@
     <ClInclude Include="luicBackground.h" />
     <ClInclude Include="luicDrawings.h" />
     <ClInclude Include="luicEffects.h" />
+    <ClInclude Include="luicFontDef.h" />
     <ClInclude Include="luicMain.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="luicMainFrame.h" />
@@ -266,6 +267,7 @@
     <ClCompile Include="luicBackground.cpp" />
     <ClCompile Include="luicDrawings.cpp" />
     <ClCompile Include="luicEffects.cpp" />
+    <ClCompile Include="luicFontDef.cpp" />
     <ClCompile Include="luicMain.cpp" />
     <ClCompile Include="idl\legacy-ui-configurator_i.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>

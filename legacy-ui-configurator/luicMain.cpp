@@ -102,8 +102,9 @@ CLUIApp::CLUIApp()
     ,              m_Settings{L"CLUIApp"}
     ,             m_MainFrame{m_Settings}
     ,              m_TestMenu{}
+    ,               m_FontMap{}
     ,            m_pWallpaper{}
-    , m_bShowDesktopWallpaper{true}
+    , m_bShowDesktopWallpaper{false}
 {
     {
         std::lock_guard<std::recursive_mutex> guard(g_pAppMx);
@@ -149,12 +150,10 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
         return code;
     }
     FromSettings(m_Settings, m_bShowDesktopWallpaper);
-
     ATOM previewClassAtom = CThemePreviewer::Register(code);
     if (!previewClassAtom) {
         return code;
     }
-
     static const ATL::CStringW shell32dll = SHELL32_PATHNAME;
     CIconCollectionFile shellIcons;
     if (!shellIcons.Load(shell32dll.GetString(), true)) {
@@ -170,6 +169,24 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
     ImListCreate(IL_Own, 16, 16);
     ImListCreate(IL_OwnBig, 64, 64);
     m_TestMenu.LoadMenuW(IDR_MENU1);
+    code = CFontDef::LoadAll(m_FontMap);
+    if (FAILED(code)) {
+        return code;
+    }
+#ifdef _DEBUG
+    int fontNum = 1;
+    FontStr charSets;
+    for (auto const& it: m_FontMap) {
+        FontStr{}.swap(charSets);
+        for (auto const& cs: it.second.m_sCharset) {
+            if (!charSets.empty()) {
+                charSets += L", ";
+            }
+            charSets += cs;
+        }
+        DebugPrintf(L"\t>>>> %4d %40s %s\n", fontNum++, it.second.m_sFullName.c_str(), charSets.c_str());
+    }
+#endif
     return code;
 }
 
@@ -247,8 +264,8 @@ HRESULT CLUIApp::Run(HINSTANCE instHnd, int showCmd)
             ReportError(L"MainFrame creation failure!", hr, true);
             return hr;
         }
-        ATLTRACE2(atlTraceUI, 0, _T("All OK, launch main window [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
         m_MainFrame.ShowWindow(showCmd);
+        ATLTRACE2(atlTraceUI, 0, _T("Launch main loop [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
         hr = loop.Run();
         RemoveMessageLoop();
     }
