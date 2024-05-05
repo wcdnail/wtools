@@ -60,6 +60,8 @@ private:
 
     CThemePreviewer      m_stPreview;
 
+    WTL::CBitmap        m_bmSolid[3];
+
     void InitResizeMap();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
@@ -71,8 +73,15 @@ private:
     void ItemClr1Enable(BOOL bEnable);
     void ItemClr2Enable(BOOL bEnable);
     void FontEnable(BOOL bEnable);
+    void FontClrEnable(BOOL bEnable);
 
-    void FontSelByFamily(LOGFONT const* lfFont);
+    static void BtnFillColor(WTL::CButton& bnControl, HBRUSH hBrush, CBitmap& bmp);
+    bool BtnSetColor(WTL::CButton& bnControl, int iColor, CBitmap& bmp) const;
+    void ItemColorSet(int nItem);
+    void SizeSet(int metric, int textControl, int udControl);
+
+    void FontSetFamily(LOGFONT const* pLogFont);
+    void FontSetSizes(LOGFONT const* lfFont);
     void FontOnItemChaged(int nItem);
 
     void OnSelectTheme(int nThemeIndex);

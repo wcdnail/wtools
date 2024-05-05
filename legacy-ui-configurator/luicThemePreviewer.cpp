@@ -41,7 +41,7 @@ CThemePreviewer::~CThemePreviewer()
 CThemePreviewer::CThemePreviewer()
     :          Super{}
     ,    m_Wallpaper{}
-    , m_SelectedRect{-1, -1}
+    , m_prSelected{-1, -1}
     ,  m_bUserSelect{false}
 {
     HRESULT code;
@@ -68,7 +68,7 @@ CThemePreviewer::CThemePreviewer()
     , DoubleBuffered{true}
     ,       m_pTheme{nullptr}
     ,    m_Wallpaper{}
-    , m_SelectedRect{-1, -1}
+    , m_prSelected{-1, -1}
     ,  m_bUserSelect{false}
 {
 }
@@ -81,6 +81,7 @@ void CThemePreviewer::SubclassIt(HWND hWnd)
     ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
     m_hWnd = hWnd;
     InitWallpapers();
+    ModifyStyleEx(0, WS_EX_CLIENTEDGE);
 }
 
 void CThemePreviewer::OnSelectTheme(CTheme* pTheme)
@@ -92,7 +93,7 @@ void CThemePreviewer::OnSelectTheme(CTheme* pTheme)
 void CThemePreviewer::OnSelectItem(int nItem)
 {
     if (EN_Desktop == nItem) {
-        m_SelectedRect = std::make_pair(-1, -1);
+        m_prSelected = std::make_pair(-1, -1);
     }
 }
 
@@ -349,8 +350,8 @@ CRect CThemePreviewer::GetSeletcedRect()
         return {};
     }
     m_bUserSelect = false;
-    const int wi = m_SelectedRect.first;
-    const int ri = m_SelectedRect.second;
+    const int wi = m_prSelected.first;
+    const int ri = m_prSelected.second;
     if (wi < 0 || wi > WND_Count - 1) {
         return {};
     }
@@ -366,13 +367,32 @@ void CThemePreviewer::OnLButton(UINT nFlags, CPoint point)
         for (int i = 0; i < WR_Count; i++) {
             CRect const& rcExamine = m_WndRect[j][i];
             if (!rcExamine.IsRectEmpty() && rcExamine.PtInRect(point)) {
-                m_SelectedRect = std::make_pair(j, i);
+                m_prSelected = std::make_pair(j, i);
                 m_bUserSelect = true;
                 ::InvalidateRect(m_hWnd, nullptr, FALSE);
+                NotifyParent();
                 return ;
             }
         }
     }
-    m_SelectedRect = std::make_pair(-1, -1);
+    m_prSelected = std::make_pair(-1, -1);
     ::InvalidateRect(m_hWnd, nullptr, FALSE);
+}
+
+int CThemePreviewer::RectIndexToElementId() const
+{
+    switch (m_prSelected.first) {
+    case WND_MsgBox: break;
+    case WND_Front: break;
+    case WND_Back: break;
+    }
+    return CB_ERR;
+}
+
+void CThemePreviewer::NotifyParent()
+{
+    int nElementId = RectIndexToElementId();
+    if (CB_ERR != nElementId) {
+        //::SendMessageW()
+    }
 }

@@ -10,7 +10,7 @@ using GdipImagePtr = std::unique_ptr<Gdiplus::Image>;
 using GdipImageVec = std::vector<GdipImagePtr>;
 using SelectedPair = std::pair<int, int>;
 
-#if 0 // ##TODO: решить проблему регистрации класса при использовании ATL/WTL
+#if 0 // решено, теперь нужно решить - а нужно ли? ) ##TODO: решить проблему регистрации класса при использовании ATL/WTL
 #include <atlwin.h>
 using CThemePreviewerTraits = ATL::CWinTraits<WS_CHILD | WS_VISIBLE | WS_BORDER, 0>;
 struct CThemePreviewer: ATL::CWindowImpl<CThemePreviewer, ATL::CWindow, CThemePreviewerTraits>,
@@ -56,7 +56,7 @@ private:
 
     CTheme*                 m_pTheme;
     GdipImageVec         m_Wallpaper;
-    SelectedPair      m_SelectedRect;
+    SelectedPair      m_prSelected;
     bool               m_bUserSelect;
     WindowRects m_WndRect[WND_Count];
 
@@ -67,4 +67,6 @@ private:
     int OnCreate(LPCREATESTRUCT pCS);
     void OnPaint(CDCHandle dc);
     void OnLButton(UINT nFlags, CPoint point);
+    int RectIndexToElementId() const;
+    void NotifyParent();
 };

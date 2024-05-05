@@ -197,18 +197,110 @@ void CPageAppearance::FontEnable(BOOL bEnable)
     m_cbFontSmooth.EnableWindow(bEnable);
 }
 
-void CPageAppearance::FontSelByFamily(LOGFONT const* lfFont)
+void CPageAppearance::FontClrEnable(BOOL bEnable)
 {
-    if (!lfFont) {
+    m_stFontClr.EnableWindow(bEnable);
+    m_bnFontClr.EnableWindow(bEnable);
+}
+
+void CPageAppearance::BtnFillColor(WTL::CButton& bnControl, HBRUSH hBrush, CBitmap& bmp)
+{
+    LONG          cx{0};
+    LONG          cy{0};
+    CRect      rcBtn{};
+    CDC     dcCompat{};
+    CBitmap bmCompat{};
+    CWindowDC     dc{bnControl.m_hWnd};
+    bnControl.GetClientRect(rcBtn);
+    cx = rcBtn.Width();
+    cy = rcBtn.Height();
+    rcBtn.DeflateRect(cx/6, cy/4);
+    dcCompat.CreateCompatibleDC(dc);
+    bmCompat.CreateCompatibleBitmap(dcCompat, rcBtn.Width(), rcBtn.Height());
+    bmp.Attach(bmCompat.Detach());
+    HBITMAP bmPrev = dcCompat.SelectBitmap(bmp);
+    dcCompat.FillRect(rcBtn, hBrush);
+    dcCompat.SelectBitmap(bmPrev);
+    bnControl.SetBitmap(bmp);
+}
+
+bool CPageAppearance::BtnSetColor(WTL::CButton& bnControl, int iColor, CBitmap& bmp) const
+{
+    HBRUSH hBrush = nullptr;
+    if (!m_pTheme || !(hBrush = m_pTheme->GetBrush(iColor))) {
+        return false;
+    }
+    BtnFillColor(bnControl, hBrush, bmp);
+    return true;
+}
+
+void CPageAppearance::ItemColorSet(int nItem)
+{
+    ItemClr1Enable(FALSE);
+    ItemClr2Enable(FALSE);
+    FontClrEnable(FALSE);
+    auto const* pAssignment = GetElementAssignment(nItem);
+    if (!pAssignment) {
+        return ;
+    }
+    if (BtnSetColor(m_bnItemClr1, pAssignment->color1, m_bmSolid[0])) {
+        ItemClr1Enable(TRUE);
+    }
+    if (BtnSetColor(m_bnItemClr2, pAssignment->color2, m_bmSolid[1])) {
+        ItemClr2Enable(TRUE);
+    }
+    if (BtnSetColor(m_bnFontClr, pAssignment->fontColor, m_bmSolid[2])) {
+        FontClrEnable(TRUE);
+    }
+}
+
+void CPageAppearance::SizeSet(int metric, int textControl, int udControl)
+{
+    if (metric < 0) {
+        SetDlgItemTextW(textControl, L"");
+        return;
+    }
+    //SendDlgItemMessage(m_hWnd, udControl, UDM_SETRANGE, 0L, MAKELONG(g_sizeRanges[metric].max, g_sizeRanges[metric].min));
+    //int value = GetSchemeMetric(&g_schemes->scheme.ncMetrics, metric);
+    //SetDlgItemInt(g_hDlg, textControl, value, FALSE);
+}
+
+void CPageAppearance::FontSetFamily(LOGFONT const* pLogFont)
+{
+    if (!pLogFont) {
         // ##FIXME: trace error?
         return ;
     }
-    const int nFont = m_cbFont.FindStringExact(-1, lfFont->lfFaceName);
+    const int nFont = m_cbFont.FindStringExact(-1, pLogFont->lfFaceName);
     if (nFont < 0) {
         // ##TODO: trace error
         return ;
     }
     m_cbFont.SetCurSel(nFont);
+}
+
+void CPageAppearance::FontSetSizes(LOGFONT const* pLogFont)
+{
+    LONG size = FontLogToPt<LONG>(pLogFont->lfHeight);
+    wchar_t szSize[4] = { 0 };
+    if (wsprintf(szSize, L"%d", size) < 1) {
+        szSize[0] = L'8';
+    }
+    int comboIndex;
+    if (size < MIN_FONT_SIZE) {
+        comboIndex = 0;
+    }
+    else if (size > MAX_FONT_SIZE) {
+        comboIndex = MAX_FONT_SIZE - MIN_FONT_SIZE;
+    }
+    else {
+        comboIndex = m_cbFontSize.FindStringExact(CB_ERR, szSize);
+        if (comboIndex < 0) {
+            comboIndex = 2; // ##TODO: ENUM this!
+        }
+    }
+    m_cbFontSize.SetCurSel(comboIndex);
+    m_cbFontSize.SetWindowTextW(szSize);
 }
 
 void CPageAppearance::FontOnItemChaged(int nItem)
@@ -225,8 +317,8 @@ void CPageAppearance::FontOnItemChaged(int nItem)
         return;
     }
     FontEnable(TRUE);
-    FontSelByFamily(pLogFont);
-    //SelectFontSizes(pLogFont);
+    FontSetFamily(pLogFont);
+    FontSetSizes(pLogFont);
     //SetDlgItemInt(g_hDlg, IDC_CLASSIC_FONTWIDTH_E, FontLogToPt(plfFont->lfWidth), FALSE);
     //SetDlgItemInt(g_hDlg, IDC_CLASSIC_FONTANGLE_E, plfFont->lfEscapement / 10, FALSE);
     //SendDlgItemMessage(g_hDlg, IDC_CLASSIC_FONTBOLD, BM_SETCHECK, (WPARAM)(plfFont->lfWeight >= FW_BOLD), 0L);
@@ -252,4 +344,5 @@ void CPageAppearance::OnSelectItem(int nItem)
     m_cbItem.SetCurSel(nItem);
     ItemEnable(TRUE);
     FontOnItemChaged(nItem);
+    ItemColorSet(nItem);
 }

@@ -86,6 +86,12 @@ struct SizeRange
     int current;
 };
 
+enum FONT_SIZES_CN : long
+{
+    MIN_FONT_SIZE = 6,
+    MAX_FONT_SIZE = 24,
+};
+
 enum FONT_NAMES : int
 {
     FONT_Caption,
@@ -208,5 +214,13 @@ inline NONCLIENTMETRICS const& CTheme::GetNcMetrcs() const { return m_ncMetrics;
 template <typename Res>
 inline Res ScaleForDpi(Res n)
 {
-    return MulDiv(static_cast<int>(n), CTheme::g_DPI, USER_DEFAULT_SCREEN_DPI);
+    return static_cast<Res>(MulDiv(static_cast<int>(n), CTheme::g_DPI, USER_DEFAULT_SCREEN_DPI));
+}
+
+static constexpr long DEFAULT_FONT_DPI = 72;
+
+template <typename Res>
+inline Res FontLogToPt(long n)
+{
+    return -static_cast<Res>(MulDiv(n, DEFAULT_FONT_DPI, CTheme::g_DPI));
 }
