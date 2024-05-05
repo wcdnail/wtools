@@ -125,9 +125,9 @@ HICON CLUIApp::GetIcon(int icon) const
     return m_ImList[IL_Own].GetIcon(icon);
 }
 
-CMenu const& CLUIApp::GetTestMenu() const
+CMenuHandle CLUIApp::GetTestMenu() const
 {
-    return m_TestMenu;
+    return {m_TestMenu.m_hMenu};
 }
 
 void CLUIApp::SetMainFrameStatus(int status, ATL::CStringW&& message)

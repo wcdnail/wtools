@@ -58,7 +58,7 @@ public:
     Conf::Section& GetSettings();
     CTheme& CurrentTheme() const;
     HICON GetIcon(int icon) const;
-    CMenu const& GetTestMenu() const;
+    CMenuHandle GetTestMenu() const;
     WTL::CImageListManaged const& GetImageList(int index) const;
     IDesktopWallpaper* GetWallpaperMan();
     bool ShowDesktopWallpaper() const;
