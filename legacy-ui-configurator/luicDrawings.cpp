@@ -3,9 +3,9 @@
 #include "luicTheme.h"
 #include "luicMain.h"
 #include "dh.tracing.h"
-#include "dh.tracing.defs.h"
 #include "rect.putinto.h"
 #include "string.utils.error.code.h"
+#include <utility>
 
 //
 // https://stackoverflow.com/questions/14994012/how-draw-caption-in-alttab-switcher-when-paint-custom-captionframe
@@ -613,12 +613,11 @@ void CDrawRoutine::DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UI
     DrawMenuText(dc, text, rc, format, COLOR_3DSHADOW);
 }
 
-void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT fnMarlett, int selectedItem) const
+void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selIt, WindowRects& rects) const
 {
-    if (!hMenu || !fnMarlett) {
+    if (!hMenu || !hFont) {
         return ;
     }
-
     int backColorIndex = COLOR_MENU;
 #if WINVER >= WINVER_XP
     if (m_Theme.IsFlatMenus()) {
@@ -626,15 +625,13 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
     }
 #endif
     dc.FillRect(rc, m_Theme.GetBrush(backColorIndex));
-
     int    spacing = 10;
-    HFONT  prevFnt = dc.SelectFont(fnMarlett);
+    HFONT  prevFnt = dc.SelectFont(hFont);
     UINT txtFormat = DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOCLIP;
     CRect   rcItem = rc;
     CRect   rcText;
     SIZE      size;
     int     margin;
-
 #if WINVER >= WINVER_2K
     BOOL  bKbdCues = FALSE;
     if (SystemParametersInfoW(SPI_GETKEYBOARDCUES, 0, &bKbdCues, 0) && !bKbdCues) {
@@ -646,13 +643,16 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
         spacing = tm.tmAveCharWidth;
     }
     margin = spacing / 2;
-
     rcItem.bottom--;
     rcText.top = rcItem.top - 1;
     rcText.bottom = rcItem.bottom;
 
-    int menuItemCount = GetMenuItemCount(hMenu);
-    for (int iMenuItem = 0; iMenuItem < menuItemCount; iMenuItem++) {
+    enum : int { MENU_ITEMS_TARGET_MAX = 3 };
+    CRect* prcTarget[MENU_ITEMS_TARGET_MAX] = {
+        &rects[WR_MenuItem], &rects[WR_MenuDisabled], &rects[WR_MenuSelected]
+    };
+    const auto itCount = std::min<int>(MENU_ITEMS_TARGET_MAX, GetMenuItemCount(hMenu));
+    for (int iMenuItem = 0; iMenuItem < itCount; iMenuItem++) {
         WCHAR text[32] = { 0 };
         if (!GetMenuStringW(hMenu, iMenuItem, text, _countof(text)-1, MF_BYPOSITION)) {
             continue;
@@ -681,7 +681,7 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
                 DrawMenuText(dc, text, rcText, txtFormat, COLOR_GRAYTEXT);
             }
         }
-        else if ((state & MF_HILITE) || (iMenuItem == selectedItem)) {
+        else if ((state & MF_HILITE) || (iMenuItem == selIt)) {
 #if WINVER >= WINVER_2K
 #if WINVER >= WINVER_XP
             if (m_Theme.IsFlatMenus()) {
@@ -707,6 +707,7 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
         else {
             DrawMenuText(dc, text, rcText, txtFormat, COLOR_MENUTEXT);
         }
+        *(prcTarget[iMenuItem]) = rcItem;
         rcItem.left = rcItem.right;
     }
     dc.SelectFont(prevFnt);
@@ -925,18 +926,17 @@ void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStr
     }
 }
 
-void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
+void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects) const
 {
-    HICON const*          icons = StaticInit::instance().m_hIcon;
-    WindowRects const&    rects = params.rects;
-    HFONT              menuFont = m_Theme.GetFont(FONT_Menu);
-    HFONT              captFont = m_Theme.GetFont(FONT_Caption);
-    HICON              captIcon = nullptr;
-    UINT              captFlags = params.captFlags | DC_TEXT;
-    int     workspaceColorIndex = COLOR_APPWORKSPACE;
-    int        borderColorIndex = COLOR_INACTIVEBORDER;
-    const bool        isToolWnd = (0 != (DC_SMALLCAP & params.captFlags));
-    const bool         isActive = (0 != (DC_ACTIVE & params.captFlags));
+    HICON const*      icons = StaticInit::instance().m_hIcon;
+    HFONT const    menuFont = m_Theme.GetFont(FONT_Menu);
+    HFONT const    captFont = m_Theme.GetFont(FONT_Caption);
+    HICON          captIcon = nullptr;
+    UINT          captFlags = params.captFlags | DC_TEXT;
+    int workspaceColorIndex = COLOR_APPWORKSPACE;
+    int    borderColorIndex = COLOR_INACTIVEBORDER;
+    const bool    isToolWnd = (0 != (DC_SMALLCAP & params.captFlags));
+    const bool     isActive = (0 != (DC_ACTIVE & params.captFlags));
 
     if (!isToolWnd) {
         if (isActive) { captIcon = icons[StaticInit::ICON_ActiveWnd]; }
@@ -970,7 +970,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
 
     if (!isToolWnd) {
         if (params.hMenu) {
-            DrawMenuBar(dc, rects[WR_Menu], params.hMenu, menuFont, params.selectedMenu);
+            DrawMenuBar(dc, rects[WR_Menu], params.hMenu, menuFont, params.selectedMenu, rects);
         }
 
         CRect rcWork = rects[WR_Workspace];
@@ -989,7 +989,6 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
             CRect  rcLine = rcText;
             LONG       cy = -(m_Theme.GetLogFont(FONT_Desktop)->lfHeight) + 2;
             rcLine.bottom = rcLine.top + cy;
-
             for (int i = 0; i < params.text.lineCount; i++) {
                 if (rcLine.top > rcText.bottom) {
                     break;
@@ -1009,13 +1008,12 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const
                 rcLine.top = rcLine.bottom;
                 rcLine.bottom = rcLine.top + cy;
             }
-
             dc.SetBkMode(prevBkMode);
             dc.SetTextColor(prevBkClr);
             dc.SetTextColor(prevClr);
             dc.SelectFont(prevFnt);
+            rects[WR_WinText] = rcText;
         }
-
         DrawScrollbar(dc, rects[WR_Scroll], isActive);
     }
     else {

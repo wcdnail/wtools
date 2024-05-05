@@ -28,6 +28,7 @@ struct CThemePreviewer: ATL::CWindowImpl<CThemePreviewer, ATL::CWindow, CThemePr
 
 using GdipImagePtr = std::unique_ptr<Gdiplus::Image>;
 using GdipImageVec = std::vector<GdipImagePtr>;
+using SelectedPair = std::pair<int, int>;
 
 struct CThemePreviewer: CF::DoubleBuffered
 {
@@ -50,14 +51,14 @@ private:
         WND_Count
     };
 
-    HWND                        m_hWnd;
-    GdipImageVec           m_Wallpaper;
-    std::pair<int, int> m_SelectedRect;
-    bool                 m_bUserSelect;
-    WindowRects   m_WndRect[WND_Count];
+    HWND                      m_hWnd;
+    GdipImageVec         m_Wallpaper;
+    SelectedPair      m_SelectedRect;
+    bool               m_bUserSelect;
+    WindowRects m_WndRect[WND_Count];
 
     HRESULT InitWallpapers();
-    static void CalcRects(CRect const& rcClient, DRect& rcFront, DRect& rcBack, DRect& rcMsg, DRect& rcIcon);
+    static void CalcRects(CRect const& rcClient, CRect& rcFront, CRect& rcBack, CRect& rcMsg, CRect& rcIcon);
     void DrawDesktop(CDCHandle dc, CRect const& rc);
     CRect GetSeletcedRect();
     int OnCreate(LPCREATESTRUCT pCS);

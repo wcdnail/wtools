@@ -13,7 +13,11 @@ enum WindowRectIndex: int
     WR_Hyperlink,
     WR_Message,
     WR_Scroll,
+    WR_WinText,
     WR_Workspace,
+    WR_MenuSelected,
+    WR_MenuDisabled,
+    WR_MenuItem,
     WR_Menu,
     WR_Caption,
     WR_Frame,
@@ -45,8 +49,6 @@ struct WindowText
 
 struct DrawWindowArgs
 {
-    WindowRects&    rects;
-    DRect const&    drect;
     ATL::CStringW caption;
     UINT        captFlags;
     HMENU           hMenu;
@@ -72,11 +74,11 @@ public:
     void DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags) const;
     void DrawMenuText(CDCHandle hdc, PCWSTR text, CRect& rc, UINT format, int color) const;
     void DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UINT format) const;
-    void DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selectedItem) const;
+    void DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selIt, WindowRects& rects) const;
     void DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled) const;
     void DrawToolTip(CDCHandle dc, CRect& rcParam, ATL::CStringW&& tooltip) const;
     void DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const;
-    void DrawWindow(CDCHandle dc, DrawWindowArgs const& params) const;
+    void DrawWindow(CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects) const;
 
 private:
     struct StaticInit;

@@ -7,6 +7,7 @@
 #include "wcdafx.api.h"
 #include "dh.timer.h"
 #include "strint.h"
+#include <utility>
 #include <string>
 
 namespace DH
@@ -85,7 +86,7 @@ namespace DH
         template <typename C>
         inline void CopyCharsForPrinting(C* dest, size_t dlen, C const* source, size_t slen)
         {
-            size_t left = min(dlen, slen);
+            size_t left = std::min<size_t>(dlen, slen);
             while (left > 0) {
                 *dest = PrintableChar(*source);
                 ++source;
