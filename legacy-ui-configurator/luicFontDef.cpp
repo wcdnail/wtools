@@ -11,15 +11,16 @@ struct EnumFontProcArgs
     CDC m_ScreenDC = {};
     FontMap  m_Map = {};
 
-    bool Parse(ENUMLOGFONTEXW const* lpelfe)
+    bool Parse(ENUMLOGFONTEXW const* lpelfe, NEWTEXTMETRICEX const* lpntme)
     {
-        FontStr  faceName = lpelfe->elfLogFont.lfFaceName;
-        FontStr   charSet = lpelfe->elfScript;
-        CFontDef* fontDef = nullptr;
+        FontStr    faceName = lpelfe->elfLogFont.lfFaceName;
+        CharsetPair charSet = std::make_pair<int, FontStr>(lpelfe->elfLogFont.lfCharSet, lpelfe->elfScript);
+        CFontDef*   fontDef = nullptr;
         auto it = m_Map.find(faceName);
         if (it == m_Map.end()) {
             fontDef = &m_Map[faceName];
             fontDef->m_sFullName = lpelfe->elfFullName;
+            fontDef->m_tmHeight = lpntme->ntmTm.tmHeight;
         }
         else {
             fontDef = &it->second;
@@ -38,16 +39,19 @@ static int CALLBACK FontEnumerator(ENUMLOGFONTEXW const*  lpelfe,
                                    DWORD dwFontType,
                                    EnumFontProcArgs& args)
 {
-    UNREFERENCED_PARAMETER(lpntme);
     UNREFERENCED_PARAMETER(dwFontType);
 #ifdef _DEBUG_XTRA
-    DebugPrintf(L">> %4d t:%04X ^%-3d %40s '%s'\n", args.m_Counter + 1, dwFontType,
+    uint64_t signCodePage = *reinterpret_cast<const uint64_t*>(lpntme->ntmFontSig.fsCsb);
+    DebugPrintf(L">> %4d t:%04X ^%-3d csb:%p >>cs:%-3d<< %40s [fn:'%s' scr:'%s']\n", args.m_Counter + 1, dwFontType,
         lpntme->ntmTm.tmHeight,
+        signCodePage,
+        lpelfe->elfLogFont.lfCharSet,
         lpelfe->elfLogFont.lfFaceName,
+        lpelfe->elfFullName,
         lpelfe->elfStyle
     );
 #endif
-    if (!args.Parse(lpelfe)) {
+    if (!args.Parse(lpelfe, lpntme)) {
         return 0;
     }
     return 1;

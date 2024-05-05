@@ -173,7 +173,7 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
     if (FAILED(code)) {
         return code;
     }
-#ifdef _DEBUG
+#ifdef _DEBUG_XTRA
     int fontNum = 1;
     FontStr charSets;
     for (auto const& it: m_FontMap) {
@@ -182,7 +182,7 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
             if (!charSets.empty()) {
                 charSets += L", ";
             }
-            charSets += cs;
+            charSets += std::to_wstring(cs.first) + L":'" + cs.second + L"'";
         }
         DebugPrintf(L"\t>>>> %4d %40s %s\n", fontNum++, it.second.m_sFullName.c_str(), charSets.c_str());
     }
