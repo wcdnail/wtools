@@ -57,13 +57,13 @@ public:
     CLUIApp();
 
     Conf::Section& GetSettings();
-    CTheme& CurrentTheme() const;
     HICON GetIcon(int icon) const;
     CMenuHandle GetTestMenu() const;
     WTL::CImageListManaged const& GetImageList(int index) const;
     IDesktopWallpaper* GetWallpaperMan() const;
     bool ShowDesktopWallpaper() const;
     FontMap const& GetFontMap() const;
+    CTheme& GetTheme(int nThemeIndex) const;
 
     HRESULT Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID = nullptr);
     HRESULT Run(HINSTANCE instHnd, int showCmd);

@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 
+struct CTheme;
 struct CPageImpl;
 
 using  CPageImplPtr = std::unique_ptr<CPageImpl>;
@@ -33,8 +34,9 @@ protected:
 
     UINT               IDD;
     std::wstring m_Caption;
+    CTheme*       m_pTheme;
 
-    CPageImpl(UINT idd, std::wstring&& caption);
+    CPageImpl(UINT idd, std::wstring&& caption, CTheme* pTheme = nullptr);
 
     static bool CtlDisable(HWND hWndCtl);
     static BOOL DoForEachImpl(HWND hWndCtl, ForeachFn const& routine);
@@ -58,8 +60,10 @@ private:
     ResizeVec m_ResiseMap;
 
     BEGIN_MSG_MAP_EX(CColorsPage)
-        MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
-        MSG_WM_ERASEBKGND(OnEraseBkgnd)
+        if (nullptr != m_pTheme) {
+            MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
+            MSG_WM_ERASEBKGND(OnEraseBkgnd)
+        }
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_COMMAND(OnCommand)

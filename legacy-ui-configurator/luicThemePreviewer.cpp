@@ -66,6 +66,7 @@ CThemePreviewer::CThemePreviewer()
 CThemePreviewer::CThemePreviewer()
     :   ATL::CWindow{}
     , DoubleBuffered{true}
+    ,       m_pTheme{nullptr}
     ,    m_Wallpaper{}
     , m_SelectedRect{-1, -1}
     ,  m_bUserSelect{false}
@@ -80,6 +81,19 @@ void CThemePreviewer::SubclassIt(HWND hWnd)
     ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
     m_hWnd = hWnd;
     InitWallpapers();
+}
+
+void CThemePreviewer::OnSelectTheme(CTheme* pTheme)
+{
+    m_pTheme = pTheme;
+    InvalidateRect(nullptr, FALSE);
+}
+
+void CThemePreviewer::OnSelectItem(int nItem)
+{
+    if (EN_Desktop == nItem) {
+        m_SelectedRect = std::make_pair(-1, -1);
+    }
 }
 
 LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -272,14 +286,16 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
         WindowRects& rcTarget;
         CRect const& rcSource;
     };
-
-    const auto& theme = CLUIApp::App()->CurrentTheme();
-    const auto  hMenu = CLUIApp::App()->GetTestMenu();
-
-    CRect rcFront;
-    CRect  rcBack;
-    CRect   rcMsg;
-    CRect  rcIcon;
+    if (!m_pTheme) {
+        return;
+    }
+    auto const*  pApp = CLUIApp::App();
+    const auto& theme = *m_pTheme;
+    const auto  hMenu = pApp->GetTestMenu();
+    CRect     rcFront;
+    CRect      rcBack;
+    CRect       rcMsg;
+    CRect      rcIcon;
     CalcRects(rcClient, rcFront, rcBack, rcMsg, rcIcon);
     const DrawWindowArgs wparam[WND_Count] = {
         { L"Inactive window",                       0,   hMenu, -1, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
@@ -292,7 +308,7 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
         { m_WndRect[WND_MsgBox],   rcMsg },
     };
     dc.FillSolidRect(rcClient, theme.GetColor(COLOR_BACKGROUND));
-    if (CLUIApp::App()->ShowDesktopWallpaper() && (m_Wallpaper.size() > 0)) {
+    if (pApp->ShowDesktopWallpaper() && (m_Wallpaper.size() > 0)) {
         GdipImagePtr const& imPtr = m_Wallpaper[0];
 
         Gdiplus::RectF rcfImage;

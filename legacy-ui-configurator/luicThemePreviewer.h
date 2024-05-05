@@ -39,6 +39,8 @@ struct CThemePreviewer: ATL::CWindow,
     CThemePreviewer();
 
     void SubclassIt(HWND hWnd);
+    void OnSelectTheme(CTheme* pTheme);
+    void OnSelectItem(int nItem);
 
 private:
     static LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -52,6 +54,7 @@ private:
         WND_Count
     };
 
+    CTheme*                 m_pTheme;
     GdipImageVec         m_Wallpaper;
     SelectedPair      m_SelectedRect;
     bool               m_bUserSelect;

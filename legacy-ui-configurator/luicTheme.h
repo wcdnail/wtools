@@ -9,6 +9,48 @@
 struct CPageAppearance;
 class CLUIApp;
 
+enum ThemeIndex : int
+{
+    TI_Invalid = -1,
+    TI_Current,
+};
+
+enum ELEMENT_NAME : int
+{
+    EN_Desktop,
+    EN_AppBackground,
+    EN_Window,
+    EN_Menu,             // The width affects the icon and caption buttons of MDI children
+    EN_ActiveCaption,    // Title bar of active windows
+    EN_InactiveCaption,  // Title bar of inactive windows
+    EN_SMCaption,        // Title bar of palette (small) windows
+    EN_ActiveBorder,     // Border of active resizable windows
+    EN_InactiveBorder,   // Border of inactive resizable windows
+    EN_Scrollbar,
+    EN_3DObject,
+    EN_3DShadow,         // Not in official applets
+    EN_3DLight,          // Not in official applets
+    EN_SelectedItem,     // Also used for text selection
+    EN_DisabledItem,
+    EN_Tooltip,
+    EN_MsgBox,
+#if WINVER >= WINVER_2K
+    EN_Hyperlink,
+#endif
+#if WINVER >= WINVER_XP
+    EN_FlatmenuBar,
+#endif
+#if WINVER >= WINVER_VISTA
+    /**
+      * Border of windows, including property sheets for some reason.
+      * If SIZE_PADDEDBORDER is > 0, the windows with fixed borders affected also
+      * include SIZE_BORDER
+      */
+    EN_PaddedBorder,
+#endif
+    ELEMENT_Count
+};
+
 enum SIZE_NAMES : int
 {
     SIZE_Border,
@@ -120,6 +162,7 @@ struct CTheme
 private:
     static const SizeRange g_DefaultSizeRange[SIZES_Count];
 
+    int                       m_nIndex;
     ATL::CString              m_MyName;
     CLogFont              m_lfIconFont;
     bool           m_bGradientCaptions;
@@ -140,9 +183,9 @@ private:
     bool LoadSysGradientCaptionsSetting();
     bool LoadSysFlatMenusSetting();
 
-    static void LoadThemes(CPageAppearance& uiPage, CTheme& initialTheme);
-    static void LoadElements(CPageAppearance& uiPage);
-    static void LoadFonts(CPageAppearance& uiPage, FontMap const&);
+    static void ThemesStaticInit(CPageAppearance& uiPage, CTheme& initialTheme);
+    static void ElementsStaticInit(CPageAppearance& uiPage);
+    static void FontsStaticInit(CPageAppearance& uiPage, FontMap const&);
 };
 
 inline bool             CTheme::IsGradientCaptions() const { return m_bGradientCaptions; }

@@ -7,112 +7,76 @@
 
 namespace
 {
-    enum ELEMENT_NAME : int
-    {
-        EN_Desktop,
-        EN_AppBackground,
-        EN_Window,
-        EN_Menu,             // The width affects the icon and caption buttons of MDI children
-        EN_ActiveCaption,    // Title bar of active windows
-        EN_InactiveCaption,  // Title bar of inactive windows
-        EN_SMCaption,        // Title bar of palette (small) windows
-        EN_ActiveBorder,     // Border of active resizable windows
-        EN_InactiveBorder,   // Border of inactive resizable windows
-        EN_Scrollbar,
-        EN_3DObject,
-        EN_3DShadow,         // Not in official applets
-        EN_3DLight,          // Not in official applets
-        EN_SelectedItem,     // Also used for text selection
-        EN_DisabledItem,
-        EN_Tooltip,
-        EN_MsgBox,
-#if WINVER >= WINVER_2K
-        EN_Hyperlink,
-#endif
-#if WINVER >= WINVER_XP
-        EN_FlatmenuBar,
-#endif
-#if WINVER >= WINVER_VISTA
-        /**
-         * Border of windows, including property sheets for some reason.
-         * If SIZE_PADDEDBORDER is > 0, the windows with fixed borders affected also
-         * include SIZE_BORDER
-         */
-        EN_PaddedBorder,
-#endif
-        ELEMENT_Count
-    };
+struct ElementAssignment
+{
+    PCWSTR   name;
+    int     size1;
+    int     size2;
+    int    color1;
+    int    color2;
+    int      font;
+    int fontColor;
+};
 
-    struct ElementAssignment
-    {
-        PCWSTR   name;
-        int     size1;
-        int     size2;
-        int    color1;
-        int    color2;
-        int      font;
-        int fontColor;
-    };
-
-    #if WINVER < WINVER_2K
-    static const int COLORS_COUNT = 25;
+#if WINVER < WINVER_2K
+static const int COLORS_COUNT = 25;
 #elif WINVER < WINVER_XP
-    static const int COLORS_COUNT = 29;
+static const int COLORS_COUNT = 29;
 #else
-    static const int COLORS_COUNT = 31;
+static const int COLORS_COUNT = 31;
 #endif
-    static_assert(CLR_Count == COLORS_COUNT, "CLR_Count COUNT is NOT match COLORS_COUNT!");
+static_assert(CLR_Count == COLORS_COUNT, "CLR_Count COUNT is NOT match COLORS_COUNT!");
 
-    template <typename Res>
-    static inline Res GetCurrentDPI()
-    {
-        int temp = USER_DEFAULT_SCREEN_DPI;
-        HDC screenDc{ GetDC(nullptr) };
-        if (screenDc) {
-            temp = GetDeviceCaps(screenDc, LOGPIXELSY);
-            ReleaseDC(nullptr, screenDc);
-        }
-        return static_cast<Res>(temp);
+template <typename Res>
+static inline Res GetCurrentDPI()
+{
+    int temp = USER_DEFAULT_SCREEN_DPI;
+    HDC screenDc{ GetDC(nullptr) };
+    if (screenDc) {
+        temp = GetDeviceCaps(screenDc, LOGPIXELSY);
+        ReleaseDC(nullptr, screenDc);
     }
+    return static_cast<Res>(temp);
+}
 
-    ElementAssignment const* GetElementAssignment(int dex)
+ElementAssignment const* GetElementAssignment(int dex)
+{
+    // Assign the color and metric numbers to each element of the combo box
+    //                              Name  Size 1                Size 2               Color 1                 Color 2                         Font            Fontcolor
+    static const ElementAssignment gsl_assignment[ELEMENT_Count] =
     {
-        // Assign the color and metric numbers to each element of the combo box
-        //                              Name  Size 1                Size 2               Color 1                 Color 2                         Font            Fontcolor
-        static const ElementAssignment gsl_assignment[ELEMENT_Count] =
-        {
-        /* 0*/ {                  L"Desktop", -1,                   -1,                  COLOR_DESKTOP,          -1,                             FONT_Desktop,   -1                          },
-        /* 1*/ {   L"Application Background", -1,                   -1,                  COLOR_APPWORKSPACE,     -1,                             -1,             -1                          },
-        /* 2*/ {                   L"Window", -1,                   -1,                  COLOR_WINDOW,           COLOR_WINDOWFRAME,              -1,             COLOR_WINDOWTEXT            },
-        /* 3*/ {                     L"Menu", SIZE_MenuHeight,      SIZE_MenuWidth,      COLOR_MENU,             -1,                             FONT_Menu,      COLOR_MENUTEXT              },
-        /* 4*/ {       L"Title Bar - Active", SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_ACTIVECAPTION,    COLOR_GRADIENTACTIVECAPTION,    FONT_Caption,   COLOR_CAPTIONTEXT           },
-        /* 5*/ {     L"Title Bar - Inactive", SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_INACTIVECAPTION,  COLOR_GRADIENTINACTIVECAPTION,  FONT_Caption,   COLOR_INACTIVECAPTIONTEXT   },
-        /* 6*/ {      L"Title Bar - Palette", SIZE_SMCaptionHeight, SIZE_SMCaptionWidth, -1,                     -1,                             FONT_SMCaption, -1                          },
-        /* 7*/ {   L"Window Border - Active", SIZE_Border,          -1,                  COLOR_ACTIVEBORDER,     -1,                             -1,             -1                          },
-        /* 8*/ { L"Window Border - Inactive", SIZE_Border,          -1,                  COLOR_INACTIVEBORDER,   -1,                             -1,             -1                          },
-        /* 9*/ {                L"Scrollbar", SIZE_ScrollWidth,     SIZE_ScrollHeight,   COLOR_SCROLLBAR,        -1,                             -1,             -1                          },
-        /*10*/ {                L"3D Object", -1,                   -1,                  COLOR_3DFACE,           -1,                             -1,             COLOR_BTNTEXT               },
-        /*11*/ {                L"3D Shadow", -1,                   -1,                  COLOR_3DSHADOW,         COLOR_3DDKSHADOW,               -1,             -1                          },
-        /*12*/ {                 L"3D Light", -1,                   -1,                  COLOR_3DHILIGHT,        COLOR_3DLIGHT,                  -1,             -1                          },
-        /*13*/ {            L"Selected Item", -1,                   -1,                  COLOR_HIGHLIGHT,        -1,                             -1,             COLOR_HIGHLIGHTTEXT         },
-        /*14*/ {            L"Disabled Item", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_GRAYTEXT              },
-        /*15*/ {                  L"ToolTip", -1,                   -1,                  COLOR_INFOBK,           -1,                             FONT_Tooltip,   COLOR_INFOTEXT              },
-        /*16*/ {              L"Message Box", -1,                   -1,                  -1,                     -1,                             FONT_Message,   COLOR_WINDOWTEXT            },
+    /* 0*/ {                  L"Desktop", -1,                   -1,                  COLOR_DESKTOP,          -1,                             FONT_Desktop,   -1                          },
+    /* 1*/ {   L"Application Background", -1,                   -1,                  COLOR_APPWORKSPACE,     -1,                             -1,             -1                          },
+    /* 2*/ {                   L"Window", -1,                   -1,                  COLOR_WINDOW,           COLOR_WINDOWFRAME,              -1,             COLOR_WINDOWTEXT            },
+    /* 3*/ {                     L"Menu", SIZE_MenuHeight,      SIZE_MenuWidth,      COLOR_MENU,             -1,                             FONT_Menu,      COLOR_MENUTEXT              },
+    /* 4*/ {       L"Title Bar - Active", SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_ACTIVECAPTION,    COLOR_GRADIENTACTIVECAPTION,    FONT_Caption,   COLOR_CAPTIONTEXT           },
+    /* 5*/ {     L"Title Bar - Inactive", SIZE_CaptionHeight,   SIZE_CaptionWidth,   COLOR_INACTIVECAPTION,  COLOR_GRADIENTINACTIVECAPTION,  FONT_Caption,   COLOR_INACTIVECAPTIONTEXT   },
+    /* 6*/ {      L"Title Bar - Palette", SIZE_SMCaptionHeight, SIZE_SMCaptionWidth, -1,                     -1,                             FONT_SMCaption, -1                          },
+    /* 7*/ {   L"Window Border - Active", SIZE_Border,          -1,                  COLOR_ACTIVEBORDER,     -1,                             -1,             -1                          },
+    /* 8*/ { L"Window Border - Inactive", SIZE_Border,          -1,                  COLOR_INACTIVEBORDER,   -1,                             -1,             -1                          },
+    /* 9*/ {                L"Scrollbar", SIZE_ScrollWidth,     SIZE_ScrollHeight,   COLOR_SCROLLBAR,        -1,                             -1,             -1                          },
+    /*10*/ {                L"3D Object", -1,                   -1,                  COLOR_3DFACE,           -1,                             -1,             COLOR_BTNTEXT               },
+    /*11*/ {                L"3D Shadow", -1,                   -1,                  COLOR_3DSHADOW,         COLOR_3DDKSHADOW,               -1,             -1                          },
+    /*12*/ {                 L"3D Light", -1,                   -1,                  COLOR_3DHILIGHT,        COLOR_3DLIGHT,                  -1,             -1                          },
+    /*13*/ {            L"Selected Item", -1,                   -1,                  COLOR_HIGHLIGHT,        -1,                             -1,             COLOR_HIGHLIGHTTEXT         },
+    /*14*/ {            L"Disabled Item", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_GRAYTEXT              },
+    /*15*/ {                  L"ToolTip", -1,                   -1,                  COLOR_INFOBK,           -1,                             FONT_Tooltip,   COLOR_INFOTEXT              },
+    /*16*/ {              L"Message Box", -1,                   -1,                  -1,                     -1,                             FONT_Message,   COLOR_WINDOWTEXT            },
 #if WINVER >= WINVER_2K
-        /*17*/ {                L"Hyperlink", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_HOTLIGHT              },
+    /*17*/ {                L"Hyperlink", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_HOTLIGHT              },
 #endif
 #if WINVER >= WINVER_XP
-        /*18*/ {          L"Menu Bar (Flat)", -1,                   -1,                  COLOR_MENUBAR,          COLOR_MENUHILIGHT,              -1,             -1                          },
+    /*18*/ {          L"Menu Bar (Flat)", -1,                   -1,                  COLOR_MENUBAR,          COLOR_MENUHILIGHT,              -1,             -1                          },
 #endif
 #if WINVER >= WINVER_VISTA
-        /*19*/ {     L"Window Padded Border", SIZE_PaddedBorder,    -1,                  -1,                     -1,                             -1,             -1                          },
+    /*19*/ {     L"Window Padded Border", SIZE_PaddedBorder,    -1,                  -1,                     -1,                             -1,             -1                          },
 #endif
-        };
-        if (dex < 0 || dex >= ELEMENT_Count) {
-            return nullptr;
-        }
-        return &gsl_assignment[dex];
+    };
+    if (dex < 0 || dex >= ELEMENT_Count) {
+        return nullptr;
     }
+    return &gsl_assignment[dex];
+}
 }
 
 int CTheme::g_DPI = GetCurrentDPI<int>();
@@ -139,7 +103,8 @@ CTheme::~CTheme()
 }
 
 CTheme::CTheme(bool loadSystemTheme)
-    :            m_MyName{"Native"}
+    :            m_nIndex{TI_Invalid}
+    ,            m_MyName{"Native"}
     ,        m_lfIconFont{}
     , m_bGradientCaptions{true}
     ,        m_bFlatMenus{false}
@@ -433,7 +398,7 @@ LOGFONT const* CTheme::GetLogFont(int font) const
     return GetNcMetricFont(*this, font);
 }
 
-void CTheme::LoadThemes(CPageAppearance& uiPage, CTheme& initialTheme)
+void CTheme::ThemesStaticInit(CPageAppearance& uiPage, CTheme& initialTheme)
 {
     WTL::CComboBox& lbCtl = uiPage.m_ThemeSel;
     lbCtl.ResetContent();
@@ -446,11 +411,11 @@ void CTheme::LoadThemes(CPageAppearance& uiPage, CTheme& initialTheme)
             ), code);
         return ;
     }
-    lbCtl.SetItemDataPtr(item, reinterpret_cast<void*>(&initialTheme));
-    lbCtl.SetCurSel(item);
+    initialTheme.m_nIndex = item;
+    lbCtl.SetItemData(item, static_cast<DWORD_PTR>(item));
 }
 
-void CTheme::LoadElements(CPageAppearance& uiPage)
+void CTheme::ElementsStaticInit(CPageAppearance& uiPage)
 {
     WTL::CComboBox& lbCtl = uiPage.m_ElementSel;
     lbCtl.ResetContent();
@@ -478,10 +443,9 @@ void CTheme::LoadElements(CPageAppearance& uiPage)
             lbCtl.SetCurSel(iElement);
         }
     }
-    lbCtl.SetCurSel(EN_Desktop);
 }
 
-void CTheme::LoadFonts(CPageAppearance& uiPage, FontMap const& mapFont)
+void CTheme::FontsStaticInit(CPageAppearance& uiPage, FontMap const& mapFont)
 {
     WTL::CComboBox& lbCtl = uiPage.m_FontSel;
     lbCtl.ResetContent();
@@ -501,7 +465,9 @@ void CTheme::LoadFonts(CPageAppearance& uiPage, FontMap const& mapFont)
 
 void CTheme::PerformStaticInit(CPageAppearance& uiPage, CLUIApp const* pApp)
 {
-    LoadThemes(uiPage, pApp->CurrentTheme());
-    LoadElements(uiPage);
-    LoadFonts(uiPage, pApp->GetFontMap());
+    CTheme& theme = pApp->GetTheme(TI_Current);
+    ThemesStaticInit(uiPage, theme);
+    ElementsStaticInit(uiPage);
+    FontsStaticInit(uiPage, pApp->GetFontMap());
+    uiPage.OnSelectTheme(theme.m_nIndex);
 }

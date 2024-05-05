@@ -27,4 +27,7 @@ private:
     void InitResizeMap();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
+    void OnSelectFont(LOGFONT const* lfFont);
+    void OnSelectTheme(int nThemeIndex);
+    void OnSelectItem(int nItem);
 };

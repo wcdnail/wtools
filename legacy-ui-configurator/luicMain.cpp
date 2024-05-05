@@ -113,11 +113,6 @@ CLUIApp::CLUIApp()
 
 }
 
-CTheme& CLUIApp::CurrentTheme() const
-{
-    return g_CurrentTheme;
-}
-
 HICON CLUIApp::GetIcon(int icon) const
 {
     if (icon < 0 || icon >= IconCount) {
@@ -275,4 +270,11 @@ HRESULT CLUIApp::Run(HINSTANCE instHnd, int showCmd)
         MessageBoxA(nullptr, ex.what(), "epic FAIL", MB_ICONERROR);
     }
     return hr;
+}
+
+CTheme& CLUIApp::GetTheme(int nThemeIndex) const
+{
+    UNREFERENCED_ARG(nThemeIndex);
+    // ##TODO: implement theme manager
+    return g_CurrentTheme;
 }

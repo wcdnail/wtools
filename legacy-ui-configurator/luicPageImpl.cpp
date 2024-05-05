@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "luicPageImpl.h"
-#include "luicMain.h"
+#include "luicTheme.h"
 #include "dh.tracing.h"
 #include "debug.dump.msg.h"
 #include "dh.tracing.defs.h"
@@ -10,9 +10,10 @@ CPageImpl::~CPageImpl()
 {
 }
 
-CPageImpl::CPageImpl(UINT idd, std::wstring&& caption)
-    :         IDD{ idd }
-    ,   m_Caption{ std::move(caption) }
+CPageImpl::CPageImpl(UINT idd, std::wstring&& caption, CTheme* pTheme /*= nullptr*/)
+    :         IDD{idd}
+    ,   m_Caption{std::move(caption)}
+    ,    m_pTheme{pTheme}
     , m_ResiseMap{}
 {
 }
@@ -78,19 +79,17 @@ void CPageImpl::DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count)
 
 HBRUSH CPageImpl::OnCtlColorStatic(CDCHandle dc, HWND wndStatic)
 {
-    CTheme& theme = CLUIApp::App()->CurrentTheme();
-    dc.SetTextColor(theme.GetColor(COLOR_CAPTIONTEXT));
-    dc.SetBkColor(theme.GetColor(COLOR_MENU));
-    return theme.GetBrush(COLOR_MENU);
+    dc.SetTextColor(m_pTheme->GetColor(COLOR_CAPTIONTEXT));
+    dc.SetBkColor(m_pTheme->GetColor(COLOR_MENU));
+    return m_pTheme->GetBrush(COLOR_MENU);
 }
 
 HBRUSH CPageImpl::OnEraseBkgnd(CDCHandle dc)
 {
-    CTheme& theme = CLUIApp::App()->CurrentTheme();
     CRect rc;
     GetClientRect(rc);
-    dc.FillSolidRect(rc, theme.GetColor(COLOR_MENU));
-    return theme.GetBrush(COLOR_MENU);
+    dc.FillSolidRect(rc, m_pTheme->GetColor(COLOR_MENU));
+    return m_pTheme->GetBrush(COLOR_MENU);
 }
 
 void CPageImpl::OnResizeNotify()

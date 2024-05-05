@@ -69,8 +69,6 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     DoForEach(CtlDisable);
 
     m_Preview.SubclassIt(GetDlgItem(IDC_APP_PREVIEW));
-    m_Preview.EnableWindow(TRUE);
-
     m_ThemeSel.Attach(GetDlgItem(IDC_APP_THEME_SEL));
     m_ThemeSizeSel.Attach(GetDlgItem(IDC_APP_SIZE_SEL));
     m_ThemeImport.Attach(GetDlgItem(IDC_APP_THEME_BN_IMPORT));
@@ -88,7 +86,6 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_ThemeSizeSel.SetCurSel(0);
 
     CTheme::PerformStaticInit(*this, pApp);
-
     InitResizeMap();
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }
@@ -96,4 +93,50 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 void CPageAppearance::OnDestroy()
 {
     CPageImpl::OnDestroy();
+}
+
+void CPageAppearance::OnSelectFont(LOGFONT const* lfFont)
+{
+    if (!lfFont) {
+        // ##FIXME: trace error?
+        return ;
+    }
+    const int nFont = m_FontSel.FindStringExact(-1, lfFont->lfFaceName);
+    if (nFont < 0) {
+        // ##TODO: trace error
+        return ;
+    }
+    m_FontSel.SetCurSel(nFont);
+}
+
+void CPageAppearance::OnSelectTheme(int nThemeIndex)
+{
+    auto const* pApp = CLUIApp::App();
+    m_pTheme = &pApp->GetTheme(nThemeIndex);
+    m_Preview.OnSelectTheme(m_pTheme);
+
+    m_ThemeSel.SetCurSel(nThemeIndex);
+    
+    m_Preview.EnableWindow(TRUE);
+    m_ThemeSel.EnableWindow(TRUE);
+    m_ThemeSave.EnableWindow(TRUE);
+    m_ThemeRename.EnableWindow(TRUE);
+    m_ElementSel.EnableWindow(TRUE);
+
+    OnSelectItem(EN_Desktop);
+}
+
+void CPageAppearance::OnSelectItem(int nItem)
+{
+    m_Preview.OnSelectItem(nItem);
+    m_ElementSel.SetCurSel(nItem);
+    if (m_pTheme) {
+        auto const* pLogFont = m_pTheme->GetLogFont(nItem);
+        if (!pLogFont) {
+            // ##TODO: report why pLogFont is NULL
+        }
+        else {
+            OnSelectFont(pLogFont);
+        }
+    }
 }
