@@ -68,6 +68,17 @@ enum SIZE_NAMES : int
     SIZES_Count
 };
 
+struct ElementAssignment
+{
+    PCWSTR   name;
+    int     size1;
+    int     size2;
+    int    color1;
+    int    color2;
+    int      font;
+    int fontColor;
+};
+
 struct SizeRange
 {
     int     min;
@@ -136,6 +147,8 @@ enum COLOR_NAMES : int
 #endif
     CLR_Count
 };
+
+ElementAssignment const* GetElementAssignment(int dex);
 
 struct CTheme
 {

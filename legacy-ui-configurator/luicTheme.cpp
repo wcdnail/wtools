@@ -7,17 +7,6 @@
 
 namespace
 {
-struct ElementAssignment
-{
-    PCWSTR   name;
-    int     size1;
-    int     size2;
-    int    color1;
-    int    color2;
-    int      font;
-    int fontColor;
-};
-
 #if WINVER < WINVER_2K
 static const int COLORS_COUNT = 25;
 #elif WINVER < WINVER_XP
@@ -37,6 +26,7 @@ static inline Res GetCurrentDPI()
         ReleaseDC(nullptr, screenDc);
     }
     return static_cast<Res>(temp);
+}
 }
 
 ElementAssignment const* GetElementAssignment(int dex)
@@ -76,7 +66,6 @@ ElementAssignment const* GetElementAssignment(int dex)
         return nullptr;
     }
     return &gsl_assignment[dex];
-}
 }
 
 int CTheme::g_DPI = GetCurrentDPI<int>();
@@ -400,7 +389,7 @@ LOGFONT const* CTheme::GetLogFont(int font) const
 
 void CTheme::ThemesStaticInit(CPageAppearance& uiPage, CTheme& initialTheme)
 {
-    WTL::CComboBox& lbCtl = uiPage.m_ThemeSel;
+    WTL::CComboBox& lbCtl = uiPage.m_cbTheme;
     lbCtl.ResetContent();
     int item = lbCtl.AddString(initialTheme.m_MyName);
     if (item < 0) {
@@ -417,7 +406,7 @@ void CTheme::ThemesStaticInit(CPageAppearance& uiPage, CTheme& initialTheme)
 
 void CTheme::ElementsStaticInit(CPageAppearance& uiPage)
 {
-    WTL::CComboBox& lbCtl = uiPage.m_ElementSel;
+    WTL::CComboBox& lbCtl = uiPage.m_cbItem;
     lbCtl.ResetContent();
     for (int iElement = 0; iElement < ELEMENT_Count; iElement++) {
         const auto* assignment = GetElementAssignment(iElement);
@@ -447,9 +436,13 @@ void CTheme::ElementsStaticInit(CPageAppearance& uiPage)
 
 void CTheme::FontsStaticInit(CPageAppearance& uiPage, FontMap const& mapFont)
 {
-    WTL::CComboBox& lbCtl = uiPage.m_FontSel;
+    WTL::CComboBox& lbCtl = uiPage.m_cbFont;
     lbCtl.ResetContent();
     for (auto const& it: mapFont) {
+        if (L'@' == it.first[0]) {
+            // ##TODO: skip @'at'ed font?
+            continue;
+        }
         int item = lbCtl.AddString(it.first.c_str());
         if (item < 0) {
             auto code = static_cast<HRESULT>(GetLastError());
