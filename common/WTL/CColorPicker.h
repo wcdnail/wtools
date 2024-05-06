@@ -17,7 +17,7 @@ struct CColorPicker: CColorPickerBase
     ~CColorPicker() override;
     CColorPicker();
 
-    HRESULT PreCreateClass();
+    HRESULT PreCreateWindow();
 
     CColorPicker& operator = (HWND hWnd); // make compatible with WTL/DDX
 
@@ -43,17 +43,17 @@ inline CColorPicker::CColorPicker()
 {
 }
 
-inline HRESULT CColorPicker::PreCreateClass()
+inline HRESULT CColorPicker::PreCreateWindow()
 {
     HRESULT code = S_OK;
-    // ##TODO: ThreadSafe gs_Atom!
+    // ##TODO: gs_Atom is not ThreadSafe!
     if (!gs_Atom) {
         const ATOM atom = ATL::AtlModuleRegisterClassExW(nullptr, &GetWndClassInfo().m_wc);
         if (!atom) {
             code = static_cast<HRESULT>(GetLastError());
             return code;
         }
-        // ##TODO: ThreadSafe gs_Atom!
+        // ##TODO: gs_Atom is not ThreadSafe!
         gs_Atom = atom;
     }
     if (!m_thunk.Init(nullptr, nullptr)) {

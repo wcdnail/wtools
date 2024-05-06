@@ -11,7 +11,6 @@ struct CTatorMainDlg: CIndirectDialogImpl<CTatorMainDlg>,
                       CDialogResize<CTatorMainDlg>,
                       CWinDataExchange<CTatorMainDlg>,
                       CMessageFilter
-    
 {
     enum Sizes: short
     {
@@ -43,7 +42,7 @@ struct CTatorMainDlg: CIndirectDialogImpl<CTatorMainDlg>,
 
     HRESULT Initialize()
     {
-        return m_ccColorPicker.PreCreateClass();
+        return m_ccColorPicker.PreCreateWindow();
     }
 
     BEGIN_DDX_MAP(CTatorMainDlg)
