@@ -5,3 +5,4 @@
 #pragma comment(lib, "shlwapi.lib")
 #pragma comment(lib, "gdiplus.lib")
 #pragma comment(lib, "msimg32.lib")
+#pragma comment(lib, "comctl32.lib")
