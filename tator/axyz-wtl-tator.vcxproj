@@ -18,6 +18,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ATator.MemDlg.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -28,6 +30,12 @@
     <ProjectReference Include="..\common\wccf-minimal-static.vcxproj">
       <Project>{dc0c6531-b048-4c6c-bcd3-71f3f7cf9ab3}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="axyz-wtl-tator.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="ATator.Main.ico" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>axyz-wtl-tator</ProjectName>
@@ -93,7 +101,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WCDAFX_DLL;_UNICODE;UNICODE;_DLL;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;_DLL;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -135,7 +143,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WCDAFX_DLL;_UNICODE;UNICODE;_DLL;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;_DLL;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
