@@ -6,7 +6,8 @@
 #include <atlcrack.h>
 
 class CTatorMainDlg : public CIndirectDialogImpl<CTatorMainDlg>,
-                      public CDialogResize<CTatorMainDlg>
+                      public CDialogResize<CTatorMainDlg>,
+                      public CMessageFilter
     
 {
 public:
@@ -25,7 +26,16 @@ public:
         BEFORE_FIRST_CONTROL_ID = 26999,
         IDC_DLG_ICON,
         IDC_GRP_BEVEL,
+        IDC_CUSTOM_CTL1,
     };
+
+    BOOL PreTranslateMessage(MSG* pMsg) override
+    {
+        if (IsDialogMessageW(pMsg)) {
+            return TRUE;
+        }
+        return FALSE;
+    }
 
     BEGIN_DIALOG(DIALOG_X, DIALOG_Y, DIALOG_CX, DIALOG_CY)
         DIALOG_CAPTION(_T("TATOR [XYZ]"))
@@ -39,6 +49,7 @@ public:
         //CONTROL_DEFPUSHBUTTON(_T("OK"), IDOK, 130, 81, 50, 14, 0, 0)
         CONTROL_CTEXT(_T(""), IDC_GRP_BEVEL, DIALOG_BRD_CX, DIALOG_BRD_CY, DIALOG_CX - DIALOG_BRD_CX*2, DIALOG_CY - DIALOG_BRD_CY*2, SS_SUNKEN | WS_GROUP, 0)
         CONTROL_ICON(MAKEINTRESOURCE(IDI_ICON1), IDC_DLG_ICON, DIALOG_BRD_CX+8, DIALOG_CY - DIALOG_BRD_CY*2 - 20, 18, 20, WS_GROUP, 0)
+        CONTROL_CONTROL(_T(""), IDC_CUSTOM_CTL1, _T("CColorPicker"), WS_GROUP, DIALOG_BRD_CX+8, DIALOG_BRD_CX+8, DIALOG_CX - (DIALOG_BRD_CX+8)*2, DIALOG_CY - (DIALOG_BRD_CY+8)*2 - 24, 0)
     END_CONTROLS_MAP()
 
     BEGIN_DLGRESIZE_MAP(CTatorMainDlg)
@@ -72,4 +83,5 @@ public:
         EndDialog(wID);
         return 0;
     }
+
 };

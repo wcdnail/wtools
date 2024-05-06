@@ -1,6 +1,8 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "ATator.MemDlg.h"
 #include "windows.gui.leaks.h"
+#include "string.utils.format.h"
+#include "string.utils.error.code.h"
 #include "dh.tracing.h"
 
 CAppModule _Module;
@@ -8,14 +10,38 @@ CAppModule _Module;
 static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 {
     int nRet = 0;
-    //CMessageLoop theLoop;
-    //_Module.AddMessageLoop(&theLoop);
+    CMessageLoop theLoop;
+    _Module.AddMessageLoop(&theLoop);
 
     CTatorMainDlg dlg;
-    nRet = static_cast<int>(dlg.DoModal());
+    const HWND hWndDlg = dlg.Create(GetActiveWindow());         // если диалог содержит каcтомный контрол,
+    if (!hWndDlg) {                                             // класс которого НЕ зарегистрирован, ф-ция вернет NULL
+        auto code = static_cast<HRESULT>(GetLastError());       // а GetLastError вернет 0...
+        if (ERROR_SUCCESS == code) {
+            code = static_cast<HRESULT>(WSAGetLastError());
+            if (ERROR_SUCCESS == code) {
+                DWORD dwCode = 0;                               // GetExitCodeThread хотя бы вернет значение, отличное от 0
+                BOOL  thrRes = GetExitCodeThread(GetCurrentThread(), &dwCode);
+                if (!thrRes) {
+                    code = static_cast<HRESULT>(GetLastError());
+                }
+                else {
+                    code = static_cast<HRESULT>(dwCode);
+                }
+            }
+        }
+        ATL::CString codeMessage = Str::ErrorCode<TCHAR>::SystemMessage(code);
+        ATL::CString  strMessage;
+        strMessage.Format(_T("Не могу создать диалоговое окно.\r\n[%s]"), codeMessage.GetString());
+        MessageBox(GetActiveWindow(), strMessage.GetString(), _T("FATAL"), MB_ICONSTOP);
+        return static_cast<int>(code);
+    }
+    theLoop.AddMessageFilter(&dlg);
+    dlg.ShowWindow(SW_SHOW);
 
-    //nRet = theLoop.Run();
-    //_Module.RemoveMessageLoop();
+    nRet = theLoop.Run();
+    theLoop.RemoveMessageFilter(&dlg);
+    _Module.RemoveMessageLoop();
     return nRet;
 }
 
