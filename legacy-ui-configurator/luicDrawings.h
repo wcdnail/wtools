@@ -59,6 +59,9 @@ struct DrawWindowArgs
 class CDrawRoutine
 {
 public:
+    static UINT GetDrawItemFrameType(UINT nCtlType);
+    static UINT ConvDrawItemState(UINT diState);
+
     ~CDrawRoutine();
     CDrawRoutine(CTheme const& theme);
 
@@ -67,22 +70,23 @@ public:
     void DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const;
     void DrawEdge(CDCHandle dc, CRect& pRect, UINT edge, UINT uFlags) const;
     void DrawFrameButton(CDCHandle dc, CRect& rcParam, UINT uState) const;
-    void DrawFrameCaption(CDCHandle dc, CRect& rcParam, UINT uFlags, CFont& fnMarlett) const;
-    void DrawFrameScroll(CDCHandle dc, CRect& rcParam, UINT uFlags, CFont& fnMarlett) const;
-    void DrawFrameControl(CDCHandle dc, CRect& rcParam, UINT uType, UINT uState, CFont& fnMarlett) const;
-    LONG DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags) const;
+    void DrawFrameCaption(CDCHandle dc, CRect& rcParam, UINT uFlags);
+    void DrawFrameScroll(CDCHandle dc, CRect& rcParam, UINT uFlags);
+    void DrawFrameControl(CDCHandle dc, CRect& rcParam, UINT uType, UINT uState);
+    LONG DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags);
     void DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags) const;
     void DrawMenuText(CDCHandle hdc, PCWSTR text, CRect& rc, UINT format, int color) const;
     void DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UINT format) const;
     void DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selIt, WindowRects& rects) const;
-    void DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled) const;
+    void DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled);
     void DrawToolTip(CDCHandle dc, CRect& rcParam, ATL::CStringW&& tooltip) const;
     void DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const;
-    void DrawWindow(CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects) const;
+    void DrawWindow(CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects);
 
 private:
     struct StaticInit;
 
     CTheme const& m_Theme;
     int      m_BorderSize;
+    CFont     m_ftMarlett;
 };

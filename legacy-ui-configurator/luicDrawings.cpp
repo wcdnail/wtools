@@ -215,6 +215,40 @@ private:
     }
 };
 
+UINT CDrawRoutine::GetDrawItemFrameType(UINT nCtlType)
+{
+    switch (nCtlType) {
+    case ODT_BUTTON:    return DFC_BUTTON;
+    case ODT_MENU:      return DFC_MENU;
+    case ODT_COMBOBOX:
+    case ODT_LISTBOX:
+    case ODT_LISTVIEW:
+    case ODT_STATIC:
+    case ODT_TAB:
+        break;
+    }
+    return 0;
+}
+
+UINT CDrawRoutine::ConvDrawItemState(UINT diState)
+{
+    UINT result = 0;
+    if ((diState & ODS_DISABLED) || (diState & ODS_GRAYED) || (diState & ODS_INACTIVE)) {
+        result |= DFCS_INACTIVE;
+    }
+    if (diState & ODS_CHECKED) {
+        result |= DFCS_CHECKED;
+    }
+    if (diState & ODS_SELECTED) {
+        result |= DFCS_PUSHED;
+    }
+    if (diState & ODS_HOTLIGHT) {
+        result |= DFCS_HOT;
+    }
+    // ODS_FOCUS ODS_NOACCEL ODS_NOFOCUSRECT
+    return result;
+}
+
 CDrawRoutine::~CDrawRoutine()
 {
 }
@@ -390,7 +424,7 @@ static CRect MakeSquareRect(CRect const& rcSrc)
     return rcDst;
 }
 
-void CDrawRoutine::DrawFrameCaption(CDCHandle dc, CRect& rcParam, UINT uFlags, CFont& fnMarlett) const
+void CDrawRoutine::DrawFrameCaption(CDCHandle dc, CRect& rcParam, UINT uFlags)
 {
     TCHAR symbol = 0;
     switch (uFlags & 0xff) {
@@ -413,10 +447,10 @@ void CDrawRoutine::DrawFrameCaption(CDCHandle dc, CRect& rcParam, UINT uFlags, C
     if (0 == symbol) {
         return ;
     }
-    if (!fnMarlett.m_hFont) {
-        fnMarlett = StaticInit::CreateMarlettFont(myRect.bottom - myRect.top);
+    if (!m_ftMarlett.m_hFont) {
+        m_ftMarlett = StaticInit::CreateMarlettFont(myRect.bottom - myRect.top);
     }
-    HFONT prevFont = dc.SelectFont(fnMarlett);
+    HFONT prevFont = dc.SelectFont(m_ftMarlett);
     int   prevMode = dc.SetBkMode(TRANSPARENT);
     if (uFlags & DFCS_INACTIVE) { // Draw shadow
         SetTextColor(dc, m_Theme.GetColor(COLOR_3DHILIGHT));
@@ -428,7 +462,7 @@ void CDrawRoutine::DrawFrameCaption(CDCHandle dc, CRect& rcParam, UINT uFlags, C
     dc.SelectFont(prevFont);
 }
 
-void CDrawRoutine::DrawFrameScroll(CDCHandle dc, CRect& rcParam, UINT uFlags, CFont& fnMarlett) const
+void CDrawRoutine::DrawFrameScroll(CDCHandle dc, CRect& rcParam, UINT uFlags)
 {
     TCHAR symbol = 0;
     switch (uFlags & 0xff) {
@@ -453,10 +487,10 @@ void CDrawRoutine::DrawFrameScroll(CDCHandle dc, CRect& rcParam, UINT uFlags, CF
     if (0 == symbol) {
         return ;
     }
-    if (!fnMarlett.m_hFont) {
-        fnMarlett = StaticInit::CreateMarlettFont(myRect.bottom - myRect.top);
+    if (!m_ftMarlett.m_hFont) {
+        m_ftMarlett = StaticInit::CreateMarlettFont(myRect.bottom - myRect.top);
     }
-    HFONT prevFont = dc.SelectFont(fnMarlett);
+    HFONT prevFont = dc.SelectFont(m_ftMarlett);
     int   prevMode = dc.SetBkMode(TRANSPARENT);
     if (uFlags & DFCS_INACTIVE) {
         SetTextColor(dc, m_Theme.GetColor(COLOR_3DHILIGHT));
@@ -469,19 +503,16 @@ void CDrawRoutine::DrawFrameScroll(CDCHandle dc, CRect& rcParam, UINT uFlags, CF
 }
 
 
-void CDrawRoutine::DrawFrameControl(CDCHandle dc, CRect& rcParam, UINT uType, UINT uState, CFont& fnMarlett) const
+void CDrawRoutine::DrawFrameControl(CDCHandle dc, CRect& rcParam, UINT uType, UINT uState)
 {
     switch (uType) {
-    case DFC_CAPTION: DrawFrameCaption(dc, rcParam, uState, fnMarlett); break;
-    case DFC_SCROLL:  DrawFrameScroll(dc, rcParam, uState, fnMarlett); break;
-    case DFC_BUTTON:
-    default:
-        DrawFrameButton(dc, rcParam, uState);
-        break;
+    case DFC_CAPTION: DrawFrameCaption(dc, rcParam, uState); break;
+    case DFC_SCROLL:  DrawFrameScroll(dc, rcParam, uState); break;
+    case DFC_BUTTON:  DrawFrameButton(dc, rcParam, uState); break;
     }
 }
 
-LONG CDrawRoutine::DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags) const
+LONG CDrawRoutine::DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags)
 {
     static const int margin = 2;
     int         buttonWidth = m_Theme.GetNcMetrcs().iCaptionWidth;
@@ -514,17 +545,16 @@ LONG CDrawRoutine::DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool
     rc.right = rcCaption.right - margin;
     rc.left = rc.right - buttonWidth;
 
-    CFont fnMarlett;
-    DrawFrameControl(dc, rc, DFC_CAPTION, DFCS_CAPTIONCLOSE, fnMarlett);
+    DrawFrameControl(dc, rc, DFC_CAPTION, DFCS_CAPTIONCLOSE);
 
     if (withMinMax) {
         rc.right = rc.left - margin;
         rc.left = rc.right - buttonWidth;
-        DrawFrameControl(dc, rc, DFC_CAPTION, DFCS_CAPTIONMAX, fnMarlett);
+        DrawFrameControl(dc, rc, DFC_CAPTION, DFCS_CAPTIONMAX);
 
         rc.right = rc.left;
         rc.left = rc.right - buttonWidth;
-        DrawFrameControl(dc, rc, DFC_CAPTION, DFCS_CAPTIONMIN, fnMarlett);
+        DrawFrameControl(dc, rc, DFC_CAPTION, DFCS_CAPTIONMIN);
     }
     return rc.left;
 }
@@ -713,13 +743,12 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
     dc.SelectFont(prevFnt);
 }
 
-void CDrawRoutine::DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled) const
+void CDrawRoutine::DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled)
 {
-    CFont        fnMarlett;
-    CRect               rc;
-    int       buttonHeight = m_Theme.GetNcMetrcs().iScrollHeight;
-    UINT frameControlFlags = (enabled ? 0 : DFCS_INACTIVE);
-    HBRUSH     hbrScrollBk = m_Theme.GetBrush(COLOR_SCROLLBAR);
+    CRect               rc{};
+    int       buttonHeight{m_Theme.GetNcMetrcs().iScrollHeight};
+    UINT frameControlFlags{static_cast<UINT>(enabled ? 0 : DFCS_INACTIVE)};
+    HBRUSH     hbrScrollBk{m_Theme.GetBrush(COLOR_SCROLLBAR)};
     rc.left = rcParam.left;
     rc.right = rcParam.right;
     if (rcParam.bottom - rcParam.top - buttonHeight * 2 <= 0) {
@@ -728,10 +757,10 @@ void CDrawRoutine::DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enable
     if (buttonHeight >= 5) {
         rc.top = rcParam.top;
         rc.bottom = rcParam.top + buttonHeight;
-        DrawFrameControl(dc, rc, DFC_SCROLL, DFCS_SCROLLUP | frameControlFlags, fnMarlett);
+        DrawFrameControl(dc, rc, DFC_SCROLL, DFCS_SCROLLUP | frameControlFlags);
         rc.top = rcParam.bottom - buttonHeight;
         rc.bottom = rcParam.bottom;
-        DrawFrameControl(dc, rc, DFC_SCROLL, DFCS_SCROLLDOWN | frameControlFlags, fnMarlett);
+        DrawFrameControl(dc, rc, DFC_SCROLL, DFCS_SCROLLDOWN | frameControlFlags);
     }
     else {
         buttonHeight = 0;
@@ -926,7 +955,7 @@ void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStr
     }
 }
 
-void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects) const
+void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects)
 {
     HICON const*      icons = StaticInit::instance().m_hIcon;
     HFONT const    menuFont = m_Theme.GetFont(FONT_Menu);

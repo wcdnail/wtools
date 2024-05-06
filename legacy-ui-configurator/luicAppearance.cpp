@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "luicAppearance.h"
+#include "luicDrawings.h"
 #include "luicMain.h"
 #include "string.utils.format.h"
 #include "dev.assistance/dev.assist.h"
@@ -14,7 +15,83 @@ CPageAppearance::CPageAppearance(std::wstring&& caption)
     : CPageImpl{ IDD_PAGE_APPEARANCE, std::move(caption) }
     , m_stPreview{}
 {
+#if 0
+    memset(m_bmColor, CB_ERR, sizeof(m_bmColor));
+    m_bmColor[BTN_ItemColor1] = COLOR_BTNFACE;
+    m_bmColor[BTN_ItemColor2] = COLOR_BTNSHADOW;
+    m_bmColor[BTN_FontColor1] = COLOR_WINDOW;
+#ifdef _DEBUG
+    for (auto const& it: m_bmColor) {
+        ATLASSUME(it != CB_ERR);
+    }
+#endif
+#endif
 }
+
+#if 0
+BOOL CPageAppearance::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
+{
+    MSG_WM_DRAWITEM(OnDrawItem)
+    return CPageImpl::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
+}
+
+bool CPageAppearance::BtnSetColor(int nBtn, int iColor)
+{
+    if ((nBtn < 0) || (nBtn > BTN_ColorCount) || (iColor < 0)) {
+        return false;
+    }
+    m_bmColor[nBtn] = iColor;
+    return true;
+}
+
+void CPageAppearance::BtnColorFill(WTL::CButton const& bnControl, CDCHandle dc, CRect const& rcItem, int iColor)
+{
+    if (!m_pTheme) {
+        return ;
+    }
+    CRect rcClr{rcItem};
+    rcClr.DeflateRect(rcItem.Width()/6, rcItem.Height()/4);
+    if (bnControl.IsWindowEnabled()) {
+        dc.FillSolidRect(rcClr, m_pTheme->GetColor(m_bmColor[iColor]));
+    }
+    else {
+        dc.FillSolidRect(rcClr, m_pTheme->GetColor(COLOR_BTNFACE));
+    }
+}
+
+void CPageAppearance::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT pDI)
+{
+    CDCHandle    dc{pDI->hDC};
+    CRect    rcItem{pDI->rcItem};
+    UINT   nCtlType{CDrawRoutine::GetDrawItemFrameType(pDI->CtlType)};
+    UINT  nCtlState{CDrawRoutine::ConvDrawItemState(pDI->itemState)};
+    if (m_pTheme) {
+        CRect         rcFrame{rcItem};
+        CDrawRoutine drawings{*m_pTheme};
+        drawings.DrawFrameControl(dc, rcFrame, nCtlType, nCtlState);
+    }
+    else {
+        dc.DrawFrameControl(rcItem, nCtlType, nCtlState);
+    }
+    switch (pDI->CtlType) {
+    case ODT_BUTTON:{
+        switch (nIDCtl) {
+        case IDC_APP_ITEM_COLOR1_SEL: BtnColorFill(m_bnItemClr1, dc, rcItem, BTN_ItemColor1);
+        case IDC_APP_ITEM_COLOR2_SEL: BtnColorFill(m_bnItemClr2, dc, rcItem, BTN_ItemColor2);
+        case IDC_APP_FONT_COLOR_SEL:  BtnColorFill(m_bnFontClr1, dc, rcItem, BTN_FontColor1);
+        }
+        break;
+    }
+    default:
+        break;
+    }
+    if ((pDI->itemAction & ODA_FOCUS) || (pDI->itemAction & ODA_SELECT)) {
+        CRect rcFocus = rcItem;
+        rcFocus.DeflateRect(2, 2);
+        dc.DrawFocusRect(rcFocus);
+    }
+}
+#endif
 
 void CPageAppearance::InitResizeMap()
 {
@@ -99,7 +176,7 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_edFontWidth.Attach(GetDlgItem(IDC_APP_FONT_WDTH_EDIT));
     m_udFontWidth.Attach(GetDlgItem(IDC_APP_FONT_WDTH_SPIN));
     m_stFontClr.Attach(GetDlgItem(IDC_APP_FONT_COLOR_CAP));
-    m_bnFontClr.Attach(GetDlgItem(IDC_APP_FONT_COLOR_SEL));
+    m_bnFontClr1.Attach(GetDlgItem(IDC_APP_FONT_COLOR_SEL));
     m_stFontStyle.Attach(GetDlgItem(IDC_APP_FONT_STYLE_CAP));
     m_bnFontBold.Attach(GetDlgItem(IDC_APP_FONT_STYLE_BOLD));
     m_bnFontItalic.Attach(GetDlgItem(IDC_APP_FONT_STYLE_ITALIC));
@@ -119,6 +196,11 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_bnThemeRename.SetIcon(pApp->GetIcon(IconEditField));
     m_bnThemeDelete.SetIcon(pApp->GetIcon(IconHatchCross));
     m_bnThemeImport.SetIcon(pApp->GetIcon(IconFolderOpen));
+
+    m_bnItemClr1.ModifyStyle(0, BS_BITMAP | BS_PUSHBUTTON);
+    m_bnItemClr2.ModifyStyle(0, BS_BITMAP | BS_PUSHBUTTON);
+    m_bnFontClr1.ModifyStyle(0, BS_BITMAP | BS_PUSHBUTTON);
+
     m_cbThemeSize.AddString(L"Normal");
     m_cbThemeSize.SetCurSel(0);
 
@@ -144,7 +226,8 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         }
     }
     if (0) {
-        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
+            nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
     }
 }
 
@@ -202,7 +285,7 @@ void CPageAppearance::FontEnable(BOOL bEnable)
     m_edFontWidth.EnableWindow(bEnable);
     m_udFontWidth.EnableWindow(bEnable);
     m_stFontClr.EnableWindow(bEnable);
-    m_bnFontClr.EnableWindow(bEnable);
+    m_bnFontClr1.EnableWindow(bEnable);
     m_stFontStyle.EnableWindow(bEnable);
     m_bnFontBold.EnableWindow(bEnable);
     m_bnFontItalic.EnableWindow(bEnable);
@@ -214,39 +297,43 @@ void CPageAppearance::FontEnable(BOOL bEnable)
     m_cbFontSmooth.EnableWindow(bEnable);
 }
 
-void CPageAppearance::FontClrEnable(BOOL bEnable)
+void CPageAppearance::FontClr1Enable(BOOL bEnable)
 {
     m_stFontClr.EnableWindow(bEnable);
-    m_bnFontClr.EnableWindow(bEnable);
+    m_bnFontClr1.EnableWindow(bEnable);
 }
 
-void CPageAppearance::BtnFillColor(WTL::CButton& bnControl, int iColor, CBitmap& bmp) const
+void CPageAppearance::BtnColorFill(WTL::CButton& bnControl, int nBtn, int iColor)
 {
-    LONG          cx{0};
-    LONG          cy{0};
-    CRect      rcBtn{};
-    CDC     dcCompat{};
-    CBitmap bmCompat{};
-    CWindowDC     dc{m_hWnd};
-    bnControl.GetClientRect(rcBtn);
-    cx = rcBtn.Width();
-    cy = rcBtn.Height();
-    rcBtn.DeflateRect(cx/6, cy/4);
-    dcCompat.CreateCompatibleDC(dc);
-    bmCompat.CreateCompatibleBitmap(dcCompat, rcBtn.Width(), rcBtn.Height());
-    bmp.Attach(bmCompat.Detach());
-    HBITMAP bmPrev = dcCompat.SelectBitmap(bmp);
-    dcCompat.FillSolidRect(rcBtn, m_pTheme->GetColor(iColor));
-    dcCompat.SelectBitmap(bmPrev);
-    bnControl.SetBitmap(bmp);
+    HBITMAP hBitmapToSet = nullptr;
+    {
+        HBRUSH  hBrush{m_pTheme->GetBrush(iColor)};
+        CRect rcBitmap{};
+        bnControl.GetClientRect(rcBitmap);
+        rcBitmap.DeflateRect(rcBitmap.Width()/6, rcBitmap.Height()/4);
+
+        WTL::CWindowDC bnDC{bnControl};
+        WTL::CDC     dcTemp{};
+        WTL::CBitmap bmTemp{};
+        dcTemp.CreateCompatibleDC(bnDC);
+        bmTemp.CreateCompatibleBitmap(bnDC, rcBitmap.Width(), rcBitmap.Height());
+        HBITMAP prv = dcTemp.SelectBitmap(bmTemp);
+        dcTemp.FillRect(rcBitmap, hBrush);
+        // ... SAVE PRV!!!
+        hBitmapToSet = dcTemp.GetCurrentBitmap();
+        m_bmColor[nBtn].Attach(bmTemp.Detach());
+        m_dcColor[nBtn].Attach(dcTemp.Detach());
+    }
+    bnControl.SetBitmap(hBitmapToSet);
 }
 
-bool CPageAppearance::BtnSetColor(WTL::CButton& bnControl, int iColor, CBitmap& bmp) const
+bool CPageAppearance::BtnSetColor(WTL::CButton& bnControl, int nBtn, int iColor)
 {
-    if (!m_pTheme || iColor < 0) {
+    if ((nBtn < 0) || (nBtn > BTN_ColorCount) || (iColor < 0)) {
+        bnControl.SetBitmap(nullptr);
         return false;
     }
-    BtnFillColor(bnControl, iColor, bmp);
+    BtnColorFill(bnControl, nBtn, iColor);
     return true;
 }
 
@@ -254,19 +341,19 @@ void CPageAppearance::ItemColorSet(int nItem)
 {
     ItemClr1Enable(FALSE);
     ItemClr2Enable(FALSE);
-    FontClrEnable(FALSE);
+    FontClr1Enable(FALSE);
     auto const* pAssignment = CTheme::GetItemAssignment(nItem);
     if (!pAssignment) {
         return ;
     }
-    if (BtnSetColor(m_bnItemClr1, pAssignment->color1, m_bmSolid[0])) {
+    if (BtnSetColor(m_bnItemClr1, BTN_ItemColor1, pAssignment->color1)) {
         ItemClr1Enable(TRUE);
     }
-    if (BtnSetColor(m_bnItemClr2, pAssignment->color2, m_bmSolid[1])) {
+    if (BtnSetColor(m_bnItemClr2, BTN_ItemColor2, pAssignment->color2)) {
         ItemClr2Enable(TRUE);
     }
-    if (BtnSetColor(m_bnFontClr, pAssignment->fontColor, m_bmSolid[2])) {
-        FontClrEnable(TRUE);
+    if (BtnSetColor(m_bnFontClr1, BTN_FontColor1, pAssignment->fontColor)) {
+        FontClr1Enable(TRUE);
     }
 }
 
@@ -362,3 +449,4 @@ void CPageAppearance::OnItemSelect(int nItem)
     FontOnItemChaged(nItem);
     ItemColorSet(nItem);
 }
+

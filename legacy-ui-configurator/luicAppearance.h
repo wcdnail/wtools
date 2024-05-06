@@ -44,7 +44,7 @@ private:
     WTL::CEdit         m_edFontWidth;
     WTL::CUpDownCtrl   m_udFontWidth;
     WTL::CStatic         m_stFontClr;
-    WTL::CButton         m_bnFontClr;
+    WTL::CButton        m_bnFontClr1;
     WTL::CStatic       m_stFontStyle;
     WTL::CButton        m_bnFontBold;
     WTL::CButton      m_bnFontItalic;
@@ -60,7 +60,22 @@ private:
 
     CThemePreviewer      m_stPreview;
 
-    WTL::CBitmap        m_bmSolid[3];
+    enum EBNColors: int 
+    {
+        BTN_ItemColor1 = 0,
+        BTN_ItemColor2,
+        BTN_FontColor1,
+        BTN_ColorCount
+    };
+    WTL::CBitmap m_bmColor[BTN_ColorCount];
+    WTL::CDC     m_dcColor[BTN_ColorCount];
+
+#if 0
+    int m_bmColor[BTN_ColorCount];
+    BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
+    void BtnColorFill(WTL::CButton const& bnControl, CDCHandle dc, CRect const& rcItem, int iColor);
+    void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT pDI);
+#endif
 
     void InitResizeMap();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
@@ -74,10 +89,10 @@ private:
     void ItemClr1Enable(BOOL bEnable);
     void ItemClr2Enable(BOOL bEnable);
     void FontEnable(BOOL bEnable);
-    void FontClrEnable(BOOL bEnable);
+    void FontClr1Enable(BOOL bEnable);
 
-    void BtnFillColor(WTL::CButton& bnControl, int iColor, CBitmap& bmp) const;
-    bool BtnSetColor(WTL::CButton& bnControl, int iColor, CBitmap& bmp) const;
+    void BtnColorFill(WTL::CButton& bnControl, int nBtn, int iColor);
+    bool BtnSetColor(WTL::CButton& bnControl, int nBtn, int iColor);
     void ItemColorSet(int nItem);
     void SizeSet(int metric, int textControl, int udControl);
 
