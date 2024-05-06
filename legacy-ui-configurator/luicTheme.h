@@ -162,12 +162,14 @@ struct CTheme
     static PCTSTR SizeName(int size);
     static PCTSTR FontName(int font);
     static PCTSTR ColorName(int color);
+    static int GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size);
 
     bool LoadSysTheme();
     COLORREF GetColor(int color) const;
     HBRUSH GetBrush(int color) const;
     HFONT GetFont(int font) const;
     LOGFONT const* GetLogFont(int font) const;
+    SizeRange const* GetSizeRange(int metric) const;
     bool IsGradientCaptions() const;
     bool IsFlatMenus() const;
     NONCLIENTMETRICS const& GetNcMetrcs() const;

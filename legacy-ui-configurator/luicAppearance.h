@@ -94,7 +94,7 @@ private:
     void BtnColorFill(WTL::CButton& bnControl, int nBtn, int iColor);
     bool BtnSetColor(WTL::CButton& bnControl, int nBtn, int iColor);
     void ItemColorSet(int nItem);
-    void SizeSet(int metric, int textControl, int udControl);
+    void ItemSizeSet(int metric, int nSizeCtlID, WTL::CUpDownCtrl& udSize);
 
     void FontSetFamily(LOGFONT const* pLogFont);
     void FontSetSizes(LOGFONT const* lfFont);

@@ -364,15 +364,17 @@ void CPageAppearance::ItemColorSet(int nItem)
     }
 }
 
-void CPageAppearance::SizeSet(int metric, int textControl, int udControl)
+void CPageAppearance::ItemSizeSet(int metric, int nSizeCtlID, WTL::CUpDownCtrl& udSize)
 {
-    if (metric < 0) {
-        SetDlgItemTextW(textControl, L"");
+    if (metric < 0 || !m_pTheme) {
+        SetDlgItemTextW(nSizeCtlID, L"");
         return;
     }
-    //SendDlgItemMessage(m_hWnd, udControl, UDM_SETRANGE, 0L, MAKELONG(g_sizeRanges[metric].max, g_sizeRanges[metric].min));
-    //int value = GetSchemeMetric(&g_schemes->scheme.ncMetrics, metric);
-    //SetDlgItemInt(g_hDlg, textControl, value, FALSE);
+    if (auto const* pSizeRange = m_pTheme->GetSizeRange(metric)) {
+        udSize.SetRange(pSizeRange->min, pSizeRange->max);
+    }
+    int nSize = CTheme::GetNcMetricSize(&m_pTheme->GetNcMetrcs(), metric);
+    SetDlgItemInt(nSizeCtlID, nSize, FALSE);
 }
 
 void CPageAppearance::FontSetFamily(LOGFONT const* pLogFont)
@@ -457,5 +459,10 @@ void CPageAppearance::OnItemSelect(int nItem)
     ItemEnable(TRUE);
     FontOnItemChaged(nItem);
     ItemColorSet(nItem);
-}
 
+    if (auto const* pAssignment = CTheme::GetItemAssignment(nItem)) {
+        ItemSizeSet(pAssignment->size1, IDC_APP_ITEM_SIZE1_EDIT, m_udItemSize1);
+        ItemSizeSet(pAssignment->size2, IDC_APP_ITEM_SIZE2_EDIT, m_udItemSize2);
+        ItemSizeSet(pAssignment->font, IDC_APP_FONT_WDTH_EDIT, m_udFontWidth);
+    }
+}

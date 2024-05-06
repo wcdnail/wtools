@@ -103,7 +103,7 @@ CTheme::CTheme(bool loadSystemTheme)
 }
 
 _Ret_maybenull_
-PCTSTR CTheme::SizeName(int size)
+PCTSTR CTheme::SizeName(int size) // it for tooltips!
 {
     static const PCTSTR gsl_sizeNames[SIZES_Count] = {
         TEXT("BorderWidth"),            // 0 = SIZE_BORDER
@@ -197,7 +197,7 @@ PCTSTR CTheme::ColorName(int color)
     return gsl_ColorName[color];
 }
 
-static int GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size)
+int CTheme::GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size)
 {
     switch (size) {
     case SIZE_Border:           return ncMetrics->iBorderWidth;
@@ -379,6 +379,14 @@ HFONT CTheme::GetFont(int font) const
 LOGFONT const* CTheme::GetLogFont(int font) const
 {
     return GetNcMetricFont(*this, font);
+}
+
+SizeRange const* CTheme::GetSizeRange(int metric) const
+{
+    if ((metric < 0) || (metric > SIZES_Count - 1)) {
+        return nullptr;
+    }
+    return &m_SizeRange[metric];
 }
 
 void CTheme::ThemesStaticInit(CPageAppearance& uiPage, CTheme& initialTheme)
