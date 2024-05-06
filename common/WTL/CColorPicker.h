@@ -86,43 +86,49 @@ inline void CColorPicker::OnPaint(CDCHandle)
     CPaintDC paintDC{m_hWnd};
     CDCHandle     dc{paintDC};
     CRect         rc{};
-    COLORREF    clLT{0x00ffffff};
-    COLORREF    clRT{0x00fc2500};
-    COLORREF    clRB{0x00000000};
-    COLORREF    clLB{0x00000000};
+    COLORREF    clCC{0x005a5a5a};
+    COLORREF    clWT{0x00ffffff};
+    COLORREF    clTG{0x00fc2500};
+    COLORREF    clBK{0x00000000};
 
     GetClientRect(rc);
     dc.FillSolidRect(rc, m_clrBkgnd);
 
-    TRIVERTEX vertex[4] = 
+    TRIVERTEX vertex[] = 
     {
+        { rc.Width() / 2, rc.Height() / 2,
+            static_cast<COLOR16>(static_cast<USHORT>(GetRValue(clCC)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetGValue(clCC)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetBValue(clCC)) << 8),
+            0x0000
+        },
         { rc.left, rc.top,
-            static_cast<COLOR16>(static_cast<USHORT>(GetRValue(clLT)) << 8),
-            static_cast<COLOR16>(static_cast<USHORT>(GetGValue(clLT)) << 8),
-            static_cast<COLOR16>(static_cast<USHORT>(GetBValue(clLT)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetRValue(clWT)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetGValue(clWT)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetBValue(clWT)) << 8),
             0x0000
         },
         { rc.right, rc.top,
-            static_cast<COLOR16>(static_cast<USHORT>(GetRValue(clRT)) << 8),
-            static_cast<COLOR16>(static_cast<USHORT>(GetGValue(clRT)) << 8),
-            static_cast<COLOR16>(static_cast<USHORT>(GetBValue(clRT)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetRValue(clTG)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetGValue(clTG)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetBValue(clTG)) << 8),
             0x0000
         },
         { rc.right, rc.bottom,
-            static_cast<COLOR16>(static_cast<USHORT>(GetRValue(clRB)) << 8),
-            static_cast<COLOR16>(static_cast<USHORT>(GetGValue(clRB)) << 8),
-            static_cast<COLOR16>(static_cast<USHORT>(GetBValue(clRB)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetRValue(clBK)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetGValue(clBK)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetBValue(clBK)) << 8),
             0x0000
         },
         { rc.left, rc.bottom,
-            static_cast<COLOR16>(static_cast<USHORT>(GetRValue(clLB)) << 8),
-            static_cast<COLOR16>(static_cast<USHORT>(GetGValue(clLB)) << 8),
-            static_cast<COLOR16>(static_cast<USHORT>(GetBValue(clLB)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetRValue(clBK)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetGValue(clBK)) << 8),
+            static_cast<COLOR16>(static_cast<USHORT>(GetBValue(clBK)) << 8),
             0x0000
         },
     };
 
-    GRADIENT_TRIANGLE triGrad[2] = {{1, 2, 3},{0, 1, 3}};
+    GRADIENT_TRIANGLE triGrad[] = {{0, 2, 1}, {2, 3, 0}, {4, 3, 0}};
     GradientFill(dc, vertex, _countof(vertex), triGrad, _countof(triGrad), GRADIENT_FILL_TRIANGLE);
 
 }
