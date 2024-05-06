@@ -305,21 +305,28 @@ void CPageAppearance::FontClr1Enable(BOOL bEnable)
 
 void CPageAppearance::BtnColorFill(WTL::CButton& bnControl, int nBtn, int iColor)
 {
+    ATLASSUME(m_pTheme != nullptr);
     HBITMAP hBitmapToSet = nullptr;
     {
-        HBRUSH  hBrush{m_pTheme->GetBrush(iColor)};
-        CRect    rcBtn{};
-        bnControl.GetClientRect(rcBtn);
-        rcBtn.DeflateRect(rcBtn.Width() / 6, rcBtn.Height() / 4);
-        CRect rcBitmap{0, 0, rcBtn.Width(), rcBtn.Height()};
-
+        CDrawRoutine   draw{*m_pTheme};
+        COLORREF     nColor{m_pTheme->GetColor(iColor)};
+        HBRUSH    hbrBorder{m_pTheme->GetBrush(COLOR_BTNSHADOW)};
         WTL::CWindowDC   dc{m_hWnd};
         WTL::CDC     dcTemp{};
         WTL::CBitmap bmTemp{};
+        CRect         rcBtn{};
+
+        bnControl.GetClientRect(rcBtn);
+        rcBtn.DeflateRect(rcBtn.Width() / 5, rcBtn.Height() / 5);
+        CRect rcBitmap{0, 0, rcBtn.Width(), rcBtn.Height()};
+
         dcTemp.CreateCompatibleDC(dc);
         bmTemp.CreateCompatibleBitmap(dc, rcBitmap.Width(), rcBitmap.Height());
         const HBITMAP hbmPrev = dcTemp.SelectBitmap(bmTemp);
-        dcTemp.FillRect(rcBitmap, hBrush);
+
+        dcTemp.FillSolidRect(rcBitmap, nColor);
+        draw.DrawBorder(dcTemp.m_hDC, rcBitmap, 1, hbrBorder);
+
         dcTemp.SelectBitmap(hbmPrev);
         m_bmColor[nBtn].Attach(bmTemp.Detach());
         hBitmapToSet = m_bmColor[nBtn];
