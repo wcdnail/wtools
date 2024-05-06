@@ -90,6 +90,7 @@
 #define IDC_APP_CB_FLATMENUS            3039
 #define IDC_APP_PREVIEW                 3040
 #define IDC_APP_THEME_BN_IMPORT         3041
+#define IDC_APP_FONT_STYLE_ANGLE_SPIN2  3044
 #define ID_ACC_ALT_ENTER                32769
 #define ID_ACC_ALT_TAB                  32771
 #define ID_ACC_SELECT_ALL               32772
@@ -102,7 +103,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        220
 #define _APS_NEXT_COMMAND_VALUE         32778
-#define _APS_NEXT_CONTROL_VALUE         221
+#define _APS_NEXT_CONTROL_VALUE         222
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif
