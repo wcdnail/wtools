@@ -58,6 +58,9 @@
     <ClInclude Include="windows.uses.gdi+.h" />
     <ClInclude Include="debug.dump.msg.h" />
     <ClInclude Include="windows.wtl.buffered.paint.h" />
+    <ClInclude Include="WTL\CColorPicker.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">
@@ -65,6 +68,9 @@
     </Filter>
     <Filter Include="dev.assistance">
       <UniqueIdentifier>{f3e05629-8356-44e1-addf-c389094f1804}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WTL">
+      <UniqueIdentifier>{f06b3532-bd6a-4f40-ac4f-ea9c849e4bf5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

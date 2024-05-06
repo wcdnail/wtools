@@ -9,18 +9,39 @@ CAppModule _Module;
 
 static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 {
-    int nRet = 0;
+    int      nRet = 0;
+    bool bRunLoop = true;
+    bool   bError = false;
+
     CMessageLoop theLoop;
     _Module.AddMessageLoop(&theLoop);
 
     CTatorMainDlg dlg;
-    const HWND hWndDlg = dlg.Create(GetActiveWindow());         // если диалог содержит каcтомный контрол,
-    if (!hWndDlg) {                                             // класс которого НЕ зарегистрирован, ф-ция вернет NULL
-        auto code = static_cast<HRESULT>(GetLastError());       // а GetLastError вернет 0...
-        if (ERROR_SUCCESS == code) {
-            code = static_cast<HRESULT>(WSAGetLastError());
-            if (ERROR_SUCCESS == code) {
-                DWORD dwCode = 0;                               // GetExitCodeThread хотя бы вернет значение, отличное от 0
+    HRESULT code = dlg.Initialize();
+    if (ERROR_SUCCESS == code) {
+        if constexpr (true) {
+            bRunLoop = false;
+            nRet = static_cast<int>(dlg.DoModal());
+            if (-1 == nRet) {
+                code = static_cast<HRESULT>(GetLastError());
+                bError = true;
+            }
+        }
+        else {
+            const HWND hWndDlg = dlg.Create(GetActiveWindow());
+            if (hWndDlg) {
+                theLoop.AddMessageFilter(&dlg);
+                dlg.ShowWindow(SW_SHOW);
+            }
+            else {
+                code = static_cast<HRESULT>(GetLastError());
+                bError = true;
+            }
+        }
+        if (bError && (ERROR_SUCCESS == code)) {                // если диалог содержит каcтомный контрол,
+            code = static_cast<HRESULT>(WSAGetLastError());     // класс которого НЕ зарегистрирован, ф-ция Create вернет NULL
+            if (ERROR_SUCCESS == code) {                        // а GetLastError вернет 0...
+                DWORD dwCode = ERROR_SUCCESS;                   // GetExitCodeThread хотя бы вернет значение, отличное от 0
                 BOOL  thrRes = GetExitCodeThread(GetCurrentThread(), &dwCode);
                 if (!thrRes) {
                     code = static_cast<HRESULT>(GetLastError());
@@ -30,17 +51,18 @@ static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
                 }
             }
         }
+    }
+    if (ERROR_SUCCESS != code) {
         ATL::CString codeMessage = Str::ErrorCode<TCHAR>::SystemMessage(code);
         ATL::CString  strMessage;
         strMessage.Format(_T("Не могу создать диалоговое окно.\r\n[%s]"), codeMessage.GetString());
         MessageBox(GetActiveWindow(), strMessage.GetString(), _T("FATAL"), MB_ICONSTOP);
         return static_cast<int>(code);
     }
-    theLoop.AddMessageFilter(&dlg);
-    dlg.ShowWindow(SW_SHOW);
-
-    nRet = theLoop.Run();
-    theLoop.RemoveMessageFilter(&dlg);
+    if (bRunLoop) {
+        nRet = theLoop.Run();
+        theLoop.RemoveMessageFilter(&dlg);
+    }
     _Module.RemoveMessageLoop();
     return nRet;
 }

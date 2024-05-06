@@ -1,16 +1,18 @@
 #pragma once
 
+#include "WTL/CColorPicker.h"
 #include "resource.h"
 #include <atlframe.h>
-#include <atldlgs.h>
 #include <atlcrack.h>
+#include <atldlgs.h>
+#include <atlddx.h>
 
-class CTatorMainDlg : public CIndirectDialogImpl<CTatorMainDlg>,
-                      public CDialogResize<CTatorMainDlg>,
-                      public CMessageFilter
+struct CTatorMainDlg: CIndirectDialogImpl<CTatorMainDlg>,
+                      CDialogResize<CTatorMainDlg>,
+                      CWinDataExchange<CTatorMainDlg>,
+                      CMessageFilter
     
 {
-public:
     enum Sizes: short
     {
         DIALOG_X = 0,
@@ -29,6 +31,8 @@ public:
         IDC_CUSTOM_CTL1,
     };
 
+    CColorPicker m_ccColorPicker;
+
     BOOL PreTranslateMessage(MSG* pMsg) override
     {
         if (IsDialogMessageW(pMsg)) {
@@ -36,6 +40,15 @@ public:
         }
         return FALSE;
     }
+
+    HRESULT Initialize()
+    {
+        return m_ccColorPicker.PreCreateClass();
+    }
+
+    BEGIN_DDX_MAP(CTatorMainDlg)
+        //DDX_CONTROL_HANDLE(IDC_CUSTOM_CTL1, m_ccColorPicker)
+    END_DDX_MAP()
 
     BEGIN_DIALOG(DIALOG_X, DIALOG_Y, DIALOG_CX, DIALOG_CY)
         DIALOG_CAPTION(_T("TATOR [XYZ]"))
@@ -68,6 +81,8 @@ public:
     {
         UNREFERENCED_PARAMETER(wndFocus);
         UNREFERENCED_PARAMETER(lInitParam);
+
+        ATLASSUME(m_ccColorPicker.m_hWnd != nullptr);
 
         CIcon icon(LoadIconW(ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
         SetIcon(icon, TRUE);

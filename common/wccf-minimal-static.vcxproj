@@ -68,6 +68,7 @@
     <ClInclude Include="string.utils.format.h" />
     <ClInclude Include="windows.uses.gdi+.h" />
     <ClInclude Include="windows.wtl.buffered.paint.h" />
+    <ClInclude Include="WTL\CColorPicker.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>wccf-minimal-static</ProjectName>
