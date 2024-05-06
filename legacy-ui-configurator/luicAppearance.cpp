@@ -131,6 +131,28 @@ void CPageAppearance::OnDestroy()
     CPageImpl::OnDestroy();
 }
 
+LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
+{
+    //if (IDC_APP_ITEM_SEL == idCtrl) {
+        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE NTFY: c:%4d n:%04x\n", idCtrl, pnmh->code);
+    //}
+    //switch (pnmh->code) {
+    ////case TCN_SELCHANGE: {
+    ////    int numba = TabCtrl_GetCurSel(pnmh->hwndFrom);
+    ////    PagesShow(numba, true);
+    ////    break;
+    ////}
+    ////case TCN_SELCHANGING: {
+    ////    int numba = TabCtrl_GetCurSel(pnmh->hwndFrom);
+    ////    PagesShow(numba, false);
+    ////    break;
+    ////}
+    //default:
+    //    break;
+    //}
+    return 0;
+}
+
 void CPageAppearance::ThemeEnable(BOOL bEnable)
 {
     m_stTheme.EnableWindow(bEnable);
@@ -239,7 +261,7 @@ void CPageAppearance::ItemColorSet(int nItem)
     ItemClr1Enable(FALSE);
     ItemClr2Enable(FALSE);
     FontClrEnable(FALSE);
-    auto const* pAssignment = GetElementAssignment(nItem);
+    auto const* pAssignment = CTheme::GetItemAssignment(nItem);
     if (!pAssignment) {
         return ;
     }
@@ -305,7 +327,7 @@ void CPageAppearance::FontSetSizes(LOGFONT const* pLogFont)
 
 void CPageAppearance::FontOnItemChaged(int nItem)
 {
-    auto const* pAssignment = GetElementAssignment(nItem);
+    auto const* pAssignment = CTheme::GetItemAssignment(nItem);
     const int         iFont = pAssignment ? pAssignment->font : TI_Invalid;
     if (iFont < 0) {
         FontEnable(FALSE);
@@ -331,7 +353,7 @@ void CPageAppearance::OnSelectTheme(int nThemeIndex)
 {
     auto const* pApp = CLUIApp::App();
     m_pTheme = &pApp->GetTheme(nThemeIndex);
-    m_stPreview.OnSelectTheme(m_pTheme);
+    m_stPreview.OnSelectTheme(m_pTheme, &m_cbItem);
     m_stPreview.EnableWindow(TRUE);
     m_cbTheme.SetCurSel(nThemeIndex);
     ThemeEnable(TRUE);

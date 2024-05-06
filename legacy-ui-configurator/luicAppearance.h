@@ -65,6 +65,7 @@ private:
     void InitResizeMap();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
+    LRESULT OnNotify(int idCtrl, LPNMHDR pnmh) override;
 
     void ThemeEnable(BOOL bEnable);
     void ItemEnable(BOOL bEnable);

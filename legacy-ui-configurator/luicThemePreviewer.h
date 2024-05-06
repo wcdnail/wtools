@@ -39,7 +39,7 @@ struct CThemePreviewer: ATL::CWindow,
     CThemePreviewer();
 
     void SubclassIt(HWND hWnd);
-    void OnSelectTheme(CTheme* pTheme);
+    void OnSelectTheme(CTheme* pTheme, WTL::CComboBox* pcbItem);
     void OnSelectItem(int nItem);
 
 private:
@@ -55,15 +55,17 @@ private:
     };
 
     CTheme*                 m_pTheme;
+    WTL::CComboBox*        m_pcbItem;
     GdipImageVec         m_Wallpaper;
-    SelectedPair      m_prSelected;
-    bool               m_bUserSelect;
+    SelectedPair        m_prSelected;
+    bool               m_bLBtnDown;
     WindowRects m_WndRect[WND_Count];
 
     HRESULT InitWallpapers();
     static void CalcRects(CRect const& rcClient, CRect& rcFront, CRect& rcBack, CRect& rcMsg, CRect& rcIcon);
     void DrawDesktop(CDCHandle dc, CRect const& rc);
     CRect GetSeletcedRect();
+    void SetSelectedRect(int wr, int ri);
     int OnCreate(LPCREATESTRUCT pCS);
     void OnPaint(CDCHandle dc);
     void OnLButton(UINT nFlags, CPoint point);

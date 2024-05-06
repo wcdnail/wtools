@@ -42,7 +42,7 @@ CThemePreviewer::CThemePreviewer()
     :          Super{}
     ,    m_Wallpaper{}
     , m_prSelected{-1, -1}
-    ,  m_bUserSelect{false}
+    ,  m_bLBtnDown{false}
 {
     HRESULT code;
     const ATOM atom = ATL::AtlModuleRegisterClassExW(nullptr, &GetWndClassInfo().m_wc);
@@ -69,7 +69,7 @@ CThemePreviewer::CThemePreviewer()
     ,       m_pTheme{nullptr}
     ,    m_Wallpaper{}
     , m_prSelected{-1, -1}
-    ,  m_bUserSelect{false}
+    ,  m_bLBtnDown{false}
 {
 }
 
@@ -84,9 +84,10 @@ void CThemePreviewer::SubclassIt(HWND hWnd)
     ModifyStyleEx(0, WS_EX_CLIENTEDGE);
 }
 
-void CThemePreviewer::OnSelectTheme(CTheme* pTheme)
+void CThemePreviewer::OnSelectTheme(CTheme* pTheme, WTL::CComboBox* pcbItem)
 {
     m_pTheme = pTheme;
+    m_pcbItem = pcbItem;
     InvalidateRect(nullptr, FALSE);
 }
 
@@ -346,10 +347,10 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
 
 CRect CThemePreviewer::GetSeletcedRect()
 {
-    if (!m_bUserSelect) {
+    if (!m_bLBtnDown) {
         return {};
     }
-    m_bUserSelect = false;
+    m_bLBtnDown = false;
     const int wi = m_prSelected.first;
     const int ri = m_prSelected.second;
     if (wi < 0 || wi > WND_Count - 1) {
@@ -361,38 +362,94 @@ CRect CThemePreviewer::GetSeletcedRect()
     return m_WndRect[wi][ri];
 }
 
+void CThemePreviewer::SetSelectedRect(int wr, int ri)
+{
+    m_prSelected = std::make_pair(wr, ri);
+    ::InvalidateRect(m_hWnd, nullptr, FALSE);
+    NotifyParent();
+}
+
 void CThemePreviewer::OnLButton(UINT nFlags, CPoint point)
 {
+    m_bLBtnDown = true;
     for (int j = 0; j < WND_Count; j++) {
         for (int i = 0; i < WR_Count; i++) {
             CRect const& rcExamine = m_WndRect[j][i];
             if (!rcExamine.IsRectEmpty() && rcExamine.PtInRect(point)) {
-                m_prSelected = std::make_pair(j, i);
-                m_bUserSelect = true;
-                ::InvalidateRect(m_hWnd, nullptr, FALSE);
-                NotifyParent();
+                SetSelectedRect(j, i);
                 return ;
             }
         }
     }
-    m_prSelected = std::make_pair(-1, -1);
-    ::InvalidateRect(m_hWnd, nullptr, FALSE);
+    SetSelectedRect(TI_Invalid, TI_Invalid);
 }
 
 int CThemePreviewer::RectIndexToElementId() const
 {
-    switch (m_prSelected.first) {
-    case WND_MsgBox: break;
-    case WND_Front: break;
-    case WND_Back: break;
+    static const int gs_nItemIndex[WND_Count][WR_Count] = {
+        {                  // WND_MsgBox ------------------
+        /* WR_Tooltip      */ EN_Tooltip,
+        /* WR_Button       */ EN_3DObject,
+        /* WR_Hyperlink    */ EN_Hyperlink,
+        /* WR_Message      */ EN_MsgBox,
+        /* WR_Scroll       */ EN_MsgBox,
+        /* WR_WinText      */ EN_MsgBox,
+        /* WR_Workspace    */ EN_MsgBox,
+        /* WR_MenuSelected */ EN_SelectedItem,
+        /* WR_MenuDisabled */ EN_DisabledItem,
+        /* WR_MenuItem     */ EN_FlatmenuBar,
+        /* WR_Menu         */ EN_Menu,
+        /* WR_Caption      */ EN_SMCaption,
+        /* WR_Frame        */ EN_PaddedBorder,
+        /* WR_Border       */ EN_PaddedBorder,
+        }, {               // WND_Front -------------------
+        /* WR_Tooltip      */ EN_Tooltip,
+        /* WR_Button       */ EN_3DObject,
+        /* WR_Hyperlink    */ EN_Hyperlink,
+        /* WR_Message      */ EN_MsgBox,
+        /* WR_Scroll       */ EN_Scrollbar,
+        /* WR_WinText      */ EN_Window,
+        /* WR_Workspace    */ EN_AppBackground,
+        /* WR_MenuSelected */ EN_SelectedItem,
+        /* WR_MenuDisabled */ EN_DisabledItem,
+        /* WR_MenuItem     */ EN_FlatmenuBar,
+        /* WR_Menu         */ EN_Menu,
+        /* WR_Caption      */ EN_ActiveCaption,
+        /* WR_Frame        */ EN_ActiveBorder,
+        /* WR_Border       */ EN_PaddedBorder,
+        }, {               // WND_Back --------------------
+        /* WR_Tooltip      */ EN_Tooltip,
+        /* WR_Button       */ EN_3DObject,
+        /* WR_Hyperlink    */ EN_Hyperlink,
+        /* WR_Message      */ EN_MsgBox,
+        /* WR_Scroll       */ EN_Scrollbar,
+        /* WR_WinText      */ EN_DisabledItem,
+        /* WR_Workspace    */ EN_DisabledItem,
+        /* WR_MenuSelected */ EN_InactiveCaption,
+        /* WR_MenuDisabled */ EN_DisabledItem,
+        /* WR_MenuItem     */ EN_FlatmenuBar,
+        /* WR_Menu         */ EN_Menu,
+        /* WR_Caption      */ EN_InactiveCaption,
+        /* WR_Frame        */ EN_InactiveBorder,
+        /* WR_Border       */ EN_PaddedBorder,
+        }
+    };
+    const int wi = m_prSelected.first;
+    const int ri = m_prSelected.second;
+    if (wi < 0 || wi > WND_Count - 1) {
+        return EN_Desktop;
     }
-    return CB_ERR;
+    if (ri < 0 || ri > WR_Count - 1) {
+        return EN_Desktop;
+    }
+    return gs_nItemIndex[wi][ri];
 }
 
 void CThemePreviewer::NotifyParent()
 {
-    int nElementId = RectIndexToElementId();
-    if (CB_ERR != nElementId) {
-        //::SendMessageW()
+    if (!m_pcbItem) {
+        return ;
     }
+    int nElementId = RectIndexToElementId();
+    m_pcbItem->SetCurSel(nElementId);
 }

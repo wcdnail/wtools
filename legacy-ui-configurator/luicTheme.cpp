@@ -29,11 +29,13 @@ static inline Res GetCurrentDPI()
 }
 }
 
-ElementAssignment const* GetElementAssignment(int dex)
+int CTheme::g_DPI = GetCurrentDPI<int>();
+
+PCItemAssign CTheme::GetItemAssignment(int dex)
 {
     // Assign the color and metric numbers to each element of the combo box
     //                              Name  Size 1                Size 2               Color 1                 Color 2                         Font            Fontcolor
-    static const ElementAssignment gsl_assignment[ELEMENT_Count] =
+    static const ItemAssignment gsl_assignment[EN_Count] =
     {
     /* 0*/ {                  L"Desktop", -1,                   -1,                  COLOR_DESKTOP,          -1,                             FONT_Desktop,   -1                          },
     /* 1*/ {   L"Application Background", -1,                   -1,                  COLOR_APPWORKSPACE,     -1,                             -1,             -1                          },
@@ -52,23 +54,15 @@ ElementAssignment const* GetElementAssignment(int dex)
     /*14*/ {            L"Disabled Item", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_GRAYTEXT              },
     /*15*/ {                  L"ToolTip", -1,                   -1,                  COLOR_INFOBK,           -1,                             FONT_Tooltip,   COLOR_INFOTEXT              },
     /*16*/ {              L"Message Box", -1,                   -1,                  -1,                     -1,                             FONT_Message,   COLOR_WINDOWTEXT            },
-#if WINVER >= WINVER_2K
     /*17*/ {                L"Hyperlink", -1,                   -1,                  -1,                     -1,                             -1,             COLOR_HOTLIGHT              },
-#endif
-#if WINVER >= WINVER_XP
     /*18*/ {          L"Menu Bar (Flat)", -1,                   -1,                  COLOR_MENUBAR,          COLOR_MENUHILIGHT,              -1,             -1                          },
-#endif
-#if WINVER >= WINVER_VISTA
     /*19*/ {     L"Window Padded Border", SIZE_PaddedBorder,    -1,                  -1,                     -1,                             -1,             -1                          },
-#endif
     };
-    if (dex < 0 || dex >= ELEMENT_Count) {
+    if (dex < 0 || dex >= EN_Count) {
         return nullptr;
     }
     return &gsl_assignment[dex];
 }
-
-int CTheme::g_DPI = GetCurrentDPI<int>();
 
 const SizeRange CTheme::g_DefaultSizeRange[SIZES_Count] =
 {
@@ -408,8 +402,8 @@ void CTheme::ElementsStaticInit(CPageAppearance& uiPage)
 {
     WTL::CComboBox& lbCtl = uiPage.m_cbItem;
     lbCtl.ResetContent();
-    for (int iElement = 0; iElement < ELEMENT_Count; iElement++) {
-        const auto* assignment = GetElementAssignment(iElement);
+    for (int iElement = 0; iElement < EN_Count; iElement++) {
+        const auto* assignment = GetItemAssignment(iElement);
         if (!assignment) {
             auto code = static_cast<HRESULT>(ERROR_ACCESS_DENIED);
             ReportError(

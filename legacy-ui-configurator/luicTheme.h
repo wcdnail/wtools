@@ -15,7 +15,7 @@ enum ThemeIndex : int
     TI_Current,
 };
 
-enum ELEMENT_NAME : int
+enum EItemIndex : int
 {
     EN_Desktop,
     EN_AppBackground,
@@ -34,24 +34,18 @@ enum ELEMENT_NAME : int
     EN_DisabledItem,
     EN_Tooltip,
     EN_MsgBox,
-#if WINVER >= WINVER_2K
     EN_Hyperlink,
-#endif
-#if WINVER >= WINVER_XP
     EN_FlatmenuBar,
-#endif
-#if WINVER >= WINVER_VISTA
     /**
       * Border of windows, including property sheets for some reason.
       * If SIZE_PADDEDBORDER is > 0, the windows with fixed borders affected also
       * include SIZE_BORDER
       */
     EN_PaddedBorder,
-#endif
-    ELEMENT_Count
+    EN_Count
 };
 
-enum SIZE_NAMES : int
+enum ESizeIndex : int
 {
     SIZE_Border,
     SIZE_ScrollWidth,
@@ -68,7 +62,7 @@ enum SIZE_NAMES : int
     SIZES_Count
 };
 
-struct ElementAssignment
+struct ItemAssignment
 {
     PCWSTR   name;
     int     size1;
@@ -79,6 +73,9 @@ struct ElementAssignment
     int fontColor;
 };
 
+using  PItemAssign = ItemAssignment*;
+using PCItemAssign = ItemAssignment const*;
+
 struct SizeRange
 {
     int     min;
@@ -86,13 +83,13 @@ struct SizeRange
     int current;
 };
 
-enum FONT_SIZES_CN : long
+enum EFontSizes : long
 {
     MIN_FONT_SIZE = 6,
     MAX_FONT_SIZE = 24,
 };
 
-enum FONT_NAMES : int
+enum EFontIndex : int
 {
     FONT_Caption,
     FONT_SMCaption,
@@ -106,7 +103,7 @@ enum FONT_NAMES : int
     FONTS_Count
 };
 
-enum COLOR_NAMES : int
+enum EColorIndex : int
 {
     CLR_Scrollbar = 0,          // 00 = COLOR_SCROLLBAR
     CLR_Background,             // 01 = COLOR_BACKGROUND
@@ -154,8 +151,6 @@ enum COLOR_NAMES : int
     CLR_Count
 };
 
-ElementAssignment const* GetElementAssignment(int dex);
-
 struct CTheme
 {
     static int g_DPI;
@@ -163,6 +158,7 @@ struct CTheme
     ~CTheme();
     CTheme(bool loadSystemTheme);
 
+    static PCItemAssign GetItemAssignment(int dex);
     static PCTSTR SizeName(int size);
     static PCTSTR FontName(int font);
     static PCTSTR ColorName(int color);
