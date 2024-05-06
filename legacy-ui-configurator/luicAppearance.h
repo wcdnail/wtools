@@ -65,7 +65,7 @@ private:
     void InitResizeMap();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
-    LRESULT OnNotify(int idCtrl, LPNMHDR pnmh) override;
+    void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
 
     void ThemeEnable(BOOL bEnable);
     void ItemEnable(BOOL bEnable);
@@ -76,7 +76,7 @@ private:
     void FontEnable(BOOL bEnable);
     void FontClrEnable(BOOL bEnable);
 
-    static void BtnFillColor(WTL::CButton& bnControl, HBRUSH hBrush, CBitmap& bmp);
+    void BtnFillColor(WTL::CButton& bnControl, int iColor, CBitmap& bmp) const;
     bool BtnSetColor(WTL::CButton& bnControl, int iColor, CBitmap& bmp) const;
     void ItemColorSet(int nItem);
     void SizeSet(int metric, int textControl, int udControl);
@@ -85,6 +85,6 @@ private:
     void FontSetSizes(LOGFONT const* lfFont);
     void FontOnItemChaged(int nItem);
 
-    void OnSelectTheme(int nThemeIndex);
-    void OnSelectItem(int nItem);
+    void OnThemeSelect(int nThemeIndex);
+    void OnItemSelect(int nItem);
 };

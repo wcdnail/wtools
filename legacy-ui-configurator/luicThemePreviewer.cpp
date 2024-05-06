@@ -451,5 +451,9 @@ void CThemePreviewer::NotifyParent()
         return ;
     }
     int nElementId = RectIndexToElementId();
-    m_pcbItem->SetCurSel(nElementId);
+    if (CB_ERR != m_pcbItem->SetCurSel(nElementId)) {
+        WORD   id = m_pcbItem->GetDlgCtrlID();
+        WORD code = CBN_SELENDOK;
+        ::SendMessageW(GetParent(), WM_COMMAND, MAKEWPARAM(id, code), reinterpret_cast<LPARAM>(m_pcbItem->m_hWnd));
+    }
 }

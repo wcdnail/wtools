@@ -74,6 +74,7 @@ private:
             OnResizeNotify();
             return TRUE;
         }
+        REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
 
     WTL::_AtlDlgResizeMap const* GetDlgResizeMap() const;

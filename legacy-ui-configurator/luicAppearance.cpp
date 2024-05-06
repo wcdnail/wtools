@@ -2,6 +2,7 @@
 #include "luicAppearance.h"
 #include "luicMain.h"
 #include "string.utils.format.h"
+#include "dev.assistance/dev.assist.h"
 #include "UT/debug.assistance.h"
 #include "resz/resource.h"
 
@@ -131,26 +132,20 @@ void CPageAppearance::OnDestroy()
     CPageImpl::OnDestroy();
 }
 
-LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
+void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
-    //if (IDC_APP_ITEM_SEL == idCtrl) {
-        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE NTFY: c:%4d n:%04x\n", idCtrl, pnmh->code);
-    //}
-    //switch (pnmh->code) {
-    ////case TCN_SELCHANGE: {
-    ////    int numba = TabCtrl_GetCurSel(pnmh->hwndFrom);
-    ////    PagesShow(numba, true);
-    ////    break;
-    ////}
-    ////case TCN_SELCHANGING: {
-    ////    int numba = TabCtrl_GetCurSel(pnmh->hwndFrom);
-    ////    PagesShow(numba, false);
-    ////    break;
-    ////}
-    //default:
-    //    break;
-    //}
-    return 0;
+    if (IDC_APP_ITEM_SEL == nID) {
+        switch (uNotifyCode) {
+        case CBN_SELCHANGE:
+            break;
+        case CBN_SELENDOK:
+            OnItemSelect(m_cbItem.GetCurSel());
+            break;
+        }
+    }
+    if (0) {
+        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+    }
 }
 
 void CPageAppearance::ThemeEnable(BOOL bEnable)
@@ -225,14 +220,14 @@ void CPageAppearance::FontClrEnable(BOOL bEnable)
     m_bnFontClr.EnableWindow(bEnable);
 }
 
-void CPageAppearance::BtnFillColor(WTL::CButton& bnControl, HBRUSH hBrush, CBitmap& bmp)
+void CPageAppearance::BtnFillColor(WTL::CButton& bnControl, int iColor, CBitmap& bmp) const
 {
     LONG          cx{0};
     LONG          cy{0};
     CRect      rcBtn{};
     CDC     dcCompat{};
     CBitmap bmCompat{};
-    CWindowDC     dc{bnControl.m_hWnd};
+    CWindowDC     dc{m_hWnd};
     bnControl.GetClientRect(rcBtn);
     cx = rcBtn.Width();
     cy = rcBtn.Height();
@@ -241,18 +236,17 @@ void CPageAppearance::BtnFillColor(WTL::CButton& bnControl, HBRUSH hBrush, CBitm
     bmCompat.CreateCompatibleBitmap(dcCompat, rcBtn.Width(), rcBtn.Height());
     bmp.Attach(bmCompat.Detach());
     HBITMAP bmPrev = dcCompat.SelectBitmap(bmp);
-    dcCompat.FillRect(rcBtn, hBrush);
+    dcCompat.FillSolidRect(rcBtn, m_pTheme->GetColor(iColor));
     dcCompat.SelectBitmap(bmPrev);
     bnControl.SetBitmap(bmp);
 }
 
 bool CPageAppearance::BtnSetColor(WTL::CButton& bnControl, int iColor, CBitmap& bmp) const
 {
-    HBRUSH hBrush = nullptr;
-    if (!m_pTheme || !(hBrush = m_pTheme->GetBrush(iColor))) {
+    if (!m_pTheme || iColor < 0) {
         return false;
     }
-    BtnFillColor(bnControl, hBrush, bmp);
+    BtnFillColor(bnControl, iColor, bmp);
     return true;
 }
 
@@ -349,7 +343,7 @@ void CPageAppearance::FontOnItemChaged(int nItem)
     //SelectFontSmoothing(lfFont);
 }
 
-void CPageAppearance::OnSelectTheme(int nThemeIndex)
+void CPageAppearance::OnThemeSelect(int nThemeIndex)
 {
     auto const* pApp = CLUIApp::App();
     m_pTheme = &pApp->GetTheme(nThemeIndex);
@@ -357,10 +351,10 @@ void CPageAppearance::OnSelectTheme(int nThemeIndex)
     m_stPreview.EnableWindow(TRUE);
     m_cbTheme.SetCurSel(nThemeIndex);
     ThemeEnable(TRUE);
-    OnSelectItem(EN_Desktop);
+    OnItemSelect(EN_Desktop);
 }
 
-void CPageAppearance::OnSelectItem(int nItem)
+void CPageAppearance::OnItemSelect(int nItem)
 {
     m_stPreview.OnSelectItem(nItem);
     m_cbItem.SetCurSel(nItem);

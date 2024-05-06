@@ -456,5 +456,5 @@ void CTheme::PerformStaticInit(CPageAppearance& uiPage, CLUIApp const* pApp)
     ThemesStaticInit(uiPage, theme);
     ElementsStaticInit(uiPage);
     FontsStaticInit(uiPage, pApp->GetFontMap());
-    uiPage.OnSelectTheme(theme.m_nIndex);
+    uiPage.OnThemeSelect(theme.m_nIndex);
 }
