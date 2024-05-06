@@ -202,6 +202,7 @@ private:
 
     static void ThemesStaticInit(CPageAppearance& uiPage, CTheme& initialTheme);
     static void ElementsStaticInit(CPageAppearance& uiPage);
+    static void FontsSizeStaticInit(CPageAppearance& uiPage);
     static void FontsButtonsStaticInit(CPageAppearance& uiPage);
     static void FontsSmoothStaticInit(CPageAppearance& uiPage);
     static void FontsStaticInit(CPageAppearance& uiPage, FontMap const&);

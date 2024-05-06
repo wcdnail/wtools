@@ -15,83 +15,7 @@ CPageAppearance::CPageAppearance(std::wstring&& caption)
     : CPageImpl{ IDD_PAGE_APPEARANCE, std::move(caption) }
     , m_stPreview{}
 {
-#if 0
-    memset(m_bmColor, CB_ERR, sizeof(m_bmColor));
-    m_bmColor[BTN_ItemColor1] = COLOR_BTNFACE;
-    m_bmColor[BTN_ItemColor2] = COLOR_BTNSHADOW;
-    m_bmColor[BTN_FontColor1] = COLOR_WINDOW;
-#ifdef _DEBUG
-    for (auto const& it: m_bmColor) {
-        ATLASSUME(it != CB_ERR);
-    }
-#endif
-#endif
 }
-
-#if 0
-BOOL CPageAppearance::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
-{
-    MSG_WM_DRAWITEM(OnDrawItem)
-    return CPageImpl::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
-}
-
-bool CPageAppearance::BtnSetColor(int nBtn, int iColor)
-{
-    if ((nBtn < 0) || (nBtn > BTN_ColorCount) || (iColor < 0)) {
-        return false;
-    }
-    m_bmColor[nBtn] = iColor;
-    return true;
-}
-
-void CPageAppearance::BtnColorFill(WTL::CButton const& bnControl, CDCHandle dc, CRect const& rcItem, int iColor)
-{
-    if (!m_pTheme) {
-        return ;
-    }
-    CRect rcClr{rcItem};
-    rcClr.DeflateRect(rcItem.Width()/6, rcItem.Height()/4);
-    if (bnControl.IsWindowEnabled()) {
-        dc.FillSolidRect(rcClr, m_pTheme->GetColor(m_bmColor[iColor]));
-    }
-    else {
-        dc.FillSolidRect(rcClr, m_pTheme->GetColor(COLOR_BTNFACE));
-    }
-}
-
-void CPageAppearance::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT pDI)
-{
-    CDCHandle    dc{pDI->hDC};
-    CRect    rcItem{pDI->rcItem};
-    UINT   nCtlType{CDrawRoutine::GetDrawItemFrameType(pDI->CtlType)};
-    UINT  nCtlState{CDrawRoutine::ConvDrawItemState(pDI->itemState)};
-    if (m_pTheme) {
-        CRect         rcFrame{rcItem};
-        CDrawRoutine drawings{*m_pTheme};
-        drawings.DrawFrameControl(dc, rcFrame, nCtlType, nCtlState);
-    }
-    else {
-        dc.DrawFrameControl(rcItem, nCtlType, nCtlState);
-    }
-    switch (pDI->CtlType) {
-    case ODT_BUTTON:{
-        switch (nIDCtl) {
-        case IDC_APP_ITEM_COLOR1_SEL: BtnColorFill(m_bnItemClr1, dc, rcItem, BTN_ItemColor1);
-        case IDC_APP_ITEM_COLOR2_SEL: BtnColorFill(m_bnItemClr2, dc, rcItem, BTN_ItemColor2);
-        case IDC_APP_FONT_COLOR_SEL:  BtnColorFill(m_bnFontClr1, dc, rcItem, BTN_FontColor1);
-        }
-        break;
-    }
-    default:
-        break;
-    }
-    if ((pDI->itemAction & ODA_FOCUS) || (pDI->itemAction & ODA_SELECT)) {
-        CRect rcFocus = rcItem;
-        rcFocus.DeflateRect(2, 2);
-        dc.DrawFocusRect(rcFocus);
-    }
-}
-#endif
 
 void CPageAppearance::InitResizeMap()
 {
@@ -139,6 +63,61 @@ void CPageAppearance::InitResizeMap()
         { IDC_APP_PREVIEW,                  DLSZ_SIZE_X | DLSZ_SIZE_Y },
     };
     DlgResizeAdd(ctrlResizeMap, std::size(ctrlResizeMap));
+}
+
+static inline void CtlAdjustHeight(ATL::CWindow& control, int nHeight)
+{
+    CRect rc;
+    control.GetWindowRect(rc);
+    control.SetWindowPos(nullptr, 0, 0, rc.right - rc.left, nHeight,
+        SWP_NOMOVE |
+        SWP_NOZORDER | SWP_NOREDRAW | SWP_NOACTIVATE | SWP_NOCOPYBITS |
+        SWP_NOOWNERZORDER
+    );
+}
+
+static inline void CtlAdjustHeightAndShift(ATL::CWindow& control, int x, int y, int nHeight)
+{
+    CRect rc;
+    control.GetWindowRect(rc);
+    OffsetRect(rc, x, y);
+    control.SetWindowPos(nullptr, rc.left, rc.top - 1, rc.right - rc.left, nHeight + 2,
+        SWP_NOZORDER | SWP_NOREDRAW | SWP_NOACTIVATE | SWP_NOCOPYBITS |
+        SWP_NOOWNERZORDER
+    );
+}
+
+void CPageAppearance::CtlAdjustPositions()
+{
+    CRect rcItemCb;
+    m_cbItem.GetWindowRect(rcItemCb);
+    const int nHeight = rcItemCb.Height();
+
+    CRect rcDialog;
+    GetWindowRect(rcDialog);
+    int xOffset = -rcDialog.left;
+    int yOffset = -rcDialog.top;
+
+    CtlAdjustHeightAndShift(m_bnThemeImport, xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnThemeSave, xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnThemeRename, xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnThemeDelete, xOffset, yOffset, nHeight);
+
+    CtlAdjustHeightAndShift(m_bnItemClr1, xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnItemClr2, xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnFontClr1, xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnFontBold, xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnFontItalic, xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnFontUndrln, xOffset, yOffset, nHeight);
+
+    CtlAdjustHeight(m_edItemSize1, nHeight);
+    CtlAdjustHeight(m_udItemSize1, nHeight);
+    CtlAdjustHeight(m_edItemSize2, nHeight);
+    CtlAdjustHeight(m_udItemSize2, nHeight);
+    CtlAdjustHeight(m_edFontWidth, nHeight);
+    CtlAdjustHeight(m_udFontWidth, nHeight);
+    CtlAdjustHeight(m_edFontAngle, nHeight);
+    CtlAdjustHeight(m_udFontAngle, nHeight);
 }
 
 BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
@@ -201,9 +180,7 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_bnItemClr2.ModifyStyle(0, BS_BITMAP | BS_PUSHBUTTON);
     m_bnFontClr1.ModifyStyle(0, BS_BITMAP | BS_PUSHBUTTON);
 
-    m_cbThemeSize.AddString(L"Normal");
-    m_cbThemeSize.SetCurSel(0);
-
+    CtlAdjustPositions();
     CTheme::PerformStaticInit(*this, pApp);
     InitResizeMap();
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
@@ -240,7 +217,7 @@ void CPageAppearance::ThemeEnable(BOOL bEnable)
     m_bnThemeImport.EnableWindow(bEnable);
     m_bnThemeSave.EnableWindow(bEnable);
     m_bnThemeRename.EnableWindow(bEnable);
-    m_bnThemeDelete.EnableWindow(bEnable); /// DELETE button!
+    //m_bnThemeDelete.EnableWindow(bEnable); /// DELETE button!
 }
 
 void CPageAppearance::ItemEnable(BOOL bEnable)
@@ -310,7 +287,7 @@ void CPageAppearance::BtnColorFill(WTL::CButton& bnControl, int nBtn, int iColor
     {
         CDrawRoutine   draw{*m_pTheme};
         COLORREF     nColor{m_pTheme->GetColor(iColor)};
-        HBRUSH    hbrBorder{m_pTheme->GetBrush(COLOR_BTNSHADOW)};
+        HBRUSH    hbrBorder{AtlGetStockBrush(BLACK_BRUSH)};
         WTL::CWindowDC   dc{m_hWnd};
         WTL::CDC     dcTemp{};
         WTL::CBitmap bmTemp{};
@@ -364,17 +341,18 @@ void CPageAppearance::ItemColorSet(int nItem)
     }
 }
 
-void CPageAppearance::ItemSizeSet(int metric, int nSizeCtlID, WTL::CUpDownCtrl& udSize)
+BOOL CPageAppearance::ItemSizeSet(int metric, int nSizeCtlID, WTL::CUpDownCtrl& udSize)
 {
     if (metric < 0 || !m_pTheme) {
         SetDlgItemTextW(nSizeCtlID, L"");
-        return;
+        return FALSE;
     }
     if (auto const* pSizeRange = m_pTheme->GetSizeRange(metric)) {
         udSize.SetRange(pSizeRange->min, pSizeRange->max);
     }
     int nSize = CTheme::GetNcMetricSize(&m_pTheme->GetNcMetrcs(), metric);
     SetDlgItemInt(nSizeCtlID, nSize, FALSE);
+    return TRUE;
 }
 
 void CPageAppearance::FontSetFamily(LOGFONT const* pLogFont)
@@ -428,11 +406,13 @@ void CPageAppearance::FontOnItemChaged(int nItem)
         FontEnable(FALSE);
         return;
     }
+    
     FontEnable(TRUE);
     FontSetFamily(pLogFont);
     FontSetSizes(pLogFont);
-    //SetDlgItemInt(g_hDlg, IDC_CLASSIC_FONTWIDTH_E, FontLogToPt(pLogFont->lfWidth), FALSE);
-    //SetDlgItemInt(g_hDlg, IDC_CLASSIC_FONTANGLE_E, pLogFont->lfEscapement / 10, FALSE);
+    ItemSizeSet(iFont, IDC_APP_FONT_WDTH_EDIT, m_udFontWidth);
+    //SetDlgItemInt(IDC_APP_FONT_WDTH_EDIT, FontLogToPt<int>(pLogFont->lfWidth), FALSE);
+    SetDlgItemInt(IDC_APP_FONT_STYLE_ANGLE_EDIT, pLogFont->lfEscapement / 10, FALSE);
 
     m_bnFontBold.SetCheck(pLogFont->lfWeight >= FW_BOLD);
     m_bnFontItalic.SetCheck(pLogFont->lfItalic);
@@ -441,28 +421,33 @@ void CPageAppearance::FontOnItemChaged(int nItem)
     ComboSetCurSelByData(m_cbFontSmooth, (DWORD_PTR)pLogFont->lfQuality);
 }
 
-void CPageAppearance::OnThemeSelect(int nThemeIndex)
-{
-    auto const* pApp = CLUIApp::App();
-    m_pTheme = &pApp->GetTheme(nThemeIndex);
-    m_stPreview.OnSelectTheme(m_pTheme, &m_cbItem);
-    m_stPreview.EnableWindow(TRUE);
-    m_cbTheme.SetCurSel(nThemeIndex);
-    ThemeEnable(TRUE);
-    OnItemSelect(EN_Desktop);
-}
-
 void CPageAppearance::OnItemSelect(int nItem)
 {
     m_stPreview.OnSelectItem(nItem);
     m_cbItem.SetCurSel(nItem);
     ItemEnable(TRUE);
-    FontOnItemChaged(nItem);
     ItemColorSet(nItem);
-
+    ItemSize1Enable(FALSE);
+    ItemSize2Enable(FALSE);
     if (auto const* pAssignment = CTheme::GetItemAssignment(nItem)) {
-        ItemSizeSet(pAssignment->size1, IDC_APP_ITEM_SIZE1_EDIT, m_udItemSize1);
-        ItemSizeSet(pAssignment->size2, IDC_APP_ITEM_SIZE2_EDIT, m_udItemSize2);
-        ItemSizeSet(pAssignment->font, IDC_APP_FONT_WDTH_EDIT, m_udFontWidth);
+        BOOL bEnable = ItemSizeSet(pAssignment->size1, IDC_APP_ITEM_SIZE1_EDIT, m_udItemSize1);
+        ItemSize1Enable(bEnable);
+        bEnable = ItemSizeSet(pAssignment->size2, IDC_APP_ITEM_SIZE2_EDIT, m_udItemSize2);
+        ItemSize2Enable(bEnable);
     }
+    FontOnItemChaged(nItem);
+}
+
+void CPageAppearance::OnThemeSelect(int nThemeIndex)
+{
+    auto const* pApp = CLUIApp::App();
+    m_pTheme = &pApp->GetTheme(nThemeIndex);
+    ATLASSERT(m_pTheme != nullptr);
+    m_stPreview.OnSelectTheme(m_pTheme, &m_cbItem);
+    m_stPreview.EnableWindow(TRUE);
+    m_cbTheme.SetCurSel(nThemeIndex);
+    ThemeEnable(TRUE);
+    OnItemSelect(EN_Desktop);
+    m_bcGradientCapts.SetCheck(m_pTheme->IsGradientCaptions() ? TRUE : FALSE);
+    m_bcFlatMenus.SetCheck(m_pTheme->IsFlatMenus() ? TRUE : FALSE);
 }

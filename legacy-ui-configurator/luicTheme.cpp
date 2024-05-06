@@ -94,9 +94,9 @@ CTheme::CTheme(bool loadSystemTheme)
 {
     ZeroMemory(&m_ncMetrics, sizeof(m_ncMetrics));
     ZeroMemory(&m_Color, sizeof(m_Color));
-
-    CopyMemory(&m_SizeRange, &g_DefaultSizeRange, sizeof(m_SizeRange));
-
+    for (int i = 0; i < SIZES_Count; i++) {
+        m_SizeRange[i] = g_DefaultSizeRange[i];
+    }
     if (loadSystemTheme) {
         LoadSysTheme();
     }
@@ -291,17 +291,16 @@ bool CTheme::LoadSysNcMetrics()
 
     ZeroMemory(&ncMetrics, sizeof(ncMetrics));
     ncMetrics.cbSize = sizeof(NONCLIENTMETRICS);
-
-    BOOL ret = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncMetrics, 0);
+    const BOOL ret = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncMetrics, 0);
     if (!ret) {
         return false;
     }
+    CopyMemory(&m_ncMetrics, &ncMetrics, sizeof(ncMetrics));
+    ATLASSUME(memcmp(&m_ncMetrics, &ncMetrics, sizeof(ncMetrics)) == 0);
     SizeRange sizeRanges[SIZES_Count] = { 0 };
     for (int iSize = 0; iSize < SIZES_Count; iSize++) {
-        sizeRanges[iSize].current = GetNcMetricSize(&ncMetrics, iSize);
+        m_SizeRange[iSize].current = GetNcMetricSize(&ncMetrics, iSize);
     }
-    CopyMemory(&m_ncMetrics, &ncMetrics, sizeof(ncMetrics));
-    CopyMemory(&m_SizeRange, &sizeRanges, sizeof(sizeRanges));
     RefreshFonts();
     return true;
 }
@@ -404,6 +403,9 @@ void CTheme::ThemesStaticInit(CPageAppearance& uiPage, CTheme& initialTheme)
     }
     initialTheme.m_nIndex = item;
     lbCtl.SetItemData(item, static_cast<DWORD_PTR>(item));
+
+    uiPage.m_cbThemeSize.AddString(L"Normal");
+    uiPage.m_cbThemeSize.SetCurSel(0);
 }
 
 void CTheme::ElementsStaticInit(CPageAppearance& uiPage)
@@ -434,6 +436,26 @@ void CTheme::ElementsStaticInit(CPageAppearance& uiPage)
             lbCtl.SetCurSel(iElement);
         }
     }
+}
+
+void CTheme::FontsSizeStaticInit(CPageAppearance& uiPage)
+{
+    WTL::CComboBox& lbCtl = uiPage.m_cbFontSize;
+    lbCtl.ResetContent();
+    for (int size = MIN_FONT_SIZE; size <= MAX_FONT_SIZE; size++) {
+        auto str = std::to_wstring(size);
+        int item = lbCtl.AddString(str.c_str());
+        if (item < 0) {
+            auto code = static_cast<HRESULT>(GetLastError());
+            ReportError(
+                Str::ElipsisW::Format(L"Append listbox [w:%08x] item '%s' failed!", 
+                    lbCtl.m_hWnd, str.c_str()
+                ), code);
+            continue;
+        }
+        lbCtl.SetItemData(item, static_cast<DWORD_PTR>(size));
+    }
+    lbCtl.SetCurSel(0);
 }
 
 void CTheme::FontsButtonsStaticInit(CPageAppearance& uiPage)
@@ -514,8 +536,11 @@ void CTheme::FontsStaticInit(CPageAppearance& uiPage, FontMap const& mapFont)
         }
     }
     lbCtl.SetCurSel(0);
+    FontsSizeStaticInit(uiPage);
     FontsSmoothStaticInit(uiPage);
     FontsButtonsStaticInit(uiPage);
+    uiPage.m_udFontWidth.SetRange32(0, 24);
+    uiPage.m_udFontAngle.SetRange32(0, 359);
 }
 
 void CTheme::PerformStaticInit(CPageAppearance& uiPage, CLUIApp const* pApp)

@@ -78,6 +78,7 @@ private:
 #endif
 
     void InitResizeMap();
+    void CtlAdjustPositions();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
@@ -94,7 +95,7 @@ private:
     void BtnColorFill(WTL::CButton& bnControl, int nBtn, int iColor);
     bool BtnSetColor(WTL::CButton& bnControl, int nBtn, int iColor);
     void ItemColorSet(int nItem);
-    void ItemSizeSet(int metric, int nSizeCtlID, WTL::CUpDownCtrl& udSize);
+    BOOL ItemSizeSet(int metric, int nSizeCtlID, WTL::CUpDownCtrl& udSize);
 
     void FontSetFamily(LOGFONT const* pLogFont);
     void FontSetSizes(LOGFONT const* lfFont);
