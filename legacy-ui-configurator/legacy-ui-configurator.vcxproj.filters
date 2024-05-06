@@ -178,6 +178,12 @@
     <Image Include="resz\rom-my-comp.ico">
       <Filter>resz\iconz</Filter>
     </Image>
+    <Image Include="bom-font-bold.ico">
+      <Filter>resz</Filter>
+    </Image>
+    <Image Include="resz\bom-font-bold.ico">
+      <Filter>resz</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="idl\legacy-ui-configurator.idl">

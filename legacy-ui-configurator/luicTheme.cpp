@@ -428,6 +428,64 @@ void CTheme::ElementsStaticInit(CPageAppearance& uiPage)
     }
 }
 
+void CTheme::FontsButtonsStaticInit(CPageAppearance& uiPage)
+{
+    static CFont gs_fntBold;
+    static CFont gs_fntItalic;
+    static CFont gs_fntUnderline;
+
+    if (!gs_fntBold.m_hFont) {
+        HFONT hFont = uiPage.m_bnFontBold.GetFont();
+        LOGFONTW lf;
+        GetObjectW(hFont, sizeof(lf), &lf);
+        lf.lfWeight = FW_BOLD;
+        lf.lfItalic = FALSE;
+        lf.lfUnderline = FALSE;
+        gs_fntBold.CreateFontIndirectW(&lf);
+        lf.lfWeight = FW_NORMAL;
+        lf.lfItalic = TRUE;
+        gs_fntItalic.CreateFontIndirectW(&lf);
+        lf.lfItalic = FALSE;
+        lf.lfUnderline = TRUE;
+        gs_fntUnderline.CreateFontIndirectW(&lf);
+    }
+
+    uiPage.m_bnFontBold.SetFont(gs_fntBold);
+    uiPage.m_bnFontItalic.SetFont(gs_fntItalic);
+    uiPage.m_bnFontUndrln.SetFont(gs_fntUnderline);
+}
+
+void CTheme::FontsSmoothStaticInit(CPageAppearance& uiPage)
+{
+    struct FontSmoothDef
+    {
+        PCWSTR szName;
+        int     nType;
+    };
+    static const FontSmoothDef fsdData[] = {
+        { L"Default", DEFAULT_QUALITY }, 
+        { L"Disabled", NONANTIALIASED_QUALITY }, 
+        { L"ClearType", CLEARTYPE_QUALITY }, 
+        { L"Natural ClearType", CLEARTYPE_NATURAL_QUALITY }, 
+    };
+
+    WTL::CComboBox& lbCtl = uiPage.m_cbFontSmooth;
+    lbCtl.ResetContent();
+    for (auto const& it: fsdData) {
+        int item = lbCtl.AddString(it.szName);
+        if (item < 0) {
+            auto code = static_cast<HRESULT>(GetLastError());
+            ReportError(
+                Str::ElipsisW::Format(L"Append listbox [w:%08x] item '%s' failed!", 
+                    lbCtl.m_hWnd, it.szName
+                ), code);
+            continue;
+        }
+        lbCtl.SetItemData(item, it.nType);
+    }
+    lbCtl.SetCurSel(0);
+}
+
 void CTheme::FontsStaticInit(CPageAppearance& uiPage, FontMap const& mapFont)
 {
     WTL::CComboBox& lbCtl = uiPage.m_cbFont;
@@ -448,6 +506,8 @@ void CTheme::FontsStaticInit(CPageAppearance& uiPage, FontMap const& mapFont)
         }
     }
     lbCtl.SetCurSel(0);
+    FontsSmoothStaticInit(uiPage);
+    FontsButtonsStaticInit(uiPage);
 }
 
 void CTheme::PerformStaticInit(CPageAppearance& uiPage, CLUIApp const* pApp)

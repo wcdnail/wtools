@@ -216,6 +216,7 @@ HRESULT CLUIApp::ImListCreate(int index, int cx, int cy)
         IDI_EDIT_NAME,
         IDI_HATCH_CROSS,
         IDI_FOLDER_OPEN,
+        IDI_FNT_BOLD,
     };
     HRESULT code = S_FALSE;
     m_ImList[index].Create(cx, cy, ILC_MASK | ILC_COLOR32, _countof(iconsIDs), 0);

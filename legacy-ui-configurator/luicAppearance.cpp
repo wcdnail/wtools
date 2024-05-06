@@ -429,12 +429,14 @@ void CPageAppearance::FontOnItemChaged(int nItem)
     FontEnable(TRUE);
     FontSetFamily(pLogFont);
     FontSetSizes(pLogFont);
-    //SetDlgItemInt(g_hDlg, IDC_CLASSIC_FONTWIDTH_E, FontLogToPt(plfFont->lfWidth), FALSE);
-    //SetDlgItemInt(g_hDlg, IDC_CLASSIC_FONTANGLE_E, plfFont->lfEscapement / 10, FALSE);
-    //SendDlgItemMessage(g_hDlg, IDC_CLASSIC_FONTBOLD, BM_SETCHECK, (WPARAM)(plfFont->lfWeight >= FW_BOLD), 0L);
-    //SendDlgItemMessage(g_hDlg, IDC_CLASSIC_FONTITALIC, BM_SETCHECK, (WPARAM)plfFont->lfItalic, 0L);
-    //SendDlgItemMessage(g_hDlg, IDC_CLASSIC_FONTUNDERLINE, BM_SETCHECK, (WPARAM)plfFont->lfUnderline, 0L);
-    //SelectFontSmoothing(lfFont);
+    //SetDlgItemInt(g_hDlg, IDC_CLASSIC_FONTWIDTH_E, FontLogToPt(pLogFont->lfWidth), FALSE);
+    //SetDlgItemInt(g_hDlg, IDC_CLASSIC_FONTANGLE_E, pLogFont->lfEscapement / 10, FALSE);
+
+    m_bnFontBold.SetCheck(pLogFont->lfWeight >= FW_BOLD);
+    m_bnFontItalic.SetCheck(pLogFont->lfItalic);
+    m_bnFontUndrln.SetCheck(pLogFont->lfUnderline);
+
+    ComboSetCurSelByData(m_cbFontSmooth, (DWORD_PTR)pLogFont->lfQuality);
 }
 
 void CPageAppearance::OnThemeSelect(int nThemeIndex)

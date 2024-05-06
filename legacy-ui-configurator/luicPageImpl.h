@@ -38,6 +38,7 @@ protected:
 
     CPageImpl(UINT idd, std::wstring&& caption, CTheme* pTheme = nullptr);
 
+    static bool ComboSetCurSelByData(WTL::CComboBox& cbControl, DWORD_PTR nData);
     static bool CtlDisable(HWND hWndCtl);
     static BOOL DoForEachImpl(HWND hWndCtl, ForeachFn const& routine);
     void DoForEach(ForeachFn const& routine);

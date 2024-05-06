@@ -18,6 +18,18 @@ CPageImpl::CPageImpl(UINT idd, std::wstring&& caption, CTheme* pTheme /*= nullpt
 {
 }
 
+bool CPageImpl::ComboSetCurSelByData(WTL::CComboBox& cbControl, DWORD_PTR nData)
+{
+    int nCount = cbControl.GetCount();
+    for (int n = 0; n < nCount; n++) {
+        if (nData == cbControl.GetItemData(n)) {
+            cbControl.SetCurSel(n);
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CPageImpl::CtlDisable(HWND hWndCtl)
 {
     ::EnableWindow(hWndCtl, FALSE);

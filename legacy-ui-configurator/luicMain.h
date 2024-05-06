@@ -31,6 +31,7 @@ enum IconIndex : int
     IconEditField,
     IconHatchCross,
     IconFolderOpen,
+    IconFontBold,
     IconCount
 };
 

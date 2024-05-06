@@ -329,6 +329,8 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="bom-font-bold.ico" />
+    <Image Include="resz\bom-font-bold.ico" />
     <Image Include="resz\rom-0.ico" />
     <Image Include="resz\rom-1.ico" />
     <Image Include="resz\rom-2.ico" />
