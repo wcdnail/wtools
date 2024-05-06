@@ -6,6 +6,7 @@
 #include "dev.assistance/dev.assist.h"
 #include "UT/debug.assistance.h"
 #include "resz/resource.h"
+#include <atldlgs.h>
 
 CPageAppearance::~CPageAppearance()
 {
@@ -193,16 +194,28 @@ void CPageAppearance::OnDestroy()
 
 void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
-    if (IDC_APP_ITEM_SEL == nID) {
+    switch (nID) {
+    case IDC_APP_ITEM_SEL:{
         switch (uNotifyCode) {
-        case CBN_SELCHANGE:
-            break;
         case CBN_SELENDOK:
             OnItemSelect(m_cbItem.GetCurSel());
             break;
         }
+        return ;
     }
-    if (0) {
+    case IDC_APP_ITEM_COLOR1_SEL: 
+    case IDC_APP_ITEM_COLOR2_SEL:
+    case IDC_APP_FONT_COLOR_SEL: {
+        if (BN_CLICKED == uNotifyCode) {
+            WTL::CColorDialog dlgColorPicker;
+            dlgColorPicker.DoModal(m_hWnd);
+        }
+        return ;
+    }
+    default:
+        break;
+    }
+    if constexpr (true) {
         DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
             nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
     }
@@ -261,8 +274,6 @@ void CPageAppearance::FontEnable(BOOL bEnable)
     m_stFontWidth.EnableWindow(bEnable);
     m_edFontWidth.EnableWindow(bEnable);
     m_udFontWidth.EnableWindow(bEnable);
-    m_stFontClr.EnableWindow(bEnable);
-    m_bnFontClr1.EnableWindow(bEnable);
     m_stFontStyle.EnableWindow(bEnable);
     m_bnFontBold.EnableWindow(bEnable);
     m_bnFontItalic.EnableWindow(bEnable);

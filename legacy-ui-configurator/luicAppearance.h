@@ -70,13 +70,6 @@ private:
 
     WTL::CBitmap m_bmColor[BTN_ColorCount];
 
-#if 0
-    int m_bmColor[BTN_ColorCount];
-    BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
-    void BtnColorFill(WTL::CButton const& bnControl, CDCHandle dc, CRect const& rcItem, int iColor);
-    void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT pDI);
-#endif
-
     void InitResizeMap();
     void CtlAdjustPositions();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
@@ -101,6 +94,6 @@ private:
     void FontSetSizes(LOGFONT const* lfFont);
     void FontOnItemChaged(int nItem);
 
-    void OnThemeSelect(int nThemeIndex);
     void OnItemSelect(int nItem);
+    void OnThemeSelect(int nThemeIndex);
 };
