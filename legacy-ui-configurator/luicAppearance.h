@@ -67,8 +67,8 @@ private:
         BTN_FontColor1,
         BTN_ColorCount
     };
+
     WTL::CBitmap m_bmColor[BTN_ColorCount];
-    WTL::CDC     m_dcColor[BTN_ColorCount];
 
 #if 0
     int m_bmColor[BTN_ColorCount];
