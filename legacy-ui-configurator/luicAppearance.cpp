@@ -277,7 +277,7 @@ bool CPageAppearance::BtnSetColor(int nButton, int iColor)
     }
     const COLORREF clrToSet = m_pTheme->GetColor(iColor);
     m_bnItemColor[nButton].SetDefaultColor(clrToSet);
-    m_bnItemColor[nButton].SetDefaultText(Str::ElipsisW::Format(L"Revert to: %06X", clrToSet));
+    m_bnItemColor[nButton].SetDefaultText(Str::ElipsisW::Format(L"Revert #%06X", clrToSet));
     m_bnItemColor[nButton].SetColor(clrToSet);
     return true;
 }

@@ -727,7 +727,7 @@ LRESULT CColorButton::OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
     if ((uState & ODS_DISABLED) == 0) {
         dc.SetBkColor((m_clrCurrent == CLR_DEFAULT) ? m_clrDefault : m_clrCurrent);
         dc.ExtTextOut(0, 0, ETO_OPAQUE, &rcDraw, nullptr, 0, nullptr);
-        dc.FrameRect(&rcDraw, (HBRUSH)::GetStockObject(BLACK_BRUSH));
+        dc.FrameRect(&rcDraw, static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH)));
     }
     return 1;
 }
@@ -1295,38 +1295,31 @@ void CColorButton::CPickerImpl::CreatePickerToolTips(CToolTipCtrl& sToolTip)
 //      @flag FALSE | If the index is not valid
 //
 //-----------------------------------------------------------------------------
-
 BOOL CColorButton::CPickerImpl::GetPickerCellRect(int nIndex, RECT* pRect) const
 {
     //
     // If the custom box
     //
-
     if (nIndex == CUSTOM_BOX_VALUE) {
         *pRect = m_rectCustomText;
         return TRUE;
     }
-
     //
     // If the default box
     //
-
     else if (nIndex == DEFAULT_BOX_VALUE) {
         *pRect = m_rectDefaultText;
         return TRUE;
     }
-
     //
     // Validate the range
     //
-
-    if (nIndex < 0 || nIndex >= m_nNumColors)
+    if (nIndex < 0 || nIndex >= m_nNumColors) {
         return FALSE;
-
+    }
     //
     // Compute the value of the boxes
     //
-
     pRect->left = (nIndex % m_nNumColumns) * m_sizeBox.cx + m_rectBoxes.left;
     pRect->top = (nIndex / m_nNumColumns) * m_sizeBox.cy + m_rectBoxes.top;
     pRect->right = pRect->left + m_sizeBox.cx;
@@ -1343,7 +1336,6 @@ BOOL CColorButton::CPickerImpl::GetPickerCellRect(int nIndex, RECT* pRect) const
 // @rdesc None
 //
 //-----------------------------------------------------------------------------
-
 void CColorButton::CPickerImpl::FindPickerCellFromColor(COLORREF clr)
 {
     if (clr == CLR_DEFAULT && m_rMaster.HasDefaultText()) {
@@ -1373,7 +1365,6 @@ void CColorButton::CPickerImpl::FindPickerCellFromColor(COLORREF clr)
 // @rdesc None
 //
 //-----------------------------------------------------------------------------
-
 void CColorButton::CPickerImpl::OnMouseHover(int nIndex)
 {
     CClientDC dc(m_wndPicker);
@@ -1576,20 +1567,17 @@ void CColorButton::CPickerImpl::DrawPickerCell(CDC& dc, int nIndex)
     //
     if (!pstrText->empty()) {
         CRect rcText = rect;
-        if (nIndex == DEFAULT_BOX_VALUE) {
+        if (DEFAULT_BOX_VALUE == nIndex) {
             //
             // Draw default color box
             //
             CRect rcDefColor = rcText;
-            rcDefColor.right = rcText.right - 6;
-            rcDefColor.left = rcDefColor.right - 16;
-            rcText.right = rcDefColor.left - 6;
-            dc.SetBkColor(::GetSysColor(COLOR_3DSHADOW));
-            dc.ExtTextOut(0, 0, ETO_OPAQUE, rcDefColor, nullptr, 0, nullptr);
-            rect.InflateRect(-1, -1);
+            rcDefColor.right = rcText.right - 4;
+            rcDefColor.left = rcDefColor.right - rcText.Height();
+            rcText.right = rcDefColor.left - 4;
             dc.SetBkColor(m_rMaster.m_clrDefault);
             dc.ExtTextOut(0, 0, ETO_OPAQUE, rcDefColor, nullptr, 0, nullptr);
-
+            dc.FrameRect(&rcDefColor, static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH)));
         }
         HFONT hfontOld = dc.SelectFont(m_font);
         dc.SetTextColor(clrText);
