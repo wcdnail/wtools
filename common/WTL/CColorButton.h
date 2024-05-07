@@ -1,5 +1,4 @@
-#ifndef DSSI_COLORBUTTON_H
-#define DSSI_COLORBUTTON_H
+#pragma once
 
 //-----------------------------------------------------------------------------
 // 
@@ -153,8 +152,8 @@
 //-----------------------------------------------------------------------------
 
 #include <atlwin.h>
-#include <atlstr.h>
 #include <string>
+#include <memory>
 
 //-----------------------------------------------------------------------------
 //
@@ -167,6 +166,8 @@
 // Test for themes
 //
 //-----------------------------------------------------------------------------
+
+#define COLORBUTTON_NOTHEMES
 
 #if !defined (COLORBUTTON_NOTHEMES) && !defined (__ATLTHEME_H__)
 #define COLORBUTTON_NOTHEMES
@@ -197,7 +198,11 @@ struct NMCOLORBUTTON
 //
 //-----------------------------------------------------------------------------
 
-class CColorButton : public ATL::CWindowImpl<CColorButton>
+class CColorButton;
+
+using CColorButtonSuper = ATL::CWindowImpl<CColorButton>;
+
+class CColorButton : public CColorButtonSuper
 #if !defined (COLORBUTTON_NOTHEMES)
                    , public CThemeImpl<CColorButton>
 #endif
@@ -213,29 +218,22 @@ public:
         LPCTSTR pszName;
     };
 
-    // @access Construction and destruction
-public:
-    // @cmember General constructor
-    CColorButton();
-
     // @cmember General destructor
     ~CColorButton() override;
 
-    // @access Public inline methods
-public:
-    // @cmember Subclass the window
+    // @cmember General constructor
+    CColorButton();
 
+    // @cmember Subclass the window
     BOOL SubclassWindow(HWND hWnd);
 
     // @cmember Get the current color
-
     COLORREF GetColor(void) const
     {
         return m_clrCurrent;
     }
 
     // @cmember Set the current color
-
     void SetColor(COLORREF clrCurrent)
     {
         m_clrCurrent = clrCurrent;
@@ -245,86 +243,42 @@ public:
     }
 
     // @cmember Get the default color
-
     COLORREF GetDefaultColor(void) const
     {
         return m_clrDefault;
     }
 
     // @cmember Set the default color
-
     void SetDefaultColor(COLORREF clrDefault)
     {
         m_clrDefault = clrDefault;
     }
 
     // @cmember Set the custom text
-
-    void SetCustomText(LPCTSTR pszText)
-    {
-        if (pszText) {
-            m_pszCustomText = pszText;
-        }
-        else {
-            String{}.swap(m_pszCustomText);
-        }
-    }
+    void SetCustomText(LPCTSTR pszText);
 
     // @cmember Set the custom text via a resource string
-    void SetCustomText(UINT nID)
-    {
-        if (nID == 0) {
-            SetCustomText(nullptr);
-        }
-        else {
-            ATL::CString temp;
-            if (temp.LoadStringW(nID)) {
-                String{temp.GetString(), static_cast<size_t>(temp.GetLength())}.swap(m_pszCustomText);
-            }
-        }
-    }
+    void SetCustomText(UINT nID);
 
     // @cmember Set the default text
-    void SetDefaultText(LPCTSTR pszText)
-    {
-        if (pszText) {
-            m_pszDefaultText = pszText;
-        }
-        else {
-            String{}.swap(m_pszDefaultText);
-        }
-    }
+    void SetDefaultText(LPCTSTR pszText);
 
     // @cmember Set the default text via a resource string
-    void SetDefaultText(UINT nID)
-    {
-        if (nID == 0) {
-            SetDefaultText(nullptr);
-        }
-        else {
-            ATL::CString temp;
-            if (temp.LoadStringW(nID)) {
-                String{temp.GetString(), static_cast<size_t>(temp.GetLength())}.swap(m_pszDefaultText);
-            }
-        }
-    }
+    void SetDefaultText(UINT nID);
 
     // @cmember Get the tracking flag
-
     BOOL GetTrackSelection(void) const
     {
         return m_fTrackSelection;
     }
 
     // @cmember Set the tracking flag
-
     void SetTrackSelection(BOOL fTrack)
     {
         m_fTrackSelection = fTrack;
     }
 
     // @cmember Set both strings from a resource
-
     void SetText(UINT nDefault, UINT nCustom)
     {
         SetDefaultText(nDefault);
@@ -332,21 +286,17 @@ public:
     }
 
     // @cmember Do we have custom text
-
     BOOL HasCustomText() const
     {
         return !m_pszCustomText.empty();
     }
 
     // @cmember Do we have default text
-
     BOOL HasDefaultText() const
     {
         return !m_pszDefaultText.empty();
     }
 
-    // @access ATL window support
-public:
     BEGIN_MSG_MAP(CColorButton)
 #if !defined (COLORBUTTON_NOTHEMES)
         CHAIN_MSG_MAP(CThemeImpl <CColorButton>) // should be here, not at bottom
@@ -395,38 +345,6 @@ public:
     // @cmember Handle on click
     LRESULT OnClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
-    // @access Protected methods
-protected:
-    // @cmember Display the picker popup
-    BOOL Picker();
-
-    // @cmember Set the window size of the picker control
-    void SetPickerWindowSize();
-
-    // @cmember Create the picker tooltips
-    void CreatePickerToolTips(CToolTipCtrl& sToolTip);
-
-    // @cmember Get the rect of a given cell
-    BOOL GetPickerCellRect(int nIndex, RECT* pRect) const;
-
-    // @cmember Set the selected color from the given color
-    void FindPickerCellFromColor(COLORREF clr);
-
-    // @cmember Set a new selection
-    void ChangePickerSelection(int nIndex);
-
-    // @cmember End the picker selection process
-    void EndPickerSelection(BOOL fOked);
-
-    // @cmember Draw a cell
-    void DrawPickerCell(CDC& dc, int nIndex);
-
-    // @cmember Send notification message
-    void SendNotification(UINT nCode, COLORREF clr, BOOL fColorValid);
-
-    // @cmember Do a hit test
-    int PickerHitTest(const POINT& pt);
-
     // @access Protected static methods
 protected:
     // @cmember Draw an arrow
@@ -434,21 +352,19 @@ protected:
 
     // @access Protected members
 protected:
-    //
-    // THE FOLLOWING variables control the actual button
-    //
-
-    // @cmember Current color
-    COLORREF m_clrCurrent;
-
-    // @cmember default color
-    COLORREF m_clrDefault;
+    struct CPickerImpl;
 
     // @cmember Default text
     String m_pszDefaultText;
 
     // @cmember Custom text
     String m_pszCustomText;
+
+    // @cmember Current color
+    COLORREF m_clrCurrent;
+
+    // @cmember default color
+    COLORREF m_clrDefault;
 
     // @cmember True if popup active override
     BOOL m_fPopupActive;
@@ -459,78 +375,6 @@ protected:
     // @cmember True if the mouse is over
     BOOL m_fMouseOver;
 
-    //
-    // THE FOLLOWING variables control the popup
-    //
-
     // @cmember The contained picker control
-    ATL::CContainedWindow m_wndPicker;
-
-    // @cmember Array of colors for the popup
-    static ColorTableEntry gm_sColors[];
-
-    // @cmember Number of columns in the picker
-    int m_nNumColumns;
-
-    // @cmember Number of rows in the picker
-    int m_nNumRows;
-
-    // @cmember Total number of colors in the color array
-    int m_nNumColors;
-
-    // @cmember Font used on the picker control
-    CFont m_font;
-
-    // @cmember Pallete used on the picker control
-    CPalette m_palette;
-
-    // @cmember Current picker color
-    COLORREF m_clrPicker;
-
-    // @cmember Margins for the picker
-    CRect m_rectMargins;
-
-    // @cmember Rectangle of the custom text
-    CRect m_rectCustomText;
-
-    // @cmember Rectangle of the default text
-    CRect m_rectDefaultText;
-
-    // @cmember Rectangle of the boxes
-    CRect m_rectBoxes;
-
-    // @cmember If true, menu is flat
-    BOOL m_fPickerFlat;
-
-    // @cmember Size of the color boxes 
-    CSize m_sizeBox;
-
-    // @cmember Picker current selection
-    int m_nCurrentSel;
-
-    // @cmember The original user selection
-    int m_nChosenColorSel;
-
-    // @cmember If true, the picker was OK, and no canceled out
-    BOOL m_fOked;
-
-    // @cmember Color used to draw background
-    COLORREF m_clrBackground;
-
-    // @cmember Color used for highlight border
-    COLORREF m_clrHiLightBorder;
-
-    // @cmember Color used for highlight 
-    COLORREF m_clrHiLight;
-
-    // @cmember Color used for low-light
-    COLORREF m_clrLoLight;
-
-    // @cmember Color used for highlight text
-    COLORREF m_clrHiLightText;
-
-    // @cmember Color used for normal text
-    COLORREF m_clrText;
+    std::unique_ptr<CPickerImpl> m_pPicker;
 };
-
-#endif // DSSI_COLORBUTTON_H
