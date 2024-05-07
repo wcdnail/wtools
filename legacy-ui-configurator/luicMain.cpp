@@ -91,10 +91,8 @@ int WINAPI _tWinMain(HINSTANCE instHnd, HINSTANCE, LPTSTR, int showCmd)
 
 CLUIApp::~CLUIApp()
 {
-    {
-        std::lock_guard<std::recursive_mutex> guard(g_pAppMx);
-        g_pApp = nullptr;
-    }
+    std::lock_guard<std::recursive_mutex> guard(g_pAppMx);
+    g_pApp = nullptr;
 }
 
 CLUIApp::CLUIApp()
@@ -110,7 +108,6 @@ CLUIApp::CLUIApp()
         std::lock_guard<std::recursive_mutex> guard(g_pAppMx);
         g_pApp = this;
     }
-
 }
 
 HICON CLUIApp::GetIcon(int icon) const

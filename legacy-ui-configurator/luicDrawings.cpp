@@ -141,7 +141,7 @@ private:
         const int  maxCount = ilSmall.GetImageCount() - 1;
         m_hIcon[ICON_ActiveWnd]   = ilSmall.GetIcon(rand() % maxCount);
         m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
-        m_hIcon[ICON_Desktop1]    = ilBig.GetIcon(IconMatreshka); // IconMyComp
+        m_hIcon[ICON_Desktop1]    = ilBig.GetIcon(IconMyComp); // IconMatreshka
         m_hIcon[ICON_Cursor1]     = (HICON)LoadCursorW(nullptr, IDC_APPSTARTING);
 
         LoadExplorerSettings();
@@ -804,14 +804,14 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
 
     rcMenu = rcCapt;
     if (!isToolWnd) {
-        rcMenu.y  = rcCapt.Bottom() + 1;
-        rcMenu.cy = m_Theme.GetNcMetrcs().iMenuHeight + 1;
+        rcMenu.y  = rcCapt.Bottom();
+        rcMenu.cy = m_Theme.GetNcMetrcs().iMenuHeight + 2;
         target[WR_Menu] = ToCRect(rcMenu);
         rcWork.cy -= rcCapt.cy;
     }
 
     rcWork.Shrink(1, 1);
-    rcWork.y = rcMenu.Bottom() + 1;
+    rcWork.y = rcMenu.Bottom();
     target[WR_Workspace] = ToCRect(rcWork);
 
     if (!isToolWnd) {
