@@ -97,8 +97,6 @@
 //-----------------------------------------------------------------------------
 #include "stdafx.h"
 #include "CColorButton.h"
-#include <atlstr.h>
-#include <atltheme.h>
 
 //
 // The Picker class name
@@ -195,7 +193,7 @@ struct CColorButton::CThemed : public WTL::CThemeImpl<CThemed>
         return m_rMaster.GetExStyle();
     }
 
-    bool DrawThemeBkgnd(CDCHandle dc, CRect& rcDraw, UINT uState, BOOL fPopupActive, BOOL fMouseOver)
+    bool DrawThemeBkgnd(WTL::CDCHandle dc, CRect& rcDraw, UINT uState, BOOL fPopupActive, BOOL fMouseOver)
     {
         if (!m_hTheme) {
             return false;
@@ -240,9 +238,9 @@ struct CColorButton::CPickerImpl
     // @cmember Total number of colors in the color array
     int m_nNumColors;
     // @cmember Font used on the picker control
-    CFont m_font;
+    WTL::CFont m_font;
     // @cmember Pallete used on the picker control
-    CPalette m_palette;
+    WTL::CPalette m_palette;
     // @cmember Current picker color
     COLORREF m_clrPicker;
     // @cmember Margins for the picker
@@ -288,7 +286,7 @@ struct CColorButton::CPickerImpl
     void SetPickerWindowSize();
 
     // @cmember Create the picker tooltips
-    void CreatePickerToolTips(CToolTipCtrl& sToolTip);
+    void CreatePickerToolTips(WTL::CToolTipCtrl& sToolTip);
 
     // @cmember Get the rect of a given cell
     BOOL GetPickerCellRect(int nIndex, RECT* pRect) const;
@@ -304,7 +302,7 @@ struct CColorButton::CPickerImpl
     void EndPickerSelection(BOOL fOked);
 
     // @cmember Draw a cell
-    void DrawPickerCell(CDC& dc, int nIndex);
+    void DrawPickerCell(WTL::CDC& dc, int nIndex);
 
     // @cmember Send notification message
     void SendNotification(UINT nCode, COLORREF clr, BOOL fColorValid);
@@ -656,7 +654,7 @@ LRESULT CColorButton::OnMouseLeave(UINT, WPARAM, LPARAM, BOOL& bHandled)
 LRESULT CColorButton::OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     const auto lpItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
-    CDC dc(lpItem->hDC);
+    WTL::CDC dc(lpItem->hDC);
     //
     // Get data about the request
     //
@@ -736,7 +734,7 @@ LRESULT CColorButton::OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 //
 // @mfunc Draw the arrow of the button
 //
-// @parm CDC & | dc | Destination DC
+// @parm WTL::CDC & | dc | Destination DC
 //
 // @parm const RECT & | rect | Rectangle of the control
 //
@@ -748,7 +746,7 @@ LRESULT CColorButton::OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 //
 //-----------------------------------------------------------------------------
 
-void CColorButton::DrawArrow(CDC& dc, const RECT& rect,
+void CColorButton::DrawArrow(WTL::CDC& dc, const RECT& rect,
                              int iDirection, COLORREF clrArrow)
 {
     POINT ptsArrow[3];
@@ -799,9 +797,9 @@ void CColorButton::DrawArrow(CDC& dc, const RECT& rect,
     }
     }
 
-    CBrush brArrow;
+    WTL::CBrush brArrow;
     brArrow.CreateSolidBrush(clrArrow);
-    CPen penArrow;
+    WTL::CPen penArrow;
     penArrow.CreatePen(PS_SOLID, 0, clrArrow);
 
     HBRUSH hbrOld = dc.SelectBrush(brArrow);
@@ -939,7 +937,7 @@ BOOL CColorButton::CPickerImpl::Picker()
     wc.lpfnWndProc = CContainedWindow::StartWindowProc;
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
-    wc.hInstance = ModuleHelper::GetResourceInstance();
+    wc.hInstance = WTL::ModuleHelper::GetResourceInstance();
     wc.hIcon = nullptr;
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wc.hbrBackground = reinterpret_cast<HBRUSH>((COLOR_MENU + 1));
@@ -963,11 +961,11 @@ BOOL CColorButton::CPickerImpl::Picker()
     //
     CRect rcButton;
     m_rMaster.GetWindowRect(&rcButton);
-    ModuleHelper::AddCreateWndData(&m_wndPicker.m_thunk.cd, &m_wndPicker);
+    WTL::ModuleHelper::AddCreateWndData(&m_wndPicker.m_thunk.cd, &m_wndPicker);
     m_wndPicker.m_hWnd = ::CreateWindowEx(0, CColorPicker_ClassName, nullptr,
         WS_POPUP, rcButton.left, rcButton.bottom, 100, 100,
         m_rMaster.GetParent(), nullptr, 
-        ModuleHelper::GetModuleInstance(), nullptr
+        WTL::ModuleHelper::GetModuleInstance(), nullptr
     );
     //
     // If we created the window
@@ -980,7 +978,7 @@ BOOL CColorButton::CPickerImpl::Picker()
         //
         // Create the tooltips
         //
-        CToolTipCtrl sToolTip;
+        WTL::CToolTipCtrl sToolTip;
         CreatePickerToolTips(sToolTip);
         //
         // Find which cell (if any) corresponds to the initial color
@@ -1054,7 +1052,7 @@ BOOL CColorButton::CPickerImpl::Picker()
         //
         if (fOked) {
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
-                CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
+                WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
                 if (dlg.DoModal() == IDOK) {
                     m_rMaster.m_clrCurrent = dlg.GetColor();
                 }
@@ -1079,7 +1077,7 @@ BOOL CColorButton::CPickerImpl::Picker()
     // Unregister our class
     //
     UnregisterClass(CColorPicker_ClassName, // reinterpret_cast<LPCTSTR>(MAKELONG(atom, 0)),
-                    ModuleHelper::GetModuleInstance());
+                    WTL::ModuleHelper::GetModuleInstance());
     return fOked;
 }
 
@@ -1097,7 +1095,7 @@ void CColorButton::CPickerImpl::SetPickerWindowSize()
     // If we are showing a custom or default text area, get the font and text size.
     //
     if (m_rMaster.HasCustomText() || m_rMaster.HasDefaultText()) {
-        CClientDC dc(m_wndPicker);
+        WTL::CClientDC dc(m_wndPicker);
         const HFONT hfontOld = dc.SelectFont(m_font);
         //
         // Get the size of the custom text (if there IS custom text)
@@ -1260,7 +1258,7 @@ void CColorButton::CPickerImpl::SetPickerWindowSize()
 //
 //-----------------------------------------------------------------------------
 
-void CColorButton::CPickerImpl::CreatePickerToolTips(CToolTipCtrl& sToolTip)
+void CColorButton::CPickerImpl::CreatePickerToolTips(WTL::CToolTipCtrl& sToolTip)
 {
     //
     // Create the tool tip
@@ -1367,7 +1365,7 @@ void CColorButton::CPickerImpl::FindPickerCellFromColor(COLORREF clr)
 //-----------------------------------------------------------------------------
 void CColorButton::CPickerImpl::OnMouseHover(int nIndex)
 {
-    CClientDC dc(m_wndPicker);
+    WTL::CClientDC dc(m_wndPicker);
     //
     // Clamp the index
     //
@@ -1452,7 +1450,7 @@ void CColorButton::CPickerImpl::EndPickerSelection(BOOL fOked)
 //
 // @mfunc Draw the given cell
 //
-// @parm CDC & | dc | Destination cell
+// @parm WTL::CDC & | dc | Destination cell
 //
 // @parm int | nIndex | Index of the cell
 //
@@ -1460,7 +1458,7 @@ void CColorButton::CPickerImpl::EndPickerSelection(BOOL fOked)
 //
 //-----------------------------------------------------------------------------
 
-void CColorButton::CPickerImpl::DrawPickerCell(CDC& dc, int nIndex)
+void CColorButton::CPickerImpl::DrawPickerCell(WTL::CDC& dc, int nIndex)
 {
     //
     // Get the drawing rect
@@ -1784,7 +1782,7 @@ LRESULT CColorButton::OnPickerMouseMove(UINT, WPARAM, LPARAM lParam, BOOL&)
 //-----------------------------------------------------------------------------
 LRESULT CColorButton::OnPickerPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    CPaintDC dc(m_pPicker->m_wndPicker);
+    WTL::CPaintDC dc(m_pPicker->m_wndPicker);
     //
     // Draw raised window edge (ex-window style WS_EX_WINDOWEDGE is sposed to do this,
     // but for some reason isn't
@@ -1792,7 +1790,7 @@ LRESULT CColorButton::OnPickerPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
     CRect rect;
     m_pPicker->m_wndPicker.GetClientRect(&rect);
     if (m_pPicker->m_fPickerFlat) {
-        CPen pen;
+        WTL::CPen pen;
         pen.CreatePen(PS_SOLID, 0, ::GetSysColor(COLOR_GRAYTEXT));
         HPEN hpenOld = dc.SelectPen(pen);
         dc.Rectangle(rect.left, rect.top, rect.Width(), rect.Height());

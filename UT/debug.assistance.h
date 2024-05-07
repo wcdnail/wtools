@@ -12,14 +12,14 @@ struct NormWindow
     static constexpr DWORD   DefaultStyle = WS_OVERLAPPEDWINDOW | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
     static constexpr DWORD DefaultExStyle = WS_EX_APPWINDOW | WS_EX_OVERLAPPEDWINDOW;
 
-    CIcon         hIcon;
-    CIcon     hPrevIcon;
-    CIcon  hPrevIconBig;
-    HINSTANCE  hResInst = nullptr;
-    DWORD   dwPrevStyle = 0;
-    DWORD dwPrevExStyle = 0;
-    DWORD       dwStyle = DefaultStyle;
-    DWORD     dwExStyle = DefaultExStyle;
+    WTL::CIcon         hIcon;
+    WTL::CIcon     hPrevIcon;
+    WTL::CIcon  hPrevIconBig;
+    HINSTANCE       hResInst = nullptr;
+    DWORD        dwPrevStyle = 0;
+    DWORD      dwPrevExStyle = 0;
+    DWORD            dwStyle = DefaultStyle;
+    DWORD          dwExStyle = DefaultExStyle;
 
     void MakeItNorm(HWND hWnd);
 };

@@ -5,6 +5,7 @@
 #include "dh.tracing.h"
 #include "rect.putinto.h"
 #include "string.utils.error.code.h"
+#include <atltheme.h>
 #include <utility>
 
 //
@@ -67,7 +68,7 @@ static const signed char LTRBInnerMono[] = {
 
 } // namespace
 
-struct CDrawRoutine::StaticInit
+struct CDrawRoutine::StaticInit: public WTL::CThemeImpl<StaticInit>
 {
     enum : int
     {
@@ -95,7 +96,7 @@ struct CDrawRoutine::StaticInit
         return inst;
     }
 
-    static CFontHandle CreateMarlettFont(LONG height)
+    static WTL::CFontHandle CreateMarlettFont(LONG height)
     {
         LOGFONT lf = { 0 };
         lstrcpy(lf.lfFaceName, TEXT("Marlett"));
@@ -233,7 +234,7 @@ CDrawRoutine::CDrawRoutine(CTheme const& theme)
     UNREFERENCED_PARAMETER(StaticInit::instance());
 }
 
-void CDrawRoutine::DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const
+void CDrawRoutine::DrawBorder(WTL::CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const
 {
     CRect     rc = rcParam;
     auto hPrevBr = dc.SelectBrush(hBrush); 
@@ -252,7 +253,7 @@ void CDrawRoutine::DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidt
     }
 }
 
-void CDrawRoutine::DrawEdge(CDCHandle dc, CRect& rcParam, UINT edge, UINT uFlags) const
+void CDrawRoutine::DrawEdge(WTL::CDCHandle dc, CRect& rcParam, UINT edge, UINT uFlags) const
 {
     CRect rcInner = rcParam;
     HPEN  prevPen = nullptr;
@@ -281,7 +282,7 @@ void CDrawRoutine::DrawEdge(CDCHandle dc, CRect& rcParam, UINT edge, UINT uFlags
 #if WINVER >= WINVER_2K && !defined(WINVER_IS_98)
 #define SetPenColor(border) \
     SetDCPenColor(dc, m_Theme.GetColor(border))
-    prevPen = dc.SelectPen(AtlGetStockPen(DC_PEN));
+    prevPen = dc.SelectPen(WTL::AtlGetStockPen(DC_PEN));
     SetPenColor(LTOuterI);
 #else
     HPEN hPen = CreatePen(PS_SOLID, 1, m_Theme.GetColor(LTOuterI);
@@ -367,7 +368,7 @@ void CDrawRoutine::DrawEdge(CDCHandle dc, CRect& rcParam, UINT edge, UINT uFlags
 #endif
 }
 
-void CDrawRoutine::DrawFrameButton(CDCHandle dc, CRect& rcParam, UINT uState) const
+void CDrawRoutine::DrawFrameButton(WTL::CDCHandle dc, CRect& rcParam, UINT uState) const
 {
     UINT edge;
     if (uState & (DFCS_PUSHED | DFCS_CHECKED | DFCS_FLAT)) {
@@ -397,7 +398,7 @@ static CRect MakeSquareRect(CRect const& rcSrc)
     return rcDst;
 }
 
-void CDrawRoutine::DrawFrameCaption(CDCHandle dc, CRect& rcParam, UINT uFlags)
+void CDrawRoutine::DrawFrameCaption(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags)
 {
     TCHAR symbol = 0;
     switch (uFlags & 0xff) {
@@ -435,7 +436,7 @@ void CDrawRoutine::DrawFrameCaption(CDCHandle dc, CRect& rcParam, UINT uFlags)
     dc.SelectFont(prevFont);
 }
 
-void CDrawRoutine::DrawFrameScroll(CDCHandle dc, CRect& rcParam, UINT uFlags)
+void CDrawRoutine::DrawFrameScroll(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags)
 {
     TCHAR symbol = 0;
     switch (uFlags & 0xff) {
@@ -476,7 +477,7 @@ void CDrawRoutine::DrawFrameScroll(CDCHandle dc, CRect& rcParam, UINT uFlags)
 }
 
 
-void CDrawRoutine::DrawFrameControl(CDCHandle dc, CRect& rcParam, UINT uType, UINT uState)
+void CDrawRoutine::DrawFrameControl(WTL::CDCHandle dc, CRect& rcParam, UINT uType, UINT uState)
 {
     switch (uType) {
     case DFC_CAPTION: DrawFrameCaption(dc, rcParam, uState); break;
@@ -485,7 +486,7 @@ void CDrawRoutine::DrawFrameControl(CDCHandle dc, CRect& rcParam, UINT uType, UI
     }
 }
 
-LONG CDrawRoutine::DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags)
+LONG CDrawRoutine::DrawCaptionButtons(WTL::CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags)
 {
     static const int margin = 2;
     int         buttonWidth = m_Theme.GetNcMetrcs().iCaptionWidth;
@@ -532,7 +533,7 @@ LONG CDrawRoutine::DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool
     return rc.left;
 }
 
-void CDrawRoutine::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT fnMarlet, HICON hIcon, PCWSTR str, UINT uFlags) const
+void CDrawRoutine::DrawCaption(WTL::CDCHandle dc, CRect const& rcParam, HFONT fnMarlet, HICON hIcon, PCWSTR str, UINT uFlags) const
 {
     CRect rcTmp = rcParam;
     int iColor1 = COLOR_INACTIVECAPTION;
@@ -602,13 +603,13 @@ void CDrawRoutine::DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT fnMarle
     }
 }
 
-void CDrawRoutine::DrawMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UINT format, int color) const
+void CDrawRoutine::DrawMenuText(WTL::CDCHandle dc, PCWSTR text, CRect& rc, UINT format, int color) const
 {
     SetTextColor(dc, m_Theme.GetColor(color));
     DrawTextW(dc, text, -1, rc, format);
 }
 
-void CDrawRoutine::DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UINT format) const
+void CDrawRoutine::DrawDisabledMenuText(WTL::CDCHandle dc, PCWSTR text, CRect& rc, UINT format) const
 {
     OffsetRect(rc, 1, 1);
     DrawMenuText(dc, text, rc, format, COLOR_3DHILIGHT);
@@ -616,7 +617,7 @@ void CDrawRoutine::DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UI
     DrawMenuText(dc, text, rc, format, COLOR_3DSHADOW);
 }
 
-void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selIt, WindowRects& rects) const
+void CDrawRoutine::DrawMenuBar(WTL::CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selIt, WindowRects& rects) const
 {
     if (!hMenu || !hFont) {
         return ;
@@ -716,7 +717,7 @@ void CDrawRoutine::DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT
     dc.SelectFont(prevFnt);
 }
 
-void CDrawRoutine::DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled)
+void CDrawRoutine::DrawScrollbar(WTL::CDCHandle dc, CRect const& rcParam, BOOL enabled)
 {
     CRect               rc{};
     int       buttonHeight{m_Theme.GetNcMetrcs().iScrollHeight};
@@ -844,7 +845,7 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
     }
 }
 
-void CDrawRoutine::DrawToolTip(CDCHandle dc, CRect& rcParam, ATL::CStringW&& tooltip) const
+void CDrawRoutine::DrawToolTip(WTL::CDCHandle dc, CRect& rcParam, ATL::CStringW&& tooltip) const
 {
     CSize  szText;
     CRect& rcText = rcParam;
@@ -872,7 +873,7 @@ void CDrawRoutine::DrawToolTip(CDCHandle dc, CRect& rcParam, ATL::CStringW&& too
 #define IsDarkColor(color) \
     ((GetRValue(color) * 2 + GetGValue(color) * 5 + GetBValue(color)) <= 128 * 8)
 
-void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const
+void CDrawRoutine::DrawDesktopIcon(WTL::CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const
 {
     bool bShadow = StaticInit::instance().m_bIconLabelShadows;
     HICON  hIcon = StaticInit::instance().m_hIcon[StaticInit::ICON_Desktop1];
@@ -928,7 +929,7 @@ void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStr
     }
 }
 
-void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects)
+void CDrawRoutine::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects)
 {
     HICON const*      icons = StaticInit::instance().m_hIcon;
     HFONT const    menuFont = m_Theme.GetFont(FONT_Menu);

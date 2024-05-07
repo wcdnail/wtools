@@ -48,7 +48,7 @@ void SetMFStatus(int status, PCWSTR format, ...);
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 
-class CLUIApp: public CAppModule
+class CLUIApp: public WTL::CAppModule
 {
 public:
     using Super = CAppModule;
@@ -60,7 +60,7 @@ public:
 
     Conf::Section& GetSettings();
     HICON GetIcon(int icon) const;
-    CMenuHandle GetTestMenu() const;
+    WTL::CMenuHandle GetTestMenu() const;
     WTL::CImageListManaged const& GetImageList(int index) const;
     IDesktopWallpaper* GetWallpaperMan() const;
     bool IsThemePreviewDrawWallpaper() const;
@@ -76,7 +76,7 @@ private:
 
     Conf::Section                  m_Settings;
     CMainFrame                    m_MainFrame;
-    CMenu                          m_TestMenu;
+    WTL::CMenu                     m_TestMenu;
     FontMap                         m_FontMap;
     IDesktopWallpaperPtr         m_pWallpaper;
     bool              m_bShowDesktopWallpaper;

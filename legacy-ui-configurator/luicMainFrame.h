@@ -9,8 +9,8 @@
 
 struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
                    WTL::CDialogResize<CMainFrame>,
-                   CMessageFilter,
-                   CIdleHandler
+                   WTL::CMessageFilter,
+                   WTL::CIdleHandler
 {
     using   Super = WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>;
     using Resizer = WTL::CDialogResize<CMainFrame> ;
@@ -21,11 +21,11 @@ struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
     void SetStatus(int status, ATL::CStringW&& message);
 
 private:
-    CRect                 m_rcMainFrame;
-    Conf::Section            m_Settings;
-    CMainView                    m_View;
-    CMultiPaneStatusBarCtrl m_StatusBar;
-    bool                 m_bInitialized;
+    CRect                      m_rcMainFrame;
+    Conf::Section                 m_Settings;
+    CMainView                         m_View;
+    WTL::CMultiPaneStatusBarCtrl m_StatusBar;
+    bool                      m_bInitialized;
 
     friend class Super;
     friend class Resizer;

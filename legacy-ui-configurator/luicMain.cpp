@@ -118,7 +118,7 @@ HICON CLUIApp::GetIcon(int icon) const
     return m_ImList[IL_Own].GetIcon(icon);
 }
 
-CMenuHandle CLUIApp::GetTestMenu() const
+WTL::CMenuHandle CLUIApp::GetTestMenu() const
 {
     return {m_TestMenu.m_hMenu};
 }
@@ -225,7 +225,7 @@ HRESULT CLUIApp::ImListCreate(int index, int cx, int cy)
         ReportError(L"Creation of ImageList failed!", code, true, MB_ICONWARNING);
         return code;
     }
-    CIconHandle tempIco;
+    WTL::CIconHandle tempIco;
     for (const auto it : iconsIDs) {
         tempIco.LoadIconW(it, cx, cy);
         if (!tempIco.m_hIcon) {
@@ -246,7 +246,7 @@ HRESULT CLUIApp::Run(HINSTANCE instHnd, int showCmd)
 
     HRESULT hr = S_FALSE;
     try {
-        CMessageLoop  loop;
+        WTL::CMessageLoop  loop;
         hr = Initialize(nullptr, instHnd);
         if (FAILED(hr)) {
             ReportError(L"Initialization failure!", hr, true);
@@ -263,7 +263,7 @@ HRESULT CLUIApp::Run(HINSTANCE instHnd, int showCmd)
             return hr;
         }
         m_MainFrame.ShowWindow(showCmd);
-        ATLTRACE2(atlTraceUI, 0, _T("Launch main loop [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
+        ATLTRACE2(WTL::atlTraceUI, 0, _T("Launch main loop [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
         hr = loop.Run();
         RemoveMessageLoop();
     }

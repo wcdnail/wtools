@@ -9,6 +9,8 @@
 #include <gdiplus.h>
 #include <filesystem>
 
+class CImageList;
+
 enum : int { LV_MakeInsert = 0 };
 
 CPageDllIcons::~CPageDllIcons()
@@ -375,9 +377,9 @@ void CPageDllIcons::AttemptToSaveSelected(std::wstring const& filename, UINT cou
 
 bool CPageDllIcons::ExportIconOLE(int it, bool needBig, std::wstring const& filename)
 {
-    HRESULT      code = S_OK;
-    CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
-    HICON        icon = ilSrc.GetIcon(it);
+    HRESULT           code = S_OK;
+    WTL::CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
+    HICON             icon = ilSrc.GetIcon(it);
     if (!icon) {
         code = static_cast<HRESULT>(GetLastError());
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
@@ -414,9 +416,9 @@ bool CPageDllIcons::ExportIconGDIP(int it, bool needBig, std::wstring const& fil
 {
     using GdipBitmapPtr = std::unique_ptr<Gdiplus::Bitmap>;
 
-    HRESULT      code = S_OK;
-    CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
-    HICON        icon = ilSrc.GetIcon(it);
+    HRESULT           code = S_OK;
+    WTL::CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
+    HICON             icon = ilSrc.GetIcon(it);
     if (!icon) {
         code = static_cast<HRESULT>(GetLastError());
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
@@ -441,9 +443,9 @@ bool CPageDllIcons::ExportIconGDIP(int it, bool needBig, std::wstring const& fil
 
 bool CPageDllIcons::ExportIconOLE2(int it, bool needBig, std::wstring const& filename)
 {
-    HRESULT      code = S_OK;
-    CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
-    HICON        icon = ilSrc.GetIcon(it);
+    HRESULT           code = S_OK;
+    WTL::CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
+    HICON             icon = ilSrc.GetIcon(it);
     if (!icon) {
         code = static_cast<HRESULT>(GetLastError());
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),
@@ -507,9 +509,9 @@ BOOL SaveIcon3(PCTSTR szIconFile, HICON hIcon[], int nNumIcons);
 
 bool CPageDllIcons::ExportIconPLAIN(int it, bool needBig, std::wstring const& filename)
 {
-    HRESULT      code = S_OK;
-    CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
-    HICON        icon = ilSrc.GetIcon(it, ILD_TRANSPARENT);
+    HRESULT           code = S_OK;
+    WTL::CImageList& ilSrc = needBig ? m_il32x32 : m_il16x16;
+    HICON             icon = ilSrc.GetIcon(it, ILD_TRANSPARENT);
     if (!icon) {
         code = static_cast<HRESULT>(GetLastError());
         SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %s", it, filename.c_str(),

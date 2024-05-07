@@ -96,7 +96,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
     OnResizeNotify();
     m_View.ShowWindow(SW_SHOW);
 
-    CMessageLoop* pLoop = pApp->GetMessageLoop();
+    WTL::CMessageLoop* pLoop = pApp->GetMessageLoop();
     ATLASSERT(pLoop != nullptr);
     pLoop->AddMessageFilter(this);
     pLoop->AddIdleHandler(this);
@@ -110,7 +110,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
 
 void CMainFrame::OnDestroy()
 {
-    CMessageLoop* pLoop = CLUIApp::App()->GetMessageLoop();
+    WTL::CMessageLoop* pLoop = CLUIApp::App()->GetMessageLoop();
     ATLASSERT(pLoop != nullptr);
     pLoop->RemoveIdleHandler(this);
     pLoop->RemoveMessageFilter(this);

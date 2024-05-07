@@ -6,10 +6,10 @@ namespace
 {
 struct EnumFontProcArgs
 {
-    int  m_Counter = {0};
-    HRESULT m_Code = {0};
-    CDC m_ScreenDC = {};
-    FontMap  m_Map = {};
+    int       m_Counter = {0};
+    HRESULT      m_Code = {0};
+    WTL::CDC m_ScreenDC = {};
+    FontMap       m_Map = {};
 
     bool Parse(ENUMLOGFONTEXW const* lpelfe, NEWTEXTMETRICEX const* lpntme)
     {

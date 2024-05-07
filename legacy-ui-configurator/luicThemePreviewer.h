@@ -35,11 +35,11 @@ private:
     WindowRects m_WndRect[WND_Count];
 
     static void CalcRects(CRect const& rcClient, CRect& rcFront, CRect& rcBack, CRect& rcMsg, CRect& rcIcon);
-    void DrawDesktop(CDCHandle dc, CRect const& rc);
+    void DrawDesktop(WTL::CDCHandle dc, CRect const& rc);
     CRect GetSeletcedRect();
     void SetSelectedRect(int wr, int ri);
     int OnCreate(LPCREATESTRUCT pCS);
-    void OnPaint(CDCHandle dc);
+    void OnPaint(WTL::CDCHandle dc);
     void OnLButton(UINT nFlags, CPoint point);
     int RectIndexToElementId() const;
     void NotifyParent() const;

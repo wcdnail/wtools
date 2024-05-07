@@ -109,11 +109,11 @@ int CThemePreviewer::OnCreate(LPCREATESTRUCT pCS)
     return 0;
 }
 
-void CThemePreviewer::OnPaint(CDCHandle dcParam)
+void CThemePreviewer::OnPaint(WTL::CDCHandle dcParam)
 {
     UNREFERENCED_PARAMETER(dcParam);
-    const CPaintDC dcPaint{m_hWnd};
-    const CDCHandle dc{dcPaint};
+    const WTL::CPaintDC dcPaint{m_hWnd};
+    const WTL::CDCHandle dc{dcPaint};
   //CF::BufferedPaint bufferedPaint(dcPaint, GetSecondDc(), IsDoubleBuffered(), m_hWnd);
   //CDCHandle dc = bufferedPaint.GetCurrentDc();
     CRect rc;
@@ -198,7 +198,7 @@ const WinText MsgBox_Text[] = {
 };
 } // namespace
 
-void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
+void CThemePreviewer::DrawDesktop(WTL::CDCHandle dc, CRect const& rcClient)
 {
     struct DrawWindowRects
     {

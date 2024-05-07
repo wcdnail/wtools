@@ -67,26 +67,26 @@ public:
 
     void CalcRects(CRect const& rc, UINT captFlags, WindowRects& target);
 
-    void DrawBorder(CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const;
-    void DrawEdge(CDCHandle dc, CRect& pRect, UINT edge, UINT uFlags) const;
-    void DrawFrameButton(CDCHandle dc, CRect& rcParam, UINT uState) const;
-    void DrawFrameCaption(CDCHandle dc, CRect& rcParam, UINT uFlags);
-    void DrawFrameScroll(CDCHandle dc, CRect& rcParam, UINT uFlags);
-    void DrawFrameControl(CDCHandle dc, CRect& rcParam, UINT uType, UINT uState);
-    LONG DrawCaptionButtons(CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags);
-    void DrawCaption(CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags) const;
-    void DrawMenuText(CDCHandle hdc, PCWSTR text, CRect& rc, UINT format, int color) const;
-    void DrawDisabledMenuText(CDCHandle dc, PCWSTR text, CRect& rc, UINT format) const;
-    void DrawMenuBar(CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selIt, WindowRects& rects) const;
-    void DrawScrollbar(CDCHandle dc, CRect const& rcParam, BOOL enabled);
-    void DrawToolTip(CDCHandle dc, CRect& rcParam, ATL::CStringW&& tooltip) const;
-    void DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const;
-    void DrawWindow(CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects);
+    void DrawBorder(WTL::CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const;
+    void DrawEdge(WTL::CDCHandle dc, CRect& pRect, UINT edge, UINT uFlags) const;
+    void DrawFrameButton(WTL::CDCHandle dc, CRect& rcParam, UINT uState) const;
+    void DrawFrameCaption(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags);
+    void DrawFrameScroll(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags);
+    void DrawFrameControl(WTL::CDCHandle dc, CRect& rcParam, UINT uType, UINT uState);
+    LONG DrawCaptionButtons(WTL::CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags);
+    void DrawCaption(WTL::CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags) const;
+    void DrawMenuText(WTL::CDCHandle hdc, PCWSTR text, CRect& rc, UINT format, int color) const;
+    void DrawDisabledMenuText(WTL::CDCHandle dc, PCWSTR text, CRect& rc, UINT format) const;
+    void DrawMenuBar(WTL::CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selIt, WindowRects& rects) const;
+    void DrawScrollbar(WTL::CDCHandle dc, CRect const& rcParam, BOOL enabled);
+    void DrawToolTip(WTL::CDCHandle dc, CRect& rcParam, ATL::CStringW&& tooltip) const;
+    void DrawDesktopIcon(WTL::CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const;
+    void DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects);
 
 private:
     struct StaticInit;
 
-    CTheme const& m_Theme;
-    int      m_BorderSize;
-    CFont     m_ftMarlett;
+    CTheme const&  m_Theme;
+    int       m_BorderSize;
+    WTL::CFont m_ftMarlett;
 };

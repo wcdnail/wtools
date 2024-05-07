@@ -233,7 +233,7 @@ LOGFONT const* CTheme::GetNcMetricFont(CTheme const& theme, int font)
 
 bool CTheme::RefreshBrushes()
 {
-    CBrush tmpBrush[CLR_Count];
+    WTL::CBrush tmpBrush[CLR_Count];
     for (int iColor = 0; iColor < CLR_Count; iColor++) {
         if (CLR_INVALID == m_Color[iColor]) {
             // ##TODO: придумать решение
@@ -249,14 +249,14 @@ bool CTheme::RefreshBrushes()
 
 bool CTheme::RefreshFonts()
 {
-    CFont tmpFont[FONTS_Count];
+    WTL::CFont tmpFont[FONTS_Count];
     for (int iFont = 0; iFont < FONTS_Count; iFont++) {
         LOGFONT const* lf = GetNcMetricFont(*this, iFont);
         if (!lf) {
             // ##TODO: придумать решение
             continue;
         }
-        CLogFont lfObj(*lf);
+        WTL::CLogFont lfObj(*lf);
 #if WINVER >= WINVER_2K
         if (FONT_Hyperlink == iFont) {
             lfObj.lfUnderline = TRUE;
@@ -307,7 +307,7 @@ bool CTheme::LoadSysNcMetrics()
 
 bool CTheme::LoadSysIconFont()
 {
-    CLogFont lfIconFont;
+    WTL::CLogFont lfIconFont;
     if (!SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(lfIconFont), &lfIconFont, 0)) {
         return false;
     }
@@ -370,7 +370,7 @@ bool CTheme::SetColor(int iColor, COLORREF clrNew)
     }
     // TODO: implement history...
     m_Color[iColor] = clrNew;
-    CBrush tmpBrush;
+    WTL::CBrush tmpBrush;
     tmpBrush.CreateSolidBrush(m_Color[iColor]);
     m_Brush[iColor].Attach(tmpBrush.Detach());
     return true;
@@ -477,9 +477,9 @@ void CTheme::FontsSizeStaticInit(CPageAppearance& uiPage)
 
 void CTheme::FontsButtonsStaticInit(CPageAppearance& uiPage)
 {
-    static CFont gs_fntBold;
-    static CFont gs_fntItalic;
-    static CFont gs_fntUnderline;
+    static WTL::CFont gs_fntBold;
+    static WTL::CFont gs_fntItalic;
+    static WTL::CFont gs_fntUnderline;
 
     if (!gs_fntBold.m_hFont) {
         HFONT hFont = uiPage.m_bnFontBold.GetFont();

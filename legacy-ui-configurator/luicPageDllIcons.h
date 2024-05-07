@@ -16,8 +16,8 @@ private:
     WTL::CButton     m_bnBrowse;
     WTL::CButton     m_bnExport;
     WTL::CListViewCtrl m_lvView;
-    CImageList        m_il32x32;
-    CImageList        m_il16x16;
+    WTL::CImageList   m_il32x32;
+    WTL::CImageList   m_il16x16;
     std::wstring m_CurrFilename;
     bool           m_bManagedIl;
 

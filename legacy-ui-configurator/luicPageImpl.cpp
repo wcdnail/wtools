@@ -78,7 +78,7 @@ void CPageImpl::DlgResizeAdd(int nCtlID, DWORD dwResizeFlags)
 {
     CWindow item = GetDlgItem(nCtlID);
     _ASSERT_EXPR(item.Detach() != nullptr, _CRT_WIDE("Attempting to append not existing control to ResizeMap!"));
-    m_ResiseMap.emplace_back(_AtlDlgResizeMap{ nCtlID, dwResizeFlags });
+    m_ResiseMap.emplace_back(WTL::_AtlDlgResizeMap{ nCtlID, dwResizeFlags });
 }
 
 void CPageImpl::DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count)
@@ -89,14 +89,14 @@ void CPageImpl::DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count)
     newItems.swap(m_ResiseMap);
 }
 
-HBRUSH CPageImpl::OnCtlColorStatic(CDCHandle dc, HWND wndStatic)
+HBRUSH CPageImpl::OnCtlColorStatic(WTL::CDCHandle dc, HWND wndStatic)
 {
     dc.SetTextColor(m_pTheme->GetColor(COLOR_CAPTIONTEXT));
     dc.SetBkColor(m_pTheme->GetColor(COLOR_MENU));
     return m_pTheme->GetBrush(COLOR_MENU);
 }
 
-HBRUSH CPageImpl::OnEraseBkgnd(CDCHandle dc)
+HBRUSH CPageImpl::OnEraseBkgnd(WTL::CDCHandle dc)
 {
     CRect rc;
     GetClientRect(rc);
@@ -118,7 +118,7 @@ BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     UNREFERENCED_ARG(wndFocus);
     UNREFERENCED_ARG(lInitParam);
 
-    m_ResiseMap.emplace_back(_AtlDlgResizeMap{ -1, 0 });
+    m_ResiseMap.emplace_back(WTL::_AtlDlgResizeMap{ -1, 0 });
     DlgResize_Init(false, false);
     return TRUE;
 }

@@ -18,5 +18,5 @@ private:
 
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     HRESULT InitWallpapers();
-    void WallpaperPaint(CDCHandle dc, CRect const& rc);
+    void WallpaperPaint(WTL::CDCHandle dc, CRect const& rc);
 };

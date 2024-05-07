@@ -14,7 +14,7 @@ using  CPageImplPtr = std::unique_ptr<CPageImpl>;
 
 struct CPageImpl: ATL::CDialogImpl<CPageImpl>,
                   WTL::CDialogResize<CPageImpl>,
-                  CMessageFilter
+                  WTL::CMessageFilter
 {
     using     Super = ATL::CDialogImpl<CPageImpl>;
     using   Resizer = WTL::CDialogResize<CPageImpl>;
@@ -46,8 +46,8 @@ protected:
     void DlgResizeAdd(int nCtlID, DWORD dwResizeFlags);
     void DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count);
 
-    HBRUSH OnCtlColorStatic(CDCHandle dc, HWND wndStatic);
-    HBRUSH OnEraseBkgnd(CDCHandle dc);
+    HBRUSH OnCtlColorStatic(WTL::CDCHandle dc, HWND wndStatic);
+    HBRUSH OnEraseBkgnd(WTL::CDCHandle dc);
 
     virtual void OnResizeNotify();
     virtual BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);

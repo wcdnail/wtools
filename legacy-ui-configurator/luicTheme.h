@@ -190,13 +190,13 @@ private:
 
     int                       m_nIndex;
     ATL::CString              m_MyName;
-    CLogFont              m_lfIconFont;
+    WTL::CLogFont         m_lfIconFont;
     bool           m_bGradientCaptions;
     bool                  m_bFlatMenus;
     NONCLIENTMETRICS       m_ncMetrics;
     COLORREF        m_Color[CLR_Count];
-    CBrush          m_Brush[CLR_Count];
-    CFont          m_Font[FONTS_Count];
+    WTL::CBrush     m_Brush[CLR_Count];
+    WTL::CFont     m_Font[FONTS_Count];
     SizeRange m_SizeRange[SIZES_Count];
 
     static LOGFONT const* GetNcMetricFont(CTheme const& theme, int font);

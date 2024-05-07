@@ -309,7 +309,7 @@ public:
     // @access Protected static methods
 protected:
     // @cmember Draw an arrow
-    static void DrawArrow(CDC& dc, const RECT& rect, int iDirection = 0, COLORREF clrArrow = RGB(0, 0, 0));
+    static void DrawArrow(WTL::CDC& dc, const RECT& rect, int iDirection = 0, COLORREF clrArrow = RGB(0, 0, 0));
 
     // @access Protected members
 protected:

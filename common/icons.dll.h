@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-using IconArray = std::vector<CIcon>;
+using IconArray = std::vector<WTL::CIcon>;
 
 class CIconCollectionFile
 {
@@ -42,7 +42,6 @@ inline IconArray const& CIconCollectionFile::GetArraySm() const
 {
     return m_IconArrSm;
 }
-
 
 inline size_t CIconCollectionFile::GetCount() const
 {

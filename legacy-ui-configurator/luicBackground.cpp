@@ -78,7 +78,7 @@ HRESULT CPageBackground::InitWallpapers()
     return m_Wallpaper.size() > 0 ? S_OK : code;
 }
 
-void CPageBackground::WallpaperPaint(CDCHandle dc, CRect const& rc)
+void CPageBackground::WallpaperPaint(WTL::CDCHandle dc, CRect const& rc)
 {
     if (m_Wallpaper.size() < 1) {
         return ;
