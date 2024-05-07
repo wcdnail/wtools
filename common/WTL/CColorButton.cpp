@@ -934,7 +934,7 @@ BOOL CColorButton::CPickerImpl::Picker()
     WNDCLASSEX wc;
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = CS_CLASSDC | CS_SAVEBITS | CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = CContainedWindow::StartWindowProc;
+    wc.lpfnWndProc = ATL::CContainedWindow::StartWindowProc;
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
     wc.hInstance = WTL::ModuleHelper::GetResourceInstance();
