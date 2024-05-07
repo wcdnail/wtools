@@ -151,6 +151,14 @@ enum EColorIndex : int
     CLR_Count
 };
 
+enum EItemColors: int 
+{
+    IT_Color1 = 0,
+    IT_Color2,
+    IT_FontColor1,
+    IT_ColorCount
+};
+
 struct CTheme
 {
     static int g_DPI;
@@ -166,6 +174,7 @@ struct CTheme
 
     bool LoadSysTheme();
     COLORREF GetColor(int color) const;
+    bool SetColor(int iColor, COLORREF dword);
     HBRUSH GetBrush(int color) const;
     HFONT GetFont(int font) const;
     LOGFONT const* GetLogFont(int font) const;
@@ -201,7 +210,7 @@ private:
     bool LoadSysFlatMenusSetting();
 
     static void ThemesStaticInit(CPageAppearance& uiPage, CTheme& initialTheme);
-    static void ElementsStaticInit(CPageAppearance& uiPage);
+    static void ItemStaticInit(CPageAppearance& uiPage);
     static void FontsSizeStaticInit(CPageAppearance& uiPage);
     static void FontsButtonsStaticInit(CPageAppearance& uiPage);
     static void FontsSmoothStaticInit(CPageAppearance& uiPage);

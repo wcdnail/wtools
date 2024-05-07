@@ -13,4 +13,4 @@
 #define LTH_STATUS          L"        Status|"
 #define LTH_SHELL_ICON      L"     ShellIcon|"
 #define LTH_DESK_WALLPPR    L"DesktopWallppr|"
-
+#define LTH_APPEARANCE      L"    Appearance|"

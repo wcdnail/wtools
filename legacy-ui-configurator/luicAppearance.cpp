@@ -104,9 +104,9 @@ void CPageAppearance::CtlAdjustPositions()
     CtlAdjustHeightAndShift(m_bnThemeRename, xOffset, yOffset, nHeight);
     CtlAdjustHeightAndShift(m_bnThemeDelete, xOffset, yOffset, nHeight);
 
-    CtlAdjustHeightAndShift(m_bnItemColor[BTN_ItemColor1], xOffset, yOffset, nHeight);
-    CtlAdjustHeightAndShift(m_bnItemColor[BTN_ItemColor2], xOffset, yOffset, nHeight);
-    CtlAdjustHeightAndShift(m_bnItemColor[BTN_FontColor1], xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnItemColor[IT_Color1], xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnItemColor[IT_Color2], xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnItemColor[IT_FontColor1], xOffset, yOffset, nHeight);
     CtlAdjustHeightAndShift(m_bnFontBold, xOffset, yOffset, nHeight);
     CtlAdjustHeightAndShift(m_bnFontItalic, xOffset, yOffset, nHeight);
     CtlAdjustHeightAndShift(m_bnFontUndrln, xOffset, yOffset, nHeight);
@@ -144,9 +144,9 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_edItemSize2.Attach(GetDlgItem(IDC_APP_ITEM_SIZE2_EDIT));
     m_udItemSize2.Attach(GetDlgItem(IDC_APP_ITEM_SIZE2_SPIN));
     m_stItemClr1.Attach(GetDlgItem(IDC_APP_ITEM_COLOR1_CAP));
-    m_bnItemColor[BTN_ItemColor1].SubclassWindow(GetDlgItem(IDC_APP_ITEM_COLOR1_SEL));
+    m_bnItemColor[IT_Color1].SubclassWindow(GetDlgItem(IDC_APP_ITEM_COLOR1_SEL));
     m_stItemClr2.Attach(GetDlgItem(IDC_APP_ITEM_COLOR2_CAP));
-    m_bnItemColor[BTN_ItemColor2].SubclassWindow(GetDlgItem(IDC_APP_ITEM_COLOR2_SEL));
+    m_bnItemColor[IT_Color2].SubclassWindow(GetDlgItem(IDC_APP_ITEM_COLOR2_SEL));
 
     m_stFont.Attach(GetDlgItem(IDC_APP_FONT_CAP));
     m_cbFont.Attach(GetDlgItem(IDC_APP_FONT_SEL));
@@ -156,7 +156,7 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_edFontWidth.Attach(GetDlgItem(IDC_APP_FONT_WDTH_EDIT));
     m_udFontWidth.Attach(GetDlgItem(IDC_APP_FONT_WDTH_SPIN));
     m_stFontClr1.Attach(GetDlgItem(IDC_APP_FONT_COLOR_CAP));
-    m_bnItemColor[BTN_FontColor1].SubclassWindow(GetDlgItem(IDC_APP_FONT_COLOR_SEL));
+    m_bnItemColor[IT_FontColor1].SubclassWindow(GetDlgItem(IDC_APP_FONT_COLOR_SEL));
     m_stFontStyle.Attach(GetDlgItem(IDC_APP_FONT_STYLE_CAP));
     m_bnFontBold.Attach(GetDlgItem(IDC_APP_FONT_STYLE_BOLD));
     m_bnFontItalic.Attach(GetDlgItem(IDC_APP_FONT_STYLE_ITALIC));
@@ -177,7 +177,7 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_bnThemeDelete.SetIcon(pApp->GetIcon(IconHatchCross));
     m_bnThemeImport.SetIcon(pApp->GetIcon(IconFolderOpen));
 
-    for (int i = 0; i < BTN_ColorCount; i++) {
+    for (int i = 0; i < IT_ColorCount; i++) {
         m_bnItemColor[i].SetDefaultText(_T("Revert"));
         m_bnItemColor[i].SetCustomText(_T("Customize"));
     }
@@ -191,13 +191,6 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 void CPageAppearance::OnDestroy()
 {
     CPageImpl::OnDestroy();
-}
-
-void CPageAppearance::ColorPicker(int nWhichOne)
-{
-    COLORREF srcColor = 0x00ff00ff;
-    WTL::CColorDialog dlgColorPicker(srcColor, CC_FULLOPEN, m_hWnd);
-    dlgColorPicker.DoModal(m_hWnd);
 }
 
 void CPageAppearance::ThemeEnable(BOOL bEnable)
@@ -235,13 +228,13 @@ void CPageAppearance::ItemSize2Enable(BOOL bEnable)
 void CPageAppearance::ItemClr1Enable(BOOL bEnable)
 {
     m_stItemClr1.EnableWindow(bEnable);
-    m_bnItemColor[BTN_ItemColor1].EnableWindow(bEnable);
+    m_bnItemColor[IT_Color1].EnableWindow(bEnable);
 }
 
 void CPageAppearance::ItemClr2Enable(BOOL bEnable)
 {
     m_stItemClr2.EnableWindow(bEnable);
-    m_bnItemColor[BTN_ItemColor2].EnableWindow(bEnable);
+    m_bnItemColor[IT_Color2].EnableWindow(bEnable);
 }
 
 void CPageAppearance::FontEnable(BOOL bEnable)
@@ -267,12 +260,12 @@ void CPageAppearance::FontEnable(BOOL bEnable)
 void CPageAppearance::FontClr1Enable(BOOL bEnable)
 {
     m_stFontClr1.EnableWindow(bEnable);
-    m_bnItemColor[BTN_FontColor1].EnableWindow(bEnable);
+    m_bnItemColor[IT_FontColor1].EnableWindow(bEnable);
 }
 
-bool CPageAppearance::BtnSetColor(int nButton, int iColor)
+bool CPageAppearance::ItemColorSetBtn(int nButton, int iColor)
 {
-    if ((nButton < 0) || (nButton > BTN_ColorCount) || (iColor < 0)) {
+    if ((nButton < 0) || (nButton > IT_ColorCount) || (iColor < 0)) {
         return false;
     }
     const COLORREF clrToSet = m_pTheme->GetColor(iColor);
@@ -291,13 +284,13 @@ void CPageAppearance::ItemColorSet(int nItem)
     if (!pAssignment) {
         return ;
     }
-    if (BtnSetColor(BTN_ItemColor1, pAssignment->color1)) {
+    if (ItemColorSetBtn(IT_Color1, pAssignment->color1)) {
         ItemClr1Enable(TRUE);
     }
-    if (BtnSetColor(BTN_ItemColor2, pAssignment->color2)) {
+    if (ItemColorSetBtn(IT_Color2, pAssignment->color2)) {
         ItemClr2Enable(TRUE);
     }
-    if (BtnSetColor(BTN_FontColor1, pAssignment->fontColor)) {
+    if (ItemColorSetBtn(IT_FontColor1, pAssignment->fontColor)) {
         FontClr1Enable(TRUE);
     }
     }
@@ -413,6 +406,15 @@ void CPageAppearance::OnThemeSelect(int nThemeIndex)
     m_bcFlatMenus.SetCheck(m_pTheme->IsFlatMenus() ? TRUE : FALSE);
 }
 
+void CPageAppearance::ColorPicker(int nButton)
+{
+    UNREFERENCED_ARG(nButton);
+    // TODO: implement custom color picker dialog
+    //COLORREF srcColor = 0x00ff00ff;
+    //WTL::CColorDialog dlgColorPicker(srcColor, CC_FULLOPEN, m_hWnd);
+    //dlgColorPicker.DoModal(m_hWnd);
+}
+
 void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
     switch (nID) {
@@ -444,9 +446,9 @@ LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
     if (CPN_SELENDOK == pnmh->code) {
         int nButton = CB_ERR;
         switch (idCtrl) {
-        case IDC_APP_ITEM_COLOR1_SEL: nButton = BTN_ItemColor1; goto TryChange;
-        case IDC_APP_ITEM_COLOR2_SEL: nButton = BTN_ItemColor2; goto TryChange;
-        case IDC_APP_FONT_COLOR_SEL:  nButton = BTN_FontColor1;
+        case IDC_APP_ITEM_COLOR1_SEL: nButton = IT_Color1; goto TryChange;
+        case IDC_APP_ITEM_COLOR2_SEL: nButton = IT_Color2; goto TryChange;
+        case IDC_APP_FONT_COLOR_SEL:  nButton = IT_FontColor1;
      TryChange:
             ItemColorTryChange(nButton);
             break;
@@ -464,8 +466,43 @@ LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
     return 0;
 }
 
+int CPageAppearance::ItemGetSel(PCItemAssign& pAssignment) const
+{
+    const int nItem = m_cbItem.GetCurSel();
+    if (TI_Invalid == nItem) {
+        return TI_Invalid;
+    }
+    pAssignment = CTheme::GetItemAssignment(nItem);
+    return nItem;
+}
+
 void CPageAppearance::ItemColorTryChange(int nButton)
 {
-    COLORREF clrCurrent = m_bnItemColor[nButton].GetColor();
-    DebugThreadPrintf(LTH_COLORIZER L" APPRNCE TryChangeClr: id:%d ==> %08x\n", nButton, clrCurrent);
+    if (!m_pTheme) {
+        return ;
+    }
+    const COLORREF clrTryed = m_bnItemColor[nButton].GetColor();
+    PCItemAssign  pAssignment = nullptr;
+    const int nItem = ItemGetSel(pAssignment);
+    if (TI_Invalid == nItem || !pAssignment) {
+        return ;
+    }
+    int nWhich = TI_Invalid;
+    switch (nButton) {
+    case IT_Color1:     nWhich = pAssignment->color1; break;
+    case IT_Color2:     nWhich = pAssignment->color2; break;
+    case IT_FontColor1: nWhich = pAssignment->fontColor; break;
+    }
+    const bool bSuccess = m_pTheme->SetColor(nWhich, clrTryed);
+    DebugThreadPrintf(LTH_APPEARANCE L" Item: '%s' SetColor '%s'[%d] ==> #%08x == %s\n", 
+        pAssignment->name,
+        CTheme::ColorName(nWhich),
+        nWhich,
+        clrTryed,
+        bSuccess ? L"OK" : L"FAIL"
+    );
+    if (bSuccess) {
+        m_stPreview.InvalidateRect(nullptr, FALSE);
+    }
+    
 }

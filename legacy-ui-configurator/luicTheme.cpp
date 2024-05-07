@@ -359,6 +359,16 @@ COLORREF CTheme::GetColor(int color) const
     return m_Color[color];
 }
 
+bool CTheme::SetColor(int iColor, COLORREF clrNew)
+{
+    if (iColor < 0 || (iColor > CLR_Count - 1)) {
+        return false;
+    }
+    m_Color[iColor] = clrNew;
+    // TODO: implement history...
+    return true;
+}
+
 HBRUSH CTheme::GetBrush(int color) const
 {
     if (color < 0 || color >= CLR_Count) {
@@ -408,7 +418,7 @@ void CTheme::ThemesStaticInit(CPageAppearance& uiPage, CTheme& initialTheme)
     uiPage.m_cbThemeSize.SetCurSel(0);
 }
 
-void CTheme::ElementsStaticInit(CPageAppearance& uiPage)
+void CTheme::ItemStaticInit(CPageAppearance& uiPage)
 {
     WTL::CComboBox& lbCtl = uiPage.m_cbItem;
     lbCtl.ResetContent();
@@ -547,7 +557,7 @@ void CTheme::PerformStaticInit(CPageAppearance& uiPage, CLUIApp const* pApp)
 {
     CTheme& theme = pApp->GetTheme(TI_Current);
     ThemesStaticInit(uiPage, theme);
-    ElementsStaticInit(uiPage);
+    ItemStaticInit(uiPage);
     FontsStaticInit(uiPage, pApp->GetFontMap());
     uiPage.OnThemeSelect(theme.m_nIndex);
 }
