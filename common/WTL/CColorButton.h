@@ -163,18 +163,6 @@
 
 //-----------------------------------------------------------------------------
 //
-// Test for themes
-//
-//-----------------------------------------------------------------------------
-
-#define COLORBUTTON_NOTHEMES
-
-#if !defined (COLORBUTTON_NOTHEMES) && !defined (__ATLTHEME_H__)
-#define COLORBUTTON_NOTHEMES
-#endif
-
-//-----------------------------------------------------------------------------
-//
 // Notification messages
 //
 //-----------------------------------------------------------------------------
@@ -203,9 +191,6 @@ class CColorButton;
 using CColorButtonSuper = ATL::CWindowImpl<CColorButton>;
 
 class CColorButton : public CColorButtonSuper
-#if !defined (COLORBUTTON_NOTHEMES)
-                   , public CThemeImpl<CColorButton>
-#endif
 {
     // @access Types and enumerations
 public:
@@ -298,9 +283,9 @@ public:
     }
 
     BEGIN_MSG_MAP(CColorButton)
-#if !defined (COLORBUTTON_NOTHEMES)
-        CHAIN_MSG_MAP(CThemeImpl <CColorButton>) // should be here, not at bottom
-#endif
+//#if !defined (COLORBUTTON_NOTHEMES)
+//        CHAIN_MSG_MAP(CThemeImpl <CColorButton>) // should be here, not at bottom
+//#endif
         MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove);
         MESSAGE_HANDLER(WM_MOUSELEAVE, OnMouseLeave);
         MESSAGE_HANDLER(OCM__BASE + WM_DRAWITEM, OnDrawItem)
@@ -352,6 +337,7 @@ protected:
 
     // @access Protected members
 protected:
+    struct CThemeImpl;
     struct CPickerImpl;
 
     // @cmember Default text

@@ -95,11 +95,14 @@
 //      Created in $/Omni_V2/exe_cnf
 //
 //-----------------------------------------------------------------------------
-
 #include "stdafx.h"
 #include "CColorButton.h"
 #include <atlstr.h>
+#include <atltheme.h>
 
+//
+// The Picker class name
+//
 static constexpr TCHAR CColorPicker_ClassName[] = _T("CColorPicker");
 
 //
@@ -116,6 +119,103 @@ static char THIS_FILE[] = __FILE__;
 //
 static constexpr int g_ciArrowSizeX = 4;
 static constexpr int g_ciArrowSizeY = 2;
+
+//
+// Other definitions
+//
+#define DEFAULT_BOX_VALUE   -3
+#define CUSTOM_BOX_VALUE    -2
+#define INVALID_COLOR       -1
+#define MAX_COLORS          100
+
+//
+// Sizing definitions
+//
+static const CSize s_sizeTextHiBorder(3, 3);
+static const CSize s_sizeTextMargin(2, 2);
+static const CSize s_sizeBoxHiBorder(2, 2);
+static const CSize s_sizeBoxMargin(0, 0);
+static const CSize s_sizeBoxCore(14, 14);
+
+//
+// Ok, here is how all the sizing works.  All picker elements use the
+// exact same rules.  They all have 3 elements, their core size, the size
+// of the highlight border, an the size of the margin.
+//
+// For text, the core size is just the extent of the text to be drawn.
+// For the color boxes, it is the s_sizeBoxCore value.  (For pointless
+// jollies, the box size was modified so it doesn't have to be square.  We
+// are talking about changing 3-4 lines of code.  No biggie.)
+//
+// Also, just a point of note.  Each area has a well defined rectagle. 
+// (m_rectDefaultText, m_rectCustomText, and m_rectBoxes)
+// Even if there isn't any default or custom text, the rectagles are still
+// well defined, but they have no height.  Their UpperLeft () is at the
+// proper position and their Width () is valid.  In the case of the boxes,
+// m_rectBoxes is the rectagle that contains all the boxes.  These changes
+// made drawing and hit test 100000 times easier.
+//
+
+#define COLORBUTTON_NOTHEMES
+
+//-----------------------------------------------------------------------------
+//
+// Test for themes
+//
+//-----------------------------------------------------------------------------
+struct CColorButton::CThemeImpl
+#if defined (COLORBUTTON_NOTHEMES) || !defined (__ATLTHEME_H__)
+{
+    void OnSubclassWindow(PCWSTR) {}
+    bool DrawThemeBkgnd(CDCHandle, CRect&, UINT, BOOL, BOOL) { return false; }
+
+#define COLORBUTTON_NOTHEMES
+#else
+    : public WTL::CThemeImpl<CColorButton::CThemeImpl>
+{
+    static inline bool m_bInitialized = false;
+
+    void OnSubclassWindow(PCWSTR pszClassList)
+    {
+        if (!m_bInitialized) {
+            m_bInitialized = nullptr != OpenThemeData(pszClassList);
+        }
+    }
+
+    bool DrawThemeBkgnd(CDCHandle dc, CRect& rcDraw, UINT uState, BOOL fPopupActive, BOOL fMouseOver)
+    {
+        if (!m_hTheme) {
+            return false;
+        }
+        //
+        // Draw the outer edge
+        //
+        UINT uFrameState = 0;
+        if ((uState & ODS_SELECTED) != 0 || fPopupActive) {
+            uFrameState |= PBS_PRESSED;
+        }
+        if ((uState & ODS_DISABLED) != 0) {
+            uFrameState |= PBS_DISABLED;
+        }
+        if ((uState & ODS_HOTLIGHT) != 0 || fMouseOver) {
+            uFrameState |= PBS_HOT;
+        }
+        else if ((uState & ODS_DEFAULT) != 0) {
+            uFrameState |= PBS_DEFAULTED;
+        }
+        DrawThemeBackground(dc, BP_PUSHBUTTON, uFrameState, &rcDraw, nullptr);
+        GetThemeBackgroundContentRect(dc, BP_PUSHBUTTON, uFrameState, &rcDraw, &rcDraw);
+        return true;
+    }
+#endif
+
+    static CColorButton::CThemeImpl& instance()
+    {
+        static CColorButton::CThemeImpl inst;
+        return inst;
+    }
+};
+
 
 //
 // THE FOLLOWING variables control the popup
@@ -287,44 +387,6 @@ CColorButton::ColorTableEntry CColorButton::CPickerImpl::gm_sColors[] =
     {RGB(0xFF, 0xFF, 0xFF), _T("White")}
 };
 
-//
-// Other definitions
-//
-
-#define DEFAULT_BOX_VALUE   -3
-#define CUSTOM_BOX_VALUE    -2
-#define INVALID_COLOR       -1
-#define MAX_COLORS          100
-
-//
-// Sizing definitions
-//
-
-static const CSize s_sizeTextHiBorder(3, 3);
-static const CSize s_sizeTextMargin(2, 2);
-static const CSize s_sizeBoxHiBorder(2, 2);
-static const CSize s_sizeBoxMargin(0, 0);
-static const CSize s_sizeBoxCore(14, 14);
-
-//
-// Ok, here is how all the sizing works.  All picker elements use the
-// exact same rules.  They all have 3 elements, their core size, the size
-// of the highlight border, an the size of the margin.
-//
-// For text, the core size is just the extent of the text to be drawn.
-// For the color boxes, it is the s_sizeBoxCore value.  (For pointless
-// jollies, the box size was modified so it doesn't have to be square.  We
-// are talking about changing 3-4 lines of code.  No biggie.)
-//
-// Also, just a point of note.  Each area has a well defined rectagle. 
-// (m_rectDefaultText, m_rectCustomText, and m_rectBoxes)
-// Even if there isn't any default or custom text, the rectagles are still
-// well defined, but they have no height.  Their UpperLeft () is at the
-// proper position and their Width () is valid.  In the case of the boxes,
-// m_rectBoxes is the rectagle that contains all the boxes.  These changes
-// made drawing and hit test 100000 times easier.
-//
-
 //-----------------------------------------------------------------------------
 //
 // @mfunc <c CColorButton> destructor.
@@ -354,6 +416,7 @@ CColorButton::CColorButton()
     ,      m_fMouseOver{FALSE}
     ,         m_pPicker{std::make_unique<CPickerImpl>(*this)}
 {
+    CThemeImpl::instance().OnSubclassWindow(L"Button");
 }
 
 void CColorButton::SetCustomText(LPCTSTR pszText)
@@ -418,9 +481,6 @@ BOOL CColorButton::SubclassWindow(HWND hWnd)
 {
     CWindowImpl<CColorButton>::SubclassWindow(hWnd);
     ModifyStyle(0, BS_OWNERDRAW);
-#if !defined (COLORBUTTON_NOTHEMES)
-    OpenThemeData(L"Button");
-#endif
     return TRUE;
 }
 
@@ -579,33 +639,12 @@ LRESULT CColorButton::OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
     // If we have a theme
     //
     m_fPopupActive = false;
-#if !defined (COLORBUTTON_NOTHEMES)
-    if (m_hTheme != nullptr) {
-        //
-        // Draw the outer edge
-        //
-        UINT uFrameState = 0;
-        if ((uState & ODS_SELECTED) != 0 || m_fPopupActive) {
-            uFrameState |= PBS_PRESSED;
-        }
-        if ((uState & ODS_DISABLED) != 0) {
-            uFrameState |= PBS_DISABLED;
-        }
-        if ((uState & ODS_HOTLIGHT) != 0 || m_fMouseOver) {
-            uFrameState |= PBS_HOT;
-        }
-        else if ((uState & ODS_DEFAULT) != 0) {
-            uFrameState |= PBS_DEFAULTED;
-        }
-        DrawThemeBackground(dc, BP_PUSHBUTTON, uFrameState, &rcDraw, nullptr);
-        GetThemeBackgroundContentRect(dc, BP_PUSHBUTTON, uFrameState, &rcDraw, &rcDraw);
+    if (CThemeImpl::instance().DrawThemeBkgnd(dc.m_hDC, rcDraw, uState, m_fPopupActive, m_fMouseOver)) {
     }
     //
     // Otherwise, we are old school
     //
-    else
-#endif
-    {
+    else {
         //
         // Draw the outer edge
         //
@@ -624,24 +663,20 @@ LRESULT CColorButton::OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
             rcDraw.OffsetRect(1, 1);
         }
     }
-
     //
     // Draw focus
     //
-
     if ((uState & ODS_FOCUS) != 0 || m_fPopupActive) {
-        CRect rcFocus(rcDraw.left, rcDraw.top,
-                      rcDraw.right - 1, rcDraw.bottom);
+        const CRect rcFocus(rcDraw.left, rcDraw.top,
+                            rcDraw.right - 1, rcDraw.bottom);
         dc.DrawFocusRect(&rcFocus);
     }
     rcDraw.InflateRect(
-        -::GetSystemMetrics(SM_CXEDGE),
-        -::GetSystemMetrics(SM_CYEDGE));
-
+        -GetSystemMetrics(SM_CXEDGE),
+        -GetSystemMetrics(SM_CYEDGE));
     //
     // Draw the arrow
     //
-
     {
         CRect rcArrow;
         rcArrow.left = rcDraw.right - g_ciArrowSizeX - ::GetSystemMetrics(SM_CXEDGE) / 2;
@@ -654,18 +689,14 @@ LRESULT CColorButton::OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 
         rcDraw.right = rcArrow.left - ::GetSystemMetrics(SM_CXEDGE) / 2;
     }
-
     //
     // Draw separator
     //
-
     dc.DrawEdge(&rcDraw, EDGE_ETCHED, BF_RIGHT);
     rcDraw.right -= (::GetSystemMetrics(SM_CXEDGE) * 2) + 1;
-
     //
     // Draw color
     //
-
     if ((uState & ODS_DISABLED) == 0) {
         dc.SetBkColor((m_clrCurrent == CLR_DEFAULT) ? m_clrDefault : m_clrCurrent);
         dc.ExtTextOut(0, 0, ETO_OPAQUE, &rcDraw, nullptr, 0, nullptr);
@@ -1854,14 +1885,12 @@ LRESULT CColorButton::OnPickerPaletteChanged(UINT uMsg, WPARAM wParam, LPARAM lP
 void CColorButton::CPickerImpl::SendNotification(UINT nCode, COLORREF clr, BOOL fColorValid)
 {
     NMCOLORBUTTON nmclr;
-
     nmclr.hdr.code = nCode;
     nmclr.hdr.hwndFrom = m_rMaster.m_hWnd;
     nmclr.hdr.idFrom = m_rMaster.GetDlgCtrlID();
     nmclr.fColorValid = fColorValid;
     nmclr.clr = clr;
-
-    ::SendMessage(m_rMaster.GetParent(), WM_NOTIFY,
+    SendMessage(m_rMaster.GetParent(), WM_NOTIFY,
         static_cast<WPARAM>(m_rMaster.GetDlgCtrlID()),
         reinterpret_cast<LPARAM>(&nmclr));
 }
