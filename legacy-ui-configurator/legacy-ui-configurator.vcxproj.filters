@@ -178,6 +178,12 @@
     <Image Include="resz\bom-font-bold.ico">
       <Filter>resz</Filter>
     </Image>
+    <Image Include="rom-7-matreshka.ico">
+      <Filter>resz</Filter>
+    </Image>
+    <Image Include="resz\rom-7-matreshka.ico">
+      <Filter>resz</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="idl\legacy-ui-configurator.idl">

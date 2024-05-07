@@ -14,33 +14,6 @@
 namespace
 {
 
-#if 0
-CIconHandle LoadShellIcon(ATL::CStringW const& entry, UINT flags = SHGFI_SMALLICON | SHGFI_ADDOVERLAYS, unsigned attrs = INVALID_FILE_ATTRIBUTES)
-{
-    if (INVALID_FILE_ATTRIBUTES == attrs) {
-        attrs = GetFileAttributesW(entry.GetString());
-    }
-    if (INVALID_FILE_ATTRIBUTES == attrs) {
-        const auto code = static_cast<HRESULT>(GetLastError());
-        DH::TPrintf(LTH_SHELL_ICON L" Can't get attrs for '%s' - %d '%s'\n",
-            entry.GetString(), code, Str::ErrorCode<>::SystemMessage(code)
-        );
-        return {};
-    }
-    SHFILEINFOW info;
-    ZeroMemory(&info, sizeof(info));
-    const DWORD_PTR rv = SHGetFileInfoW(entry.GetString(), attrs, &info, sizeof(info), SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | flags);
-    if (0 == rv) {
-        const auto code = static_cast<HRESULT>(GetLastError());
-        DH::TPrintf(LTH_SHELL_ICON L" Can't load icon for '%s' - %d '%s'\n",
-            entry.GetString(), code, Str::ErrorCode<>::SystemMessage(code)
-        );
-        return {};
-    }
-    return CIconHandle(info.hIcon);
-}
-#endif
-
 /*
  * Borders:
  * (None),                        BDR_RAISEDOUTER,                                 BDR_SUNKENOUTER,               BDR_RAISEDOUTER | BDR_SUNKENOUTER
@@ -168,7 +141,7 @@ private:
         const int  maxCount = ilSmall.GetImageCount() - 1;
         m_hIcon[ICON_ActiveWnd]   = ilSmall.GetIcon(rand() % maxCount);
         m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
-        m_hIcon[ICON_Desktop1]    = ilBig.GetIcon(IconMyComp);
+        m_hIcon[ICON_Desktop1]    = ilBig.GetIcon(IconMatreshka); // IconMyComp
         m_hIcon[ICON_Cursor1]     = (HICON)LoadCursorW(nullptr, IDC_APPSTARTING);
 
         LoadExplorerSettings();
@@ -799,7 +772,7 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
 {
   //long        dpiScale = ScaleForDpi<long>(8);
     const bool isToolWnd = (0 != (DC_SMALLCAP & captFlags));
-    const bool  isActive = (0 != (DC_ACTIVE & captFlags));
+  //const bool  isActive = (0 != (DC_ACTIVE & captFlags));
     LRect       rcBorder = FromCRect<long>(rc);
     LRect        rcFrame;
     LRect         rcCapt;
@@ -812,13 +785,13 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
 
     target[WR_Border] = ToCRect(rcBorder);
 
-    m_BorderSize = m_Theme.GetNcMetrcs().iBorderWidth + 1;
+    m_BorderSize = m_Theme.GetNcMetrcs().iBorderWidth;
 #if WINVER >= WINVER_VISTA
     m_BorderSize += m_Theme.GetNcMetrcs().iPaddedBorderWidth;
 #endif
 
     rcFrame = rcBorder;
-    rcFrame.Shrink(m_BorderSize, m_BorderSize);
+    rcFrame.Shrink(m_BorderSize - 1, m_BorderSize - 1);
     rcFrame.PutInto(rcBorder, PutAt::Center);
     target[WR_Frame] = ToCRect(rcFrame);
     rcWork = rcFrame;
@@ -837,7 +810,7 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
         rcWork.cy -= rcCapt.cy;
     }
 
-    rcWork.Shrink(2, 2);
+    rcWork.Shrink(1, 1);
     rcWork.y = rcMenu.Bottom() + 1;
     target[WR_Workspace] = ToCRect(rcWork);
 
@@ -981,7 +954,8 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params, Window
     }
 
     if (isToolWnd) {
-        dc.FillSolidRect(rects[WR_Frame], m_Theme.GetColor(COLOR_MENU));
+      //dc.FillSolidRect(rects[WR_Frame], m_Theme.GetColor(COLOR_MENU));
+        dc.FillRect(rects[WR_Frame], m_Theme.GetBrush(COLOR_3DFACE));
         CRect rcEdge(rects[WR_Frame]);
         dc.DrawEdge(rcEdge, EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
         rcEdge.InflateRect(1, 1);
@@ -990,7 +964,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params, Window
     else {
         DrawBorder(dc, rects[WR_Border], m_BorderSize, m_Theme.GetBrush(borderColorIndex));
         dc.DrawEdge(CRect(rects[WR_Border]), EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
-        dc.FillRect(rects[WR_Frame], m_Theme.GetBrush(COLOR_WINDOWFRAME));
+      //dc.FillRect(rects[WR_Frame], m_Theme.GetBrush(COLOR_WINDOWFRAME));
     }
 
     CRect rcCapt = rects[WR_Caption];

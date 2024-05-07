@@ -217,7 +217,10 @@ HRESULT CLUIApp::ImListCreate(int index, int cx, int cy)
         IDI_HATCH_CROSS,
         IDI_FOLDER_OPEN,
         IDI_FNT_BOLD,
+        IDI_MATRESHKA,
     };
+    static_assert(std::size(iconsIDs) == IconCount, "iconsIDs COUNT is NOT match IconCount!");
+    //
     HRESULT code = S_FALSE;
     m_ImList[index].Create(cx, cy, ILC_MASK | ILC_COLOR32, _countof(iconsIDs), 0);
     if (!m_ImList[index].m_hImageList) {

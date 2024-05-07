@@ -322,6 +322,7 @@
     <Image Include="resz\rom-0.ico" />
     <Image Include="resz\rom-1.ico" />
     <Image Include="resz\rom-2.ico" />
+    <Image Include="resz\rom-7-matreshka.ico" />
     <Image Include="resz\rom-delete.ico" />
     <Image Include="resz\rom-my-comp.ico" />
     <Image Include="resz\rom-open.ico" />
@@ -329,6 +330,7 @@
     <Image Include="resz\rom-save.ico" />
     <Image Include="rom-1.ico" />
     <Image Include="rom-2.ico" />
+    <Image Include="rom-7-matreshka.ico" />
     <Image Include="rom-delete.ico" />
     <Image Include="rom-my-comp.ico" />
     <Image Include="rom-open.ico" />

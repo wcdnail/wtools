@@ -45,6 +45,8 @@
 #define IDC_RADIO1                      219
 #define IDI_ICON1                       219
 #define IDI_FNT_BOLD                    219
+#define IDI_ICON2                       220
+#define IDI_MATRESHKA                   220
 #define IDC_RADIO3                      221
 #define IDC_RADIO4                      222
 #define IDC_RADIO5                      223
@@ -101,7 +103,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        220
+#define _APS_NEXT_RESOURCE_VALUE        221
 #define _APS_NEXT_COMMAND_VALUE         32778
 #define _APS_NEXT_CONTROL_VALUE         222
 #define _APS_NEXT_SYMED_VALUE           106

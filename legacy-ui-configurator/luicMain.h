@@ -32,6 +32,7 @@ enum IconIndex : int
     IconHatchCross,
     IconFolderOpen,
     IconFontBold,
+    IconMatreshka,
     IconCount
 };
 
