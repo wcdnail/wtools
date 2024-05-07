@@ -1,15 +1,15 @@
 #pragma once
 
 #include "luicDrawings.h"
-#include "windows.wtl.buffered.paint.h"
+//#include "windows.wtl.buffered.paint.h"
 
 using SelectedPair = std::pair<int, int>;
 
-struct CThemePreviewer: ATL::CWindow, CF::DoubleBuffered
+struct CThemePreviewer: ATL::CWindow //, CF::DoubleBuffered
 {
     static ATOM Register(HRESULT& code);
 
-    ~CThemePreviewer() override;
+    ~CThemePreviewer();
     CThemePreviewer();
 
     void SubclassIt(HWND hWnd);
@@ -42,5 +42,5 @@ private:
     void OnPaint(CDCHandle dc);
     void OnLButton(UINT nFlags, CPoint point);
     int RectIndexToElementId() const;
-    void NotifyParent();
+    void NotifyParent() const;
 };

@@ -38,7 +38,7 @@ CThemePreviewer::~CThemePreviewer()
 
 CThemePreviewer::CThemePreviewer()
     :   ATL::CWindow{}
-    , DoubleBuffered{true}
+  //, DoubleBuffered{true}
     ,       m_pTheme{nullptr}
     ,      m_pcbItem{nullptr}
     ,   m_prSelected{-1, -1}
@@ -82,7 +82,7 @@ LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     else {
         LONG_PTR tempLP = ::GetWindowLongPtrW(hWnd, GWLP_USERDATA);
         if (tempLP) {
-            auto*   self = reinterpret_cast<CThemePreviewer*>(tempLP);
+            auto* self = reinterpret_cast<CThemePreviewer*>(tempLP);
             switch (uMsg) {
             case WM_PAINT:{
                 self->OnPaint({reinterpret_cast<HDC>(wParam)});
@@ -94,11 +94,11 @@ LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
                 return 0;
             }
             }
-            /// CHAIN_MSG_MAP(Cf::DoubleBuffered)
-            LRESULT lRes = 0;
-            if (self->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lRes, 0)) {
-                return lRes;
-            }
+            ///// CHAIN_MSG_MAP(Cf::DoubleBuffered)
+            //LRESULT lRes = 0;
+            //if (self->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lRes, 0)) {
+            //    return lRes;
+            //}
         }
     }
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
@@ -112,10 +112,13 @@ int CThemePreviewer::OnCreate(LPCREATESTRUCT pCS)
 void CThemePreviewer::OnPaint(CDCHandle dcParam)
 {
     UNREFERENCED_PARAMETER(dcParam);
-    CPaintDC dcPaint(m_hWnd);
-    CF::BufferedPaint bufferedPaint(dcPaint, GetSecondDc(), IsDoubleBuffered(), m_hWnd);
-    CDCHandle dc = bufferedPaint.GetCurrentDc();
-    DrawDesktop(dc, bufferedPaint.GetRect());
+    const CPaintDC dcPaint{m_hWnd};
+    const CDCHandle dc{dcPaint};
+  //CF::BufferedPaint bufferedPaint(dcPaint, GetSecondDc(), IsDoubleBuffered(), m_hWnd);
+  //CDCHandle dc = bufferedPaint.GetCurrentDc();
+    CRect rc;
+    GetClientRect(rc);
+    DrawDesktop(dc, rc);
 }
 
 void CThemePreviewer::CalcRects(CRect const& rcClient, CRect& rcFront, CRect& rcBack, CRect& rcMsg, CRect& rcIcon)
@@ -289,7 +292,7 @@ void CThemePreviewer::OnLButton(UINT nFlags, CPoint point)
 
 int CThemePreviewer::RectIndexToElementId() const
 {
-    static const int gs_nItemIndex[WND_Count][WR_Count] = {
+    static constexpr int gs_nItemIndex[WND_Count][WR_Count] = {
         {                  // WND_MsgBox ------------------
         /* WR_Tooltip      */ EN_Tooltip,
         /* WR_Button       */ EN_3DObject,
@@ -348,15 +351,14 @@ int CThemePreviewer::RectIndexToElementId() const
     return gs_nItemIndex[wi][ri];
 }
 
-void CThemePreviewer::NotifyParent()
+void CThemePreviewer::NotifyParent() const
 {
     if (!m_pcbItem) {
         return ;
     }
-    int nElementId = RectIndexToElementId();
+    const int nElementId = RectIndexToElementId();
     if (CB_ERR != m_pcbItem->SetCurSel(nElementId)) {
-        WORD   id = m_pcbItem->GetDlgCtrlID();
-        WORD code = CBN_SELENDOK;
-        ::SendMessageW(GetParent(), WM_COMMAND, MAKEWPARAM(id, code), reinterpret_cast<LPARAM>(m_pcbItem->m_hWnd));
+        const WORD id = m_pcbItem->GetDlgCtrlID();
+        ::SendMessageW(GetParent(), WM_COMMAND, MAKEWPARAM(id, CBN_SELENDOK), reinterpret_cast<LPARAM>(m_pcbItem->m_hWnd));
     }
 }

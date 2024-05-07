@@ -364,8 +364,15 @@ bool CTheme::SetColor(int iColor, COLORREF clrNew)
     if (iColor < 0 || (iColor > CLR_Count - 1)) {
         return false;
     }
-    m_Color[iColor] = clrNew;
+    if (clrNew == m_Color[iColor]) {
+        // Same color...
+        return false;
+    }
     // TODO: implement history...
+    m_Color[iColor] = clrNew;
+    CBrush tmpBrush;
+    tmpBrush.CreateSolidBrush(m_Color[iColor]);
+    m_Brush[iColor].Attach(tmpBrush.Detach());
     return true;
 }
 

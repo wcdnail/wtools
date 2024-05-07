@@ -61,10 +61,10 @@ private:
     ResizeVec m_ResiseMap;
 
     BEGIN_MSG_MAP_EX(CColorsPage)
-        if (nullptr != m_pTheme) {
-            MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
-            MSG_WM_ERASEBKGND(OnEraseBkgnd)
-        }
+      //if (nullptr != m_pTheme) {
+      //    MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
+      //    MSG_WM_ERASEBKGND(OnEraseBkgnd)
+      //}
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_COMMAND(OnCommand)

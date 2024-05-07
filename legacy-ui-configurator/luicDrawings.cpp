@@ -947,7 +947,7 @@ void CDrawRoutine::DrawDesktopIcon(CDCHandle dc, CRect const& rcParam, ATL::CStr
     dc.SelectFont(prevFont);
     dc.SetBkMode(prevMode);
     if (drawCursor) {
-        HICON hCursor = StaticInit::instance().m_hIcon[StaticInit::ICON_Cursor1];
+        const HICON hCursor = StaticInit::instance().m_hIcon[StaticInit::ICON_Cursor1];
         CRect rcCursor{rcIcon.right + 8, rcIcon.bottom - 16, 0, 0};
         rcCursor.right = rcCursor.left + 32; // ##TODO: GetSystemMetrics for cursor painting
         rcCursor.bottom = rcCursor.top + 32;
@@ -977,7 +977,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params, Window
     }
     if (isActive) {
         borderColorIndex    = COLOR_ACTIVEBORDER;
-        workspaceColorIndex = COLOR_3DFACE;
+        workspaceColorIndex = COLOR_WINDOW;
     }
 
     if (isToolWnd) {
@@ -990,7 +990,7 @@ void CDrawRoutine::DrawWindow(CDCHandle dc, DrawWindowArgs const& params, Window
     else {
         DrawBorder(dc, rects[WR_Border], m_BorderSize, m_Theme.GetBrush(borderColorIndex));
         dc.DrawEdge(CRect(rects[WR_Border]), EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
-        dc.FillSolidRect(rects[WR_Frame], m_Theme.GetColor(COLOR_MENU));
+        dc.FillRect(rects[WR_Frame], m_Theme.GetBrush(COLOR_WINDOWFRAME));
     }
 
     CRect rcCapt = rects[WR_Caption];
