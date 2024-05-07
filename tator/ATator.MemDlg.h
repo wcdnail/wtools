@@ -7,10 +7,10 @@
 #include <atldlgs.h>
 #include <atlddx.h>
 
-struct CTatorMainDlg: CIndirectDialogImpl<CTatorMainDlg>,
-                      CDialogResize<CTatorMainDlg>,
-                      CWinDataExchange<CTatorMainDlg>,
-                      CMessageFilter
+struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
+                      WTL::CDialogResize<CTatorMainDlg>,
+                      WTL::CWinDataExchange<CTatorMainDlg>,
+                      WTL::CMessageFilter
 {
     enum Sizes: short
     {
@@ -84,7 +84,7 @@ struct CTatorMainDlg: CIndirectDialogImpl<CTatorMainDlg>,
 
         ATLASSUME(m_ccColorPicker.m_hWnd != nullptr);
 
-        CIcon icon(LoadIconW(ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
+        WTL::CIcon icon(LoadIconW(WTL::ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
         SetIcon(icon, TRUE);
         SetIcon(icon, FALSE);
 

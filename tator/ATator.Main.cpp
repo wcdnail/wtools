@@ -5,8 +5,11 @@
 #include "string.utils.format.h"
 #include "string.utils.error.code.h"
 #include "dh.tracing.h"
+#include "3rd-party/inipp.h"
+#include <fstream>
+#include <iostream>
 
-CAppModule _Module;
+WTL::CAppModule _Module;
 
 static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 {
@@ -15,7 +18,7 @@ static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
     bool bRunLoop = true;
     bool   bError = false;
 
-    CMessageLoop theLoop;
+    WTL::CMessageLoop theLoop;
     _Module.AddMessageLoop(&theLoop);
 
     //CTatorMainDlg dlg;
@@ -71,6 +74,26 @@ static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
     return nRet;
 }
 
+void tryIni()
+{
+    inipp::Ini<char> ini;
+    std::ifstream is("C:/_/wtools/legacy-ui-configurator/temes/themes-win98-plus/Inside your Computer (high color).theme");
+    ini.parse(is);
+
+    std::ostringstream iniStm;
+    ini.generate(iniStm);
+
+    auto const* sectName = "DEFAULT";
+
+    std::ostringstream sectStm;
+    ini.default_section(ini.sections[sectName]);
+    ini.interpolate();
+    ini.generate(sectStm);
+
+    DH::TPrintf("INI:\n", iniStm.str().c_str());
+    DH::TPrintf("[%s]:\n", sectName, sectStm.str().c_str());
+}
+
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int nCmdShow)
 {
     HRESULT code = S_OK;
@@ -87,7 +110,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
 
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
 
-    AtlInitCommonControls(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
+    tryIni();
+
+    WTL::AtlInitCommonControls(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
 
     code = _Module.Init(nullptr, hInstance);
     ATLASSERT(SUCCEEDED(code));

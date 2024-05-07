@@ -28,8 +28,8 @@ struct CColorPicker: CColorPickerBase
     END_MSG_MAP()
 
     int OnCreate(LPCREATESTRUCT pCS);
-    BOOL OnEraseBkgnd(CDCHandle dc) const;
-    void OnPaint(CDCHandle);
+    BOOL OnEraseBkgnd(WTL::CDCHandle dc) const;
+    void OnPaint(WTL::CDCHandle);
 };
 
 __declspec(selectany) ATOM CColorPicker::gs_Atom{0};
@@ -64,7 +64,7 @@ inline HRESULT CColorPicker::PreCreateWindow()
         SetLastError(static_cast<DWORD>(code));
         return code;
     }
-    ModuleHelper::AddCreateWndData(&m_thunk.cd, this);
+    WTL::ModuleHelper::AddCreateWndData(&m_thunk.cd, this);
     return S_OK;
 }
 
@@ -74,7 +74,7 @@ inline CColorPicker& CColorPicker::operator=(HWND hWnd)
     return *this;
 }
 
-inline BOOL CColorPicker::OnEraseBkgnd(CDCHandle dc) const
+inline BOOL CColorPicker::OnEraseBkgnd(WTL::CDCHandle dc) const
 {
     //CRect rc;
     //GetClientRect(rc);
@@ -82,15 +82,15 @@ inline BOOL CColorPicker::OnEraseBkgnd(CDCHandle dc) const
     return TRUE;
 }
 
-inline void CColorPicker::OnPaint(CDCHandle)
+inline void CColorPicker::OnPaint(WTL::CDCHandle)
 {
-    CPaintDC paintDC{m_hWnd};
-    CDCHandle     dc{paintDC};
-    CRect         rc{};
-    COLORREF    clCC{0x005a5a5a};
-    COLORREF    clWT{0x00ffffff};
-    COLORREF    clTG{0x00fc2500};
-    COLORREF    clBK{0x00000000};
+    WTL::CPaintDC paintDC{m_hWnd};
+    WTL::CDCHandle     dc{paintDC};
+    CRect              rc{};
+    COLORREF         clCC{0x005a5a5a};
+    COLORREF         clWT{0x00ffffff};
+    COLORREF         clTG{0x00fc2500};
+    COLORREF         clBK{0x00000000};
 
     GetClientRect(rc);
     dc.FillSolidRect(rc, m_clrBkgnd);

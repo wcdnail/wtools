@@ -33,7 +33,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         CenterWindow();
 
         // set icons
-        CIcon icon(LoadIconW(ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
+        WTL::CIcon icon(LoadIconW(WTL::ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
         SetIcon(icon, TRUE);
         SetIcon(icon, FALSE);
 
