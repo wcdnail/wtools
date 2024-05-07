@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "ATator.MemDlg.h"
+#include "CDefaultWin32Dlg.h"
 #include "windows.gui.leaks.h"
 #include "string.utils.format.h"
 #include "string.utils.error.code.h"
@@ -9,6 +10,7 @@ CAppModule _Module;
 
 static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 {
+    HRESULT  code = ERROR_SUCCESS;
     int      nRet = 0;
     bool bRunLoop = true;
     bool   bError = false;
@@ -16,14 +18,15 @@ static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
     CMessageLoop theLoop;
     _Module.AddMessageLoop(&theLoop);
 
-    CTatorMainDlg dlg;
-    HRESULT code = dlg.Initialize();
+    //CTatorMainDlg dlg;
+    //HRESULT code = dlg.Initialize();
+    CDefaultWin32Dlg dlg;
     if (ERROR_SUCCESS == code) {
         if constexpr (true) {
             bRunLoop = false;
             nRet = static_cast<int>(dlg.DoModal());
             if (-1 == nRet) {
-                code = static_cast<HRESULT>(GetLastError());
+                code = static_cast<HRESULT>(GetLastError()); // ##TODO: Try CommDlgExtendedError 
                 bError = true;
             }
         }
@@ -38,6 +41,7 @@ static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
                 bError = true;
             }
         }
+        
         if (bError && (ERROR_SUCCESS == code)) {                // если диалог содержит каcтомный контрол,
             code = static_cast<HRESULT>(WSAGetLastError());     // класс которого НЕ зарегистрирован, ф-ция Create вернет NULL
             if (ERROR_SUCCESS == code) {                        // а GetLastError вернет 0...
@@ -71,10 +75,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
 {
     HRESULT code = S_OK;
     SetErrorMode(SetErrorMode(0) | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
-    DefWindowProc(nullptr, 0, 0, 0L);
 
     code = ::CoInitialize(nullptr);
+    // If you are running on NT 4.0 or higher you can use the following call instead to 
+    // make the EXE free threaded. This means that calls come in on a random RPC thread.
+    //     HRESULT hRes = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
     ATLASSERT(SUCCEEDED(code));
+    
+    // this resolves ATL window thunking problem when Microsoft Layer for Unicode (MSLU) is used
+    DefWindowProc(nullptr, 0, 0, 0L);
 
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
 

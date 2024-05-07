@@ -244,12 +244,6 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="luicMainFrame.h" />
     <ClInclude Include="luicMainView.h" />
-    <ClInclude Include="luicPageAppearanceSystem.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="luicPageDlgTemplate.h" />
     <ClInclude Include="luicPageDllIcons.h" />
     <ClInclude Include="luicPageImpl.h" />
@@ -285,12 +279,6 @@
     </ClCompile>
     <ClCompile Include="luicMainFrame.cpp" />
     <ClCompile Include="luicMainView.cpp" />
-    <ClCompile Include="luicPageAppearanceSystem.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="luicPageDlgTemplate.cpp" />
     <ClCompile Include="luicPageDllIcons.cpp" />
     <ClCompile Include="luicPageImpl.cpp" />

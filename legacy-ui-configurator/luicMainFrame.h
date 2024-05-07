@@ -47,6 +47,7 @@ private:
             OnResizeNotify();
             return TRUE;
         }
+        REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
 
     BEGIN_DLGRESIZE_MAP(CMainFrame)

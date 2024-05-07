@@ -43,6 +43,7 @@
     <ClCompile Include="string.utils.format.cpp" />
     <ClCompile Include="windows.uses.gdi+.cpp" />
     <ClCompile Include="windows.wtl.buffered.paint.cpp" />
+    <ClCompile Include="WTL\CColorButton.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="debug.dump.msg.h" />
@@ -68,6 +69,7 @@
     <ClInclude Include="string.utils.format.h" />
     <ClInclude Include="windows.uses.gdi+.h" />
     <ClInclude Include="windows.wtl.buffered.paint.h" />
+    <ClInclude Include="WTL\CColorButton.h" />
     <ClInclude Include="WTL\CColorPicker.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

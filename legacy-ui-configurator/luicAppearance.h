@@ -2,6 +2,7 @@
 
 #include "luicPageImpl.h"
 #include "luicThemePreviewer.h"
+#include "WTL/CColorButton.h"
 #include <atlctrls.h>
 
 struct CTheme;
@@ -32,9 +33,7 @@ private:
     WTL::CEdit         m_edItemSize2;
     WTL::CUpDownCtrl   m_udItemSize2;
     WTL::CStatic        m_stItemClr1;
-    WTL::CButton        m_bnItemClr1;
     WTL::CStatic        m_stItemClr2;
-    WTL::CButton        m_bnItemClr2;
 
     WTL::CStatic            m_stFont;
     WTL::CComboBox          m_cbFont;
@@ -43,8 +42,7 @@ private:
     WTL::CStatic       m_stFontWidth;
     WTL::CEdit         m_edFontWidth;
     WTL::CUpDownCtrl   m_udFontWidth;
-    WTL::CStatic         m_stFontClr;
-    WTL::CButton        m_bnFontClr1;
+    WTL::CStatic        m_stFontClr1;
     WTL::CStatic       m_stFontStyle;
     WTL::CButton        m_bnFontBold;
     WTL::CButton      m_bnFontItalic;
@@ -68,12 +66,16 @@ private:
         BTN_ColorCount
     };
 
-    WTL::CBitmap m_bmColor[BTN_ColorCount];
+    CColorButton m_bnItemColor[BTN_ColorCount];
+
+  //WTL::CBitmap m_bmColor[BTN_ColorCount];
 
     void InitResizeMap();
     void CtlAdjustPositions();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
+    void ColorPicker(int nWhichOne);
+    void ItemColorTryChange(int nButton, UINT uNotifyCode, int nID, HWND wndCtl);
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
 
     void ThemeEnable(BOOL bEnable);
@@ -86,7 +88,7 @@ private:
     void FontClr1Enable(BOOL bEnable);
 
     void BtnColorFill(WTL::CButton& bnControl, int nBtn, int iColor);
-    bool BtnSetColor(WTL::CButton& bnControl, int nBtn, int iColor);
+    bool BtnSetColor(int nButton, int iColor);
     void ItemColorSet(int nItem);
     BOOL ItemSizeSet(int metric, int nSizeCtlID, WTL::CUpDownCtrl& udSize);
 

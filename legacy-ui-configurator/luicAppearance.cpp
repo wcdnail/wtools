@@ -104,9 +104,9 @@ void CPageAppearance::CtlAdjustPositions()
     CtlAdjustHeightAndShift(m_bnThemeRename, xOffset, yOffset, nHeight);
     CtlAdjustHeightAndShift(m_bnThemeDelete, xOffset, yOffset, nHeight);
 
-    CtlAdjustHeightAndShift(m_bnItemClr1, xOffset, yOffset, nHeight);
-    CtlAdjustHeightAndShift(m_bnItemClr2, xOffset, yOffset, nHeight);
-    CtlAdjustHeightAndShift(m_bnFontClr1, xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnItemColor[BTN_ItemColor1], xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnItemColor[BTN_ItemColor2], xOffset, yOffset, nHeight);
+    CtlAdjustHeightAndShift(m_bnItemColor[BTN_FontColor1], xOffset, yOffset, nHeight);
     CtlAdjustHeightAndShift(m_bnFontBold, xOffset, yOffset, nHeight);
     CtlAdjustHeightAndShift(m_bnFontItalic, xOffset, yOffset, nHeight);
     CtlAdjustHeightAndShift(m_bnFontUndrln, xOffset, yOffset, nHeight);
@@ -144,9 +144,11 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_edItemSize2.Attach(GetDlgItem(IDC_APP_ITEM_SIZE2_EDIT));
     m_udItemSize2.Attach(GetDlgItem(IDC_APP_ITEM_SIZE2_SPIN));
     m_stItemClr1.Attach(GetDlgItem(IDC_APP_ITEM_COLOR1_CAP));
-    m_bnItemClr1.Attach(GetDlgItem(IDC_APP_ITEM_COLOR1_SEL));
+    m_bnItemColor[BTN_ItemColor1].SubclassWindow(GetDlgItem(IDC_APP_ITEM_COLOR1_SEL));
+    m_bnItemColor[BTN_ItemColor1].SetDefaultText(_T("Item Color #1"));
     m_stItemClr2.Attach(GetDlgItem(IDC_APP_ITEM_COLOR2_CAP));
-    m_bnItemClr2.Attach(GetDlgItem(IDC_APP_ITEM_COLOR2_SEL));
+    m_bnItemColor[BTN_ItemColor2].SubclassWindow(GetDlgItem(IDC_APP_ITEM_COLOR2_SEL));
+    m_bnItemColor[BTN_ItemColor2].SetDefaultText(_T("Item Color #2"));
 
     m_stFont.Attach(GetDlgItem(IDC_APP_FONT_CAP));
     m_cbFont.Attach(GetDlgItem(IDC_APP_FONT_SEL));
@@ -155,8 +157,9 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_stFontWidth.Attach(GetDlgItem(IDC_APP_FONT_WDTH_CAP));
     m_edFontWidth.Attach(GetDlgItem(IDC_APP_FONT_WDTH_EDIT));
     m_udFontWidth.Attach(GetDlgItem(IDC_APP_FONT_WDTH_SPIN));
-    m_stFontClr.Attach(GetDlgItem(IDC_APP_FONT_COLOR_CAP));
-    m_bnFontClr1.Attach(GetDlgItem(IDC_APP_FONT_COLOR_SEL));
+    m_stFontClr1.Attach(GetDlgItem(IDC_APP_FONT_COLOR_CAP));
+    m_bnItemColor[BTN_FontColor1].SubclassWindow(GetDlgItem(IDC_APP_FONT_COLOR_SEL));
+    m_bnItemColor[BTN_FontColor1].SetDefaultText(_T("Font Color #1"));
     m_stFontStyle.Attach(GetDlgItem(IDC_APP_FONT_STYLE_CAP));
     m_bnFontBold.Attach(GetDlgItem(IDC_APP_FONT_STYLE_BOLD));
     m_bnFontItalic.Attach(GetDlgItem(IDC_APP_FONT_STYLE_ITALIC));
@@ -177,10 +180,6 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_bnThemeDelete.SetIcon(pApp->GetIcon(IconHatchCross));
     m_bnThemeImport.SetIcon(pApp->GetIcon(IconFolderOpen));
 
-    m_bnItemClr1.ModifyStyle(0, BS_BITMAP | BS_PUSHBUTTON);
-    m_bnItemClr2.ModifyStyle(0, BS_BITMAP | BS_PUSHBUTTON);
-    m_bnFontClr1.ModifyStyle(0, BS_BITMAP | BS_PUSHBUTTON);
-
     CtlAdjustPositions();
     CTheme::PerformStaticInit(*this, pApp);
     InitResizeMap();
@@ -190,6 +189,19 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 void CPageAppearance::OnDestroy()
 {
     CPageImpl::OnDestroy();
+}
+
+void CPageAppearance::ColorPicker(int nWhichOne)
+{
+    COLORREF srcColor = 0x00ff00ff;
+    WTL::CColorDialog dlgColorPicker(srcColor, CC_FULLOPEN, m_hWnd);
+    dlgColorPicker.DoModal(m_hWnd);
+}
+
+void CPageAppearance::ItemColorTryChange(int nButton, UINT uNotifyCode, int nID, HWND wndCtl)
+{
+    //BOOL bHandled = FALSE;
+    //LRESULT  lRes = m_bnItemColor[nButton].OnClicked(uNotifyCode, nID, wndCtl, bHandled);
 }
 
 void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
@@ -203,15 +215,12 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         }
         return ;
     }
-    case IDC_APP_ITEM_COLOR1_SEL: 
-    case IDC_APP_ITEM_COLOR2_SEL:
-    case IDC_APP_FONT_COLOR_SEL: {
-        if (BN_CLICKED == uNotifyCode) {
-            WTL::CColorDialog dlgColorPicker;
-            dlgColorPicker.DoModal(m_hWnd);
-        }
-        return ;
-    }
+    case IDC_APP_ITEM_COLOR1_SEL: ItemColorTryChange(BTN_ItemColor1, uNotifyCode, nID, wndCtl); return ;
+    case IDC_APP_ITEM_COLOR2_SEL: ItemColorTryChange(BTN_ItemColor2, uNotifyCode, nID, wndCtl); return ;
+    case IDC_APP_FONT_COLOR_SEL:  ItemColorTryChange(BTN_FontColor1, uNotifyCode, nID, wndCtl); return ;
+  //case IDC_APP_ITEM_COLOR1_SEL: ColorPicker(1); return ;
+  //case IDC_APP_ITEM_COLOR2_SEL: ColorPicker(2); return ;
+  //case IDC_APP_FONT_COLOR_SEL:  ColorPicker(3); return ;
     default:
         break;
     }
@@ -256,13 +265,13 @@ void CPageAppearance::ItemSize2Enable(BOOL bEnable)
 void CPageAppearance::ItemClr1Enable(BOOL bEnable)
 {
     m_stItemClr1.EnableWindow(bEnable);
-    m_bnItemClr1.EnableWindow(bEnable);
+    m_bnItemColor[BTN_ItemColor1].EnableWindow(bEnable);
 }
 
 void CPageAppearance::ItemClr2Enable(BOOL bEnable)
 {
     m_stItemClr2.EnableWindow(bEnable);
-    m_bnItemClr2.EnableWindow(bEnable);
+    m_bnItemColor[BTN_ItemColor2].EnableWindow(bEnable);
 }
 
 void CPageAppearance::FontEnable(BOOL bEnable)
@@ -287,10 +296,11 @@ void CPageAppearance::FontEnable(BOOL bEnable)
 
 void CPageAppearance::FontClr1Enable(BOOL bEnable)
 {
-    m_stFontClr.EnableWindow(bEnable);
-    m_bnFontClr1.EnableWindow(bEnable);
+    m_stFontClr1.EnableWindow(bEnable);
+    m_bnItemColor[BTN_FontColor1].EnableWindow(bEnable);
 }
 
+#if 0
 void CPageAppearance::BtnColorFill(WTL::CButton& bnControl, int nBtn, int iColor)
 {
     ATLASSUME(m_pTheme != nullptr);
@@ -321,14 +331,16 @@ void CPageAppearance::BtnColorFill(WTL::CButton& bnControl, int nBtn, int iColor
     }
     bnControl.SetBitmap(hBitmapToSet);
 }
+#endif
 
-bool CPageAppearance::BtnSetColor(WTL::CButton& bnControl, int nBtn, int iColor)
+bool CPageAppearance::BtnSetColor(int nButton, int iColor)
 {
-    if ((nBtn < 0) || (nBtn > BTN_ColorCount) || (iColor < 0)) {
-        bnControl.SetBitmap(nullptr);
+    if ((nButton < 0) || (nButton > BTN_ColorCount) || (iColor < 0)) {
         return false;
     }
-    BtnColorFill(bnControl, nBtn, iColor);
+    const COLORREF clrToSet = m_pTheme->GetColor(iColor);
+    m_bnItemColor[nButton].SetDefaultColor(clrToSet);
+    m_bnItemColor[nButton].SetDefaultText(_T("Trololo"));
     return true;
 }
 
@@ -341,16 +353,16 @@ void CPageAppearance::ItemColorSet(int nItem)
     if (!pAssignment) {
         return ;
     }
-    if (BtnSetColor(m_bnItemClr1, BTN_ItemColor1, pAssignment->color1)) {
+    if (BtnSetColor(BTN_ItemColor1, pAssignment->color1)) {
         ItemClr1Enable(TRUE);
     }
-    if (BtnSetColor(m_bnItemClr2, BTN_ItemColor2, pAssignment->color2)) {
+    if (BtnSetColor(BTN_ItemColor2, pAssignment->color2)) {
         ItemClr2Enable(TRUE);
     }
-    if (BtnSetColor(m_bnFontClr1, BTN_FontColor1, pAssignment->fontColor)) {
+    if (BtnSetColor(BTN_FontColor1, pAssignment->fontColor)) {
         FontClr1Enable(TRUE);
     }
-}
+    }
 
 BOOL CPageAppearance::ItemSizeSet(int metric, int nSizeCtlID, WTL::CUpDownCtrl& udSize)
 {

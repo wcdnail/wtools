@@ -49,6 +49,7 @@ inline HRESULT CColorPicker::PreCreateWindow()
 {
     HRESULT code = S_OK;
     // ##TODO: gs_Atom is not ThreadSafe!
+    // look at CStaticDataInitCriticalSectionLock lock;
     if (!gs_Atom) {
         const ATOM atom = ATL::AtlModuleRegisterClassExW(nullptr, &GetWndClassInfo().m_wc);
         if (!atom) {
