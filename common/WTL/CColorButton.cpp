@@ -123,10 +123,10 @@ static constexpr int g_ciArrowSizeY = 2;
 //
 // Other definitions
 //
-#define DEFAULT_BOX_VALUE   -3
-#define CUSTOM_BOX_VALUE    -2
-#define INVALID_COLOR       -1
-#define MAX_COLORS          100
+static constexpr int DEFAULT_BOX_VALUE = -3;
+static constexpr int CUSTOM_BOX_VALUE  = -2;
+static constexpr int INVALID_COLOR     = -1;
+static constexpr int MAX_COLORS        = 100;
 
 //
 // Sizing definitions
@@ -156,30 +156,43 @@ static const CSize s_sizeBoxCore(14, 14);
 // made drawing and hit test 100000 times easier.
 //
 
-#define COLORBUTTON_NOTHEMES
+#define COLORBUTTON_NOTHEMES 0
 
 //-----------------------------------------------------------------------------
 //
 // Test for themes
 //
 //-----------------------------------------------------------------------------
-struct CColorButton::CThemeImpl
-#if defined (COLORBUTTON_NOTHEMES) || !defined (__ATLTHEME_H__)
+
+#if (COLORBUTTON_NOTHEMES == 1) || !defined (__ATLTHEME_H__)
+
+struct CColorButton::CThemed
 {
-    void OnSubclassWindow(PCWSTR) {}
+    HANDLE OpenThemeData(PCWSTR) { return INVALID_HANDLE_VALUE; }
     bool DrawThemeBkgnd(CDCHandle, CRect&, UINT, BOOL, BOOL) { return false; }
+    BOOL ProcessWindowMessage(HWND, UINT, WPARAM, LPARAM, LRESULT&) { return FALSE; }
+};
 
-#define COLORBUTTON_NOTHEMES
 #else
-    : public WTL::CThemeImpl<CColorButton::CThemeImpl>
-{
-    static inline bool m_bInitialized = false;
 
-    void OnSubclassWindow(PCWSTR pszClassList)
+struct CColorButton::CThemed : public WTL::CThemeImpl<CThemed>
+{
+    CColorButton& m_rMaster;
+    HWND&            m_hWnd;
+
+    ~CThemed()
     {
-        if (!m_bInitialized) {
-            m_bInitialized = nullptr != OpenThemeData(pszClassList);
-        }
+    }
+
+    CThemed(CColorButton& rMaster)
+        : m_rMaster{rMaster}
+        ,    m_hWnd{rMaster.m_hWnd}
+    {
+    }
+
+    DWORD GetExStyle() const throw()
+    {
+        return m_rMaster.GetExStyle();
     }
 
     bool DrawThemeBkgnd(CDCHandle dc, CRect& rcDraw, UINT uState, BOOL fPopupActive, BOOL fMouseOver)
@@ -207,15 +220,9 @@ struct CColorButton::CThemeImpl
         GetThemeBackgroundContentRect(dc, BP_PUSHBUTTON, uFrameState, &rcDraw, &rcDraw);
         return true;
     }
-#endif
-
-    static CColorButton::CThemeImpl& instance()
-    {
-        static CColorButton::CThemeImpl inst;
-        return inst;
-    }
 };
 
+#endif
 
 //
 // THE FOLLOWING variables control the popup
@@ -415,8 +422,8 @@ CColorButton::CColorButton()
     , m_fTrackSelection{FALSE}
     ,      m_fMouseOver{FALSE}
     ,         m_pPicker{std::make_unique<CPickerImpl>(*this)}
+    ,         m_pThemed{std::make_unique<CThemed>(*this)}
 {
-    CThemeImpl::instance().OnSubclassWindow(L"Button");
 }
 
 void CColorButton::SetCustomText(LPCTSTR pszText)
@@ -465,6 +472,12 @@ void CColorButton::SetDefaultText(UINT nID)
     }
 }
 
+BOOL CColorButton::PreProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
+{
+    CHAIN_MSG_MAP_MEMBER((*m_pThemed))
+    return FALSE;
+}
+
 //-----------------------------------------------------------------------------
 //
 // @mfunc Subclass the control
@@ -481,6 +494,9 @@ BOOL CColorButton::SubclassWindow(HWND hWnd)
 {
     CWindowImpl<CColorButton>::SubclassWindow(hWnd);
     ModifyStyle(0, BS_OWNERDRAW);
+    if (!m_pThemed->OpenThemeData(L"Button")) {
+        // TODO: report...
+    }
     return TRUE;
 }
 
@@ -639,7 +655,7 @@ LRESULT CColorButton::OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
     // If we have a theme
     //
     m_fPopupActive = false;
-    if (CThemeImpl::instance().DrawThemeBkgnd(dc.m_hDC, rcDraw, uState, m_fPopupActive, m_fMouseOver)) {
+    if (m_pThemed->DrawThemeBkgnd(dc.m_hDC, rcDraw, uState, m_fPopupActive, m_fMouseOver)) {
     }
     //
     // Otherwise, we are old school
@@ -801,12 +817,10 @@ void CColorButton::DrawArrow(CDC& dc, const RECT& rect,
 BOOL CColorButton::CPickerImpl::Picker()
 {
     BOOL fOked = FALSE;
-
     //
     // See what version we are using
     //
-
-#if 1
+#if 1 // GetVersionEx is obsolete
     OSVERSIONINFOEXW osvi = {};
     osvi.dwOSVersionInfoSize = sizeof(osvi);
     const DWORDLONG dwlConditionMask = VerSetConditionMask(
@@ -824,26 +838,22 @@ BOOL CColorButton::CPickerImpl::Picker()
 #else
     OSVERSIONINFO osvi;
     osvi .dwOSVersionInfoSize = sizeof (osvi);
-    ::GetVersionEx (&osvi);
+    ::GetVersionEx(&osvi);
     const bool fIsXP = osvi .dwPlatformId == VER_PLATFORM_WIN32_NT &&
         (osvi .dwMajorVersion > 5 || (osvi .dwMajorVersion == 5 &&
         osvi .dwMinorVersion >= 1));
 #endif
-
     //
     // Get the flat flag
     //
-
     m_fPickerFlat = FALSE;
 #if (_WIN32_WINNT >= 0x0501)
     if (fIsXP)
         ::SystemParametersInfo(SPI_GETFLATMENU, 0, &m_fPickerFlat, FALSE);
 #endif
-
     //
     // Get all the colors I need
     //
-
     int nAlpha = 48;
     m_clrBackground = ::GetSysColor(COLOR_MENU);
     m_clrHiLightBorder = ::GetSysColor(COLOR_HIGHLIGHT);
@@ -861,47 +871,38 @@ BOOL CColorButton::CPickerImpl::Picker()
             GetGValue (m_clrHiLightBorder) * nAlpha) >> 8,
         (GetBValue (m_clrBackground) * (255 - nAlpha) +
             GetBValue (m_clrHiLightBorder) * nAlpha) >> 8);
-
     //
     // Get the margins
     //
-
     m_rectMargins.left = ::GetSystemMetrics(SM_CXEDGE);
     m_rectMargins.top = ::GetSystemMetrics(SM_CYEDGE);
     m_rectMargins.right = ::GetSystemMetrics(SM_CXEDGE);
     m_rectMargins.bottom = ::GetSystemMetrics(SM_CYEDGE);
-
     //
     // Initialize some sizing parameters
     //
-
     m_nNumColors = sizeof (gm_sColors) / sizeof(ColorTableEntry);
     _ASSERTE(m_nNumColors <= MAX_COLORS);
-    if (m_nNumColors > MAX_COLORS)
+    if (m_nNumColors > MAX_COLORS) {
         m_nNumColors = MAX_COLORS;
-
+    }
     //
     // Initialize our state
     // 
-
     m_nCurrentSel = INVALID_COLOR;
     m_nChosenColorSel = INVALID_COLOR;
     m_clrPicker = m_rMaster.m_clrCurrent;
-
     //
     // Create the font
     //
-
     NONCLIENTMETRICS ncm;
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
     SystemParametersInfo(SPI_GETNONCLIENTMETRICS,
                          sizeof(NONCLIENTMETRICS), &ncm, 0);
     m_font.CreateFontIndirect(&ncm.lfMessageFont);
-
     //
     // Create the palette
     //
-
     struct
     {
         LOGPALETTE LogPalette;
@@ -911,7 +912,6 @@ BOOL CColorButton::CPickerImpl::Picker()
     auto pLogPalette = reinterpret_cast<LOGPALETTE*>(&pal);
     pLogPalette->palVersion = 0x300;
     pLogPalette->palNumEntries = static_cast<WORD>(m_nNumColors);
-
     for (int i = 0; i < m_nNumColors; i++) {
         pLogPalette->palPalEntry[i].peRed = GetRValue(gm_sColors [i] .clrColor);
         pLogPalette->palPalEntry[i].peGreen = GetGValue(gm_sColors [i] .clrColor);
@@ -919,11 +919,9 @@ BOOL CColorButton::CPickerImpl::Picker()
         pLogPalette->palPalEntry[i].peFlags = 0;
     }
     m_palette.CreatePalette(pLogPalette);
-
     //
     // Register the window class used for the picker
     //
-
     WNDCLASSEX wc;
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = CS_CLASSDC | CS_SAVEBITS | CS_HREDRAW | CS_VREDRAW;
@@ -946,104 +944,85 @@ BOOL CColorButton::CPickerImpl::Picker()
     }
 #endif
     ATOM atom = ::RegisterClassEx(&wc);
-
+    if (!atom) {
+        // TODO: report!
+    }
     //
     // Create the window
     //
-
     CRect rcButton;
     m_rMaster.GetWindowRect(&rcButton);
     ModuleHelper::AddCreateWndData(&m_wndPicker.m_thunk.cd, &m_wndPicker);
     m_wndPicker.m_hWnd = ::CreateWindowEx(0, CColorPicker_ClassName, // reinterpret_cast<LPCTSTR>(MAKELONG(atom, 0)),
                                           _T(""), WS_POPUP, rcButton.left, rcButton.bottom, 100, 100,
                                           m_rMaster.GetParent(), nullptr, ModuleHelper::GetModuleInstance(), nullptr);
-
     //
     // If we created the window
     //
-
     if (m_wndPicker.m_hWnd != nullptr) {
         //
         // Set the window size
         //
         SetPickerWindowSize();
-
         //
         // Create the tooltips
         //
-
         CToolTipCtrl sToolTip;
         CreatePickerToolTips(sToolTip);
         //
         // Find which cell (if any) corresponds to the initial color
         //
-
         FindPickerCellFromColor(m_rMaster.m_clrCurrent);
-
         //
         // Make visible
         //
-
         m_wndPicker.ShowWindow(SW_SHOWNA);
-
         //
         // Purge the message queue of paints
         //
-
         MSG msg;
         while (::PeekMessage(&msg, nullptr, WM_PAINT, WM_PAINT, PM_NOREMOVE)) {
             if (!GetMessage(&msg, nullptr, WM_PAINT, WM_PAINT))
                 return FALSE;
             DispatchMessage(&msg);
         }
-
         // 
         // Set capture to the window which received this message
         //
-
         m_wndPicker.SetCapture();
         _ASSERTE(m_wndPicker .m_hWnd == ::GetCapture ());
-
         //
         // Get messages until capture lost or cancelled/accepted
         //
-
         while (m_wndPicker.m_hWnd == ::GetCapture()) {
             MSG msg;
             if (!::GetMessage(&msg, nullptr, 0, 0)) {
                 ::PostQuitMessage(static_cast<int>(msg.wParam));
                 break;
             }
-
             sToolTip.RelayEvent(&msg);
-
             switch (msg.message) {
             case WM_LBUTTONUP: {
                 BOOL bHandled = TRUE;
                 m_rMaster.OnPickerLButtonUp(msg.message, msg.wParam, msg.lParam, bHandled);
             }
             break;
-
             case WM_MOUSEMOVE: {
                 BOOL bHandled = TRUE;
                 m_rMaster.OnPickerMouseMove(msg.message, msg.wParam, msg.lParam, bHandled);
             }
             break;
-
             case WM_KEYUP:
                 break;
-
             case WM_KEYDOWN: {
                 BOOL bHandled = TRUE;
                 m_rMaster.OnPickerKeyDown(msg.message, msg.wParam, msg.lParam, bHandled);
             }
             break;
-
             case WM_RBUTTONDOWN:
                 ::ReleaseCapture();
                 m_fOked = FALSE;
                 break;
-
             // just dispatch rest of the messages
             default:
                 DispatchMessage(&msg);
@@ -1052,20 +1031,17 @@ BOOL CColorButton::CPickerImpl::Picker()
         }
         ::ReleaseCapture();
         fOked = m_fOked;
-
         //
         // Destroy the window
         //
         sToolTip.DestroyWindow();
         m_wndPicker.DestroyWindow();
-
         //
         // If needed, show custom
         //
         if (fOked) {
             if (fOked && m_nCurrentSel == CUSTOM_BOX_VALUE) {
                 CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
-
                 if (dlg.DoModal() == IDOK) {
                     m_rMaster.m_clrCurrent = dlg.GetColor();
                 }
@@ -1077,18 +1053,15 @@ BOOL CColorButton::CPickerImpl::Picker()
                 m_rMaster.m_clrCurrent = m_clrPicker;
             }
         }
-
         //
         // Clean up GDI objects
         //
         m_font.DeleteObject();
         m_palette.DeleteObject();
     }
-
     //
     // Unregister our class
     //
-
     UnregisterClass(CColorPicker_ClassName, // reinterpret_cast<LPCTSTR>(MAKELONG(atom, 0)),
                     ModuleHelper::GetModuleInstance());
     return fOked;
@@ -1101,19 +1074,15 @@ BOOL CColorButton::CPickerImpl::Picker()
 // @rdesc None.
 //
 //-----------------------------------------------------------------------------
-
 void CColorButton::CPickerImpl::SetPickerWindowSize()
 {
     SIZE szText = {0, 0};
-
     //
     // If we are showing a custom or default text area, get the font and text size.
     //
-
     if (m_rMaster.HasCustomText() || m_rMaster.HasDefaultText()) {
         CClientDC dc(m_wndPicker);
         const HFONT hfontOld = dc.SelectFont(m_font);
-
         //
         // Get the size of the custom text (if there IS custom text)
         //
@@ -1121,7 +1090,6 @@ void CColorButton::CPickerImpl::SetPickerWindowSize()
             dc.GetTextExtent(m_rMaster.m_pszCustomText.c_str(),
                 static_cast<int>(m_rMaster.m_pszCustomText.length()), &szText);
         }
-
         //
         // Get the size of the default text (if there IS default text)
         //
@@ -1137,31 +1105,27 @@ void CColorButton::CPickerImpl::SetPickerWindowSize()
             }
         }
         dc.SelectFont(hfontOld);
-
         //
         // Commpute the final size
         //
         szText.cx += 2 * (s_sizeTextMargin.cx + s_sizeTextHiBorder.cx);
         szText.cy += 2 * (s_sizeTextMargin.cy + s_sizeTextHiBorder.cy);
     }
-
     //
     // Initiailize our box size
     //
-
     _ASSERTE(s_sizeBoxHiBorder .cx == s_sizeBoxHiBorder .cy);
     _ASSERTE(s_sizeBoxMargin .cx == s_sizeBoxMargin .cy);
     m_sizeBox.cx = s_sizeBoxCore.cx + (s_sizeBoxHiBorder.cx + s_sizeBoxMargin.cx) * 2;
     m_sizeBox.cy = s_sizeBoxCore.cy + (s_sizeBoxHiBorder.cy + s_sizeBoxMargin.cy) * 2;
-
     //
     // Get the number of columns and rows
     //
-
     m_nNumColumns = 8;
     m_nNumRows = m_nNumColors / m_nNumColumns;
-    if ((m_nNumColors % m_nNumColumns) != 0)
+    if ((m_nNumColors % m_nNumColumns) != 0) {
         m_nNumRows++;
+    }
 
     //
     // Compute the min width

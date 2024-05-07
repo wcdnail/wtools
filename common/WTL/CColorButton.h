@@ -194,13 +194,12 @@ class CColorButton : public CColorButtonSuper
 {
     // @access Types and enumerations
 public:
-
-    using String = std::basic_string<TCHAR>;
+    using String = std::basic_string<TCHAR>; // ATL::CString is great, but lacks some transactional behaviour 
 
     struct ColorTableEntry
     {
         COLORREF clrColor;
-        LPCTSTR pszName;
+        LPCTSTR   pszName;
     };
 
     // @cmember General destructor
@@ -213,31 +212,16 @@ public:
     BOOL SubclassWindow(HWND hWnd);
 
     // @cmember Get the current color
-    COLORREF GetColor(void) const
-    {
-        return m_clrCurrent;
-    }
+    COLORREF GetColor() const;
 
     // @cmember Set the current color
-    void SetColor(COLORREF clrCurrent)
-    {
-        m_clrCurrent = clrCurrent;
-        if (IsWindow()) {
-            InvalidateRect(nullptr);
-        }
-    }
+    void SetColor(COLORREF clrCurrent);
 
     // @cmember Get the default color
-    COLORREF GetDefaultColor(void) const
-    {
-        return m_clrDefault;
-    }
+    COLORREF GetDefaultColor() const;
 
     // @cmember Set the default color
-    void SetDefaultColor(COLORREF clrDefault)
-    {
-        m_clrDefault = clrDefault;
-    }
+    void SetDefaultColor(COLORREF clrDefault);
 
     // @cmember Set the custom text
     void SetCustomText(LPCTSTR pszText);
@@ -252,40 +236,27 @@ public:
     void SetDefaultText(UINT nID);
 
     // @cmember Get the tracking flag
-    BOOL GetTrackSelection(void) const
-    {
-        return m_fTrackSelection;
-    }
+    BOOL GetTrackSelection(void) const;
 
     // @cmember Set the tracking flag
-    void SetTrackSelection(BOOL fTrack)
-    {
-        m_fTrackSelection = fTrack;
-    }
+    void SetTrackSelection(BOOL fTrack);
 
     // @cmember Set both strings from a resource
-    void SetText(UINT nDefault, UINT nCustom)
-    {
-        SetDefaultText(nDefault);
-        SetCustomText(nCustom);
-    }
+    void SetText(UINT nDefault, UINT nCustom);
 
     // @cmember Do we have custom text
-    BOOL HasCustomText() const
-    {
-        return !m_pszCustomText.empty();
-    }
+    BOOL HasCustomText() const;
 
     // @cmember Do we have default text
-    BOOL HasDefaultText() const
-    {
-        return !m_pszDefaultText.empty();
-    }
+    BOOL HasDefaultText() const;
+
+private:
+    friend CColorButtonSuper;
 
     BEGIN_MSG_MAP(CColorButton)
-//#if !defined (COLORBUTTON_NOTHEMES)
-//        CHAIN_MSG_MAP(CThemeImpl <CColorButton>) // should be here, not at bottom
-//#endif
+        if(PreProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
+            return TRUE;
+        }
         MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove);
         MESSAGE_HANDLER(WM_MOUSELEAVE, OnMouseLeave);
         MESSAGE_HANDLER(OCM__BASE + WM_DRAWITEM, OnDrawItem)
@@ -298,6 +269,8 @@ public:
 
     // @access ATL Message handlers
 protected:
+    BOOL PreProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
+
     // @cmember Handle draw item
     LRESULT OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
@@ -337,7 +310,7 @@ protected:
 
     // @access Protected members
 protected:
-    struct CThemeImpl;
+    struct CThemed;
     struct CPickerImpl;
 
     // @cmember Default text
@@ -363,4 +336,59 @@ protected:
 
     // @cmember The contained picker control
     std::unique_ptr<CPickerImpl> m_pPicker;
+    // TODO: move implementation to separate files
+
+    // @cmember The contained themed impl
+    std::unique_ptr<CThemed> m_pThemed;
+    // If CColorButton will derive from WTL::CThemeImpl, it will be damage itself...
+    // TODO: Need more deep investigation on it
 };
+
+inline COLORREF CColorButton::GetColor() const
+{
+    return m_clrCurrent;
+}
+
+inline void CColorButton::SetColor(COLORREF clrCurrent)
+{
+    m_clrCurrent = clrCurrent;
+    if (IsWindow()) {
+        InvalidateRect(nullptr);
+    }
+}
+
+inline COLORREF CColorButton::GetDefaultColor() const
+{
+    return m_clrDefault;
+}
+
+inline void CColorButton::SetDefaultColor(COLORREF clrDefault)
+{
+    m_clrDefault = clrDefault;
+}
+
+inline BOOL CColorButton::GetTrackSelection() const
+{
+    return m_fTrackSelection;
+}
+
+inline void CColorButton::SetTrackSelection(BOOL fTrack)
+{
+    m_fTrackSelection = fTrack;
+}
+
+inline void CColorButton::SetText(UINT nDefault, UINT nCustom)
+{
+    SetDefaultText(nDefault);
+    SetCustomText(nCustom);
+}
+
+inline BOOL CColorButton::HasCustomText() const
+{
+    return !m_pszCustomText.empty();
+}
+
+inline BOOL CColorButton::HasDefaultText() const
+{
+    return !m_pszDefaultText.empty();
+}
