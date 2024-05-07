@@ -230,6 +230,9 @@ public:
     void SetCustomText(UINT nID);
 
     // @cmember Set the default text
+    void SetDefaultText(ATL::CString&& szText);
+
+    // @cmember Set the default text
     void SetDefaultText(LPCTSTR pszText);
 
     // @cmember Set the default text via a resource string
@@ -269,7 +272,7 @@ private:
 
     // @access ATL Message handlers
 protected:
-    BOOL PreProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
+    BOOL PreProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult) const;
 
     // @cmember Handle draw item
     LRESULT OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);

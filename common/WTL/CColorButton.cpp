@@ -297,7 +297,8 @@ struct CColorButton::CPickerImpl
     void FindPickerCellFromColor(COLORREF clr);
 
     // @cmember Set a new selection
-    void ChangePickerSelection(int nIndex);
+    void OnMouseHover(int nIndex);
+    void ChangePickerSelection(int nIndex, BOOL fTrackSelection);
 
     // @cmember End the picker selection process
     void EndPickerSelection(BOOL fOked);
@@ -449,6 +450,16 @@ void CColorButton::SetCustomText(UINT nID)
     }
 }
 
+void CColorButton::SetDefaultText(ATL::CString&& szText)
+{
+    if (!szText.IsEmpty()) {
+        String{szText.GetString(), static_cast<size_t>(szText.GetLength())}.swap(m_pszDefaultText);
+    }
+    else {
+        String{}.swap(m_pszDefaultText);
+    }
+}
+
 void CColorButton::SetDefaultText(LPCTSTR pszText)
 {
     if (pszText) {
@@ -472,7 +483,7 @@ void CColorButton::SetDefaultText(UINT nID)
     }
 }
 
-BOOL CColorButton::PreProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
+BOOL CColorButton::PreProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult) const
 {
     CHAIN_MSG_MAP_MEMBER((*m_pThemed))
     return FALSE;
@@ -953,9 +964,11 @@ BOOL CColorButton::CPickerImpl::Picker()
     CRect rcButton;
     m_rMaster.GetWindowRect(&rcButton);
     ModuleHelper::AddCreateWndData(&m_wndPicker.m_thunk.cd, &m_wndPicker);
-    m_wndPicker.m_hWnd = ::CreateWindowEx(0, CColorPicker_ClassName, // reinterpret_cast<LPCTSTR>(MAKELONG(atom, 0)),
-                                          _T(""), WS_POPUP, rcButton.left, rcButton.bottom, 100, 100,
-                                          m_rMaster.GetParent(), nullptr, ModuleHelper::GetModuleInstance(), nullptr);
+    m_wndPicker.m_hWnd = ::CreateWindowEx(0, CColorPicker_ClassName, nullptr,
+        WS_POPUP, rcButton.left, rcButton.bottom, 100, 100,
+        m_rMaster.GetParent(), nullptr, 
+        ModuleHelper::GetModuleInstance(), nullptr
+    );
     //
     // If we created the window
     //
@@ -990,11 +1003,11 @@ BOOL CColorButton::CPickerImpl::Picker()
         // Set capture to the window which received this message
         //
         m_wndPicker.SetCapture();
-        _ASSERTE(m_wndPicker .m_hWnd == ::GetCapture ());
+        _ASSERTE(m_wndPicker .m_hWnd == GetCapture());
         //
         // Get messages until capture lost or cancelled/accepted
         //
-        while (m_wndPicker.m_hWnd == ::GetCapture()) {
+        while (m_wndPicker.m_hWnd == GetCapture()) {
             MSG msg;
             if (!::GetMessage(&msg, nullptr, 0, 0)) {
                 ::PostQuitMessage(static_cast<int>(msg.wParam));
@@ -1029,7 +1042,7 @@ BOOL CColorButton::CPickerImpl::Picker()
                 break;
             }
         }
-        ::ReleaseCapture();
+        ReleaseCapture();
         fOked = m_fOked;
         //
         // Destroy the window
@@ -1040,7 +1053,7 @@ BOOL CColorButton::CPickerImpl::Picker()
         // If needed, show custom
         //
         if (fOked) {
-            if (fOked && m_nCurrentSel == CUSTOM_BOX_VALUE) {
+            if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
                 CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
                 if (dlg.DoModal() == IDOK) {
                     m_rMaster.m_clrCurrent = dlg.GetColor();
@@ -1048,6 +1061,9 @@ BOOL CColorButton::CPickerImpl::Picker()
                 else {
                     fOked = FALSE;
                 }
+            }
+            else if (DEFAULT_BOX_VALUE == m_nCurrentSel) {
+                m_rMaster.m_clrCurrent = m_rMaster.m_clrDefault;
             }
             else {
                 m_rMaster.m_clrCurrent = m_clrPicker;
@@ -1358,7 +1374,7 @@ void CColorButton::CPickerImpl::FindPickerCellFromColor(COLORREF clr)
 //
 //-----------------------------------------------------------------------------
 
-void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex)
+void CColorButton::CPickerImpl::OnMouseHover(int nIndex)
 {
     CClientDC dc(m_wndPicker);
     //
@@ -1372,7 +1388,8 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex)
     // it being selected
     //
     if ((m_nCurrentSel >= 0 && m_nCurrentSel < m_nNumColors) ||
-        m_nCurrentSel == CUSTOM_BOX_VALUE || m_nCurrentSel == DEFAULT_BOX_VALUE) {
+        (m_nCurrentSel == CUSTOM_BOX_VALUE) || 
+        (m_nCurrentSel == DEFAULT_BOX_VALUE)) {
         int nOldSel = m_nCurrentSel;
         m_nCurrentSel = INVALID_COLOR;
         DrawPickerCell(dc, nOldSel);
@@ -1383,16 +1400,31 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex)
     m_nCurrentSel = nIndex;
     DrawPickerCell(dc, m_nCurrentSel);
     //
+    // Peek current
+    //
+    ChangePickerSelection(nIndex, m_rMaster.m_fTrackSelection);
+}
+
+void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex, BOOL fTrackSelection)
+{
+    //
+    // Clamp the index
+    //
+    if (nIndex > m_nNumColors) {
+        nIndex = CUSTOM_BOX_VALUE;
+    }
+    //
     // Store the current colour
     //
-    BOOL fValid = TRUE;
-    COLORREF clr;
-    if (m_nCurrentSel == CUSTOM_BOX_VALUE)
+    bool  fValid = true;
+    COLORREF clr = 0;
+    if (m_nCurrentSel == CUSTOM_BOX_VALUE) {
+        clr = m_rMaster.m_clrCurrent;
+    }
+    else if (m_nCurrentSel == DEFAULT_BOX_VALUE) {
         clr = m_rMaster.m_clrDefault;
-    else if (m_nCurrentSel == DEFAULT_BOX_VALUE)
-        clr = m_clrPicker = CLR_DEFAULT;
+    }
     else if (m_nCurrentSel == INVALID_COLOR) {
-        clr = RGB(0, 0, 0);
         fValid = FALSE;
     }
     else {
@@ -1401,7 +1433,7 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex)
     //
     // Send the message
     //
-    if (m_rMaster.m_fTrackSelection) {
+    if (fTrackSelection) {
         if (fValid) {
             m_rMaster.m_clrCurrent = clr;
         }
@@ -1419,7 +1451,6 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex)
 // @rdesc None.
 //
 //-----------------------------------------------------------------------------
-
 void CColorButton::CPickerImpl::EndPickerSelection(BOOL fOked)
 {
     ::ReleaseCapture();
@@ -1444,25 +1475,24 @@ void CColorButton::CPickerImpl::DrawPickerCell(CDC& dc, int nIndex)
     // Get the drawing rect
     //
     CRect rect;
-    if (!GetPickerCellRect(nIndex, &rect)) {
+    if (!GetPickerCellRect(nIndex, rect)) {
         return;
     }
     //
     // Get the text pointer and colors
     //
-    ATL::CString strText = {};
-    COLORREF      clrBox = {0};
-    SIZE      sizeMargin = {};
-    SIZE    sizeHiBorder = {};
+    static const String strDmy = {};
+    String const*     pstrText = {&strDmy};
+    COLORREF            clrBox = {0};
+    SIZE            sizeMargin = {};
+    SIZE          sizeHiBorder = {};
     if (nIndex == CUSTOM_BOX_VALUE) {
-        strText.SetString(m_rMaster.m_pszCustomText.c_str(),
-            static_cast<int>(m_rMaster.m_pszCustomText.length()));
+        pstrText = &m_rMaster.m_pszCustomText;
         sizeMargin = s_sizeTextMargin;
         sizeHiBorder = s_sizeTextHiBorder;
     }
     else if (nIndex == DEFAULT_BOX_VALUE) {
-        strText.SetString(m_rMaster.m_pszDefaultText.c_str(),
-            static_cast<int>(m_rMaster.m_pszDefaultText.length()));
+        pstrText = &m_rMaster.m_pszDefaultText;
         sizeMargin = s_sizeTextMargin;
         sizeHiBorder = s_sizeTextHiBorder;
     }
@@ -1496,7 +1526,7 @@ void CColorButton::CPickerImpl::DrawPickerCell(CDC& dc, int nIndex)
     // Select and realize the palette
     //
     HPALETTE hpalOld = nullptr;
-    if (strText.IsEmpty()) {
+    if (pstrText->empty()) {
         if (m_palette.m_hPalette != nullptr &&
             (dc.GetDeviceCaps(RASTERCAPS) & RC_PALETTE) != 0) {
             hpalOld = dc.SelectPalette(m_palette, FALSE);
@@ -1512,20 +1542,20 @@ void CColorButton::CPickerImpl::DrawPickerCell(CDC& dc, int nIndex)
         //
         if (sizeMargin.cx > 0 || sizeMargin.cy > 0) {
             dc.SetBkColor(m_clrBackground);
-            dc.ExtTextOut(0, 0, ETO_OPAQUE, &rect, nullptr, 0, nullptr);
+            dc.ExtTextOut(0, 0, ETO_OPAQUE, rect, nullptr, 0, nullptr);
             rect.InflateRect(-sizeMargin.cx, -sizeMargin.cy);
         }
         //
         // Draw the selection rectagle
         //
         dc.SetBkColor(m_clrHiLightBorder);
-        dc.ExtTextOut(0, 0, ETO_OPAQUE, &rect, nullptr, 0, nullptr);
+        dc.ExtTextOut(0, 0, ETO_OPAQUE, rect, nullptr, 0, nullptr);
         rect.InflateRect(-1, -1);
         //
         // Draw the inner coloring
         //
         dc.SetBkColor(clrHiLight);
-        dc.ExtTextOut(0, 0, ETO_OPAQUE, &rect, nullptr, 0, nullptr);
+        dc.ExtTextOut(0, 0, ETO_OPAQUE, rect, nullptr, 0, nullptr);
         rect.InflateRect(-(sizeHiBorder.cx - 1), -(sizeHiBorder.cy - 1));
     }
     //
@@ -1544,11 +1574,27 @@ void CColorButton::CPickerImpl::DrawPickerCell(CDC& dc, int nIndex)
     //
     // Draw custom text
     //
-    if (!strText.IsEmpty()) {
+    if (!pstrText->empty()) {
+        CRect rcText = rect;
+        if (nIndex == DEFAULT_BOX_VALUE) {
+            //
+            // Draw default color box
+            //
+            CRect rcDefColor = rcText;
+            rcDefColor.right = rcText.right - 6;
+            rcDefColor.left = rcDefColor.right - 16;
+            rcText.right = rcDefColor.left - 6;
+            dc.SetBkColor(::GetSysColor(COLOR_3DSHADOW));
+            dc.ExtTextOut(0, 0, ETO_OPAQUE, rcDefColor, nullptr, 0, nullptr);
+            rect.InflateRect(-1, -1);
+            dc.SetBkColor(m_rMaster.m_clrDefault);
+            dc.ExtTextOut(0, 0, ETO_OPAQUE, rcDefColor, nullptr, 0, nullptr);
+
+        }
         HFONT hfontOld = dc.SelectFont(m_font);
         dc.SetTextColor(clrText);
         dc.SetBkMode(TRANSPARENT);
-        dc.DrawText(strText.GetString(), strText.GetLength(), &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+        dc.DrawText(pstrText->c_str(), static_cast<int>(pstrText->length()), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
         dc.SelectFont(hfontOld);
     }
     //
@@ -1605,13 +1651,13 @@ LRESULT CColorButton::OnPickerKeyDown(UINT, WPARAM wParam, LPARAM, BOOL& bHandle
     case VK_RIGHT:  nOffset = 1; break;
     case VK_LEFT:   nOffset = -1; break;
     case VK_ESCAPE: 
-        m_pPicker->m_clrPicker = m_clrCurrent;
+        m_pPicker->m_clrPicker = m_clrDefault;
         m_pPicker->EndPickerSelection(FALSE);
         break;
     case VK_RETURN:
     case VK_SPACE:
         if (m_pPicker->m_nCurrentSel == INVALID_COLOR) {
-            m_pPicker->m_clrPicker = m_clrCurrent;
+            m_pPicker->m_clrPicker = m_clrDefault;
         }
         m_pPicker->EndPickerSelection(m_pPicker->m_nCurrentSel != INVALID_COLOR);
         break;
@@ -1662,7 +1708,7 @@ LRESULT CColorButton::OnPickerKeyDown(UINT, WPARAM wParam, LPARAM, BOOL& bHandle
         //
         // Set the new location
         //
-        m_pPicker->ChangePickerSelection(nNewSel);
+        m_pPicker->OnMouseHover(nNewSel);
     }
     bHandled = FALSE;
     return FALSE;
@@ -1694,7 +1740,7 @@ LRESULT CColorButton::OnPickerLButtonUp(UINT, WPARAM, LPARAM lParam, BOOL&)
     // If valid, then change selection and end
     //
     if (nNewSelection != m_pPicker->m_nCurrentSel) {
-        m_pPicker->ChangePickerSelection(nNewSelection);
+        m_pPicker->OnMouseHover(nNewSelection);
     }
     m_pPicker->EndPickerSelection(nNewSelection != INVALID_COLOR);
     return 0;
@@ -1728,7 +1774,7 @@ LRESULT CColorButton::OnPickerMouseMove(UINT, WPARAM, LPARAM lParam, BOOL&)
     // If yes, then redraw old and new cells.
     //
     if (nNewSelection != m_pPicker->m_nCurrentSel) {
-        m_pPicker->ChangePickerSelection(nNewSelection);
+        m_pPicker->OnMouseHover(nNewSelection);
     }
     return 0;
 }

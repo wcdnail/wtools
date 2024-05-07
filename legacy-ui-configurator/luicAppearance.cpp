@@ -177,6 +177,11 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_bnThemeDelete.SetIcon(pApp->GetIcon(IconHatchCross));
     m_bnThemeImport.SetIcon(pApp->GetIcon(IconFolderOpen));
 
+    for (int i = 0; i < BTN_ColorCount; i++) {
+        m_bnItemColor[i].SetDefaultText(_T("Revert"));
+        m_bnItemColor[i].SetCustomText(_T("Customize"));
+    }
+
     CtlAdjustPositions();
     CTheme::PerformStaticInit(*this, pApp);
     InitResizeMap();
@@ -193,55 +198,6 @@ void CPageAppearance::ColorPicker(int nWhichOne)
     COLORREF srcColor = 0x00ff00ff;
     WTL::CColorDialog dlgColorPicker(srcColor, CC_FULLOPEN, m_hWnd);
     dlgColorPicker.DoModal(m_hWnd);
-}
-
-void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
-{
-    switch (nID) {
-    case IDC_APP_ITEM_SEL:{
-        switch (uNotifyCode) {
-        case CBN_SELENDOK:
-            OnItemSelect(m_cbItem.GetCurSel());
-            break;
-        }
-        return ;
-    }
-    case IDC_APP_ITEM_COLOR1_SEL:
-    case IDC_APP_ITEM_COLOR2_SEL:
-    case IDC_APP_FONT_COLOR_SEL:
-        SetMsgHandled(FALSE);
-        return ;
-    default:
-        break;
-    }
-    SetMsgHandled(FALSE);
-    if constexpr (false) {
-        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
-            nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
-    }
-}
-
-LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
-{
-    if (CPN_SELENDOK == pnmh->code) {
-        int nButton = CB_ERR;
-        switch (idCtrl) {
-        case IDC_APP_ITEM_COLOR1_SEL: nButton = BTN_ItemColor1; goto TryChange;
-        case IDC_APP_ITEM_COLOR2_SEL: nButton = BTN_ItemColor2; goto TryChange;
-        case IDC_APP_FONT_COLOR_SEL:  nButton = BTN_FontColor1;
-        TryChange:
-            ItemColorTryChange(nButton);
-            break;
-        }
-        SetMsgHandled(TRUE);
-        return 0;
-    }
-    SetMsgHandled(FALSE);
-    if constexpr (false) {
-        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE NTY: id:%-4d nc:%-4d %s\n", 
-            idCtrl, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
-    }
-    return 0;
 }
 
 void CPageAppearance::ThemeEnable(BOOL bEnable)
@@ -320,8 +276,9 @@ bool CPageAppearance::BtnSetColor(int nButton, int iColor)
         return false;
     }
     const COLORREF clrToSet = m_pTheme->GetColor(iColor);
+    m_bnItemColor[nButton].SetDefaultColor(clrToSet);
+    m_bnItemColor[nButton].SetDefaultText(Str::ElipsisW::Format(L"Revert to: %06X", clrToSet));
     m_bnItemColor[nButton].SetColor(clrToSet);
-    m_bnItemColor[nButton].SetDefaultText(_T("Trololo"));
     return true;
 }
 
@@ -454,6 +411,57 @@ void CPageAppearance::OnThemeSelect(int nThemeIndex)
     OnItemSelect(EN_Desktop);
     m_bcGradientCapts.SetCheck(m_pTheme->IsGradientCaptions() ? TRUE : FALSE);
     m_bcFlatMenus.SetCheck(m_pTheme->IsFlatMenus() ? TRUE : FALSE);
+}
+
+void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
+{
+    switch (nID) {
+    case IDC_APP_ITEM_SEL:{
+        switch (uNotifyCode) {
+        case CBN_SELENDOK:
+            OnItemSelect(m_cbItem.GetCurSel());
+            break;
+        }
+        return ;
+    }
+    case IDC_APP_ITEM_COLOR1_SEL:
+    case IDC_APP_ITEM_COLOR2_SEL:
+    case IDC_APP_FONT_COLOR_SEL:
+        SetMsgHandled(FALSE);
+        return ;
+    default:
+        break;
+    }
+    SetMsgHandled(FALSE);
+    if constexpr (false) {
+        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
+            nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+    }
+}
+
+LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
+{
+    if (CPN_SELENDOK == pnmh->code) {
+        int nButton = CB_ERR;
+        switch (idCtrl) {
+        case IDC_APP_ITEM_COLOR1_SEL: nButton = BTN_ItemColor1; goto TryChange;
+        case IDC_APP_ITEM_COLOR2_SEL: nButton = BTN_ItemColor2; goto TryChange;
+        case IDC_APP_FONT_COLOR_SEL:  nButton = BTN_FontColor1;
+     TryChange:
+            ItemColorTryChange(nButton);
+            break;
+        default:
+            break;
+        }
+        SetMsgHandled(TRUE);
+        return 0;
+    }
+    SetMsgHandled(FALSE);
+    if constexpr (false) {
+        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE NTY: id:%-4d nc:%-4d %s\n", 
+            idCtrl, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+    }
+    return 0;
 }
 
 void CPageAppearance::ItemColorTryChange(int nButton)
