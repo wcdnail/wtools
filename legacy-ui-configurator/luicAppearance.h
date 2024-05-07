@@ -75,8 +75,9 @@ private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
     void ColorPicker(int nWhichOne);
-    void ItemColorTryChange(int nButton, UINT uNotifyCode, int nID, HWND wndCtl);
+    void ItemColorTryChange(int nButton);
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
+    LRESULT OnNotify(int idCtrl, LPNMHDR pnmh) override;
 
     void ThemeEnable(BOOL bEnable);
     void ItemEnable(BOOL bEnable);

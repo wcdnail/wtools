@@ -145,10 +145,8 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_udItemSize2.Attach(GetDlgItem(IDC_APP_ITEM_SIZE2_SPIN));
     m_stItemClr1.Attach(GetDlgItem(IDC_APP_ITEM_COLOR1_CAP));
     m_bnItemColor[BTN_ItemColor1].SubclassWindow(GetDlgItem(IDC_APP_ITEM_COLOR1_SEL));
-    m_bnItemColor[BTN_ItemColor1].SetDefaultText(_T("Item Color #1"));
     m_stItemClr2.Attach(GetDlgItem(IDC_APP_ITEM_COLOR2_CAP));
     m_bnItemColor[BTN_ItemColor2].SubclassWindow(GetDlgItem(IDC_APP_ITEM_COLOR2_SEL));
-    m_bnItemColor[BTN_ItemColor2].SetDefaultText(_T("Item Color #2"));
 
     m_stFont.Attach(GetDlgItem(IDC_APP_FONT_CAP));
     m_cbFont.Attach(GetDlgItem(IDC_APP_FONT_SEL));
@@ -159,7 +157,6 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_udFontWidth.Attach(GetDlgItem(IDC_APP_FONT_WDTH_SPIN));
     m_stFontClr1.Attach(GetDlgItem(IDC_APP_FONT_COLOR_CAP));
     m_bnItemColor[BTN_FontColor1].SubclassWindow(GetDlgItem(IDC_APP_FONT_COLOR_SEL));
-    m_bnItemColor[BTN_FontColor1].SetDefaultText(_T("Font Color #1"));
     m_stFontStyle.Attach(GetDlgItem(IDC_APP_FONT_STYLE_CAP));
     m_bnFontBold.Attach(GetDlgItem(IDC_APP_FONT_STYLE_BOLD));
     m_bnFontItalic.Attach(GetDlgItem(IDC_APP_FONT_STYLE_ITALIC));
@@ -198,12 +195,6 @@ void CPageAppearance::ColorPicker(int nWhichOne)
     dlgColorPicker.DoModal(m_hWnd);
 }
 
-void CPageAppearance::ItemColorTryChange(int nButton, UINT uNotifyCode, int nID, HWND wndCtl)
-{
-    //BOOL bHandled = FALSE;
-    //LRESULT  lRes = m_bnItemColor[nButton].OnClicked(uNotifyCode, nID, wndCtl, bHandled);
-}
-
 void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
     switch (nID) {
@@ -215,19 +206,42 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         }
         return ;
     }
-    case IDC_APP_ITEM_COLOR1_SEL: ItemColorTryChange(BTN_ItemColor1, uNotifyCode, nID, wndCtl); return ;
-    case IDC_APP_ITEM_COLOR2_SEL: ItemColorTryChange(BTN_ItemColor2, uNotifyCode, nID, wndCtl); return ;
-    case IDC_APP_FONT_COLOR_SEL:  ItemColorTryChange(BTN_FontColor1, uNotifyCode, nID, wndCtl); return ;
-  //case IDC_APP_ITEM_COLOR1_SEL: ColorPicker(1); return ;
-  //case IDC_APP_ITEM_COLOR2_SEL: ColorPicker(2); return ;
-  //case IDC_APP_FONT_COLOR_SEL:  ColorPicker(3); return ;
+    case IDC_APP_ITEM_COLOR1_SEL:
+    case IDC_APP_ITEM_COLOR2_SEL:
+    case IDC_APP_FONT_COLOR_SEL:
+        SetMsgHandled(FALSE);
+        return ;
     default:
         break;
     }
-    if constexpr (true) {
+    SetMsgHandled(FALSE);
+    if constexpr (false) {
         DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
             nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
     }
+}
+
+LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
+{
+    if (CPN_SELENDOK == pnmh->code) {
+        int nButton = CB_ERR;
+        switch (idCtrl) {
+        case IDC_APP_ITEM_COLOR1_SEL: nButton = BTN_ItemColor1; goto TryChange;
+        case IDC_APP_ITEM_COLOR2_SEL: nButton = BTN_ItemColor2; goto TryChange;
+        case IDC_APP_FONT_COLOR_SEL:  nButton = BTN_FontColor1;
+        TryChange:
+            ItemColorTryChange(nButton);
+            break;
+        }
+        SetMsgHandled(TRUE);
+        return 0;
+    }
+    SetMsgHandled(FALSE);
+    if constexpr (false) {
+        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE NTY: id:%-4d nc:%-4d %s\n", 
+            idCtrl, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+    }
+    return 0;
 }
 
 void CPageAppearance::ThemeEnable(BOOL bEnable)
@@ -300,46 +314,13 @@ void CPageAppearance::FontClr1Enable(BOOL bEnable)
     m_bnItemColor[BTN_FontColor1].EnableWindow(bEnable);
 }
 
-#if 0
-void CPageAppearance::BtnColorFill(WTL::CButton& bnControl, int nBtn, int iColor)
-{
-    ATLASSUME(m_pTheme != nullptr);
-    HBITMAP hBitmapToSet = nullptr;
-    {
-        CDrawRoutine   draw{*m_pTheme};
-        COLORREF     nColor{m_pTheme->GetColor(iColor)};
-        HBRUSH    hbrBorder{AtlGetStockBrush(BLACK_BRUSH)};
-        WTL::CWindowDC   dc{m_hWnd};
-        WTL::CDC     dcTemp{};
-        WTL::CBitmap bmTemp{};
-        CRect         rcBtn{};
-
-        bnControl.GetClientRect(rcBtn);
-        rcBtn.DeflateRect(rcBtn.Width() / 5, rcBtn.Height() / 5);
-        CRect rcBitmap{0, 0, rcBtn.Width(), rcBtn.Height()};
-
-        dcTemp.CreateCompatibleDC(dc);
-        bmTemp.CreateCompatibleBitmap(dc, rcBitmap.Width(), rcBitmap.Height());
-        const HBITMAP hbmPrev = dcTemp.SelectBitmap(bmTemp);
-
-        dcTemp.FillSolidRect(rcBitmap, nColor);
-        draw.DrawBorder(dcTemp.m_hDC, rcBitmap, 1, hbrBorder);
-
-        dcTemp.SelectBitmap(hbmPrev);
-        m_bmColor[nBtn].Attach(bmTemp.Detach());
-        hBitmapToSet = m_bmColor[nBtn];
-    }
-    bnControl.SetBitmap(hBitmapToSet);
-}
-#endif
-
 bool CPageAppearance::BtnSetColor(int nButton, int iColor)
 {
     if ((nButton < 0) || (nButton > BTN_ColorCount) || (iColor < 0)) {
         return false;
     }
     const COLORREF clrToSet = m_pTheme->GetColor(iColor);
-    m_bnItemColor[nButton].SetDefaultColor(clrToSet);
+    m_bnItemColor[nButton].SetColor(clrToSet);
     m_bnItemColor[nButton].SetDefaultText(_T("Trololo"));
     return true;
 }
@@ -473,4 +454,10 @@ void CPageAppearance::OnThemeSelect(int nThemeIndex)
     OnItemSelect(EN_Desktop);
     m_bcGradientCapts.SetCheck(m_pTheme->IsGradientCaptions() ? TRUE : FALSE);
     m_bcFlatMenus.SetCheck(m_pTheme->IsFlatMenus() ? TRUE : FALSE);
+}
+
+void CPageAppearance::ItemColorTryChange(int nButton)
+{
+    COLORREF clrCurrent = m_bnItemColor[nButton].GetColor();
+    DebugThreadPrintf(LTH_COLORIZER L" APPRNCE TryChangeClr: id:%d ==> %08x\n", nButton, clrCurrent);
 }

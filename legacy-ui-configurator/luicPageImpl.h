@@ -71,11 +71,11 @@ private:
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_DROPFILES(OnDropFiles)
         MSG_WM_SETFOCUS(OnSetFocus)
+        REFLECT_NOTIFICATIONS_EX()
         if (Resizer::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
             OnResizeNotify();
             return TRUE;
         }
-        REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
 
     WTL::_AtlDlgResizeMap const* GetDlgResizeMap() const;
