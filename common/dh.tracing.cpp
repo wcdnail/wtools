@@ -350,7 +350,7 @@ namespace DH
         printString(header + category + text);
     }
 
-    void ThreadPrintf(PCSTR format, ...)
+    void TPrintf(PCSTR format, ...)
     {
         va_list ap;
         va_start(ap, format);
@@ -358,7 +358,7 @@ namespace DH
         va_end(ap);
     }
 
-    void ThreadPrintf(PCWSTR format, ...)
+    void TPrintf(PCWSTR format, ...)
     {
         va_list ap;
         va_start(ap, format);
@@ -366,7 +366,7 @@ namespace DH
         va_end(ap);
     }
 
-    void ThreadPrintfc(TraceCategory const& cat, PCSTR format, ...)
+    void TCPrintf(TraceCategory const& cat, PCSTR format, ...)
     {
         va_list ap;
         va_start(ap, format);
@@ -374,7 +374,7 @@ namespace DH
         va_end(ap);
     }
 
-    void ThreadPrintfc(TraceCategory const& cat, PCWSTR format, ...)
+    void TCPrintf(TraceCategory const& cat, PCWSTR format, ...)
     {
         va_list ap;
         va_start(ap, format);
@@ -387,12 +387,12 @@ namespace DH
 
     static inline void _Start_ScopedThreadLog(PCWSTR message) 
     {
-        ThreadPrintfc(Category::Module(), L"%s thread started...\n", message);
+        TCPrintf(Category::Module(), L"%s thread started...\n", message);
     }
 
     static inline void _Stop_ScopedThreadLog(PCWSTR message, DH::Timer const& liveTime)
     {
-        ThreadPrintfc(Category::Module(), L"%s thread stopped %f seconds (%f hours)\n", message,
+        TCPrintf(Category::Module(), L"%s thread stopped %f seconds (%f hours)\n", message,
             liveTime.Seconds(), liveTime.Seconds() / 3600.); 
     }
 
@@ -431,10 +431,10 @@ namespace DH
             std::wostringstream temp;
             Runtime::Info().SimpleReport(temp);
             std::wstring report = temp.str();
-            ThreadPrintfc(Category::Module(), L"System info:\n%s", report.c_str());
+            TCPrintf(Category::Module(), L"System info:\n%s", report.c_str());
         }
         else {
-            ThreadPrintfc(Category::Module(), L"Launched on %s (%s)\n",
+            TCPrintf(Category::Module(), L"Launched on %s (%s)\n",
                 Runtime::Info().Host.Name.c_str(),
                 Runtime::Info().System.Version.DisplayName.c_str()
             );

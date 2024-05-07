@@ -186,7 +186,7 @@ namespace Twins
             //if ((data >= 'A') && (data <= 'Z'))
                 //OnComboCommand(CBN_SELENDOK, 0, NULL);
 
-            DH::ThreadPrintf(L"DRIVENFY: Notify %p == %x `%c`\n", nmh->code, code, data);
+            DH::TPrintf(L"DRIVENFY: Notify %p == %x `%c`\n", nmh->code, code, data);
         }
 
         

@@ -146,7 +146,7 @@ namespace CF::Colorized
     {
         switch (nmhdr->code) {
         case NM_CUSTOMDRAW:  //WTL::CCustomDraw<>
-            //DebugThreadPrintf(LTH_COLORIZED_CTRL L" << CUSTOMDRAW %d\n", idCtrl);
+            //DBGTPrint(LTH_COLORIZED_CTRL L" << CUSTOMDRAW %d\n", idCtrl);
             return OnCustomDraw(idCtrl, nmhdr);
         }
         return 0;

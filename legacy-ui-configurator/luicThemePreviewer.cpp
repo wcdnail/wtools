@@ -5,7 +5,6 @@
 #include "dh.tracing.defs.h"
 #include "rect.alloc.h"
 #include "string.utils.format.h"
-#include "windows.uses.gdi+.h"
 #include "rect.gdi+.h"
 
 ATOM CThemePreviewer::Register(HRESULT& code)
@@ -37,39 +36,13 @@ CThemePreviewer::~CThemePreviewer()
 {
 }
 
-#if 0
-CThemePreviewer::CThemePreviewer()
-    :          Super{}
-    ,    m_Wallpaper{}
-    , m_prSelected{-1, -1}
-    ,  m_bLBtnDown{false}
-{
-    HRESULT code;
-    const ATOM atom = ATL::AtlModuleRegisterClassExW(nullptr, &GetWndClassInfo().m_wc);
-    if (!atom) {
-        code = static_cast<HRESULT>(GetLastError());
-        ReportError(Str::ElipsisW::Format(L"Register WCLASS '%s' failure!", 
-            GetWndClassInfo().m_wc.lpszClassName), code, true, MB_ICONERROR
-        );
-    }
-    else { 
-        if (!m_thunk.Init(nullptr, nullptr)) {
-            SetLastError(ERROR_OUTOFMEMORY);
-        }
-        else {
-            ATL::_AtlWinModule.AddCreateWndData(&m_thunk.cd, this);
-        }
-    }
-}
-#endif
-
 CThemePreviewer::CThemePreviewer()
     :   ATL::CWindow{}
     , DoubleBuffered{true}
     ,       m_pTheme{nullptr}
-    ,    m_Wallpaper{}
-    , m_prSelected{-1, -1}
-    ,  m_bLBtnDown{false}
+    ,      m_pcbItem{nullptr}
+    ,   m_prSelected{-1, -1}
+    ,    m_bLBtnDown{false}
 {
 }
 
@@ -80,7 +53,6 @@ void CThemePreviewer::SubclassIt(HWND hWnd)
     ATLASSUME(CThemePreviewer_pUserData == nullptr);
     ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
     m_hWnd = hWnd;
-    InitWallpapers();
     ModifyStyleEx(0, WS_EX_CLIENTEDGE);
 }
 
@@ -132,66 +104,8 @@ LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
-HRESULT CThemePreviewer::InitWallpapers()
-{
-    using   COMStrPtr = std::shared_ptr<void>;
-    HRESULT      code = S_OK;
-    auto*  pWallpaper = CLUIApp::App()->GetWallpaperMan();
-    uint32_t mdpCount = 0;
-    code = pWallpaper->GetMonitorDevicePathCount(&mdpCount);
-    if (FAILED(code)) {
-        SetMFStatus(code, L"GetMonitorDevicePathCount failure");
-        return code;
-    }
-    GdipImageVec imageVec;
-    for (uint32_t i = 0; i < mdpCount; i++) {
-        PWSTR pDevicePath;
-        code = pWallpaper->GetMonitorDevicePathAt(i, &pDevicePath);
-        if (FAILED(code)) {
-            SetMFStatus(code, L"GetMonitorDevicePathAt failure");
-            break;
-        }
-        COMStrPtr pDevicePathPtr(pDevicePath, CoTaskMemFree);
-        DebugThreadPrintf(LTH_DESK_WALLPPR L" DevicePth: '%s'\n", pDevicePath);
-        PWSTR pWallpaperPath;
-        code = pWallpaper->GetWallpaper(pDevicePath, &pWallpaperPath);
-        if (FAILED(code)) {
-            SetMFStatus(code, L"GetWallpaper failure");
-            break;
-        }
-        COMStrPtr pWallpaperPathPtr(pWallpaperPath, CoTaskMemFree);
-        DESKTOP_WALLPAPER_POSITION pos = DWPOS_CENTER;
-        pWallpaper->GetPosition(&pos);
-        DebugThreadPrintf(LTH_DESK_WALLPPR L" Wallpaper: '%s' %d\n", pWallpaperPath, pos);
-        GdipImagePtr image{Gdiplus::Image::FromFile(pWallpaperPath, FALSE)};
-        if (!image) {
-            code = static_cast<HRESULT>(GetLastError());
-            SetMFStatus(code, L"Gdiplus::Image::FromFile '%s' failure: image == NULL", pWallpaperPath);
-            break;
-        }
-        auto status = image->GetLastStatus();
-        if (Gdiplus::Status::Ok != status) {
-            code = ERROR_ACCESS_DENIED;
-            SetMFStatus(code, L"Gdiplus::Image::FromFile '%s' failure: %s", pWallpaperPath, GdiPlus::StatusString(status));
-            break;
-        }
-        Gdiplus::RectF rcImage;
-        Gdiplus::Unit units;
-        image->GetBounds(&rcImage, &units);
-        CRect rcWallpaper = FromRectF(rcImage);
-        DebugThreadPrintf(LTH_DESK_WALLPPR L" Wallpaper: %d x %d [%d]\n", rcWallpaper.Width(), rcWallpaper.Height(), units);
-        imageVec.emplace_back(std::move(image));
-        break; // ##TODO: only one will be enough
-    }
-    m_Wallpaper.swap(imageVec);
-    return m_Wallpaper.size() > 0 ? S_OK : code;
-}
-
 int CThemePreviewer::OnCreate(LPCREATESTRUCT pCS)
 {
-    if (m_Wallpaper.empty()) {
-        InitWallpapers();
-    }
     return 0;
 }
 
@@ -310,22 +224,11 @@ void CThemePreviewer::DrawDesktop(CDCHandle dc, CRect const& rcClient)
         { m_WndRect[WND_MsgBox],   rcMsg },
     };
     dc.FillSolidRect(rcClient, theme.GetColor(COLOR_BACKGROUND));
-    if (pApp->ShowDesktopWallpaper() && (m_Wallpaper.size() > 0)) {
-        GdipImagePtr const& imPtr = m_Wallpaper[0];
 
-        Gdiplus::RectF rcfImage;
-        Gdiplus::Unit     units;
-        imPtr->GetBounds(&rcfImage, &units);
-
-        Gdiplus::ImageAttributes *attrs = nullptr;
-
-        Gdiplus::Graphics graphics(dc);
-        graphics.DrawImage(imPtr.get(),
-            ToRect(rcClient),
-            rcClient.left,    rcClient.top,
-            rcClient.Width(), rcClient.Height(),
-            units, attrs);
+    if (pApp->IsThemePreviewDrawWallpaper()) {
+        // TODO: borrow wallpaper drawer from CPageBackground
     }
+
     CDrawRoutine drawings(theme);
     drawings.DrawDesktopIcon(dc, rcIcon, L"Icon Text", true);
     for (int i = 0; i < WND_Count; i++) {

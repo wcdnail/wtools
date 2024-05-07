@@ -54,7 +54,7 @@ namespace Twins
                     , beg_(string.GetBuffer())
                     , len_(string.GetAllocLength() - 2)
                 {
-                    Dh::ThreadPrintf(L"ZzString: result buffer = %p\n", beg_);
+                    Dh::TPrintf(L"ZzString: result buffer = %p\n", beg_);
                 }
 
                 void operator() (CString const& line)

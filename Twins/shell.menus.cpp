@@ -9,7 +9,7 @@ namespace Twins
     {
         ShellImpl::ContextMenu menu;
         unsigned rv = (SUCCEEDED(menu.SetObjects(files)) ? menu.ShowContextMenu(owner, point) : (unsigned)-1);
-        DH::ThreadPrintf(_T("ShellMnu: return value = %d\n"), rv);
+        DH::TPrintf(_T("ShellMnu: return value = %d\n"), rv);
         return rv;
     }
 }

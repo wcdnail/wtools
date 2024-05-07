@@ -13,7 +13,7 @@ namespace Twins
             if (INVALID_FILE_ATTRIBUTES == attrs)
             {
                 HRESULT hr = ::GetLastError();
-                DH::ThreadPrintf(L"SHELLICO: Can't get attrs for `%s` - %d `%s`\n", entry.c_str(), hr, Str::ErrorCode<>::SystemMessage(hr));
+                DH::TPrintf(L"SHELLICO: Can't get attrs for `%s` - %d `%s`\n", entry.c_str(), hr, Str::ErrorCode<>::SystemMessage(hr));
                 return CIconHandle(NULL);
             }
         }
@@ -24,7 +24,7 @@ namespace Twins
         if (0 == rv)
         {
             HRESULT hr = ::GetLastError();
-            DH::ThreadPrintf(L"SHELLICO: Can't load icon for `%s` - %d `%s`\n", entry.c_str(), hr, Str::ErrorCode<>::SystemMessage(hr));
+            DH::TPrintf(L"SHELLICO: Can't load icon for `%s` - %d `%s`\n", entry.c_str(), hr, Str::ErrorCode<>::SystemMessage(hr));
             return CIconHandle(NULL);
         }
         

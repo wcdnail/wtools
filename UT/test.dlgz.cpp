@@ -98,7 +98,7 @@ void WinDebugDump(HWND hWnd, PCWSTR prefix)
     id.Format(L"%04d", temp.GetDlgCtrlID());
     temp.Detach();
     ::RealGetWindowClassW(hWnd, _class, _countof(_class) - 1);
-    DH::ThreadPrintfc(DH::Category::WTL(), L"%s %p::'%s'(%d) [%s:%s]\n", prefix, hWnd, 
+    DH::TCPrintf(DH::Category::WTL(), L"%s %p::'%s'(%d) [%s:%s]\n", prefix, hWnd, 
         _class, DetermineWndClass(hWnd),
         text.GetString(), id.GetString()
     );

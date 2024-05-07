@@ -308,13 +308,13 @@ namespace Conf
 
     void Section::OnParamChange(VarPtr const& vr) const
     {
-        DH::ThreadPrintf(L"SETTINGS: [%s] %s changed\n", Store->GetName().data(), vr->GetName().c_str());
+        DH::TPrintf(L"SETTINGS: [%s] %s changed\n", Store->GetName().data(), vr->GetName().c_str());
         vr->Get(Store);
     }
 
     void Section::OnParamDelete(VarPtr const& vr) const
     {
-        DH::ThreadPrintf(L"SETTINGS: [%s] %s deleted\n", Store->GetName().c_str(), vr->GetName().c_str());
+        DH::TPrintf(L"SETTINGS: [%s] %s deleted\n", Store->GetName().c_str(), vr->GetName().c_str());
     }
 
     //

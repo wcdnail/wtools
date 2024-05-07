@@ -62,7 +62,7 @@ public:
     CMenuHandle GetTestMenu() const;
     WTL::CImageListManaged const& GetImageList(int index) const;
     IDesktopWallpaper* GetWallpaperMan() const;
-    bool ShowDesktopWallpaper() const;
+    bool IsThemePreviewDrawWallpaper() const;
     FontMap const& GetFontMap() const;
     CTheme& GetTheme(int nThemeIndex) const;
 
@@ -90,5 +90,5 @@ private:
 };
 
 inline IDesktopWallpaper* CLUIApp::GetWallpaperMan() const { return m_pWallpaper; }
-inline bool          CLUIApp::ShowDesktopWallpaper() const { return m_bShowDesktopWallpaper;  } // ##TODO: m_bShowDesktopWallpaper to settings
+inline bool          CLUIApp::IsThemePreviewDrawWallpaper() const { return m_bShowDesktopWallpaper;  } // ##TODO: m_bShowDesktopWallpaper to settings
 inline FontMap const&          CLUIApp::GetFontMap() const { return m_FontMap; }

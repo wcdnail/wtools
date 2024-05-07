@@ -22,7 +22,7 @@ CIconHandle LoadShellIcon(ATL::CStringW const& entry, UINT flags = SHGFI_SMALLIC
     }
     if (INVALID_FILE_ATTRIBUTES == attrs) {
         const auto code = static_cast<HRESULT>(GetLastError());
-        DH::ThreadPrintf(LTH_SHELL_ICON L" Can't get attrs for '%s' - %d '%s'\n",
+        DH::TPrintf(LTH_SHELL_ICON L" Can't get attrs for '%s' - %d '%s'\n",
             entry.GetString(), code, Str::ErrorCode<>::SystemMessage(code)
         );
         return {};
@@ -32,7 +32,7 @@ CIconHandle LoadShellIcon(ATL::CStringW const& entry, UINT flags = SHGFI_SMALLIC
     const DWORD_PTR rv = SHGetFileInfoW(entry.GetString(), attrs, &info, sizeof(info), SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | flags);
     if (0 == rv) {
         const auto code = static_cast<HRESULT>(GetLastError());
-        DH::ThreadPrintf(LTH_SHELL_ICON L" Can't load icon for '%s' - %d '%s'\n",
+        DH::TPrintf(LTH_SHELL_ICON L" Can't load icon for '%s' - %d '%s'\n",
             entry.GetString(), code, Str::ErrorCode<>::SystemMessage(code)
         );
         return {};
@@ -148,7 +148,7 @@ private:
     {
         *reinterpret_cast<FARPROC*>(&routine) = GetProcAddress(hMod, routineName);
         if (!routine) {
-            DH::ThreadPrintf("%14s| '%s' is nullptr\n", modAlias, routineName);
+            DH::TPrintf("%14s| '%s' is nullptr\n", modAlias, routineName);
         }
         return nullptr != routine;
     }

@@ -96,7 +96,7 @@ namespace Twins
         Paths.Invalidate();
         View.SetFocus();
         SetActivePanel(*this);
-        //DH::ThreadPrintf(L"   PANEL: фокус - %d hwnd=0x%x m_hWnd=0x%x\n", Id, hwnd, m_hWnd);
+        //DH::TPrintf(L"   PANEL: фокус - %d hwnd=0x%x m_hWnd=0x%x\n", Id, hwnd, m_hWnd);
     }
 
     void Panel::OnKeyDown(UINT code, UINT rep, UINT flags)

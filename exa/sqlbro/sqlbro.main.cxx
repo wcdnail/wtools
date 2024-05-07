@@ -45,7 +45,7 @@ namespace Sqlbro
                 throw CrashException("AtlAxWinInit failed!", ::GetLastError());
 
             Module.AddMessageLoop(&MessageLoop);
-            Dh::ThreadPrintfc(Dh::Category::Module, "ribbon %s\n", RunTimeHelper::IsRibbonUIAvailable() ? "present" : "unavailable");
+            Dh::TCPrintf(Dh::Category::Module, "ribbon %s\n", RunTimeHelper::IsRibbonUIAvailable() ? "present" : "unavailable");
         }
 
         ~EntryContext()
@@ -78,7 +78,7 @@ void _ShowException(char const* caption, char const* what, char const* codetext,
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int)
 {
-    Dh::ThreadPrintfc(Dh::Category::Module, "sqlite v.%s\n", ::sqlite3_libversion());
+    Dh::TCPrintf(Dh::Category::Module, "sqlite v.%s\n", ::sqlite3_libversion());
 
     try
     {

@@ -93,7 +93,7 @@ namespace Fl
             temp.Swap(*this);
 
         else if (!silent)
-            DH::ThreadPrintf("DirEntry: `%S` %d %s\n", p.c_str(), ec.value(), ec.message().c_str());
+            DH::TPrintf("DirEntry: `%S` %d %s\n", p.c_str(), ec.value(), ec.message().c_str());
     }
 
     Entry::Entry(wchar_t const* dirpath, Twins::DirectoryNotify const& ninfo)
@@ -112,7 +112,7 @@ namespace Fl
         if (!ec)
             temp.Swap(*this);
         else
-            DH::ThreadPrintf("DirEntry: `%S %S` %d %s\n", dirpath, ninfo.Filename, ec.value(), ec.message().c_str());
+            DH::TPrintf("DirEntry: `%S %S` %d %s\n", dirpath, ninfo.Filename, ec.value(), ec.message().c_str());
     }
 
     Entry::Entry(Entry const& rhs)
@@ -171,7 +171,7 @@ namespace Fl
     void Entry::DebugDump() const
     {
 #ifdef _DEBUG
-        DH::ThreadPrintf(L"DirEntry: | %08x | %20I64u | %s\n", Flags, Size, Root.c_str());
+        DH::TPrintf(L"DirEntry: | %08x | %20I64u | %s\n", Flags, Size, Root.c_str());
 #endif
     }
 

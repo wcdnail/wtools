@@ -111,6 +111,6 @@ TEST_F(TestBasics, Dialogs)
         PrintLastError("Error in 'TestBasicDlg::ShowModal'");
         ASSERT_TRUE(false);
     }
-    DH::ThreadPrintf(L"DLG result: %d\n", dlg.Result().Code);
+    DH::TPrintf(L"DLG result: %d\n", dlg.Result().Code);
     /**/
 }

@@ -29,7 +29,7 @@ namespace Twins
         void KeyState::Dump() const
         {
 #ifdef _DEBUG_DUMP_KEY
-            DH::ThreadPrintf(_T("KeyState: %08x `%s`\n"), KeyId(), KeyIdName().c_str());
+            DH::TPrintf(_T("KeyState: %08x `%s`\n"), KeyId(), KeyIdName().c_str());
 #endif
         }
 

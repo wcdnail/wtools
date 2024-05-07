@@ -109,10 +109,10 @@ inline BOOL MoveToMonitor::MoveAttempt(MONITORINFOEXW const& monInfo) const
         CRect rcNew;
         GetWindowRect(hWnd, rcNew);
         if (rcWin != FromCRect<LONG>(rcNew)) {
-            DebugThreadPrintf(LTH_DBG_ASSIST L" WARNING: window rect changed!\n");
+            DBGTPrint(LTH_DBG_ASSIST L" WARNING: window rect changed!\n");
         }
     }
-    DebugThreadPrintf(LTH_DBG_ASSIST L" w:%08x moved to '%s'\n", hWnd, monInfo.szDevice);
+    DBGTPrint(LTH_DBG_ASSIST L" w:%08x moved to '%s'\n", hWnd, monInfo.szDevice);
     return FALSE;
 }
 
@@ -122,7 +122,7 @@ inline BOOL CALLBACK MoveToMonitor::EnumeratorProc(HMONITOR hMon, HDC hDC, LPREC
     ZeroMemory(&monInfo, sizeof(monInfo));
     monInfo.cbSize = sizeof(monInfo);
     GetMonitorInfoW(hMon, &monInfo);
-    //DebugThreadPrintf(LTH_DBG_ASSIST L" Enum monitor: '%s'\n", monInfo.szDevice);
+    //DBGTPrint(LTH_DBG_ASSIST L" Enum monitor: '%s'\n", monInfo.szDevice);
     return self->MoveAttempt(monInfo);
 }
 
@@ -136,7 +136,7 @@ inline bool MoveToMonitor::Move(HWND hWnd, DWORD dwDesiredNum, unsigned rcHowToP
                                         reinterpret_cast<MONITORENUMPROC>(EnumeratorProc),
                                         reinterpret_cast<LPARAM>(this));
     if (rv) {
-        DebugThreadPrintf(LTH_DBG_ASSIST L" Could not move w:%08x to desired monitor %d\n", hWnd, dwDesiredNum);
+        DBGTPrint(LTH_DBG_ASSIST L" Could not move w:%08x to desired monitor %d\n", hWnd, dwDesiredNum);
     }
     return FALSE == rv;
 }

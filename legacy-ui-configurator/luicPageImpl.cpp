@@ -136,12 +136,12 @@ void CPageImpl::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     switch(nID) {
     case IDCANCEL:
         DBG_DUMP_WMESSAGE_EXT(LTH_CANCEL, m_Caption.c_str(), m_hWnd, 0, 0, 0);
-        DebugThreadPrintf(LTH_WM_COMMAND L" ** CANCEL ** request\n");
+        DBGTPrint(LTH_WM_COMMAND L" ** CANCEL ** request\n");
         // ##TODO: PREVENT destroy this!
         // ##TODO: No Nicht Nein DestroyWindow() here
         return;
     default:
-        //DebugThreadPrintf(LTH_WM_COMMAND L" Unhandled: id:%-4d nc:%-4d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+        //DBGTPrint(LTH_WM_COMMAND L" Unhandled: id:%-4d nc:%-4d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
         break;
     }
     SetMsgHandled(FALSE);

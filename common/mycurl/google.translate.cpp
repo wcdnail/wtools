@@ -53,7 +53,7 @@ namespace Google
         if (Session.Perform(requestUrl.str(), tempResult))
             _ParseResp(tempResult, result);
 
-        DebugThreadPrintfc(GoogleTt, "%03.8f sec.\n", reqTimer.Seconds());
+        DBGCPrint(GoogleTt, "%03.8f sec.\n", reqTimer.Seconds());
         return result;
     }
 
@@ -87,7 +87,7 @@ namespace Google
 
             tempOutput[orig] = trans;
 
-            DebugThreadPrintfc(GoogleTt, "`%s` === `%s`\n", orig.c_str(), trans.c_str());
+            DBGCPrint(GoogleTt, "`%s` === `%s`\n", orig.c_str(), trans.c_str());
         }
 
         output.swap(tempOutput);

@@ -44,7 +44,7 @@ namespace DH
         DELETE_COPY_MOVE_OF(ScopedThreadLog);
 
         WCDAFX_API ScopedThreadLog(PCWSTR message);
-        WCDAFX_API ScopedThreadLog(int, PCWSTR format, ...);
+        WCDAFX_API ScopedThreadLog(_Printf_format_string_params_(1) int, PCWSTR format, ...);
         WCDAFX_API ~ScopedThreadLog();
 
     private:
@@ -59,32 +59,32 @@ namespace DH
         WCDAFX_API DH::TraceCategory const& WTL();
     }
 
-    WCDAFX_API void Printf(char const* format, ...);
-    WCDAFX_API void Printf(wchar_t const* format, ...);
+    WCDAFX_API void Printf(_Printf_format_string_ PCSTR format, ...);
+    WCDAFX_API void Printf(_Printf_format_string_ PCWSTR format, ...);
     
-    WCDAFX_API void ThreadPrintf(char const* format, ...);
-    WCDAFX_API void ThreadPrintf(wchar_t const* format, ...);
+    WCDAFX_API void TPrintf(_Printf_format_string_ PCSTR format, ...);
+    WCDAFX_API void TPrintf(_Printf_format_string_ PCWSTR format, ...);
     
-    WCDAFX_API void ThreadPrintfc(TraceCategory const& cat, char const* format, ...);
-    WCDAFX_API void ThreadPrintfc(TraceCategory const& cat, wchar_t const* format, ...);
+    WCDAFX_API void TCPrintf(TraceCategory const& cat, _Printf_format_string_ PCSTR format, ...);
+    WCDAFX_API void TCPrintf(TraceCategory const& cat, _Printf_format_string_ PCWSTR format, ...);
 
     namespace Impl
     {
-        template <typename C>
-        inline C PrintableChar(C symbol)
+        template <typename CharType>
+        inline CharType PrintableChar(CharType symbol)
         {
             switch (symbol) {
-            case /* LF */ 0x0a: return (C)'\x89';
-            case /* CR */ 0x0d: return (C)'\xac';
+            case /* LF */ 0x0a: return static_cast<CharType>('\x89');
+            case /* CR */ 0x0d: return static_cast<CharType>('\xac');
             }
             if (symbol < 0x20) {
-                return (C)'\x95';
+                return static_cast<CharType>('\x95');
             }
             return symbol;
         }
 
-        template <typename C>
-        inline void CopyCharsForPrinting(C* dest, size_t dlen, C const* source, size_t slen)
+        template <typename CharType>
+        inline void CopyCharsForPrinting(CharType* dest, size_t dlen, CharType const* source, size_t slen)
         {
             size_t left = std::min<size_t>(dlen, slen);
             while (left > 0) {
@@ -96,22 +96,22 @@ namespace DH
         }
     }
 
-    template <typename C, size_t S>
-    inline void MakePrintable(C (&dest)[S], C const* source, size_t sl)
+    template <typename CharType, size_t CountValue>
+    inline void MakePrintable(CharType (&dest)[CountValue], CharType const* source, size_t sl)
     {
-        //::memset(dest, 0, S * sizeof(C));
-        Impl::CopyCharsForPrinting(dest, S - 1, source, sl);
+        //::memset(dest, 0, CountValue * sizeof(CharType));
+        Impl::CopyCharsForPrinting(dest, CountValue - 1, source, sl);
     }
 
 #ifdef _DEBUG
-#   define DebugPrintf          DH::Printf
-#   define DebugThreadPrintf    DH::ThreadPrintf
-#   define DebugThreadPrintfc   DH::ThreadPrintfc
+#   define DBGPrint(...)            DH::Printf(__VA_ARGS__)
+#   define DBGTPrint(...)           DH::TPrintf(__VA_ARGS__)
+#   define DBGCPrint(Category, ...) DH::TCPrintf(Category, __VA_ARGS__)
     static const bool DebugTrue = true;
 #else
-    inline void DebugPrintf(...) {}
-    inline void DebugThreadPrintf(...) {}
-    inline void DebugThreadPrintfc(...) {}
+    inline void DBGPrint(...)       {}
+    inline void DBGTPrint(...)      {}
+    inline void DBGCPrint( ...)     {}
     static const bool DebugTrue = false;
 #endif
 }

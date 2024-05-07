@@ -39,7 +39,7 @@ namespace Lope
         }
         else
         {
-            Dh::ThreadPrintf("HTTPSREST: Resolver fails - %d (%s)\n", err.value(), err.message().c_str());
+            Dh::TPrintf("HTTPSREST: Resolver fails - %d (%s)\n", err.value(), err.message().c_str());
         }
     }
 
@@ -54,7 +54,7 @@ namespace Lope
         }
         else
         {
-            Dh::ThreadPrintf("HTTPSREST: Connector fails - %d (%s)\n", err.value(), err.message().c_str());
+            Dh::TPrintf("HTTPSREST: Connector fails - %d (%s)\n", err.value(), err.message().c_str());
         }
     }
 
@@ -71,7 +71,7 @@ namespace Lope
         }
         else
         {
-            Dh::ThreadPrintf("HTTPSREST: Writer fails - %d (%s)\n", err.value(), err.message().c_str());
+            Dh::TPrintf("HTTPSREST: Writer fails - %d (%s)\n", err.value(), err.message().c_str());
         }
     }
 
@@ -89,13 +89,13 @@ namespace Lope
             std::getline(response_stream, status_message);
             if (!response_stream || http_version.substr(0, 5) != "HTTP/")
             {
-                Dh::ThreadPrintf("HTTPSREST: Invalid response\n");
+                Dh::TPrintf("HTTPSREST: Invalid response\n");
                 return;
             }
 
             if (status_code != 200)
             {
-                Dh::ThreadPrintf("HTTPSREST: Response returned with status code %d\n", status_code);
+                Dh::TPrintf("HTTPSREST: Response returned with status code %d\n", status_code);
                 return;
             }
 
@@ -106,7 +106,7 @@ namespace Lope
         }
         else
         {
-            Dh::ThreadPrintf("HTTPSREST: Status read fails - %d (%s)\n", err.value(), err.message().c_str());
+            Dh::TPrintf("HTTPSREST: Status read fails - %d (%s)\n", err.value(), err.message().c_str());
         }
     }
 
@@ -133,7 +133,7 @@ namespace Lope
         }
         else
         {
-            Dh::ThreadPrintf("HTTPSREST: Header read fails - %d (%s)\n", err.value(), err.message().c_str());
+            Dh::TPrintf("HTTPSREST: Header read fails - %d (%s)\n", err.value(), err.message().c_str());
         }
     }
 
@@ -152,7 +152,7 @@ namespace Lope
         }
         else if (err != boost::asio::error::eof)
         {
-            Dh::ThreadPrintf("HTTPSREST: Content read fails - %d (%s)\n", err.value(), err.message().c_str());
+            Dh::TPrintf("HTTPSREST: Content read fails - %d (%s)\n", err.value(), err.message().c_str());
         }
     }
 }

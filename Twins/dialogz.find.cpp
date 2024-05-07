@@ -673,7 +673,7 @@ namespace Twins
             ATL::CTime minTime = GetTimeFrom(BegDate, BegTime);
             ATL::CTime maxTime = GetTimeFrom(EndDate, EndTime);
 
-            DH::ThreadPrintf(L"Searchin: Datetime range in [%s .. %s]\n"
+            DH::TPrintf(L"Searchin: Datetime range in [%s .. %s]\n"
                 , minTime.Format(L"%d.%m.%Y %H:%M:%S")
                 , maxTime.Format(L"%d.%m.%Y %H:%M:%S")
                 );
@@ -699,7 +699,7 @@ namespace Twins
             case NotOlderSeconds: span = CTimeSpan(0, 0, 0, value); break;
             }
             NotOlderTime = CTime::GetCurrentTime() - span;
-            DH::ThreadPrintf(L"Searchin: NotOlderTime %s\n", NotOlderTime.Format(L"%d.%m.%Y %H:%M:%S"));
+            DH::TPrintf(L"Searchin: NotOlderTime %s\n", NotOlderTime.Format(L"%d.%m.%Y %H:%M:%S"));
         }
     }
 
@@ -816,7 +816,7 @@ namespace Twins
         }
           
         if (error)
-            DH::ThreadPrintf(L"Searchin: %d -> `%s` (%S)\n", error.value(), path.c_str(), error.message().c_str());
+            DH::TPrintf(L"Searchin: %d -> `%s` (%S)\n", error.value(), path.c_str(), error.message().c_str());
     }
 
     HTREEITEM FindDialog::AppendToTree(HTREEITEM rootItem, HTREEITEM insertAfter, std::wstring const& name, int iconIndex)
@@ -1012,7 +1012,7 @@ namespace Twins
                 result = boost::regex_search(line, what, rx);
                 if (result)
                 {
-                    //DH::ThreadPrintf("Searchin: `%s` at %d:%d `%s`\n"
+                    //DH::TPrintf("Searchin: `%s` at %d:%d `%s`\n"
                     //    , TextSearchRxPattern.c_str(), linenum, what.position(), line.c_str());
                     break;
                 }

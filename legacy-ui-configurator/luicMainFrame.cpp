@@ -24,7 +24,7 @@ CMainFrame::CMainFrame(Conf::Section const& parentSettings)
 
 void CMainFrame::SetStatus(int status, ATL::CStringW&& message)
 {
-    DH::ThreadPrintf(LTH_STATUS L" [s:%d] %s\n", status, message.GetString());
+    DH::TPrintf(LTH_STATUS L" [s:%d] %s\n", status, message.GetString());
     if (!m_StatusBar.m_hWnd) {
         return;
     }
@@ -147,7 +147,7 @@ void CMainFrame::OnAccelerator(int nID)
     case ID_ACC_CTRL_SHIFT_TAB: m_View.TabShift(-1); break;
     case ID_ACC_SELECT_ALL:     m_View.SelectAll(); break;
     }
-    //DebugThreadPrintf(LTH_MAINFRAME L" ACCELERATOR: %d %p\n", nID);
+    //DBGTPrint(LTH_MAINFRAME L" ACCELERATOR: %d %p\n", nID);
 }
 
 void CMainFrame::OnCommand(UINT uNotifyCode, int nID, HWND hWndCtl)

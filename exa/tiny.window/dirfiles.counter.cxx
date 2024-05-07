@@ -17,7 +17,7 @@ static size_t GetFilesCountViaBoostFs(wchar_t const* pathStr)
         elapsed = tm.Seconds();
     }
 
-    Dh::ThreadPrintf(L"`%s` #%d %2.8f", pathStr, count, elapsed);
+    Dh::TPrintf(L"`%s` #%d %2.8f", pathStr, count, elapsed);
     return count;
 }
 
@@ -37,18 +37,18 @@ static size_t GetFilesCountViaWinApi(wchar_t const* pathStr, size_t bsize, bool 
 
     if (INVALID_HANDLE_VALUE == h)
     {
-        Dh::ThreadPrintf(L"`%s` cF failed 0x%x\n", pathStr, hr);
+        Dh::TPrintf(L"`%s` cF failed 0x%x\n", pathStr, hr);
         return 0;
     }
 
     boost::shared_ptr<void> dir(h, CloseHandle);
     boost::scoped_array<BYTE> bytes(new BYTE[bsize]);
 
-    Dh::ThreadPrintf(L"`%s` hA %.3fM\n", pathStr, bsize / (1024. * 1024.));
+    Dh::TPrintf(L"`%s` hA %.3fM\n", pathStr, bsize / (1024. * 1024.));
     
     BOOL br = ::GetFileInformationByHandleEx(h, FileIdBothDirectoryInfo, bytes.get(), (DWORD)bsize);
     hr = ::GetLastError();
-    Dh::ThreadPrintf(L"`%s` gI %d 0x%x\n", pathStr, br, hr);
+    Dh::TPrintf(L"`%s` gI %d 0x%x\n", pathStr, br, hr);
 
     if (!br || (0 != hr))
         return 0;        
@@ -79,7 +79,7 @@ static size_t GetFilesCountViaWinApi(wchar_t const* pathStr, size_t bsize, bool 
 
     size_t rsize = ((BYTE*)info) - bytes.get() + (sizeof(FILE_ID_BOTH_DIR_INFO) + info->FileNameLength - sizeof(wchar_t));
 
-    Dh::ThreadPrintf(L"`%s` #%d %.3fM %2.8f", pathStr, count, rsize / (1024. * 1024.), tm.Seconds());
+    Dh::TPrintf(L"`%s` #%d %.3fM %2.8f", pathStr, count, rsize / (1024. * 1024.), tm.Seconds());
     return count;
 }
 
@@ -99,7 +99,7 @@ static size_t ReadDir(wchar_t const* path, unsigned char* buffer, size_t bsize, 
 
     if (INVALID_HANDLE_VALUE == h)
     {
-        Dh::ThreadPrintf(L"`%s` cF failed 0x%x\n", path, hr);
+        Dh::TPrintf(L"`%s` cF failed 0x%x\n", path, hr);
         return 0;
     }
 
@@ -113,7 +113,7 @@ static size_t ReadDir(wchar_t const* path, unsigned char* buffer, size_t bsize, 
 
     if (!br || (0 != hr))
     {
-        Dh::ThreadPrintf(L"`%s` gI failed - %d 0x%x\n", path, br, hr);
+        Dh::TPrintf(L"`%s` gI failed - %d 0x%x\n", path, br, hr);
         return 0;        
     }
 

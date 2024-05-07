@@ -98,12 +98,12 @@ namespace Twins
         catch (Error const& ex)
         {
             hr = ex.Code;
-            DH::ThreadPrintf("%s - %d %s\n", ex.what(), hr, Str::ErrorCode<char>::SystemMessage(hr));
+            DH::TPrintf("%s - %d %s\n", ex.what(), hr, Str::ErrorCode<char>::SystemMessage(hr));
         }
         catch (std::exception const& ex)
         {
             hr = E_UNEXPECTED;
-            DH::ThreadPrintf("%s - %d %s\n", ex.what(), hr, Str::ErrorCode<char>::SystemMessage(hr));
+            DH::TPrintf("%s - %d %s\n", ex.what(), hr, Str::ErrorCode<char>::SystemMessage(hr));
         }
 
         ::InterlockedExchange(&id_, 0);

@@ -229,7 +229,7 @@ namespace Runtime
                 DWORD size = _countof(buffer);
                 BOOL rv = ::GetComputerNameEx((COMPUTER_NAME_FORMAT)cnf, buffer, &size);
 
-                DH::ThreadPrintf(_T("CompName: `%s` (%s)\n")
+                DH::TPrintf(_T("CompName: `%s` (%s)\n")
                     , (!rv ? (PCTSTR)Str::ErrorCode<>::SystemMessage(GetLastError()) : buffer)
                     , cmDescription[cnf]
                     );
@@ -584,7 +584,7 @@ namespace Runtime
         if (!::GetVersionExW((LPOSVERSIONINFOW)&vi)) {
             hr = static_cast<HRESULT>(::GetLastError());
             const auto errText = Str::ErrorCode<>::SystemMessage(hr);
-            DH::ThreadPrintf(L"OSVRSION: init failed %d `%s`\n", hr, errText.GetString());
+            DH::TPrintf(L"OSVRSION: init failed %d `%s`\n", hr, errText.GetString());
         }
         this->Version.Major = vi.dwMajorVersion;
         this->Version.Minor = vi.dwMinorVersion;

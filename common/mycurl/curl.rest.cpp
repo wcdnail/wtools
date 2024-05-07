@@ -156,7 +156,7 @@ namespace Curl
             char dumpbuf[54] = {0};
             Dh::MakePrintable(dumpbuf, ptr, size);
 
-            Dh::ThreadPrintfc(headerTypeCat((int)type), "(%d) %03.8f %08lu `%s`\n", type, traceTimer.Seconds(), size, dumpbuf);
+            Dh::TCPrintf(headerTypeCat((int)type), "(%d) %03.8f %08lu `%s`\n", type, traceTimer.Seconds(), size, dumpbuf);
 
             traceTimer = Dh::Timer();
             return (int)size;
@@ -191,7 +191,7 @@ namespace Curl
         void ParseHeader()
         {
             CharString header(HeaderStream.str());
-            DebugThreadPrintfc(CurlApi, "Header:\n%s\n", header.c_str());
+            DBGCPrint(CurlApi, "Header:\n%s\n", header.c_str());
         }
 
     public:
@@ -204,7 +204,7 @@ namespace Curl
             lastErrorText = ex.what();
 
             if (!lastErrorWhat.empty())
-                Dh::ThreadPrintfc(CurlApi, "%s\n", lastErrorWhat.c_str());
+                Dh::TCPrintf(CurlApi, "%s\n", lastErrorWhat.c_str());
         }
 
         template <typename T>
@@ -217,9 +217,9 @@ namespace Curl
             lastErrorText = ::curl_easy_strerror((CURLcode)lastErrorCode);
 
             if (!lastErrorWhat.empty())
-                Dh::ThreadPrintfc(CurlApi, "%s\n", lastErrorWhat.c_str());
+                Dh::TCPrintf(CurlApi, "%s\n", lastErrorWhat.c_str());
 
-            Dh::ThreadPrintfc(CurlApi, "%d %s\n", lastErrorCode, lastErrorText.c_str());
+            Dh::TCPrintf(CurlApi, "%d %s\n", lastErrorCode, lastErrorText.c_str());
         }
     };
 

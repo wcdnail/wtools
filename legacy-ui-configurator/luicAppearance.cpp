@@ -436,7 +436,7 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     }
     SetMsgHandled(FALSE);
     if constexpr (false) {
-        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
+        DBGTPrint(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
             nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
     }
 }
@@ -460,7 +460,7 @@ LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
     }
     SetMsgHandled(FALSE);
     if constexpr (false) {
-        DebugThreadPrintf(LTH_WM_NOTIFY L" APPRNCE NTY: id:%-4d nc:%-4d %s\n", 
+        DBGTPrint(LTH_WM_NOTIFY L" APPRNCE NTY: id:%-4d nc:%-4d %s\n", 
             idCtrl, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
     }
     return 0;
@@ -485,6 +485,7 @@ void CPageAppearance::ItemColorTryChange(int nButton)
     PCItemAssign  pAssignment = nullptr;
     const int nItem = ItemGetSel(pAssignment);
     if (TI_Invalid == nItem || !pAssignment) {
+        DH::TPrintf(LTH_APPEARANCE L" <<FAILED>> '%s' (%d) ==> #%08x\n", _T(__FUNCTION__), nButton, clrTryed);
         return ;
     }
     int nWhich = TI_Invalid;
@@ -494,7 +495,7 @@ void CPageAppearance::ItemColorTryChange(int nButton)
     case IT_FontColor1: nWhich = pAssignment->fontColor; break;
     }
     const bool bSuccess = m_pTheme->SetColor(nWhich, clrTryed);
-    DebugThreadPrintf(LTH_APPEARANCE L" Item: '%s' SetColor '%s'[%d] ==> #%08x == %s\n", 
+    DH::TPrintf(LTH_APPEARANCE L" Item: '%s' SetColor '%s'[%d] ==> #%08x == %s\n", 
         pAssignment->name,
         CTheme::ColorName(nWhich),
         nWhich,

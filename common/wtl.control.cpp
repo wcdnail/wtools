@@ -54,7 +54,7 @@ namespace CF
         else {
             caption.Format(L"%d", id);
         }
-        DebugThreadPrintf(format, hWnd, caption.GetString(), prevClass.GetString(), thisClass);
+        DBGTPrint(format, hWnd, caption.GetString(), prevClass.GetString(), thisClass);
     }
 #else
 #  define traceCtrl(...)
@@ -86,7 +86,7 @@ namespace CF
             msg.wParam = wParam;
             msg.lParam = lParam;
             auto msgStr = DH::MessageToStrignW(&msg);
-            DebugThreadPrintf(LTH_CONTROL L" -WM- [[ %s ]]\n", msgStr.c_str());
+            DBGTPrint(LTH_CONTROL L" -WM- [[ %s ]]\n", msgStr.c_str());
         }
 #endif
         SetMsgHandled(FALSE);

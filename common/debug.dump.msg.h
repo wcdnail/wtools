@@ -9,13 +9,13 @@
 #  define DBG_DUMP_WMESSAGE(HDR, CAPT, pMsg)                            \
     do {                                                                 \
         auto msgStr = DH::MessageToStrignW(pMsg);                         \
-        DebugThreadPrintf(HDR L" %12s [[ %s ]]\n", CAPT, msgStr.c_str());  \
+        DBGTPrint(HDR L" %12s [[ %s ]]\n", CAPT, msgStr.c_str());          \
     }                                                                       \
     while (false)
 #  define DBG_DUMP_WMESSAGE_EXT(HDR, CAPT, hWnd, uMsg, wParam, lParam)  \
     do {                                                                 \
         auto msgStr = DH::MessageToStrignW(hWnd, uMsg, wParam, lParam);   \
-        DebugThreadPrintf(HDR L" %12s [[ %s ]]\n", CAPT, msgStr.c_str());  \
+        DBGTPrint(HDR L" %12s [[ %s ]]\n", CAPT, msgStr.c_str());          \
     }                                                                       \
     while (false)
 #else

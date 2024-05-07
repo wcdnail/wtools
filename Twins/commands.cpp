@@ -31,7 +31,7 @@ namespace Twins
             CommandMap::const_iterator it = map_.find(id);
 
             if (it != map_.end())
-                DH::ThreadPrintf("ECommand: %04d(%s) already present.\n", id, name.c_str());
+                DH::TPrintf("ECommand: %04d(%s) already present.\n", id, name.c_str());
 
             map_[id] = Definition(id, keyId, name, callback);
         }
@@ -66,7 +66,7 @@ namespace Twins
             if (it != map_.end())
             {
 #ifdef _DEBUG_KEYBOARD
-                DH::ThreadPrintf(L"Keyboard: %8x(%s) `%s`\n", keyId, state.KeyIdName().c_str(), it->second.Name.c_str());
+                DH::TPrintf(L"Keyboard: %8x(%s) `%s`\n", keyId, state.KeyIdName().c_str(), it->second.Name.c_str());
 #endif
                 it->second.Callback();
             }

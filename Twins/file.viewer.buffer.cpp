@@ -10,7 +10,7 @@ namespace Fv
     {
         if (!Filepath.empty())
         {
-            DH::ThreadPrintf(L"FvBuffer: dtor `%s` %I64u - %I64u x %I64u\n"
+            DH::TPrintf(L"FvBuffer: dtor `%s` %I64u - %I64u x %I64u\n"
                 , Filepath.c_str()
                 , FileSize, BlockCount, BlockSize
                 );
@@ -69,7 +69,7 @@ namespace Fv
             def.size = readed;
         }
 
-        DH::ThreadPrintf(L"FvBuffer: read >%I64u #%I64u = %I64u (%S(%d))\n"
+        DH::TPrintf(L"FvBuffer: read >%I64u #%I64u = %I64u (%S(%d))\n"
             , lrOffset.QuadPart, index, def.size
             , error.message().c_str(), error.value()
             );
@@ -127,7 +127,7 @@ namespace Fv
             SYSTEM_INFO si = {};
             ::GetSystemInfo(&si);
             if (0 != (blockSize % si.dwAllocationGranularity))
-                DH::ThreadPrintf(L"FvBuffer: open `%s` Allocation Granularity Warning `0 != %I64u %% %u`\n"
+                DH::TPrintf(L"FvBuffer: open `%s` Allocation Granularity Warning `0 != %I64u %% %u`\n"
                 , path.c_str(), blockSize, si.dwAllocationGranularity);
 
             HANDLE inp = ::CreateFileW(path.c_str(), GENERIC_READ
@@ -148,10 +148,10 @@ namespace Fv
         }
 
         if (error)
-            DH::ThreadPrintf(L"FvBuffer: open `%s` - %d - %S\n", path.c_str()
+            DH::TPrintf(L"FvBuffer: open `%s` - %d - %S\n", path.c_str()
                 , error.value(), error.message().c_str());
         else
-            DH::ThreadPrintf(L"FvBuffer: open `%s` %I64u - %I64u x %I64u - OK\n", path.c_str()
+            DH::TPrintf(L"FvBuffer: open `%s` %I64u - %I64u x %I64u - OK\n", path.c_str()
                 , FileSize, BlockCount, BlockSize);
 
         return error;

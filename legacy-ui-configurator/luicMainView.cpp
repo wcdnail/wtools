@@ -98,7 +98,7 @@ CPageImplPtr const& CMainView::PagesGet(int numba) const
 {
     const auto& it = m_PagesMap.find(numba);
     if (it == m_PagesMap.cend()) {
-        DebugThreadPrintf(LTH_CONTROL L" Page #%d does not EXIST!\n", numba);
+        DBGTPrint(LTH_CONTROL L" Page #%d does not EXIST!\n", numba);
         static const CPageImplPtr dmyPtr;
         return dmyPtr;
     }
@@ -242,7 +242,7 @@ LRESULT CMainView::OnNotify(int idCtrl, LPNMHDR pnmh)
         break;
     }
     default:
-        //DebugThreadPrintf(LTH_WM_NOTIFY L" Unknown: c:%4d n:%04x\n", idCtrl, pnmh->code);
+        //DBGTPrint(LTH_WM_NOTIFY L" Unknown: c:%4d n:%04x\n", idCtrl, pnmh->code);
         break;
     }
     return 0;

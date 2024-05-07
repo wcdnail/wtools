@@ -14,7 +14,7 @@
 #if 0
 static int _ExceptionFilter(PEXCEPTION_POINTERS ep)
 {
-   DebugThreadPrintf(_T( "SEH [0x%08x]\n" ), ep->ExceptionRecord->ExceptionCode);
+   DBGTPrint(_T( "SEH [0x%08x]\n" ), ep->ExceptionRecord->ExceptionCode);
    return EXCEPTION_EXECUTE_HANDLER;
 }
 

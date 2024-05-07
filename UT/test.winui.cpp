@@ -59,7 +59,7 @@ struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg>, // WTL::CDialogResize<CTestWin
             OnCloseCmd(notifyCode, cmdId, hCtlWnd, bHandled);
             break;
         default:
-            DebugThreadPrintf(LTH_WM_COMMAND L" Unknown: n:%04d c:%04d w:%08x\n", notifyCode, cmdId, hCtlWnd);
+            DBGTPrint(LTH_WM_COMMAND L" Unknown: n:%04d c:%04d w:%08x\n", notifyCode, cmdId, hCtlWnd);
         }
         return 0;
     }    

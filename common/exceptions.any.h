@@ -85,7 +85,7 @@ namespace CF
         void operator () (char const* caption, char const* what, char const* codetext, char const* callstack) const
         {
             ::MessageBoxA(NULL, what, caption, MB_ICONEXCLAMATION);
-            DH::ThreadPrintfc(DH::Category::Exception, "%s\n", what);
+            DH::TCPrintf(DH::Category::Exception, "%s\n", what);
         }
     };
 

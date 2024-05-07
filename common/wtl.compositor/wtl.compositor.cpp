@@ -121,7 +121,7 @@ namespace CF::UI
         }
         catch (winrt::hresult_error const& ex) {
             winrt::hstring msg = ex.message();
-            DH::ThreadPrintfc(DH::Category::Module(), L"winrt::init_apartment FAILED 0x%08X '%s'\n", ex.code().value, msg.c_str());
+            DH::TCPrintf(DH::Category::Module(), L"winrt::init_apartment FAILED 0x%08X '%s'\n", ex.code().value, msg.c_str());
         }
     }
 
@@ -284,7 +284,7 @@ namespace CF::UI
             msg.wParam = wParam;
             msg.lParam = lParam;
             auto msgStr = DH::MessageToStrignW(&msg);
-            DebugThreadPrintf(LTH_CONTROL L" -WM- [[ %s ]]\n", msgStr.c_str());
+            DBGTPrint(LTH_CONTROL L" -WM- [[ %s ]]\n", msgStr.c_str());
         }
 #endif
         return FALSE;

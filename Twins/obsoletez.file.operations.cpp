@@ -220,7 +220,7 @@ namespace Twins
                     if (!GetSourceInfo(*it, source, attrs, size))
                     {
                         HRESULT hr = ::GetLastError();
-                        Dh::ThreadPrintf(L"NoSource: %08x - `%s`\n", hr, *it);
+                        Dh::TPrintf(L"NoSource: %08x - `%s`\n", hr, *it);
                         continue;
                     }
 
@@ -237,7 +237,7 @@ namespace Twins
                     hr = operation(boost::cref(source), boost::cref(dest), this);
 
                     // FIXME: log
-                    Dh::ThreadPrintf(L"FExecute: `%s` - %x %s\n", source, hr
+                    Dh::TPrintf(L"FExecute: `%s` - %x %s\n", source, hr
                         , (0 != hr ? Str::ErrorCode<wchar_t>::SystemMessage(hr) : L""));
 
                     // TODO: break on error...

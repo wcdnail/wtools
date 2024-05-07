@@ -147,7 +147,7 @@ namespace Twins
         std::sort(beg, end, Sort::Helper(items, column, ascending));
         Index.swap(temp);
 
-        DH::ThreadPrintf(L" SORTING: %d %2.8f sec.\n", (int)count, tm.Seconds());
+        DH::TPrintf(L" SORTING: %d %2.8f sec.\n", (int)count, tm.Seconds());
     }
 
     int FSort::FindIndexByName(FItemVector const& items, std::wstring const& name) const
@@ -174,7 +174,7 @@ namespace Twins
         IndexVector::const_iterator it = std::find_if(Index.begin(), Index.end(), pred(items, name));
         int rv = (it == Index.end() ? -1 : (int)std::distance(Index.begin(), it));
 
-        DH::ThreadPrintf(L"FINDBYNM: %d %2.8f sec.\n", (int)items.size(), tm.Seconds());
+        DH::TPrintf(L"FINDBYNM: %d %2.8f sec.\n", (int)items.size(), tm.Seconds());
 
         return rv;
     }

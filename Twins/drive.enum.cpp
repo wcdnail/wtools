@@ -140,7 +140,7 @@ namespace Twins
                         default:
                             continue;
                         }
-                        DH::ThreadPrintf(_T("DRIVENUM: %d %s [%s] (0x%08x %s(%d) 0x%08x)\n"),
+                        DH::TPrintf(_T("DRIVENUM: %d %s [%s] (0x%08x %s(%d) 0x%08x)\n"),
                             type, path, label, serial, fs, length, flags);
                         Item info;
                         info.num = count++;
@@ -171,11 +171,11 @@ namespace Twins
             }
             catch (std::exception const& ex)
             {
-                DH::ThreadPrintf("DRIVENUM: ERROR <%s>\n", ex.what());
+                DH::TPrintf("DRIVENUM: ERROR <%s>\n", ex.what());
             }
             catch (...)
             {
-                DH::ThreadPrintf("DRIVENUM: UNKNOWN ERROR\n");
+                DH::TPrintf("DRIVENUM: UNKNOWN ERROR\n");
             }
 
             return false;

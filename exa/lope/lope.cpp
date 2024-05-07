@@ -8,7 +8,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPTSTR,
 {
     int code = ERROR_BAD_ARGUMENTS;
 
-    Dh::ThreadPrintf("STARTUP : Using sqlite v. %s\n", ::sqlite3_libversion());
+    Dh::TPrintf("STARTUP : Using sqlite v. %s\n", ::sqlite3_libversion());
 
     try
     {
@@ -63,13 +63,13 @@ namespace Lope
 
         else
         {
-            Dh::ThreadPrintf("LOPECTOR: Creating IUserNotification2 failed - %s\n", Str::ErrorCode<char>::SystemMessage(hr));
+            Dh::TPrintf("LOPECTOR: Creating IUserNotification2 failed - %s\n", Str::ErrorCode<char>::SystemMessage(hr));
 
             hr = userNotify.CoCreateInstance(CLSID_UserNotification);
             if (userNotify)
                 UserNotify = userNotify2;
             else
-                Dh::ThreadPrintf("LOPECTOR: Creating IUserNotification failed - %s\n", Str::ErrorCode<char>::SystemMessage(hr));
+                Dh::TPrintf("LOPECTOR: Creating IUserNotification failed - %s\n", Str::ErrorCode<char>::SystemMessage(hr));
         }
 
         StateIcon[0].LoadIcon(IDI_RB);
@@ -192,7 +192,7 @@ namespace Lope
                 std::wstring name = infoPtr->element.GetName();
                 std::wstring help = infoPtr->element.GetHelpText();
 
-                Dh::ThreadPrintf(_T("ONENTER : %04d, %04d #> %s `%s`\n"), infoPtr->element.Pt.x, infoPtr->element.Pt.y, infoPtr->element.StringDump(), name.c_str());
+                Dh::TPrintf(_T("ONENTER : %04d, %04d #> %s `%s`\n"), infoPtr->element.Pt.x, infoPtr->element.Pt.y, infoPtr->element.StringDump(), name.c_str());
 
 #if 1
                 if (name.empty())
@@ -218,14 +218,14 @@ namespace Lope
             }
             catch (std::exception const& ex)
             {
-                Dh::ThreadPrintf("EXCPTION: %s\n", ex.what());
+                Dh::TPrintf("EXCPTION: %s\n", ex.what());
             }
         }
     }
 
     void App::OnEnter(Uia::Element const& elm)
     {
-        //Dh::ThreadPrintf(_T("ONENTER : %04d, %04d #> %s\n"), elm.Pt.x, elm.Pt.y, elm.StringDump());
+        //Dh::TPrintf(_T("ONENTER : %04d, %04d #> %s\n"), elm.Pt.x, elm.Pt.y, elm.StringDump());
 
         try
         {
@@ -234,12 +234,12 @@ namespace Lope
         }
         catch (std::exception const& ex)
         {
-            Dh::ThreadPrintf("EXCPTION: %s\n", ex.what());
+            Dh::TPrintf("EXCPTION: %s\n", ex.what());
         }
     }
 
     void App::OnLeave(Uia::Element const& elm)
     {
-        //Dh::ThreadPrintf(_T("ONLEAVE : %04d, %04d #> %s\n"), elm.Pt.x, elm.Pt.y, elm.StringDump());
+        //Dh::TPrintf(_T("ONLEAVE : %04d, %04d #> %s\n"), elm.Pt.x, elm.Pt.y, elm.StringDump());
     }
 }

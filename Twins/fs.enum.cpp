@@ -137,7 +137,7 @@ namespace Twins
 
         void EntryInfo::Dump() const
         {
-            Dh::ThreadPrintf(_T("EntryNfo: %08x | %16s | %s %s %s\n")
+            Dh::TPrintf(_T("EntryNfo: %08x | %16s | %s %s %s\n")
                 , attr
                 , Str::HumanSize(size)
                 , pathName
@@ -208,7 +208,7 @@ namespace Twins
 
         static HRESULT OnEnumError(PCTSTR rawPath, PCTSTR rawDir, PCTSTR rawMask, Enumerator& enumerator, HRESULT hr)
         {
-            Dh::ThreadPrintf(_T("EnmError: `%s%s\\%s` %s %d (0x%x)\n"), rawPath, rawDir, rawMask, Str::ErrorCode<TCHAR>::SystemMessage(hr), hr, hr);
+            Dh::TPrintf(_T("EnmError: `%s%s\\%s` %s %d (0x%x)\n"), rawPath, rawDir, rawMask, Str::ErrorCode<TCHAR>::SystemMessage(hr), hr, hr);
 
             CString pathName = LinkFilename(rawPath, rawDir);
             DWORD attrs = ::GetFileAttributes(pathName);
@@ -293,7 +293,7 @@ namespace Twins
             }
             catch (std::exception const& ex)
             {
-                Dh::ThreadPrintf("EFsError: %s\n", __FUNCTION__, ex.what());
+                Dh::TPrintf("EFsError: %s\n", __FUNCTION__, ex.what());
                 rv = ERROR_BAD_CURRENT_DIRECTORY;
             }
 

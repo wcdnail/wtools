@@ -58,7 +58,7 @@ int CALLBACK WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int)
 {
     //std::string infoReport = Runtime::Info().SimpleReport();
     //::OutputDebugStringA(infoReport.c_str());
-    Dh::ThreadPrintf(_T("AppEntry: Under Wow64? - %s\n"), Win567().UnderWow64() ? _T("Yes!") : _T("No, no no no"));
+    Dh::TPrintf(_T("AppEntry: Under Wow64? - %s\n"), Win567().UnderWow64() ? _T("Yes!") : _T("No, no no no"));
     Ut::WtlMain(instance);
     return 0;
 }

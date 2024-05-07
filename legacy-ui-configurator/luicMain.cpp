@@ -50,7 +50,7 @@ void SetMFStatus(int status, PCWSTR format, ...)
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
 {
     ATL::CStringA msg = Str::ErrorCode<char>::SystemMessage(code);
-    DH::ThreadPrintfc(DH::Category::Module(), "%s %s\n", caption.GetString(), msg.GetString());
+    DH::TCPrintf(DH::Category::Module(), "%s %s\n", caption.GetString(), msg.GetString());
 
     if (showMBox) {
         ATL::CStringA userMsg;
@@ -62,7 +62,7 @@ void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox/* = false*
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
 {
     ATL::CStringW msg = Str::ErrorCode<wchar_t>::SystemMessage(code);
-    DH::ThreadPrintfc(DH::Category::Module(), L"%s %s\n", caption.GetString(), msg.GetString());
+    DH::TCPrintf(DH::Category::Module(), L"%s %s\n", caption.GetString(), msg.GetString());
 
     if (showMBox) {
         ATL::CStringW userMsg;
@@ -181,7 +181,7 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
             }
             charSets += std::to_wstring(cs.first) + L":'" + cs.second + L"'";
         }
-        DebugPrintf(L"\t>>>> %4d %40s %s\n", fontNum++, it.second.m_sFullName.c_str(), charSets.c_str());
+        DBGPrint(L"\t>>>> %4d %40s %s\n", fontNum++, it.second.m_sFullName.c_str(), charSets.c_str());
     }
 #endif
     return code;

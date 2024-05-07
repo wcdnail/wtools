@@ -31,7 +31,7 @@ UINT CALLBACK CSysPageAppearance::PropPageCallback2(HWND hWnd, UINT uMsg, LPPROP
         break;
     }
     }
-    DebugThreadPrintf(LTH_CONTROL L"PPC: w:%08x m:%d\n", hWnd, uMsg);
+    DBGTPrint(LTH_CONTROL L"PPC: w:%08x m:%d\n", hWnd, uMsg);
     return 0;
 }
 
@@ -44,7 +44,7 @@ int CALLBACK CSysPageAppearance::PropSheetProc(HWND hWnd, UINT uMsg, LPARAM lPar
     msg.wParam = 0;
     msg.lParam = lParam;
     auto msgStr = DH::MessageToStrignW(&msg);
-    DebugThreadPrintf(LTH_CONTROL L" -PPC- [[ %s ]]\n", msgStr.c_str());
+    DBGTPrint(LTH_CONTROL L" -PPC- [[ %s ]]\n", msgStr.c_str());
 #endif
 
     return static_cast<int>(Super::StartDialogProc(hWnd, uMsg, 0, lParam));

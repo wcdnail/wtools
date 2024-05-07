@@ -58,19 +58,19 @@ namespace Simple
 
         FORMATETC format = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL }; 
         HRESULT hr = object->SetData(&format, &medium, TRUE);
-        Dh::ThreadPrintf(_T("DragDrop: SetData - 0x%x\n"), hr);
+        Dh::TPrintf(_T("DragDrop: SetData - 0x%x\n"), hr);
         if (SUCCEEDED(hr))
         {
             CComPtr<IDragSourceHelper> helper;
             if (SUCCEEDED(helper.CoCreateInstance(CLSID_DragDropHelper)))
             {
                 hr = helper->InitializeFromWindow(window, &pt, object);
-                Dh::ThreadPrintf(_T("DragDrop: Helper - 0x%x\n"), hr);
+                Dh::TPrintf(_T("DragDrop: Helper - 0x%x\n"), hr);
             }
 
             DWORD dwEffect = 0;
             hr = ::DoDragDrop(object, source, DROPEFFECT_COPY, &dwEffect);
-            Dh::ThreadPrintf(_T("DragDrop: Do - 0x%x\n"), hr);
+            Dh::TPrintf(_T("DragDrop: Do - 0x%x\n"), hr);
         }
         else
         {

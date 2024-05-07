@@ -42,7 +42,7 @@ static int CALLBACK FontEnumerator(ENUMLOGFONTEXW const*  lpelfe,
     UNREFERENCED_PARAMETER(dwFontType);
 #ifdef _DEBUG_XTRA
     uint64_t signCodePage = *reinterpret_cast<const uint64_t*>(lpntme->ntmFontSig.fsCsb);
-    DebugPrintf(L">> %4d t:%04X ^%-3d csb:%p >>cs:%-3d<< %40s [fn:'%s' scr:'%s']\n", args.m_Counter + 1, dwFontType,
+    DBGPrint(L">> %4d t:%04X ^%-3d csb:%p >>cs:%-3d<< %40s [fn:'%s' scr:'%s']\n", args.m_Counter + 1, dwFontType,
         lpntme->ntmTm.tmHeight,
         signCodePage,
         lpelfe->elfLogFont.lfCharSet,
