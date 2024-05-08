@@ -89,16 +89,19 @@ struct CDrawings::CInTheme: WTL::CThemeImpl<CInTheme>
         return static_cast<DWORD>(::GetWindowLongW(m_hWnd, GWL_EXSTYLE));
     }
 
-    bool TextPut(WTL::CDCHandle dc, CRect& rcDraw, PCWSTR szText, int nLen,
-                 int       nPartId,
-                 int      nStateId,
-                 DWORD     dwFlags
-    )
+    bool TextPut(WTL::CDCHandle       dc,
+                 CRect&           rcDraw,
+                 PCWSTR           szText,
+                 int                nLen,
+                 int             nPartId,
+                 int            nStateId,
+                 DWORD           dwFlags,
+                 const PDTTOPTS pOptions)
     {
         if (!m_hTheme) {
             return false;
         }
-        const HRESULT code = DrawThemeText(dc, nPartId, nStateId, szText, nLen, dwFlags, 0, rcDraw);
+        const HRESULT code = DrawThemeTextEx(dc, nPartId, nStateId, szText, nLen, dwFlags, rcDraw, pOptions);
         return SUCCEEDED(code);
     }
 };
@@ -162,7 +165,6 @@ struct CDrawings::CStaticRes
     };
 
     CInTheme        m_InTheme;
-    bool  m_bIconLabelShadows;
     HICON m_hIcon[ICON_Count];
 
     static WTL::CFontHandle CreateMarlettFont(LONG height);
@@ -175,8 +177,6 @@ struct CDrawings::CStaticRes
 private:
     template <typename T>
     static bool GetProcAddressEx(HMODULE hMod, T& routine, PCSTR routineName, PCSTR modAlias);
-
-    void LoadExplorerSettings();
 };
 
 CDrawings::CStaticRes::~CStaticRes()
@@ -185,7 +185,6 @@ CDrawings::CStaticRes::~CStaticRes()
 
 CDrawings::CStaticRes::CStaticRes()
     : m_InTheme{}
-    , m_bIconLabelShadows{true}
 {
     ZeroMemory(&m_hIcon, sizeof(m_hIcon));
 }
@@ -223,7 +222,6 @@ WTL::CFontHandle CDrawings::CStaticRes::CreateMarlettFont(LONG height)
 HRESULT CDrawings::CStaticRes::Init(HWND hWnd)
 {
     HRESULT code = S_OK;
-
     srand(static_cast<int>(time(nullptr)));
     auto const&   ilBig = CLUIApp::App()->GetImageList(IL_OwnBig);
     auto const& ilSmall = CLUIApp::App()->GetImageList(IL_SHELL_16x16);
@@ -232,30 +230,7 @@ HRESULT CDrawings::CStaticRes::Init(HWND hWnd)
     m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
     m_hIcon[ICON_Desktop1]    = ilBig.GetIcon(IconMyComp); // IconMatreshka
     m_hIcon[ICON_Cursor1]     = (HICON)LoadCursorW(nullptr, IDC_APPSTARTING);
-
-    LoadExplorerSettings();
     return m_InTheme.Init(hWnd);
-}
-
-void CDrawings::CStaticRes::LoadExplorerSettings()
-{
-    HKEY hKey;
-    LSTATUS status = RegOpenKeyExW(HKEY_CURRENT_USER,
-                                   L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", 0,
-                                   KEY_QUERY_VALUE, &hKey
-    );
-    if (status != ERROR_SUCCESS) {
-        return;
-    }
-    DWORD  dwType = 0;
-    DWORD  cbData = sizeof(DWORD);
-    DWORD dwValue = 0;
-    if (ERROR_SUCCESS == RegQueryValueExW(hKey, L"ListviewShadow", nullptr, &dwType, reinterpret_cast<BYTE*>(&dwValue), &cbData)) {
-        if (REG_DWORD == dwType) {
-            m_bIconLabelShadows = dwValue != 0;
-        }
-    }
-    RegCloseKey(hKey);
 }
 
 //-----------------------------------------------------------------------------
@@ -270,10 +245,81 @@ CDrawings::~CDrawings()
 {
 }
 
-CDrawings::CDrawings(CTheme const& theme, HWND hWnd /*= nullptr*/)
+CDrawings::CDrawings(CTheme const& theme)
     : m_Theme{theme}
-    , m_BorderSize{0}
+    , m_BorderSize{m_Theme.GetNcMetrcs().iBorderWidth}
 {
+    m_BorderSize += m_Theme.GetNcMetrcs().iPaddedBorderWidth;
+}
+
+void CDrawings::CalcRects(CRect const& rcBorder, UINT captFlags, WindowRects& target)
+{
+    const long  brdScale{ScaleForDpi<long>(2)}; // TODO: investigate, why 2?
+    const bool isToolWnd{0 != (DC_SMALLCAP & captFlags)};
+    CRect        rcFrame{};
+    CRect         rcCapt{};
+    CRect         rcMenu{};
+    CRect         rcWork{};
+    CRect       rcScroll{};
+    CRect      rcMessage{};
+    CRect    rcHyperlink{};
+    CRect       rcButton{};
+    CRect      rcTooltip{};
+
+    target[WR_Border] = rcBorder;
+
+    rcFrame = rcBorder;
+    rcFrame.DeflateRect(m_BorderSize + brdScale, m_BorderSize + brdScale);
+    target[WR_Frame] = rcFrame;
+    rcFrame.DeflateRect(3, 2);
+    rcWork = rcFrame;
+
+    rcCapt = rcFrame;
+    Rc::SetHeight(rcCapt, m_Theme.GetNcMetrcs().iCaptionHeight);
+    target[WR_Caption] = rcCapt;
+    rcWork.top = rcCapt.bottom;
+
+    if (!isToolWnd) {
+        rcMenu = rcCapt;
+        Rc::SetHeight(rcMenu, m_Theme.GetNcMetrcs().iMenuHeight + 2);
+        Rc::OffsetY(rcMenu, rcCapt.Height());
+        target[WR_Menu] = rcMenu;
+        rcWork.top = rcMenu.bottom;
+    }
+    target[WR_Workspace] = rcWork;
+
+    if (!isToolWnd) {
+        rcScroll = rcWork;
+        Rc::ShrinkY(rcScroll, 2);
+        Rc::SetWidth(rcScroll, m_Theme.GetNcMetrcs().iScrollWidth);
+        Rc::OffsetX(rcScroll, rcWork.Width() - rcScroll.Width() - 2);
+        target[WR_Scroll] = rcScroll;
+        rcWork.right = rcScroll.left;
+    }
+    else {
+        const long nShrink = ScaleForDpi<long>(4);
+        const long  cyFont = -(m_Theme.GetLogFont(FONT_Message)->lfHeight) + 2;
+        rcMessage = rcWork;
+        Rc::SetHeight(rcMessage, cyFont + 8);
+        Rc::OffsetY(rcMessage, 4);
+        rcMessage.DeflateRect(nShrink, nShrink);
+        target[WR_Message] = rcMessage;
+
+        rcHyperlink = rcMessage;
+        Rc::OffsetY(rcHyperlink, cyFont + 8);
+        target[WR_Hyperlink] = rcHyperlink;
+
+        rcButton = CRect{ 0, 0, rcWork.Width() / 2, cyFont * 2 };
+        Rc::PutInto(rcWork, rcButton, Rc::Bottom | Rc::XCenter);
+        Rc::OffsetY(rcButton, -nShrink);
+        target[WR_Button] = rcButton;
+
+        rcTooltip = rcButton;
+        rcTooltip.left = rcButton.right + 2;
+        Rc::OffsetY(rcTooltip, rcButton.Height() / 2);
+        rcTooltip.InflateRect(3, 3);
+        target[WR_Tooltip] = rcTooltip;
+    }
 }
 
 HRESULT CDrawings::StaticInit(HWND hWnd)
@@ -472,10 +518,10 @@ void CDrawings::DrawFrameButton(WTL::CDCHandle dc, CRect& rcParam, UINT uState) 
 
 static CRect MakeSquareRect(CRect const& rcSrc)
 {
-    int     width = rcSrc.right - rcSrc.left;
-    int    height = rcSrc.bottom - rcSrc.top;
-    int smallDiam = ((width > height) ? height : width);
-    CRect   rcDst = rcSrc;
+    const int     width = rcSrc.right - rcSrc.left;
+    const int    height = rcSrc.bottom - rcSrc.top;
+    const int smallDiam = ((width > height) ? height : width);
+    CRect         rcDst = rcSrc;
     /* Make it a square box */
     if (width < height)       /* smallDiam == width */ {
         rcDst.top += (height - width) / 2;
@@ -500,28 +546,25 @@ void CDrawings::DrawFrameCaption(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags)
     default: break;
     }
     DrawEdge(dc, rcParam, static_cast<UINT>((uFlags & DFCS_PUSHED) ? EDGE_SUNKEN : EDGE_RAISED), BF_RECT | BF_MIDDLE | BF_SOFT);
-    CRect myRect = MakeSquareRect(rcParam);
-    myRect.left += 2;
-    myRect.top += 2;
-    myRect.right -= 1;
-    myRect.bottom -= 2;
+    CRect rcSymbol = MakeSquareRect(rcParam);
+    rcSymbol.DeflateRect(2, 2);
     if (uFlags & DFCS_PUSHED) {
-        OffsetRect(&myRect, 1, 1);
+        OffsetRect(&rcSymbol, 1, 1);
     }
     if (0 == symbol) {
         return ;
     }
     if (!m_ftMarlett.m_hFont) {
-        m_ftMarlett = CStaticRes::CreateMarlettFont(myRect.bottom - myRect.top);
+        m_ftMarlett = CStaticRes::CreateMarlettFont(rcSymbol.Height());
     }
-    HFONT prevFont = dc.SelectFont(m_ftMarlett);
-    int   prevMode = dc.SetBkMode(TRANSPARENT);
+    const HFONT prevFont = dc.SelectFont(m_ftMarlett);
+    const int   prevMode = dc.SetBkMode(TRANSPARENT);
     if (uFlags & DFCS_INACTIVE) { // Draw shadow
         SetTextColor(dc, m_Theme.GetColor(COLOR_3DHILIGHT));
-        TextOut(dc, myRect.left + 1, myRect.top + 1, &symbol, 1);
+        TextOut(dc, rcSymbol.left, rcSymbol.top, &symbol, 1);
     }
     SetTextColor(dc, m_Theme.GetColor((uFlags & DFCS_INACTIVE) ? COLOR_3DSHADOW : COLOR_BTNTEXT));
-    TextOut(dc, myRect.left, myRect.top, &symbol, 1);
+    TextOut(dc, rcSymbol.left, rcSymbol.top, &symbol, 1);
     dc.SetBkMode(prevMode);
     dc.SelectFont(prevFont);
 }
@@ -538,30 +581,28 @@ void CDrawings::DrawFrameScroll(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags)
     default: break;
     }
     DrawEdge(dc, rcParam,
-        (uFlags & DFCS_PUSHED) ? (UINT)EDGE_SUNKEN : (UINT)EDGE_RAISED,
+        (uFlags & DFCS_PUSHED) ? EDGE_SUNKEN : EDGE_RAISED,
         (uFlags & DFCS_FLAT) | BF_MIDDLE | BF_RECT);
-    CRect myRect = MakeSquareRect(rcParam);
-    myRect.left += 2;
-    myRect.top += 2;
-    myRect.right -= 2;
-    myRect.bottom -= 2;
+    CRect rcSymbol = rcParam;
+    Rc::SetWidth(rcSymbol, m_Theme.GetNcMetrcs().iScrollWidth);
+    Rc::SetHeight(rcSymbol, m_Theme.GetNcMetrcs().iScrollHeight);
     if (uFlags & DFCS_PUSHED) {
-        OffsetRect(&myRect, 1, 1);
+        OffsetRect(rcSymbol, 1, 1);
     }
     if (0 == symbol) {
         return ;
     }
     if (!m_ftMarlett.m_hFont) {
-        m_ftMarlett = CStaticRes::CreateMarlettFont(myRect.bottom - myRect.top);
+        m_ftMarlett = CStaticRes::CreateMarlettFont(rcSymbol.bottom - rcSymbol.top);
     }
-    HFONT prevFont = dc.SelectFont(m_ftMarlett);
-    int   prevMode = dc.SetBkMode(TRANSPARENT);
+    const HFONT prevFont = dc.SelectFont(m_ftMarlett);
+    const int   prevMode = dc.SetBkMode(TRANSPARENT);
     if (uFlags & DFCS_INACTIVE) {
         SetTextColor(dc, m_Theme.GetColor(COLOR_3DHILIGHT));
-        dc.TextOutW(myRect.left + 1, myRect.top + 1, &symbol, 1);
+        dc.TextOutW(rcSymbol.left, rcSymbol.top, &symbol, 1);
     }
     dc.SetTextColor(m_Theme.GetColor((uFlags & DFCS_INACTIVE) ? COLOR_3DSHADOW : COLOR_BTNTEXT));
-    dc.TextOutW(myRect.left, myRect.top, &symbol, 1);
+    dc.TextOutW(rcSymbol.left, rcSymbol.top, &symbol, 1);
     dc.SetBkMode(prevMode);
     dc.SelectFont(prevFont);
 }
@@ -859,82 +900,6 @@ void CDrawings::DrawScrollbar(WTL::CDCHandle dc, CRect const& rcParam, BOOL enab
     }
 }
 
-void CDrawings::CalcRects(CRect const& rc, UINT captFlags, WindowRects& target)
-{
-  //long        dpiScale = ScaleForDpi<long>(8);
-    const bool isToolWnd = (0 != (DC_SMALLCAP & captFlags));
-  //const bool  isActive = (0 != (DC_ACTIVE & captFlags));
-    LRect       rcBorder = FromCRect<long>(rc);
-    LRect        rcFrame;
-    LRect         rcCapt;
-    LRect         rcMenu;
-    LRect         rcWork;
-    LRect       rcScroll;
-    LRect      rcMessage;
-    LRect       rcButton;
-    LRect      rcTooltip;
-
-    target[WR_Border] = ToCRect(rcBorder);
-
-    m_BorderSize = m_Theme.GetNcMetrcs().iBorderWidth;
-#if WINVER >= WINVER_VISTA
-    m_BorderSize += m_Theme.GetNcMetrcs().iPaddedBorderWidth;
-#endif
-
-    rcFrame = rcBorder;
-    rcFrame.Shrink(m_BorderSize - 1, m_BorderSize - 1);
-    rcFrame.PutInto(rcBorder, PutAt::Center);
-    target[WR_Frame] = ToCRect(rcFrame);
-    rcWork = rcFrame;
-
-    rcCapt = rcFrame;
-    rcCapt.cy = m_Theme.GetNcMetrcs().iCaptionHeight + 2;
-    rcWork.cy -= rcCapt.cy;
-    rcCapt.Shrink(1, 1);
-    target[WR_Caption] = ToCRect(rcCapt);
-
-    rcMenu = rcCapt;
-    if (!isToolWnd) {
-        rcMenu.y  = rcCapt.Bottom();
-        rcMenu.cy = m_Theme.GetNcMetrcs().iMenuHeight + 2;
-        target[WR_Menu] = ToCRect(rcMenu);
-        rcWork.cy -= rcCapt.cy;
-    }
-
-    rcWork.Shrink(1, 1);
-    rcWork.y = rcMenu.Bottom();
-    target[WR_Workspace] = ToCRect(rcWork);
-
-    if (!isToolWnd) {
-        rcScroll = rcWork;
-        rcScroll.Shrink(0, 2);
-        rcScroll.cx = m_Theme.GetNcMetrcs().iScrollWidth;
-        rcScroll.x = rcWork.Right() - rcScroll.cx - 2;
-        target[WR_Scroll] = ToCRect(rcScroll);
-    }
-    else {
-        long sx = ScaleForDpi<long>(4);
-        long cy = -(m_Theme.GetLogFont(FONT_Message)->lfHeight) + 2;
-        rcMessage = rcWork;
-        rcMessage.Shrink(sx, sx - 1);
-        rcMessage.cy = cy;
-        target[WR_Message] = ToCRect(rcMessage);
-        rcMessage.y += cy + 2;
-        target[WR_Hyperlink] = ToCRect(rcMessage);
-        rcButton = rcWork;
-        rcButton.cx = rcWork.Width() / 2;
-        rcButton.cy = cy * 2;
-        rcButton.PutInto(rcWork, PutAt::Bottom | PutAt::XCenter);
-        rcButton.y -= sx;
-        target[WR_Button] = ToCRect(rcButton);
-        rcTooltip = rcButton;
-        rcTooltip.x = rcButton.Right() + 2;
-        rcTooltip.y += rcButton.Height() / 2;
-        target[WR_Tooltip] = ToCRect(rcTooltip);
-        target[WR_Tooltip].InflateRect(3, 3);
-    }
-}
-
 void CDrawings::DrawToolTip(WTL::CDCHandle dc, CRect& rcParam, ATL::CStringW&& tooltip) const
 {
     CSize  szText;
@@ -967,7 +932,6 @@ void CDrawings::DrawDesktopIcon(WTL::CDCHandle dc, CRect const& rcParam, ATL::CS
 {
     ATLASSERT(m_pStaticRes.get() != nullptr);
 
-    const bool bShadow = m_pStaticRes->m_bIconLabelShadows;
     const HICON  hIcon = m_pStaticRes->m_hIcon[CStaticRes::ICON_Desktop1];
 
     //FillRect(dc, rcParam, m_Theme.GetBrush(COLOR_APPWORKSPACE)); // DEBUG
@@ -992,35 +956,42 @@ void CDrawings::DrawDesktopIcon(WTL::CDCHandle dc, CRect const& rcParam, ATL::CS
     }
     rcText.top = rcIcon.bottom + 4;
     rcText.bottom = rcText.top + szText.cy + 4;
-    COLORREF clrDesiredTextColor;
-    COLORREF clrShadow;
-    if (IsDarkColor(m_Theme.GetColor(COLOR_DESKTOP)) && bShadow) {
-        clrDesiredTextColor = RGB(0xFF, 0xFF, 0xFF);
-        clrShadow = RGB(0, 0, 0);
-    }
-    else {
-        clrDesiredTextColor = RGB(0, 0, 0);
-        clrShadow = RGB(0xFF, 0xFF, 0xFF);
-    }
-#if 1
-    const bool bThemedTextOut = 0 != DrawShadowText(dc, text.GetString(), text.GetLength(), rcText,
+    COLORREF clrDesiredTextColor = RGB(0xFF, 0xFF, 0xFF);
+    const COLORREF clrTextShadow = RGB(0, 0, 0);;
+    bool bThemedTextOut = false;
+#if 0
+    bThemedTextOut = 0 != DrawShadowText(dc, text.GetString(), text.GetLength(), rcText,
         DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS, clrDesiredTextColor, clrShadow, 3, 3);
 #else
-    const bool bThemedTextOut = m_pStaticRes->
-        m_InTheme.TextPut(dc, rcText, text.GetString(), text.GetLength(),
-            0,
-            0,
-            DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+    DTTOPTS dtOptions = {
+        /* dwSize;              */ sizeof(dtOptions),
+        /* dwFlags;             */ DTT_TEXTCOLOR | DTT_SHADOWCOLOR | DTT_SHADOWTYPE | DTT_SHADOWOFFSET | DTT_GLOWSIZE,
+        /* crText;              */ clrDesiredTextColor,
+        /* crBorder;            */ 0,
+        /* crShadow;            */ clrTextShadow,
+        /* iTextShadowType;     */ TST_CONTINUOUS,
+        /* ptShadowOffset;      */ { 3, 2 },
+        /* iBorderSize;         */ 0,
+        /* iFontPropId;         */ 0,
+        /* iColorPropId;        */ 0,
+        /* iStateId;            */ 0,
+        /* fApplyOverlay;       */ FALSE,
+        /* iGlowSize;           */ 32,
+        /* pfnDrawTextCallback; */ nullptr,
+        /* lParam;              */ 0
+    };
+    bThemedTextOut = m_pStaticRes->
+        m_InTheme.TextPut(dc, rcText, text.GetString(), text.GetLength(), 0, 0,
+            DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS,
+            &dtOptions);
 #endif
     if (!bThemedTextOut) {
-        if (bShadow) {
-            CRect rcShadow = rcText;
-            for (int i=0; i<3; i++) {
-                int c = i * 50;
-                dc.SetTextColor(RGB(c, c, c));
-                OffsetRect(rcShadow, 1, 1);
-                dc.DrawTextW(text.GetString(), text.GetLength(), rcShadow, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
-            }
+        CRect rcShadow = rcText;
+        for (int i=0; i<3; i++) {
+            int c = i * 50;
+            dc.SetTextColor(RGB(c, c, c));
+            OffsetRect(rcShadow, 1, 1);
+            dc.DrawTextW(text.GetString(), text.GetLength(), rcShadow, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
         }
         SetTextColor(dc, clrDesiredTextColor);
         dc.DrawTextW(text.GetString(), text.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
@@ -1050,6 +1021,8 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
     const bool    isToolWnd = (0 != (DC_SMALLCAP & params.captFlags));
     const bool     isActive = (0 != (DC_ACTIVE & params.captFlags));
 
+    m_ftMarlett.Attach(nullptr);
+
     if (!isToolWnd) {
         if (isActive) { captIcon = icons[CStaticRes::ICON_ActiveWnd]; }
         else          { captIcon = icons[CStaticRes::ICON_InactiveWnd]; }
@@ -1064,18 +1037,19 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
     }
 
     if (isToolWnd) {
-      //dc.FillSolidRect(rects[WR_Frame], m_Theme.GetColor(COLOR_MENU));
-        dc.FillRect(rects[WR_Frame], m_Theme.GetBrush(COLOR_3DFACE));
-        CRect rcEdge(rects[WR_Frame]);
-        dc.DrawEdge(rcEdge, EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
-        rcEdge.InflateRect(1, 1);
-        dc.DrawEdge(rcEdge, EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
+        static const int nmbBorder = 4;
+        CRect rcBrd = rects[WR_Frame];
+        rcBrd.InflateRect(nmbBorder, nmbBorder);
+        DrawBorder(dc, rcBrd, nmbBorder, m_Theme.GetBrush(COLOR_3DFACE));
+        DrawEdge(dc, rcBrd, EDGE_RAISED, BF_RECT | BF_ADJUST);
     }
     else {
-        DrawBorder(dc, rects[WR_Border], m_BorderSize, m_Theme.GetBrush(borderColorIndex));
-        dc.DrawEdge(CRect(rects[WR_Border]), EDGE_RAISED, BF_RECT /*| BF_ADJUST*/);
-      //dc.FillRect(rects[WR_Frame], m_Theme.GetBrush(COLOR_WINDOWFRAME));
+        CRect rcBrd = rects[WR_Border];
+        DrawBorder(dc, rcBrd, m_BorderSize, m_Theme.GetBrush(borderColorIndex));
+        DrawEdge(dc, rcBrd, EDGE_RAISED, BF_RECT | BF_ADJUST);
+        dc.FillRect(rcBrd, m_Theme.GetBrush(borderColorIndex));
     }
+    dc.FillRect(rects[WR_Frame], m_Theme.GetBrush(COLOR_3DFACE));
 
     CRect rcCapt = rects[WR_Caption];
     rcCapt.right = DrawCaptionButtons(dc, rcCapt, !isToolWnd, captFlags);
@@ -1091,12 +1065,12 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
         dc.DrawEdge(rcWork, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
 
         if (params.text.lineCount > 0) {
-            int textColorIndex = isActive ? COLOR_WINDOWTEXT : COLOR_GRAYTEXT;
-            HFONT      prevFnt = dc.SelectFont(m_Theme.GetFont(FONT_Desktop));
-            COLORREF   prevClr = dc.SetTextColor(m_Theme.GetColor(textColorIndex));
-            COLORREF prevBkClr = dc.SetBkColor(m_Theme.GetColor(workspaceColorIndex));
-            int     prevBkMode = dc.SetBkMode(TRANSPARENT);
-            CRect       rcText = rcWork;
+            const int textColorIndex = isActive ? COLOR_WINDOWTEXT : COLOR_GRAYTEXT;
+            const HFONT      prevFnt = dc.SelectFont(m_Theme.GetFont(FONT_Desktop));
+            const COLORREF   prevClr = dc.SetTextColor(m_Theme.GetColor(textColorIndex));
+            const COLORREF prevBkClr = dc.SetBkColor(m_Theme.GetColor(workspaceColorIndex));
+            const int     prevBkMode = dc.SetBkMode(TRANSPARENT);
+            CRect             rcText = rcWork;
             rcText.right = rects[WR_Scroll].left - 1;
             rcText.DeflateRect(rcWork.Width() / 16, 10);
             CRect  rcLine = rcText;

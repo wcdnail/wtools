@@ -33,7 +33,7 @@ private:
     bool                 m_bLBtnDown;
     WindowRects m_WndRect[WND_Count];
 
-    static void CalcRects(CRect const& rcClient, CRect& rcFront, CRect& rcBack, CRect& rcMsg, CRect& rcIcon);
+    static void RectsBuild(CRect const& rcClient, CRect& rcFront, CRect& rcBack, CRect& rcMsg, CRect& rcIcon);
     void DrawDesktop(WTL::CDCHandle dc, CRect const& rc);
     CRect GetSeletcedRect();
     void SetSelectedRect(int wr, int ri);

@@ -66,7 +66,7 @@ public:
     static UINT ConvDrawItemState(UINT diState);
 
     ~CDrawings();
-    CDrawings(CTheme const& theme, HWND hWnd = nullptr);
+    CDrawings(CTheme const& theme);
 
     void CalcRects(CRect const& rc, UINT captFlags, WindowRects& target);
 

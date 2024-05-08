@@ -24,7 +24,7 @@ ATOM CThemePreviewer::Register(HRESULT& code)
     wc.lpszClassName = L"CThemePreviewer";
     wc.hIconSm = nullptr;
 
-    ATOM atom = RegisterClassExW(&wc);
+    const ATOM atom = RegisterClassExW(&wc);
     if (!atom) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Register WCLASS '%s' failure!", wc.lpszClassName), code, true, MB_ICONERROR);
@@ -38,7 +38,6 @@ CThemePreviewer::~CThemePreviewer()
 
 CThemePreviewer::CThemePreviewer()
     :   ATL::CWindow{}
-  //, DoubleBuffered{true}
     ,       m_pTheme{nullptr}
     ,      m_pcbItem{nullptr}
     ,   m_prSelected{-1, -1}
@@ -114,14 +113,12 @@ void CThemePreviewer::OnPaint(WTL::CDCHandle dcParam)
     UNREFERENCED_PARAMETER(dcParam);
     const WTL::CPaintDC dcPaint{m_hWnd};
     const WTL::CDCHandle dc{dcPaint};
-  //CF::BufferedPaint bufferedPaint(dcPaint, GetSecondDc(), IsDoubleBuffered(), m_hWnd);
-  //CDCHandle dc = bufferedPaint.GetCurrentDc();
     CRect rc;
     GetClientRect(rc);
     DrawDesktop(dc, rc);
 }
 
-void CThemePreviewer::CalcRects(CRect const& rcClient, CRect& rcFront, CRect& rcBack, CRect& rcMsg, CRect& rcIcon)
+void CThemePreviewer::RectsBuild(CRect const& rcClient, CRect& rcFront, CRect& rcBack, CRect& rcMsg, CRect& rcIcon)
 {
     const double   sx = 5.;
     const double   sy = 5.;
@@ -215,7 +212,7 @@ void CThemePreviewer::DrawDesktop(WTL::CDCHandle dc, CRect const& rcClient)
     CRect      rcBack;
     CRect       rcMsg;
     CRect      rcIcon;
-    CalcRects(rcClient, rcFront, rcBack, rcMsg, rcIcon);
+    RectsBuild(rcClient, rcFront, rcBack, rcMsg, rcIcon);
     const DrawWindowArgs wparam[WND_Count] = {
         { L"Inactive window",                       0,   hMenu, -1, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
         {   L"Active window",               DC_ACTIVE,   hMenu,  2, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
@@ -330,7 +327,7 @@ int CThemePreviewer::RectIndexToElementId() const
         /* WR_Message      */ EN_MsgBox,
         /* WR_Scroll       */ EN_Scrollbar,
         /* WR_WinText      */ EN_DisabledItem,
-        /* WR_Workspace    */ EN_DisabledItem,
+        /* WR_Workspace    */ EN_AppBackground,
         /* WR_MenuSelected */ EN_InactiveCaption,
         /* WR_MenuDisabled */ EN_DisabledItem,
         /* WR_MenuItem     */ EN_FlatmenuBar,
