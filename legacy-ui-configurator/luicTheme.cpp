@@ -241,22 +241,24 @@ bool CTheme::RefreshBrushes()
     return true;
 }
 
-static void DoFontRefresh(WTL::CFont* pTarget, LOGFONT const& logFont)
+static bool DoFontRefresh(WTL::CFont* pTarget, LOGFONT const& logFont)
 {
     WTL::CFont temp{::CreateFontIndirectW(&logFont)};
     if (!temp.m_hFont) {
         // TODO: report CreateFontIndirectW
+        return false;
     }
     pTarget->Attach(temp.Detach());
+    return true;
 }
 
-void CTheme::RefreshHFont(int font, LOGFONT const& logFont)
+bool CTheme::RefreshHFont(int font, LOGFONT const& logFont)
 {
     WTL::CFont* pTarget = &m_IconFont;
     if (font >= 0 && font < FONTS_Count) {
         pTarget = &m_Font[font];
     }
-    DoFontRefresh(pTarget, logFont);
+    return DoFontRefresh(pTarget, logFont);
 }
 
 bool CTheme::RefreshHFonts()

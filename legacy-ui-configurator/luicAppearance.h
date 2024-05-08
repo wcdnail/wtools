@@ -67,11 +67,11 @@ private:
     bool ItemColorSetBtn(int nButton, int iColor);
     void ItemColorSet(int nItem);
     void ItemSizeClear(int nSize);
-    bool ItemSizeChanged(int nItem, int nSize, PCItemAssign pAssignment, bool bApply);
+    bool ItemSizeChanged(int nItem, PCItemAssign pAssignment, int iSizeControl, bool bApply = false);
 
     void FontSetFamily(LOGFONT const& logFont);
     void FontSetSizes(LOGFONT const& logFont);
-    void FontOnItemChaged(int nItem, PCItemAssign pAssignment);
+    bool ItemFontChanged(int nItem, PCItemAssign pAssignment, int iFontControl = IT_Invalid, bool bApply = false);
 
     void OnItemSelect(int nItem);
     void OnThemeSelect(int nThemeIndex);

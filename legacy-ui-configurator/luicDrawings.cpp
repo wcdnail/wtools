@@ -852,6 +852,7 @@ void CDrawings::DrawScrollbar(WTL::CDCHandle dc, CRect const& rcParam, BOOL enab
 {
     CRect               rc{};
     int       buttonHeight{m_Theme.GetNcMetrcs().iScrollHeight};
+    // TODO: USE GetNcMetrcs().iScrollWidth!!!
     UINT frameControlFlags{static_cast<UINT>(enabled ? 0 : DFCS_INACTIVE)};
     HBRUSH     hbrScrollBk{m_Theme.GetBrush(COLOR_SCROLLBAR)};
     rc.left = rcParam.left;
@@ -1074,8 +1075,9 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
             rcText.right = rects[WR_Scroll].left - 1;
             rcText.DeflateRect(rcWork.Width() / 16, 10);
             CRect  rcLine = rcText;
-            LONG       cy = -(m_Theme.GetLogFont(FONT_Desktop).lfHeight) + 2;
+            const LONG cy = FontPtToLog<LONG>(m_Theme.GetLogFont(FONT_Desktop).lfHeight);
             rcLine.bottom = rcLine.top + cy;
+            // TODO: calc text RECT within TextExtent...
             for (int i = 0; i < params.text.lineCount; i++) {
                 if (rcLine.top > rcText.bottom) {
                     break;
@@ -1083,8 +1085,8 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
                 const auto& line = params.text.line[i];
                 if (line.flags & WT_Select) {
                     CRect rcSel = rcLine;
-                    rcSel.top += 1;
-                    rcSel.InflateRect(3, 2);
+                    Rc::ShrinkX(rcSel, -2);
+                    Rc::OffsetY(rcSel, 1);
                     dc.FillSolidRect(rcSel, m_Theme.GetColor(COLOR_HIGHLIGHT));
                     dc.SetTextColor(m_Theme.GetColor(COLOR_HIGHLIGHTTEXT));
                 }
@@ -1144,3 +1146,4 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
         dc.SetBkMode(prevBkMode);
     }
 }
+

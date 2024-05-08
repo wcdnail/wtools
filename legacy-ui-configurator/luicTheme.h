@@ -176,7 +176,7 @@ struct CTheme
     bool SetColor(int iColor, COLORREF dword);
     HBRUSH GetBrush(int color) const;
     HFONT GetFont(int font) const;
-    void RefreshHFont(int font, LOGFONT const& logFont);
+    bool RefreshHFont(int font, LOGFONT const& logFont);
     LOGFONT const& GetLogFont(int font) const;
     LOGFONT& GetLogFont(int font);
     SizeRange const* GetSizeRange(int metric) const;
