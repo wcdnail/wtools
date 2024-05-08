@@ -2,6 +2,7 @@
 
 #include "rectz.h"
 #include <atlgdi.h>
+#include <memory>
 
 struct CTheme;
 
@@ -56,14 +57,16 @@ struct DrawWindowArgs
     WindowText       text;
 };
 
-class CDrawRoutine
+class CDrawings
 {
 public:
+    static HRESULT StaticInit(HWND hWnd);
+    static void StaticFree();
     static UINT GetDrawItemFrameType(UINT nCtlType);
     static UINT ConvDrawItemState(UINT diState);
 
-    ~CDrawRoutine();
-    CDrawRoutine(CTheme const& theme);
+    ~CDrawings();
+    CDrawings(CTheme const& theme, HWND hWnd = nullptr);
 
     void CalcRects(CRect const& rc, UINT captFlags, WindowRects& target);
 
@@ -84,9 +87,14 @@ public:
     void DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects);
 
 private:
-    struct StaticInit;
+    struct CInTheme;
+    struct CStaticRes;
 
-    CTheme const&  m_Theme;
-    int       m_BorderSize;
-    WTL::CFont m_ftMarlett;
+    using PStaticRes = std::unique_ptr<CStaticRes>;
+
+    static PStaticRes m_pStaticRes;
+
+    CTheme const&   m_Theme;
+    int        m_BorderSize;
+    WTL::CFont  m_ftMarlett;
 };

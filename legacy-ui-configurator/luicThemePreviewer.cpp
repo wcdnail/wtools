@@ -232,7 +232,7 @@ void CThemePreviewer::DrawDesktop(WTL::CDCHandle dc, CRect const& rcClient)
         // TODO: borrow wallpaper drawer from CPageBackground
     }
 
-    CDrawRoutine drawings(theme);
+    CDrawings drawings(theme);
     drawings.DrawDesktopIcon(dc, rcIcon, L"Icon Text", true);
     for (int i = 0; i < WND_Count; i++) {
         drawings.CalcRects(wrect[i].rcSource, wparam[i].captFlags, wrect[i].rcTarget);

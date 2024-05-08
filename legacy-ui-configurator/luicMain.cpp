@@ -244,33 +244,38 @@ HRESULT CLUIApp::Run(HINSTANCE instHnd, int showCmd)
     static constexpr int MF_Initial_CX = 1000;
     static constexpr int MF_Initial_CY = 600;
 
-    HRESULT hr = S_FALSE;
+    HRESULT code = S_FALSE;
     try {
         WTL::CMessageLoop  loop;
-        hr = Initialize(nullptr, instHnd);
-        if (FAILED(hr)) {
-            ReportError(L"Initialization failure!", hr, true);
-            return hr;
+        code = Initialize(nullptr, instHnd);
+        if (FAILED(code)) {
+            ReportError(L"Initialization failure!", code, true);
+            return code;
         }
         if (!AddMessageLoop(&loop)) {
-            hr = static_cast<HRESULT>(GetLastError());
-            ReportError(L"MessageLoop append failure!", hr, true);
-            return hr;
+            code = static_cast<HRESULT>(GetLastError());
+            ReportError(L"MessageLoop append failure!", code, true);
+            return code;
         }
         if (!m_MainFrame.CreateEx(GetActiveWindow())) {
-            hr = static_cast<HRESULT>(GetLastError());
-            ReportError(L"MainFrame creation failure!", hr, true);
-            return hr;
+            code = static_cast<HRESULT>(GetLastError());
+            ReportError(L"MainFrame creation failure!", code, true);
+            return code;
+        }
+        code = CDrawings::StaticInit(m_MainFrame.m_hWnd);
+        if (ERROR_SUCCESS != code) {
+            ReportError(L"CDrawings::StaticInit failure...", code);
         }
         m_MainFrame.ShowWindow(showCmd);
-        ATLTRACE2(WTL::atlTraceUI, 0, _T("Launch main loop [%08x] <%s>\n"), hr, _T(__FUNCDNAME__));
-        hr = loop.Run();
+        ATLTRACE2(WTL::atlTraceUI, 0, _T("Launch main loop [%08x] <%s>\n"), code, _T(__FUNCDNAME__));
+        code = loop.Run();
+        CDrawings::StaticFree();
         RemoveMessageLoop();
     }
     catch(std::exception const& ex) {
         MessageBoxA(nullptr, ex.what(), "epic FAIL", MB_ICONERROR);
     }
-    return hr;
+    return code;
 }
 
 CTheme& CLUIApp::GetTheme(int nThemeIndex) const

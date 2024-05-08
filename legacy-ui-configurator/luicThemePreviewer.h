@@ -1,11 +1,10 @@
 #pragma once
 
 #include "luicDrawings.h"
-//#include "windows.wtl.buffered.paint.h"
 
 using SelectedPair = std::pair<int, int>;
 
-struct CThemePreviewer: ATL::CWindow //, CF::DoubleBuffered
+struct CThemePreviewer: ATL::CWindow
 {
     static ATOM Register(HRESULT& code);
 

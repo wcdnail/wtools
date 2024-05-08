@@ -14,6 +14,8 @@
 
 namespace
 {
+#define GetProcAddressEX(Module, Routine) \
+    GetProcAddressEx(Module, Routine, #Routine, #Module)
 
 /*
  * Borders:
@@ -68,7 +70,87 @@ static const signed char LTRBInnerMono[] = {
 
 } // namespace
 
-struct CDrawRoutine::StaticInit: public WTL::CThemeImpl<StaticInit>
+//-----------------------------------------------------------------------------
+//
+// CInTheme UXTheme wrapper
+//
+//-----------------------------------------------------------------------------
+struct CDrawings::CInTheme: WTL::CThemeImpl<CInTheme>
+{
+    HWND m_hWnd;
+
+    ~CInTheme();
+    CInTheme();
+
+    HRESULT Init(HWND hWnd);
+
+    DWORD GetExStyle() const throw()
+    {
+        return static_cast<DWORD>(::GetWindowLongW(m_hWnd, GWL_EXSTYLE));
+    }
+
+    bool TextPut(WTL::CDCHandle dc, CRect& rcDraw, PCWSTR szText, int nLen,
+                 int       nPartId,
+                 int      nStateId,
+                 DWORD     dwFlags
+    )
+    {
+        if (!m_hTheme) {
+            return false;
+        }
+        const HRESULT code = DrawThemeText(dc, nPartId, nStateId, szText, nLen, dwFlags, 0, rcDraw);
+        return SUCCEEDED(code);
+    }
+};
+
+CDrawings::CInTheme::~CInTheme()
+{
+}
+
+CDrawings::CInTheme::CInTheme()
+    : WTL::CThemeImpl<CInTheme>{}
+    , m_hWnd{nullptr}
+{
+}
+
+HRESULT CDrawings::CInTheme::Init(HWND hWnd)
+{
+    // All class names are in $(PROJECT_DIR)\resz\ClassesNames.txt
+    //
+    // Short list:
+    // BUTTON, CLOCK, COMBOBOX, COMMUNICATIONS, CONTROLPANEL, DATEPICKER, DRAGDROP, 
+    // EDIT, EXPLORERBAR, FLYOUT, GLOBALS, HEADER, LISTBOX, LISTVIEW, MENU, MENUBAND, 
+    // NAVIGATION, PAGE, PROGRESS, REBAR, SCROLLBAR, SEARCHEDITBOX, SPIN, STARTPANEL, 
+    // STATUS, TAB, TASKBAND, TASKBAR, TASKDIALOG, TEXTSTYLE, TOOLBAR, TOOLTIP, 
+    // TRACKBAR, TRAYNOTIFY, TREEVIEW, WINDOW
+    //
+    // https://learn.microsoft.com/en-us/windows/win32/controls/parts-and-states?redirectedfrom=MSDN
+    //
+    static const PCWSTR pszClasses = L"BUTTON;EDIT;MENU;SCROLLBAR";
+    HRESULT code = S_OK;
+    if (!hWnd) {
+        return S_FALSE;
+    }
+    if (!IsThemingSupported()) {
+        return S_FALSE;
+    }
+    m_hWnd = hWnd;
+    ATLASSERT(::IsWindow(m_hWnd));
+    const HTHEME hTheme = ::OpenThemeDataEx(m_hWnd, pszClasses, OTD_FORCE_RECT_SIZING | OTD_NONCLIENT);
+    if (!hTheme) {
+        code = static_cast<HRESULT>(GetLastError());
+        return code;
+    }
+    m_hTheme = hTheme;
+    return S_OK;
+}
+
+//-----------------------------------------------------------------------------
+//
+// CStaticRes misc global resoursec
+//
+//-----------------------------------------------------------------------------
+struct CDrawings::CStaticRes
 {
     enum : int
     {
@@ -79,117 +161,133 @@ struct CDrawRoutine::StaticInit: public WTL::CThemeImpl<StaticInit>
         ICON_Count
     };
 
-    using DrawCaptionTempWFn = BOOL(WINAPI*)(HWND hWnd, HDC dc, const RECT* rcParam, HFONT fnMarlet, HICON hIcon, PCWSTR str, UINT uFlags);
-    using SetSysColorsTempFn = DWORD_PTR(WINAPI*)(const COLORREF* pPens, const HBRUSH* pBrushes, DWORD_PTR n);
-    using  DrawMenuBarTempFn = int(WINAPI*)(HWND hWnd, HDC dc, RECT* rcParam, HMENU hMenu, HFONT fnMarlet);
+    CInTheme        m_InTheme;
+    bool  m_bIconLabelShadows;
+    HICON m_hIcon[ICON_Count];
 
-    HMODULE                      USER32;
-    DrawCaptionTempWFn DrawCaptionTempW;
-    SetSysColorsTempFn SetSysColorsTemp;
-    DrawMenuBarTempFn   DrawMenuBarTemp;
-    bool            m_bIconLabelShadows;
-    HICON           m_hIcon[ICON_Count];
+    static WTL::CFontHandle CreateMarlettFont(LONG height);
 
-    static StaticInit& instance()
-    {
-        static StaticInit inst;
-        return inst;
-    }
+    ~CStaticRes();
+    CStaticRes();
 
-    static WTL::CFontHandle CreateMarlettFont(LONG height)
-    {
-        LOGFONT lf = { 0 };
-        lstrcpy(lf.lfFaceName, TEXT("Marlett"));
-        lf.lfHeight = height;
-        lf.lfWidth = 0;
-        lf.lfEscapement = 0;
-        lf.lfOrientation = 0;
-        lf.lfWeight = FW_NORMAL;
-        lf.lfItalic = FALSE;
-        lf.lfUnderline = FALSE;
-        lf.lfStrikeOut = FALSE;
-        lf.lfCharSet = SYMBOL_CHARSET;
-        lf.lfOutPrecision = OUT_DEFAULT_PRECIS;
-        lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-        lf.lfQuality = DEFAULT_QUALITY;
-        lf.lfPitchAndFamily = DEFAULT_PITCH;
-        return {CreateFontIndirect(&lf)};
-    }
+    HRESULT Init(HWND hWnd);
 
 private:
     template <typename T>
-    static bool GetProcAddressEx(HMODULE hMod, T& routine, PCSTR routineName, PCSTR modAlias)
-    {
-        *reinterpret_cast<FARPROC*>(&routine) = GetProcAddress(hMod, routineName);
-        if (!routine) {
-            DH::TPrintf("%14s| '%s' is nullptr\n", modAlias, routineName);
-        }
-        return nullptr != routine;
-    }
+    static bool GetProcAddressEx(HMODULE hMod, T& routine, PCSTR routineName, PCSTR modAlias);
 
-    #define GetProcAddressEX(Module, Routine) \
-        GetProcAddressEx(Module, Routine, #Routine, #Module)
-
-    void Init()
-    {
-        GetProcAddressEX(USER32, DrawCaptionTempW);
-        GetProcAddressEX(USER32, SetSysColorsTemp);
-        GetProcAddressEX(USER32, DrawMenuBarTemp);
-
-        srand(static_cast<int>(time(nullptr)));
-        auto const&   ilBig = CLUIApp::App()->GetImageList(IL_OwnBig);
-        auto const& ilSmall = CLUIApp::App()->GetImageList(IL_SHELL_16x16);
-        const int  maxCount = ilSmall.GetImageCount() - 1;
-        m_hIcon[ICON_ActiveWnd]   = ilSmall.GetIcon(rand() % maxCount);
-        m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
-        m_hIcon[ICON_Desktop1]    = ilBig.GetIcon(IconMyComp); // IconMatreshka
-        m_hIcon[ICON_Cursor1]     = (HICON)LoadCursorW(nullptr, IDC_APPSTARTING);
-
-        LoadExplorerSettings();
-    }
-
-    void LoadExplorerSettings()
-    {
-        HKEY hKey;
-        LSTATUS status = RegOpenKeyExW(HKEY_CURRENT_USER,
-            L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", 0,
-            KEY_QUERY_VALUE, &hKey
-        );
-        if (status != ERROR_SUCCESS) {
-            return;
-        }
-        DWORD  dwType = 0;
-        DWORD  cbData = sizeof(DWORD);
-        DWORD dwValue = 0;
-        if (ERROR_SUCCESS == RegQueryValueExW(hKey, L"ListviewShadow", nullptr, &dwType, reinterpret_cast<BYTE*>(&dwValue), &cbData)) {
-            if (REG_DWORD == dwType) {
-                m_bIconLabelShadows = dwValue != 0;
-            }
-        }
-        RegCloseKey(hKey);
-    }
-
-
-    ~StaticInit()
-    {
-        if (USER32) {
-            FreeLibrary(USER32);
-        }
-    }
-
-    StaticInit()
-        :              USER32{LoadLibraryW(L"USER32")}
-        ,    DrawCaptionTempW{nullptr}
-        ,    SetSysColorsTemp{nullptr}
-        ,     DrawMenuBarTemp{nullptr}
-        , m_bIconLabelShadows{true}
-    {
-        ZeroMemory(&m_hIcon, sizeof(m_hIcon));
-        Init();
-    }
+    void LoadExplorerSettings();
 };
 
-UINT CDrawRoutine::GetDrawItemFrameType(UINT nCtlType)
+CDrawings::CStaticRes::~CStaticRes()
+{
+}
+
+CDrawings::CStaticRes::CStaticRes()
+    : m_InTheme{}
+    , m_bIconLabelShadows{true}
+{
+    ZeroMemory(&m_hIcon, sizeof(m_hIcon));
+}
+
+template <typename T>
+bool CDrawings::CStaticRes::GetProcAddressEx(HMODULE hMod, T& routine, PCSTR routineName, PCSTR modAlias)
+{
+    *reinterpret_cast<FARPROC*>(&routine) = GetProcAddress(hMod, routineName);
+    if (!routine) {
+        DH::TPrintf("%14s| '%s' is nullptr\n", modAlias, routineName);
+    }
+    return nullptr != routine;
+}
+
+WTL::CFontHandle CDrawings::CStaticRes::CreateMarlettFont(LONG height)
+{
+    LOGFONT lf = { 0 };
+    lstrcpy(lf.lfFaceName, TEXT("Marlett"));
+    lf.lfHeight = height;
+    lf.lfWidth = 0;
+    lf.lfEscapement = 0;
+    lf.lfOrientation = 0;
+    lf.lfWeight = FW_NORMAL;
+    lf.lfItalic = FALSE;
+    lf.lfUnderline = FALSE;
+    lf.lfStrikeOut = FALSE;
+    lf.lfCharSet = SYMBOL_CHARSET;
+    lf.lfOutPrecision = OUT_DEFAULT_PRECIS;
+    lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+    lf.lfQuality = DEFAULT_QUALITY;
+    lf.lfPitchAndFamily = DEFAULT_PITCH;
+    return {CreateFontIndirect(&lf)};
+}
+
+HRESULT CDrawings::CStaticRes::Init(HWND hWnd)
+{
+    HRESULT code = S_OK;
+
+    srand(static_cast<int>(time(nullptr)));
+    auto const&   ilBig = CLUIApp::App()->GetImageList(IL_OwnBig);
+    auto const& ilSmall = CLUIApp::App()->GetImageList(IL_SHELL_16x16);
+    const int  maxCount = ilSmall.GetImageCount() - 1;
+    m_hIcon[ICON_ActiveWnd]   = ilSmall.GetIcon(rand() % maxCount);
+    m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
+    m_hIcon[ICON_Desktop1]    = ilBig.GetIcon(IconMyComp); // IconMatreshka
+    m_hIcon[ICON_Cursor1]     = (HICON)LoadCursorW(nullptr, IDC_APPSTARTING);
+
+    LoadExplorerSettings();
+    return m_InTheme.Init(hWnd);
+}
+
+void CDrawings::CStaticRes::LoadExplorerSettings()
+{
+    HKEY hKey;
+    LSTATUS status = RegOpenKeyExW(HKEY_CURRENT_USER,
+                                   L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", 0,
+                                   KEY_QUERY_VALUE, &hKey
+    );
+    if (status != ERROR_SUCCESS) {
+        return;
+    }
+    DWORD  dwType = 0;
+    DWORD  cbData = sizeof(DWORD);
+    DWORD dwValue = 0;
+    if (ERROR_SUCCESS == RegQueryValueExW(hKey, L"ListviewShadow", nullptr, &dwType, reinterpret_cast<BYTE*>(&dwValue), &cbData)) {
+        if (REG_DWORD == dwType) {
+            m_bIconLabelShadows = dwValue != 0;
+        }
+    }
+    RegCloseKey(hKey);
+}
+
+//-----------------------------------------------------------------------------
+//
+// CDrawings's
+//
+//-----------------------------------------------------------------------------
+
+CDrawings::PStaticRes CDrawings::m_pStaticRes = {};
+
+CDrawings::~CDrawings()
+{
+}
+
+CDrawings::CDrawings(CTheme const& theme, HWND hWnd /*= nullptr*/)
+    : m_Theme{theme}
+    , m_BorderSize{0}
+{
+}
+
+HRESULT CDrawings::StaticInit(HWND hWnd)
+{
+    m_pStaticRes = std::make_unique<CStaticRes>();
+    return m_pStaticRes->Init(hWnd);
+}
+
+void CDrawings::StaticFree()
+{
+    PStaticRes{}.swap(m_pStaticRes);
+}
+
+UINT CDrawings::GetDrawItemFrameType(UINT nCtlType)
 {
     switch (nCtlType) {
     case ODT_BUTTON:    return DFC_BUTTON;
@@ -204,7 +302,7 @@ UINT CDrawRoutine::GetDrawItemFrameType(UINT nCtlType)
     return 0;
 }
 
-UINT CDrawRoutine::ConvDrawItemState(UINT diState)
+UINT CDrawings::ConvDrawItemState(UINT diState)
 {
     UINT result = 0;
     if ((diState & ODS_DISABLED) || (diState & ODS_GRAYED) || (diState & ODS_INACTIVE)) {
@@ -223,18 +321,7 @@ UINT CDrawRoutine::ConvDrawItemState(UINT diState)
     return result;
 }
 
-CDrawRoutine::~CDrawRoutine()
-{
-}
-
-CDrawRoutine::CDrawRoutine(CTheme const& theme)
-    :      m_Theme{theme}
-    , m_BorderSize{0}
-{
-    UNREFERENCED_PARAMETER(StaticInit::instance());
-}
-
-void CDrawRoutine::DrawBorder(WTL::CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const
+void CDrawings::DrawBorder(WTL::CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const
 {
     CRect     rc = rcParam;
     auto hPrevBr = dc.SelectBrush(hBrush); 
@@ -253,7 +340,7 @@ void CDrawRoutine::DrawBorder(WTL::CDCHandle dc, CRect const& rcParam, int borde
     }
 }
 
-void CDrawRoutine::DrawEdge(WTL::CDCHandle dc, CRect& rcParam, UINT edge, UINT uFlags) const
+void CDrawings::DrawEdge(WTL::CDCHandle dc, CRect& rcParam, UINT edge, UINT uFlags) const
 {
     CRect rcInner = rcParam;
     HPEN  prevPen = nullptr;
@@ -261,8 +348,11 @@ void CDrawRoutine::DrawEdge(WTL::CDCHandle dc, CRect& rcParam, UINT edge, UINT u
     savePoint.x = 0;
     savePoint.y = 0;
     /* Determine the colors of the edges */
-    unsigned char edgeIndex = edge & (BDR_INNER | BDR_OUTER);
-    signed char LTInnerI, LTOuterI, RBInnerI, RBOuterI;
+    const unsigned char edgeIndex = edge & (BDR_INNER | BDR_OUTER);
+    signed char LTInnerI = 0;
+    signed char LTOuterI = 0;
+    signed char RBInnerI = 0;
+    signed char RBOuterI = 0;
     if (uFlags & BF_SOFT) {
         LTInnerI = LTOuterNormal[edgeIndex];
         LTOuterI = LTInnerNormal[edgeIndex];
@@ -274,10 +364,10 @@ void CDrawRoutine::DrawEdge(WTL::CDCHandle dc, CRect& rcParam, UINT edge, UINT u
     RBInnerI = RBInnerNormal[edgeIndex];
     RBOuterI = RBOuterNormal[edgeIndex];
 
-    int iPenLBPlus = (uFlags & BF_BOTTOMLEFT)  == BF_BOTTOMLEFT  ? 1 : 0;
-    int iPenRTPlus = (uFlags & BF_TOPRIGHT)    == BF_TOPRIGHT    ? 1 : 0;
-    int iPenRBPlus = (uFlags & BF_BOTTOMRIGHT) == BF_BOTTOMRIGHT ? 1 : 0;
-    int iPenLTPlus = (uFlags & BF_TOPLEFT)     == BF_TOPLEFT     ? 1 : 0;
+    const int iPenLBPlus = (uFlags & BF_BOTTOMLEFT)  == BF_BOTTOMLEFT  ? 1 : 0;
+    const int iPenRTPlus = (uFlags & BF_TOPRIGHT)    == BF_TOPRIGHT    ? 1 : 0;
+    const int iPenRBPlus = (uFlags & BF_BOTTOMRIGHT) == BF_BOTTOMRIGHT ? 1 : 0;
+    const int iPenLTPlus = (uFlags & BF_TOPLEFT)     == BF_TOPLEFT     ? 1 : 0;
 
 #if WINVER >= WINVER_2K && !defined(WINVER_IS_98)
 #define SetPenColor(border) \
@@ -368,7 +458,7 @@ void CDrawRoutine::DrawEdge(WTL::CDCHandle dc, CRect& rcParam, UINT edge, UINT u
 #endif
 }
 
-void CDrawRoutine::DrawFrameButton(WTL::CDCHandle dc, CRect& rcParam, UINT uState) const
+void CDrawings::DrawFrameButton(WTL::CDCHandle dc, CRect& rcParam, UINT uState) const
 {
     UINT edge;
     if (uState & (DFCS_PUSHED | DFCS_CHECKED | DFCS_FLAT)) {
@@ -398,7 +488,7 @@ static CRect MakeSquareRect(CRect const& rcSrc)
     return rcDst;
 }
 
-void CDrawRoutine::DrawFrameCaption(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags)
+void CDrawings::DrawFrameCaption(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags)
 {
     TCHAR symbol = 0;
     switch (uFlags & 0xff) {
@@ -422,7 +512,7 @@ void CDrawRoutine::DrawFrameCaption(WTL::CDCHandle dc, CRect& rcParam, UINT uFla
         return ;
     }
     if (!m_ftMarlett.m_hFont) {
-        m_ftMarlett = StaticInit::CreateMarlettFont(myRect.bottom - myRect.top);
+        m_ftMarlett = CStaticRes::CreateMarlettFont(myRect.bottom - myRect.top);
     }
     HFONT prevFont = dc.SelectFont(m_ftMarlett);
     int   prevMode = dc.SetBkMode(TRANSPARENT);
@@ -436,7 +526,7 @@ void CDrawRoutine::DrawFrameCaption(WTL::CDCHandle dc, CRect& rcParam, UINT uFla
     dc.SelectFont(prevFont);
 }
 
-void CDrawRoutine::DrawFrameScroll(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags)
+void CDrawings::DrawFrameScroll(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags)
 {
     TCHAR symbol = 0;
     switch (uFlags & 0xff) {
@@ -462,7 +552,7 @@ void CDrawRoutine::DrawFrameScroll(WTL::CDCHandle dc, CRect& rcParam, UINT uFlag
         return ;
     }
     if (!m_ftMarlett.m_hFont) {
-        m_ftMarlett = StaticInit::CreateMarlettFont(myRect.bottom - myRect.top);
+        m_ftMarlett = CStaticRes::CreateMarlettFont(myRect.bottom - myRect.top);
     }
     HFONT prevFont = dc.SelectFont(m_ftMarlett);
     int   prevMode = dc.SetBkMode(TRANSPARENT);
@@ -477,7 +567,7 @@ void CDrawRoutine::DrawFrameScroll(WTL::CDCHandle dc, CRect& rcParam, UINT uFlag
 }
 
 
-void CDrawRoutine::DrawFrameControl(WTL::CDCHandle dc, CRect& rcParam, UINT uType, UINT uState)
+void CDrawings::DrawFrameControl(WTL::CDCHandle dc, CRect& rcParam, UINT uType, UINT uState)
 {
     switch (uType) {
     case DFC_CAPTION: DrawFrameCaption(dc, rcParam, uState); break;
@@ -486,7 +576,7 @@ void CDrawRoutine::DrawFrameControl(WTL::CDCHandle dc, CRect& rcParam, UINT uTyp
     }
 }
 
-LONG CDrawRoutine::DrawCaptionButtons(WTL::CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags)
+LONG CDrawings::DrawCaptionButtons(WTL::CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags)
 {
     static const int margin = 2;
     int         buttonWidth = m_Theme.GetNcMetrcs().iCaptionWidth;
@@ -533,7 +623,7 @@ LONG CDrawRoutine::DrawCaptionButtons(WTL::CDCHandle dc, CRect const& rcCaption,
     return rc.left;
 }
 
-void CDrawRoutine::DrawCaption(WTL::CDCHandle dc, CRect const& rcParam, HFONT fnMarlet, HICON hIcon, PCWSTR str, UINT uFlags) const
+void CDrawings::DrawCaption(WTL::CDCHandle dc, CRect const& rcParam, HFONT fnMarlet, HICON hIcon, PCWSTR str, UINT uFlags) const
 {
     CRect rcTmp = rcParam;
     int iColor1 = COLOR_INACTIVECAPTION;
@@ -603,13 +693,13 @@ void CDrawRoutine::DrawCaption(WTL::CDCHandle dc, CRect const& rcParam, HFONT fn
     }
 }
 
-void CDrawRoutine::DrawMenuText(WTL::CDCHandle dc, PCWSTR text, CRect& rc, UINT format, int color) const
+void CDrawings::DrawMenuText(WTL::CDCHandle dc, PCWSTR text, CRect& rc, UINT format, int color) const
 {
     SetTextColor(dc, m_Theme.GetColor(color));
     DrawTextW(dc, text, -1, rc, format);
 }
 
-void CDrawRoutine::DrawDisabledMenuText(WTL::CDCHandle dc, PCWSTR text, CRect& rc, UINT format) const
+void CDrawings::DrawDisabledMenuText(WTL::CDCHandle dc, PCWSTR text, CRect& rc, UINT format) const
 {
     OffsetRect(rc, 1, 1);
     DrawMenuText(dc, text, rc, format, COLOR_3DHILIGHT);
@@ -617,7 +707,7 @@ void CDrawRoutine::DrawDisabledMenuText(WTL::CDCHandle dc, PCWSTR text, CRect& r
     DrawMenuText(dc, text, rc, format, COLOR_3DSHADOW);
 }
 
-void CDrawRoutine::DrawMenuBar(WTL::CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selIt, WindowRects& rects) const
+void CDrawings::DrawMenuBar(WTL::CDCHandle dc, CRect const& rc, HMENU hMenu, HFONT hFont, int selIt, WindowRects& rects) const
 {
     if (!hMenu || !hFont) {
         return ;
@@ -717,7 +807,7 @@ void CDrawRoutine::DrawMenuBar(WTL::CDCHandle dc, CRect const& rc, HMENU hMenu, 
     dc.SelectFont(prevFnt);
 }
 
-void CDrawRoutine::DrawScrollbar(WTL::CDCHandle dc, CRect const& rcParam, BOOL enabled)
+void CDrawings::DrawScrollbar(WTL::CDCHandle dc, CRect const& rcParam, BOOL enabled)
 {
     CRect               rc{};
     int       buttonHeight{m_Theme.GetNcMetrcs().iScrollHeight};
@@ -769,7 +859,7 @@ void CDrawRoutine::DrawScrollbar(WTL::CDCHandle dc, CRect const& rcParam, BOOL e
     }
 }
 
-void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& target)
+void CDrawings::CalcRects(CRect const& rc, UINT captFlags, WindowRects& target)
 {
   //long        dpiScale = ScaleForDpi<long>(8);
     const bool isToolWnd = (0 != (DC_SMALLCAP & captFlags));
@@ -845,7 +935,7 @@ void CDrawRoutine::CalcRects(CRect const& rc, UINT captFlags, WindowRects& targe
     }
 }
 
-void CDrawRoutine::DrawToolTip(WTL::CDCHandle dc, CRect& rcParam, ATL::CStringW&& tooltip) const
+void CDrawings::DrawToolTip(WTL::CDCHandle dc, CRect& rcParam, ATL::CStringW&& tooltip) const
 {
     CSize  szText;
     CRect& rcText = rcParam;
@@ -873,10 +963,12 @@ void CDrawRoutine::DrawToolTip(WTL::CDCHandle dc, CRect& rcParam, ATL::CStringW&
 #define IsDarkColor(color) \
     ((GetRValue(color) * 2 + GetGValue(color) * 5 + GetBValue(color)) <= 128 * 8)
 
-void CDrawRoutine::DrawDesktopIcon(WTL::CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const
+void CDrawings::DrawDesktopIcon(WTL::CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const
 {
-    bool bShadow = StaticInit::instance().m_bIconLabelShadows;
-    HICON  hIcon = StaticInit::instance().m_hIcon[StaticInit::ICON_Desktop1];
+    ATLASSERT(m_pStaticRes.get() != nullptr);
+
+    const bool bShadow = m_pStaticRes->m_bIconLabelShadows;
+    const HICON  hIcon = m_pStaticRes->m_hIcon[CStaticRes::ICON_Desktop1];
 
     //FillRect(dc, rcParam, m_Theme.GetBrush(COLOR_APPWORKSPACE)); // DEBUG
 
@@ -891,8 +983,8 @@ void CDrawRoutine::DrawDesktopIcon(WTL::CDCHandle dc, CRect const& rcParam, ATL:
     if (rcText.left < 0) {
         return ;
     }
-    int   prevMode = SetBkMode(dc, TRANSPARENT);
-    HFONT prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Desktop));
+    const int   prevMode = SetBkMode(dc, TRANSPARENT);
+    const HFONT prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Desktop));
 
     if (!GetTextExtentPoint32(dc, text.GetString(), text.GetLength(), &szText)) {
         szText.cx = ScaleForDpi(45);
@@ -900,28 +992,43 @@ void CDrawRoutine::DrawDesktopIcon(WTL::CDCHandle dc, CRect const& rcParam, ATL:
     }
     rcText.top = rcIcon.bottom + 4;
     rcText.bottom = rcText.top + szText.cy + 4;
-    if (bShadow) {
-        CRect rcShadow = rcText;
-        for (int i=0; i<3; i++) {
-            int c = i * 50;
-            dc.SetTextColor(RGB(c, c, c));
-            OffsetRect(rcShadow, 1, 1);
-            dc.DrawTextW(text.GetString(), text.GetLength(), rcShadow, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
-        }
-    }
-    COLORREF color;
+    COLORREF clrDesiredTextColor;
+    COLORREF clrShadow;
     if (IsDarkColor(m_Theme.GetColor(COLOR_DESKTOP)) && bShadow) {
-        color = RGB(0xFF, 0xFF, 0xFF);
+        clrDesiredTextColor = RGB(0xFF, 0xFF, 0xFF);
+        clrShadow = RGB(0, 0, 0);
     }
     else {
-        color = RGB(0, 0, 0);
+        clrDesiredTextColor = RGB(0, 0, 0);
+        clrShadow = RGB(0xFF, 0xFF, 0xFF);
     }
-    SetTextColor(dc, color);
-    dc.DrawTextW(text.GetString(), text.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+#if 1
+    const bool bThemedTextOut = 0 != DrawShadowText(dc, text.GetString(), text.GetLength(), rcText,
+        DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS, clrDesiredTextColor, clrShadow, 3, 3);
+#else
+    const bool bThemedTextOut = m_pStaticRes->
+        m_InTheme.TextPut(dc, rcText, text.GetString(), text.GetLength(),
+            0,
+            0,
+            DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+#endif
+    if (!bThemedTextOut) {
+        if (bShadow) {
+            CRect rcShadow = rcText;
+            for (int i=0; i<3; i++) {
+                int c = i * 50;
+                dc.SetTextColor(RGB(c, c, c));
+                OffsetRect(rcShadow, 1, 1);
+                dc.DrawTextW(text.GetString(), text.GetLength(), rcShadow, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+            }
+        }
+        SetTextColor(dc, clrDesiredTextColor);
+        dc.DrawTextW(text.GetString(), text.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+    }
     dc.SelectFont(prevFont);
     dc.SetBkMode(prevMode);
     if (drawCursor) {
-        const HICON hCursor = StaticInit::instance().m_hIcon[StaticInit::ICON_Cursor1];
+        const HICON hCursor = m_pStaticRes->m_hIcon[CStaticRes::ICON_Cursor1];
         CRect rcCursor{rcIcon.right + 8, rcIcon.bottom - 16, 0, 0};
         rcCursor.right = rcCursor.left + 32; // ##TODO: GetSystemMetrics for cursor painting
         rcCursor.bottom = rcCursor.top + 32;
@@ -929,9 +1036,11 @@ void CDrawRoutine::DrawDesktopIcon(WTL::CDCHandle dc, CRect const& rcParam, ATL:
     }
 }
 
-void CDrawRoutine::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects)
+void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, WindowRects& rects)
 {
-    HICON const*      icons = StaticInit::instance().m_hIcon;
+    ATLASSERT(m_pStaticRes.get() != nullptr);
+
+    HICON const*      icons = m_pStaticRes->m_hIcon;
     HFONT const    menuFont = m_Theme.GetFont(FONT_Menu);
     HFONT const    captFont = m_Theme.GetFont(FONT_Caption);
     HICON          captIcon = nullptr;
@@ -942,8 +1051,8 @@ void CDrawRoutine::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, W
     const bool     isActive = (0 != (DC_ACTIVE & params.captFlags));
 
     if (!isToolWnd) {
-        if (isActive) { captIcon = icons[StaticInit::ICON_ActiveWnd]; }
-        else          { captIcon = icons[StaticInit::ICON_InactiveWnd]; }
+        if (isActive) { captIcon = icons[CStaticRes::ICON_ActiveWnd]; }
+        else          { captIcon = icons[CStaticRes::ICON_InactiveWnd]; }
         if (captIcon) { captFlags |= DC_ICON; }
     }
     if (m_Theme.IsGradientCaptions()) {
