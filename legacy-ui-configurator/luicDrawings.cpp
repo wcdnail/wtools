@@ -1062,7 +1062,7 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
 
         CRect rcWork = rects[WR_Workspace];
         dc.FillSolidRect(rcWork, m_Theme.GetColor(workspaceColorIndex));
-        dc.DrawEdge(rcWork, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
+        DrawEdge(dc, rcWork, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
 
         if (params.text.lineCount > 0) {
             const int textColorIndex = isActive ? COLOR_WINDOWTEXT : COLOR_GRAYTEXT;

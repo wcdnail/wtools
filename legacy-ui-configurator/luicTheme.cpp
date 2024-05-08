@@ -7,15 +7,6 @@
 
 namespace
 {
-#if WINVER < WINVER_2K
-static const int COLORS_COUNT = 25;
-#elif WINVER < WINVER_XP
-static const int COLORS_COUNT = 29;
-#else
-static const int COLORS_COUNT = 31;
-#endif
-static_assert(CLR_Count == COLORS_COUNT, "CLR_Count COUNT is NOT match COLORS_COUNT!");
-
 template <typename Res>
 static inline Res GetCurrentDPI()
 {
@@ -76,9 +67,7 @@ const SizeRange CTheme::g_DefaultSizeRange[SIZES_Count] =
     /* SIZE_SMCAPTIONHEIGHT */  { 12,  70, 15 },   // 100
     /* SIZE_MENUWIDTH       */  { 12,  70, 18 },   // 100
     /* SIZE_MENUHEIGHT      */  { 12,  70, 18 },   // 100
-#if WINVER >= WINVER_VISTA
     /* SIZE_PADDEDBORDER    */  {  0,  15,  0 }    // 100
-#endif
 };
 
 CTheme::~CTheme()
@@ -86,7 +75,7 @@ CTheme::~CTheme()
 }
 
 CTheme::CTheme(bool loadSystemTheme)
-    :            m_nIndex{TI_Invalid}
+    :            m_nIndex{IT_Invalid}
     ,            m_MyName{"Native"}
     ,        m_lfIconFont{}
     , m_bGradientCaptions{true}
@@ -102,7 +91,6 @@ CTheme::CTheme(bool loadSystemTheme)
     }
 }
 
-_Ret_maybenull_
 PCTSTR CTheme::SizeName(int size) // it for tooltips!
 {
     static const PCTSTR gsl_sizeNames[SIZES_Count] = {
@@ -172,24 +160,17 @@ PCTSTR CTheme::ColorName(int color)
         TEXT("ButtonText"),             // 18 = COLOR_BTNTEXT
         TEXT("InactiveTitleText"),      // 19 = COLOR_INACTIVECAPTIONTEXT
         TEXT("ButtonHilight"),          // 20 = COLOR_BTNHIGHLIGHT
-        // COLOR_BTNHILIGHT
-        // COLOR_3DHIGHLIGHT
-        // COLOR_3DHILIGHT
         TEXT("ButtonDkShadow"),         // 21 = COLOR_3DDKSHADOW
         TEXT("ButtonLight"),            // 22 = COLOR_3DLIGHT
         TEXT("InfoText"),               // 23 = COLOR_INFOTEXT
         TEXT("InfoWindow"),             // 24 = COLOR_INFOBK
-#if WINVER >= WINVER_2K
         TEXT("ButtonAlternateFace"),    // 25 = COLOR_ALTERNATEBTNFACE
         // (unused, undefined by the SDK) --------------------------------
         TEXT("HotTrackingColor"),       // 26 = COLOR_HOTLIGHT (Hyperlink)
         TEXT("GradientActiveTitle"),    // 27 = COLOR_GRADIENTACTIVECAPTION
         TEXT("GradientInactiveTitle"),  // 28 = COLOR_GRADIENTINACTIVECAPTION
-#endif
-#if WINVER >= WINVER_XP
         TEXT("MenuHilight"),            // 29 = COLOR_MENUHILIGHT
         TEXT("MenuBar")                 // 30 = COLOR_MENUBAR
-#endif
     };
     if (color < 0 || color >= CLR_Count) {
         return nullptr;
@@ -209,9 +190,7 @@ int CTheme::GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size)
     case SIZE_SMCaptionHeight:  return ncMetrics->iSmCaptionHeight;
     case SIZE_MenuWidth:        return ncMetrics->iMenuWidth;
     case SIZE_MenuHeight:       return ncMetrics->iMenuHeight;
-#if WINVER >= WINVER_VISTA
     case SIZE_PaddedBorder:     return ncMetrics->iPaddedBorderWidth;
-#endif
     }
     return -1;
 }
@@ -257,11 +236,9 @@ bool CTheme::RefreshFonts()
             continue;
         }
         WTL::CLogFont lfObj(*lf);
-#if WINVER >= WINVER_2K
         if (FONT_Hyperlink == iFont) {
             lfObj.lfUnderline = TRUE;
         }
-#endif
         tmpFont[iFont] = lfObj.CreateFontIndirectW();
     }
     for (int iFont = 0; iFont < FONTS_Count; iFont++) {
@@ -556,8 +533,8 @@ void CTheme::FontsStaticInit(CPageAppearance& uiPage, FontMap const& mapFont)
     FontsSizeStaticInit(uiPage);
     FontsSmoothStaticInit(uiPage);
     FontsButtonsStaticInit(uiPage);
-    uiPage.m_udFontWidth.SetRange32(0, 24);
-    uiPage.m_udFontAngle.SetRange32(0, 359);
+    uiPage.m_udItemSize[IT_FontWidth].SetRange32(0, 24);
+    uiPage.m_udItemSize[IT_FontAngle].SetRange32(0, 359);
 }
 
 void CTheme::PerformStaticInit(CPageAppearance& uiPage, CLUIApp const* pApp)

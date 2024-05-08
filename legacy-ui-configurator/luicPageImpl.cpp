@@ -30,6 +30,12 @@ bool CPageImpl::ComboSetCurSelByData(WTL::CComboBox& cbControl, DWORD_PTR nData)
     return false;
 }
 
+bool CPageImpl::CtlShow(HWND hWndCtl)
+{
+    ::ShowWindow(hWndCtl, SW_SHOW);
+    return true;
+}
+
 bool CPageImpl::CtlDisable(HWND hWndCtl)
 {
     ::EnableWindow(hWndCtl, FALSE);
@@ -110,6 +116,9 @@ void CPageImpl::OnResizeNotify()
 
 BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
+#ifdef _DEBUG
+    ShowWindow(SW_SHOW);
+#endif
     DBG_DUMP_WMESSAGE_EXT(LTH_CONTROL, m_Caption.c_str(), m_hWnd, WM_INITDIALOG, 0, lInitParam);
 
     ModifyStyle(WS_BORDER | DS_CONTROL, 0);

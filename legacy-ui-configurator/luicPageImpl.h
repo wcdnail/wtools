@@ -39,6 +39,7 @@ protected:
     CPageImpl(UINT idd, std::wstring&& caption, CTheme* pTheme = nullptr);
 
     static bool ComboSetCurSelByData(WTL::CComboBox& cbControl, DWORD_PTR nData);
+    static bool CtlShow(HWND hWndCtl);
     static bool CtlDisable(HWND hWndCtl);
     static BOOL DoForEachImpl(HWND hWndCtl, ForeachFn const& routine);
     void DoForEach(ForeachFn const& routine);
@@ -61,6 +62,7 @@ private:
     ResizeVec m_ResiseMap;
 
     BEGIN_MSG_MAP_EX(CColorsPage)
+      // TODO: temporary TURN OFF colorizing
       //if (nullptr != m_pTheme) {
       //    MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
       //    MSG_WM_ERASEBKGND(OnEraseBkgnd)

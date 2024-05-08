@@ -9,9 +9,9 @@
 #include "resz/resource.h"
 #include <atlwin.h>
 
-CMainFrame::~CMainFrame()
-{
-}
+#include "luicDrawings.h"
+
+CMainFrame::~CMainFrame() = default;
 
 CMainFrame::CMainFrame(Conf::Section const& parentSettings)
     :          Super{}
@@ -67,7 +67,13 @@ void CMainFrame::OnResizeNotify()
 int CMainFrame::OnCreate(LPCREATESTRUCT)
 {
     DBG_DUMP_WMESSAGE_EXT(LTH_MAINFRAME, L"Main", m_hWnd, WM_CREATE, 0, 0);
-
+    const auto code = CDrawings::StaticInit(m_hWnd);
+    if (ERROR_SUCCESS != code) {
+        ReportError(L"CDrawings::StaticInit failure...", code);
+    }
+#ifdef _DEBUG
+    ShowWindow(SW_SHOW);
+#endif
     auto const* pApp = CLUIApp::App();
 
     HICON tempIco = pApp->GetIcon(IconMain);
@@ -110,6 +116,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
 
 void CMainFrame::OnDestroy()
 {
+    CDrawings::StaticFree();
+
     WTL::CMessageLoop* pLoop = CLUIApp::App()->GetMessageLoop();
     ATLASSERT(pLoop != nullptr);
     pLoop->RemoveIdleHandler(this);

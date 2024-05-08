@@ -43,11 +43,11 @@
 #  include <shlguid.h>
 #  include <shellapi.h>
 #  include <comdef.h>
-   
-#  include <atlbase.h>
+
 #  include <atlstr.h>
-#  include <atlwin.h>
 #  include <atltypes.h>
+#  include <atlbase.h>
+#  include <atlwin.h>
 #  include <atlcomcli.h>
 #  include <atlcom.h>
 #  include <atlsimpcoll.h>

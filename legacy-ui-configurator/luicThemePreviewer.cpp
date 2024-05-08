@@ -284,7 +284,7 @@ void CThemePreviewer::OnLButton(UINT nFlags, CPoint point)
             }
         }
     }
-    SetSelectedRect(TI_Invalid, TI_Invalid);
+    SetSelectedRect(IT_Invalid, IT_Invalid);
 }
 
 int CThemePreviewer::RectIndexToElementId() const
@@ -312,7 +312,7 @@ int CThemePreviewer::RectIndexToElementId() const
         /* WR_Message      */ EN_MsgBox,
         /* WR_Scroll       */ EN_Scrollbar,
         /* WR_WinText      */ EN_Window,
-        /* WR_Workspace    */ EN_AppBackground,
+        /* WR_Workspace    */ EN_Window,
         /* WR_MenuSelected */ EN_SelectedItem,
         /* WR_MenuDisabled */ EN_DisabledItem,
         /* WR_MenuItem     */ EN_FlatmenuBar,

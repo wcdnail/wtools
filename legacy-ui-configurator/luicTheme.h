@@ -17,7 +17,8 @@ enum ThemeIndex : int
 
 enum EItemIndex : int
 {
-    EN_Desktop,
+    IT_Invalid = -1,
+    EN_Desktop = 0,
     EN_AppBackground,
     EN_Window,
     EN_Menu,             // The width affects the icon and caption buttons of MDI children
@@ -36,13 +37,25 @@ enum EItemIndex : int
     EN_MsgBox,
     EN_Hyperlink,
     EN_FlatmenuBar,
-    /**
-      * Border of windows, including property sheets for some reason.
-      * If SIZE_PADDEDBORDER is > 0, the windows with fixed borders affected also
-      * include SIZE_BORDER
-      */
-    EN_PaddedBorder,
-    EN_Count
+    EN_PaddedBorder,    // Border of windows, including property sheets for some reason.
+    EN_Count            // If SIZE_PaddedBorder is > 0, the windows with fixed borders affected also
+};                      // include SIZE_Border
+
+enum EItemColors: int
+{
+    IT_Color1 = 0,
+    IT_Color2,
+    IT_FontColor1,
+    IT_ColorCount
+};
+
+enum EItemSize: int 
+{
+    IT_Size1 = 0,
+    IT_Size2,
+    IT_FontWidth,
+    IT_FontAngle,
+    IT_SizeCount
 };
 
 enum ESizeIndex : int
@@ -56,9 +69,7 @@ enum ESizeIndex : int
     SIZE_SMCaptionHeight,
     SIZE_MenuWidth,
     SIZE_MenuHeight,
-#if WINVER >= WINVER_VISTA
     SIZE_PaddedBorder,
-#endif
     SIZES_Count
 };
 
@@ -97,9 +108,7 @@ enum EFontIndex : int
     FONT_Tooltip,
     FONT_Message,
     FONT_Desktop,
-#if WINVER >= WINVER_2K
     FONT_Hyperlink,
-#endif
     FONTS_Count
 };
 
@@ -130,33 +139,21 @@ enum EColorIndex : int
     CLR_ButtonText,             // 18 = COLOR_BTNTEXT
     CLR_InactiveTitleText,      // 19 = COLOR_INACTIVECAPTIONTEXT
     CLR_ButtonHilight,          // 20 = COLOR_BTNHIGHLIGHT
-    // COLOR_BTNHILIGHT
-    // COLOR_3DHIGHLIGHT
-    // COLOR_3DHILIGHT
+                                //      COLOR_BTNHILIGHT
+                                //      COLOR_3DHIGHLIGHT
+                                //      COLOR_3DHILIGHT
     CLR_ButtonDkShadow,         // 21 = COLOR_3DDKSHADOW
     CLR_ButtonLight,            // 22 = COLOR_3DLIGHT
     CLR_InfoText,               // 23 = COLOR_INFOTEXT
     CLR_InfoWindow,             // 24 = COLOR_INFOBK
-#if WINVER >= WINVER_2K
     CLR_ButtonAlternateFace,    // 25 = COLOR_ALTERNATEBTNFACE
     // (unused, undefined by the SDK) --------------------------------
     CLR_HotTrackingColor,       // 26 = COLOR_HOTLIGHT (Hyperlink)
     CLR_GradientActiveTitle,    // 27 = COLOR_GRADIENTACTIVECAPTION
     CLR_GradientInactiveTitle,  // 28 = COLOR_GRADIENTINACTIVECAPTION
-#endif
-#if WINVER >= WINVER_XP
     CLR_MenuHilight,            // 29 = COLOR_MENUHILIGHT
     CLR_MenuBar,                // 30 = COLOR_MENUBAR
-#endif
     CLR_Count
-};
-
-enum EItemColors: int 
-{
-    IT_Color1 = 0,
-    IT_Color2,
-    IT_FontColor1,
-    IT_ColorCount
 };
 
 struct CTheme
@@ -171,6 +168,7 @@ struct CTheme
     static PCTSTR FontName(int font);
     static PCTSTR ColorName(int color);
     static int GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size);
+    static LOGFONT const* GetNcMetricFont(CTheme const& theme, int font);
 
     bool LoadSysTheme();
     COLORREF GetColor(int color) const;
@@ -198,8 +196,6 @@ private:
     WTL::CBrush     m_Brush[CLR_Count];
     WTL::CFont     m_Font[FONTS_Count];
     SizeRange m_SizeRange[SIZES_Count];
-
-    static LOGFONT const* GetNcMetricFont(CTheme const& theme, int font);
 
     bool RefreshBrushes();
     bool RefreshFonts();

@@ -262,14 +262,9 @@ HRESULT CLUIApp::Run(HINSTANCE instHnd, int showCmd)
             ReportError(L"MainFrame creation failure!", code, true);
             return code;
         }
-        code = CDrawings::StaticInit(m_MainFrame.m_hWnd);
-        if (ERROR_SUCCESS != code) {
-            ReportError(L"CDrawings::StaticInit failure...", code);
-        }
         m_MainFrame.ShowWindow(showCmd);
         ATLTRACE2(WTL::atlTraceUI, 0, _T("Launch main loop [%08x] <%s>\n"), code, _T(__FUNCDNAME__));
         code = loop.Run();
-        CDrawings::StaticFree();
         RemoveMessageLoop();
     }
     catch(std::exception const& ex) {

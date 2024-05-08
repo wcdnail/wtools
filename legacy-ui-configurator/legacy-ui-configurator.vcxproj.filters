@@ -173,16 +173,16 @@
       <Filter>resz\iconz</Filter>
     </Image>
     <Image Include="bom-font-bold.ico">
-      <Filter>resz</Filter>
+      <Filter>resz\iconz</Filter>
     </Image>
     <Image Include="resz\bom-font-bold.ico">
-      <Filter>resz</Filter>
-    </Image>
-    <Image Include="rom-7-matreshka.ico">
-      <Filter>resz</Filter>
+      <Filter>resz\iconz</Filter>
     </Image>
     <Image Include="resz\rom-7-matreshka.ico">
-      <Filter>resz</Filter>
+      <Filter>resz\iconz</Filter>
+    </Image>
+    <Image Include="rom-7-matreshka.ico">
+      <Filter>resz\iconz</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
