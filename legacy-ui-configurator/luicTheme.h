@@ -161,7 +161,7 @@ struct CTheme
     static int g_DPI();
 
     ~CTheme();
-    CTheme(bool loadSystemTheme);
+    CTheme(bool initFromSystem);
 
     static PCItemAssign GetItemAssignment(int dex);
     static PCTSTR SizeName(int size);
@@ -171,11 +171,13 @@ struct CTheme
     static LOGFONT const& GetNcMetricFont(CTheme const& theme, int font);
     static LOGFONT& GetNcMetricFont(CTheme& theme, int font);
 
-    bool LoadSysTheme();
+    bool LoadCurrent();
     COLORREF GetColor(int color) const;
     bool SetColor(int iColor, COLORREF dword);
+    void SetFont(int iFont, const WTL::CLogFont& lfNew, HFONT fnNew);
     WTL::CBrush const& GetBrush(int color) const;
     WTL::CFont const& GetFont(int font) const;
+    WTL::CFont& GetFont(int font);
     bool RefreshHFont(int font, LOGFONT const& logFont);
     LOGFONT const& GetLogFont(int font) const;
     LOGFONT& GetLogFont(int font);
@@ -195,26 +197,30 @@ private:
     int                       m_nIndex;
     ATL::CString              m_MyName;
     WTL::CLogFont         m_lfIconFont;
-    WTL::CFont              m_IconFont;
-    WTL::CBrush            m_IconBrush;
+    WTL::CLogFont        m_lfHyperlink;
     bool           m_bGradientCaptions;
     bool                  m_bFlatMenus;
     NONCLIENTMETRICS       m_ncMetrics;
+    WTL::CFont           m_fntReserved;
+    WTL::CBrush           m_brReserved;
     COLORREF        m_Color[CLR_Count];
     WTL::CBrush     m_Brush[CLR_Count];
     WTL::CFont     m_Font[FONTS_Count];
     SizeRange m_SizeRange[SIZES_Count];
+
+    template <class RetType, class ThemeRef>
+    static RetType GetNcMetricHFontT(ThemeRef theme, int font);
 
     template <typename RetType, typename ThemeRef>
     static RetType GetNcMetricFontT(ThemeRef theme, int font);
 
     bool RefreshBrushes();
     bool RefreshHFonts();
-    bool LoadSysColors();
-    bool LoadSysNcMetrics();
-    bool LoadSysIconFont();
-    bool LoadSysGradientCaptionsSetting();
-    bool LoadSysFlatMenusSetting();
+    bool LoadCurrentColors();
+    bool LoadCurrentNcMetrics();
+    bool LoadCurrentIconFont();
+    bool LoadCurrentGradientCaptionsSetting();
+    bool LoadCurrentFlatMenusSetting();
 
     static void ThemesStaticInit(CPageAppearance& uiPage, CTheme& initialTheme);
     static void ItemStaticInit(CPageAppearance& uiPage);

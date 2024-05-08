@@ -1012,15 +1012,15 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
 {
     ATLASSERT(m_pStaticRes.get() != nullptr);
 
-    HICON const*      icons = m_pStaticRes->m_hIcon;
-    HFONT const    menuFont = m_Theme.GetFont(FONT_Menu);
-    HFONT const    captFont = m_Theme.GetFont(FONT_Caption);
-    HICON          captIcon = nullptr;
-    UINT          captFlags = params.captFlags | DC_TEXT;
-    int workspaceColorIndex = COLOR_APPWORKSPACE;
-    int    borderColorIndex = COLOR_INACTIVEBORDER;
-    const bool    isToolWnd = (0 != (DC_SMALLCAP & params.captFlags));
-    const bool     isActive = (0 != (DC_ACTIVE & params.captFlags));
+    HICON const*         icons = m_pStaticRes->m_hIcon;
+    WTL::CFont const& menuFont = m_Theme.GetFont(FONT_Menu);
+    WTL::CFont const& captFont = m_Theme.GetFont(FONT_Caption);
+    HICON             captIcon = nullptr;
+    UINT             captFlags = params.captFlags | DC_TEXT;
+    int    workspaceColorIndex = COLOR_APPWORKSPACE;
+    int       borderColorIndex = COLOR_INACTIVEBORDER;
+    const bool       isToolWnd = (0 != (DC_SMALLCAP & params.captFlags));
+    const bool        isActive = (0 != (DC_ACTIVE & params.captFlags));
 
     m_ftMarlett.Attach(nullptr);
 
@@ -1060,7 +1060,6 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
         if (params.hMenu) {
             DrawMenuBar(dc, rects[WR_Menu], params.hMenu, menuFont, params.selectedMenu, rects);
         }
-
         CRect rcWork = rects[WR_Workspace];
         dc.FillSolidRect(rcWork, m_Theme.GetColor(workspaceColorIndex));
         DrawEdge(dc, rcWork, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
@@ -1116,12 +1115,11 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
         ATL::CStringW const& line0 = params.text.line[0].text;
         ATL::CStringW const& line1 = params.text.line[1].text;
         ATL::CStringW const& line2 = params.text.line[2].text;
-        int prevBkMode = dc.SetBkMode(TRANSPARENT);
+        const int prevBkMode = dc.SetBkMode(TRANSPARENT);
         HFONT prevFont = dc.SelectFont(m_Theme.GetFont(FONT_Message));
         SetTextColor(dc, m_Theme.GetColor(COLOR_WINDOWTEXT));
         dc.DrawTextW(line0.GetString(), line0.GetLength(), rc, DT_LEFT | DT_SINGLELINE | DT_WORD_ELLIPSIS);
         dc.SelectFont(prevFont);
-#if WINVER >= WINVER_2K
         rc = rects[WR_Hyperlink];
         if (rc.top >= rc.bottom) {
             return ;
@@ -1130,7 +1128,6 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
         SetTextColor(dc, m_Theme.GetColor(COLOR_HOTLIGHT));
         dc.DrawTextW(line1.GetString(), line1.GetLength(), rc, DT_LEFT | DT_SINGLELINE | DT_WORD_ELLIPSIS);
         dc.SelectFont(prevFont);
-#endif
         rc = rects[WR_Button];
         if (rc.top >= rc.bottom) {
             return ;

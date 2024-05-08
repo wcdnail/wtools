@@ -78,22 +78,22 @@ CTheme::~CTheme()
 {
 }
 
-CTheme::CTheme(bool loadSystemTheme)
+CTheme::CTheme(bool initFromSystem)
     :            m_nIndex{IT_Invalid}
     ,            m_MyName{"Native"}
     ,        m_lfIconFont{}
-    ,          m_IconFont{}
-    ,         m_IconBrush{}
     , m_bGradientCaptions{true}
     ,        m_bFlatMenus{false}
+    ,       m_fntReserved{}
+    ,        m_brReserved{}
 {
     ZeroMemory(&m_ncMetrics, sizeof(m_ncMetrics));
     ZeroMemory(&m_Color, sizeof(m_Color));
     for (int i = 0; i < SIZES_Count; i++) {
         m_SizeRange[i] = g_DefaultSizeRange[i];
     }
-    if (loadSystemTheme) {
-        LoadSysTheme();
+    if (initFromSystem) {
+        LoadCurrent();
     }
 }
 
@@ -126,9 +126,7 @@ PCTSTR CTheme::FontName(int font)
         TEXT("Status Font"),            // 3 = FONT_Tooltip
         TEXT("Message Font"),           // 4 = FONT_Message
         TEXT("Desktop Font"),           // 5 = FONT_Desktop
-#if WINVER >= WINVER_2K
         TEXT("Hyperlink Font"),         // 8 = FONT_Hyperlink
-#endif
     };
     if (font < 0 || font >= FONTS_Count) {
         return nullptr;
@@ -203,6 +201,25 @@ int& CTheme::GetNcMetricSize(PNONCLIENTMETRICS pncMetrics, int size)
 }
 
 template <typename RetType, typename ThemeRef>
+RetType CTheme::GetNcMetricHFontT(ThemeRef theme, int font)
+{
+    switch (font) {
+    case FONT_Caption:
+    case FONT_SMCaption:
+    case FONT_Menu:
+    case FONT_Tooltip:
+    case FONT_Message:
+    case FONT_Desktop:
+    case FONT_Hyperlink:
+        return theme.m_Font[font];
+    default:
+        break;
+    }
+    return theme.m_fntReserved;
+}
+
+
+template <typename RetType, typename ThemeRef>
 RetType CTheme::GetNcMetricFontT(ThemeRef theme, int font)
 {
     switch (font) {
@@ -211,6 +228,7 @@ RetType CTheme::GetNcMetricFontT(ThemeRef theme, int font)
     case FONT_Menu:      return theme.m_ncMetrics.lfMenuFont;
     case FONT_Tooltip:   return theme.m_ncMetrics.lfStatusFont;
     case FONT_Message:   return theme.m_ncMetrics.lfMessageFont;
+    case FONT_Hyperlink: return theme.m_lfHyperlink;
     case FONT_Desktop:
     default:
         break;
@@ -244,36 +262,29 @@ bool CTheme::RefreshBrushes()
     return true;
 }
 
-static bool DoFontRefresh(WTL::CFont* pTarget, LOGFONT const& logFont)
+static bool DoFontRefresh(WTL::CFont& fntTarget, LOGFONT const& logFont)
 {
-    WTL::CFont temp{::CreateFontIndirectW(&logFont)};
+    WTL::CFont temp{CreateFontIndirectW(&logFont)};
     if (!temp.m_hFont) {
         // TODO: report CreateFontIndirectW
         return false;
     }
-    pTarget->Attach(temp.Detach());
+    fntTarget.Attach(temp.Detach());
     return true;
 }
 
 bool CTheme::RefreshHFont(int font, LOGFONT const& logFont)
 {
-    WTL::CFont* pTarget = &m_IconFont;
-    if (font >= 0 && font < FONTS_Count) {
-        pTarget = &m_Font[font];
-    }
-    return DoFontRefresh(pTarget, logFont);
+    WTL::CFont& fntTarget = GetNcMetricHFontT<WTL::CFont&, CTheme&>(*this, font);
+    return DoFontRefresh(fntTarget, logFont);
 }
 
 bool CTheme::RefreshHFonts()
 {
     WTL::CFont tmpFont[FONTS_Count];
     for (int iFont = 0; iFont < FONTS_Count; iFont++) {
-        LOGFONT& lf = GetNcMetricFont(*this, iFont);
-        WTL::CLogFont lfCopy(lf);
-        if (FONT_Hyperlink == iFont) {
-            lfCopy.lfUnderline = TRUE;
-        }
-        tmpFont[iFont] = lfCopy.CreateFontIndirectW();
+        auto& logFont = static_cast<WTL::CLogFont&>(GetNcMetricFont(*this, iFont));
+        tmpFont[iFont] = logFont.CreateFontIndirectW();
     }
     for (int iFont = 0; iFont < FONTS_Count; iFont++) {
         m_Font[iFont].Attach(tmpFont[iFont].Detach());
@@ -281,7 +292,7 @@ bool CTheme::RefreshHFonts()
     return true;
 }
 
-bool CTheme::LoadSysColors()
+bool CTheme::LoadCurrentColors()
 {
     COLORREF colors[CLR_Count] = { 0 };
     for (int iColor = 0; iColor < CLR_Count; iColor++) {
@@ -295,7 +306,7 @@ bool CTheme::LoadSysColors()
     return RefreshBrushes();
 }
 
-bool CTheme::LoadSysNcMetrics()
+bool CTheme::LoadCurrentNcMetrics()
 {
     NONCLIENTMETRICS ncMetrics;
     static_assert(sizeof(m_ncMetrics) == sizeof(ncMetrics), "NONCLIENTMETRICS did not MATCH!");
@@ -316,17 +327,19 @@ bool CTheme::LoadSysNcMetrics()
     return true;
 }
 
-bool CTheme::LoadSysIconFont()
+bool CTheme::LoadCurrentIconFont()
 {
     WTL::CLogFont lfIconFont;
     if (!SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(lfIconFont), &lfIconFont, 0)) {
         return false;
     }
     m_lfIconFont = lfIconFont;
+    m_lfHyperlink = lfIconFont;
+    m_lfHyperlink.lfUnderline = TRUE;
     return true;
 }
 
-bool CTheme::LoadSysGradientCaptionsSetting()
+bool CTheme::LoadCurrentGradientCaptionsSetting()
 {
 #if WINVER >= WINVER_2K
     BOOL bGradientCaptions = FALSE;
@@ -338,7 +351,7 @@ bool CTheme::LoadSysGradientCaptionsSetting()
     return true;
 }
 
-bool CTheme::LoadSysFlatMenusSetting()
+bool CTheme::LoadCurrentFlatMenusSetting()
 {
 #if WINVER >= WINVER_XP
     BOOL bFlatMenus = FALSE;
@@ -350,14 +363,14 @@ bool CTheme::LoadSysFlatMenusSetting()
     return true;
 }
 
-bool CTheme::LoadSysTheme()
+bool CTheme::LoadCurrent()
 {
     bool ret = true;
-    ret &= LoadSysColors();
-    ret &= LoadSysIconFont();
-    ret &= LoadSysNcMetrics();
-    ret &= LoadSysGradientCaptionsSetting();
-    ret &= LoadSysFlatMenusSetting();
+    ret &= LoadCurrentColors();
+    ret &= LoadCurrentIconFont();
+    ret &= LoadCurrentNcMetrics();
+    ret &= LoadCurrentGradientCaptionsSetting();
+    ret &= LoadCurrentFlatMenusSetting();
     m_MyName = L"(Current)";
     return ret;
 }
@@ -387,20 +400,28 @@ bool CTheme::SetColor(int iColor, COLORREF clrNew)
     return true;
 }
 
+void CTheme::SetFont(int iFont, const WTL::CLogFont& lfNew, HFONT fnNew)
+{
+    GetLogFont(iFont) = lfNew;
+    GetFont(iFont) = fnNew;
+}
+
 WTL::CBrush const& CTheme::GetBrush(int color) const
 {
-    if (color < 0 || color >= CLR_Count) {
-        return m_IconBrush;
+    if (color < 0 || color > CLR_Count - 1) {
+        return m_brReserved;
     }
     return m_Brush[color];
 }
 
 WTL::CFont const& CTheme::GetFont(int font) const
 {
-    if (font < 0 || font >= FONTS_Count) {
-        return m_IconFont;
-    }
-    return m_Font[font];
+    return GetNcMetricHFontT<WTL::CFont const&, CTheme const&>(*this, font);
+}
+
+WTL::CFont& CTheme::GetFont(int font)
+{
+    return GetNcMetricHFontT<WTL::CFont&, CTheme&>(*this, font);
 }
 
 SizeRange const* CTheme::GetSizeRange(int metric) const

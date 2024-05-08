@@ -496,18 +496,17 @@ bool CPageAppearance::ItemFontApplyChanges(int nItem, PCItemAssign pAssignment, 
     default:
         return false;
     }
-    if (!m_pTheme->RefreshHFont(iFont, lfCopy)) {
-        // TODO: report RefreshHFont
+    WTL::CLogFont lfNew{};
+    WTL::CFont    fnNew{lfCopy.CreateFontIndirectW()};
+    if (!fnNew.m_hFont) {
+        // TODO: report CreateFontIndirectW
         return false;
     }
-    WTL::CLogFont    lfNew{};
-    WTL::CFontHandle fnNew{m_pTheme->GetFont(iFont)};
     if (!fnNew.GetLogFont(lfNew)) {
         // TODO: report GetLogFont
         return false;
     }
-    LOGFONT& lfTarget = m_pTheme->GetLogFont(nItem);
-    lfTarget = lfNew;
+    m_pTheme->SetFont(iFont, lfNew, fnNew.Detach());
     // FTODO: trace/check lfTarget
     return true;
 }
@@ -583,7 +582,10 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     // skip CColorButton reflected & other
     switch (uNotifyCode) {
     case BN_PAINT:
+    case BN_UNHILITE:
+    case BN_DISABLE:
     case CBN_SELENDCANCEL:
+        SetMsgHandled(FALSE);
         return ;
     }
     // skip during controls initialization
