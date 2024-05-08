@@ -3,6 +3,8 @@
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
+#include "luicAppearance.h"
+
 CScheme::~CScheme() = default;
 CScheme::CScheme() = default;
 

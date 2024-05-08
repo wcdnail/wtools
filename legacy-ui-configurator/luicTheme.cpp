@@ -417,7 +417,7 @@ void CTheme::FontsStaticInit(CPageAppearance& uiPage, FontMap const& mapFont)
     uiPage.m_udItemSize[IT_FontAngle].SetRange32(0, 359);
 }
 
-void CTheme::PerformStaticInit(CPageAppearance& uiPage, CLUIApp const* pApp)
+void CScheme::InitUI(CPageAppearance& uiPage)
 {
     CTheme& theme = pApp->GetTheme(TI_Current);
     ThemesStaticInit(uiPage, theme);
