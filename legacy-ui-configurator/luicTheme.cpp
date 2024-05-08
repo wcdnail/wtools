@@ -20,7 +20,11 @@ static inline Res GetCurrentDPI()
 }
 }
 
-int CTheme::g_DPI = GetCurrentDPI<int>();
+int CTheme::g_DPI()
+{
+    static int gs_DPI = GetCurrentDPI<int>();
+    return gs_DPI;
+}
 
 PCItemAssign CTheme::GetItemAssignment(int dex)
 {
@@ -79,6 +83,7 @@ CTheme::CTheme(bool loadSystemTheme)
     ,            m_MyName{"Native"}
     ,        m_lfIconFont{}
     ,          m_IconFont{}
+    ,         m_IconBrush{}
     , m_bGradientCaptions{true}
     ,        m_bFlatMenus{false}
 {
@@ -104,9 +109,7 @@ PCTSTR CTheme::SizeName(int size) // it for tooltips!
         TEXT("SmCaptionHeight"),        // 6 = SIZE_SMCAPTIONHEIGHT
         TEXT("MenuWidth"),              // 7 = SIZE_MENUWIDTH
         TEXT("MenuHeight"),             // 8 = SIZE_MENUHEIGHT
-#if WINVER >= WINVER_VISTA
         TEXT("PaddedBorderWidth")       // 9 = SIZE_PADDEDBORDER
-#endif
     };
     if (size < 0 || size >= SIZES_Count) {
         return nullptr;
@@ -384,18 +387,18 @@ bool CTheme::SetColor(int iColor, COLORREF clrNew)
     return true;
 }
 
-HBRUSH CTheme::GetBrush(int color) const
+WTL::CBrush const& CTheme::GetBrush(int color) const
 {
     if (color < 0 || color >= CLR_Count) {
-        return nullptr;
+        return m_IconBrush;
     }
     return m_Brush[color];
 }
 
-HFONT CTheme::GetFont(int font) const
+WTL::CFont const& CTheme::GetFont(int font) const
 {
     if (font < 0 || font >= FONTS_Count) {
-        return nullptr;
+        return m_IconFont;
     }
     return m_Font[font];
 }

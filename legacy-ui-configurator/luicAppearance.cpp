@@ -422,6 +422,96 @@ void CPageAppearance::FontSetSizes(LOGFONT const& logFont)
     m_cbFontSize.SetWindowTextW(szSize);
 }
 
+static bool CBGetCurText(WTL::CComboBox const& ctlCombo, ATL::CString& result)
+{
+    const int item = ctlCombo.GetCurSel();
+    if (CB_ERR == item) {
+        return false;
+    }
+    return CB_ERR != ctlCombo.GetLBText(item, result);
+}
+
+#if 0
+static bool CBGetCurData(WTL::CComboBox const& ctlCombo, int& result)
+{
+    const int item = ctlCombo.GetCurSel();
+    if (CB_ERR == item) {
+        return false;
+    }
+    int temp = ctlCombo.GetItemData(item);
+    if (CB_ERR == temp) {
+        return false;
+    }
+    result = temp;
+}
+#endif
+
+static bool CBGetCurTextInt(WTL::CComboBox const& ctlCombo, int& result)
+{
+    ATL::CString strTemp;
+    if (!CBGetCurText(ctlCombo, strTemp)) {
+        return false;
+    }
+    int temp = CB_ERR;
+    if (_stscanf_s(strTemp.GetString(), _T("%d"), &temp) < 0) {
+        return false;
+    }
+    result = temp;
+    return true;
+}
+
+
+bool CPageAppearance::ItemFontApplyChanges(int nItem, PCItemAssign pAssignment, int iFont, int iFontControl) const
+{
+    WTL::CLogFont lfCopy = m_pTheme->GetLogFont(iFont);
+    switch (iFontControl) {
+    case IDC_APP_FONT_SEL:{
+        ATL::CString strFamily;
+        if (!CBGetCurText(m_cbFont, strFamily)) {
+            return false;
+        }
+        ZeroMemory(lfCopy.lfFaceName, sizeof(lfCopy.lfFaceName));
+        _tcsncpy_s(lfCopy.lfFaceName, strFamily.GetString(), std::min<size_t>(strFamily.GetLength(), sizeof(lfCopy.lfFaceName)));
+        break;
+    }
+    case IDC_APP_FONT_SIZE_SEL:{
+        int nSize = IT_Invalid;
+        if (!CBGetCurTextInt(m_cbFontSize, nSize) || IT_Invalid == nSize) {
+            return false;
+        }
+        lfCopy.lfHeight = FontPtToLog<LONG>(nSize);
+        break;
+    }
+    case IDC_APP_FONT_SMOOTH_SEL:
+        break;
+    case IDC_APP_FONT_STYLE_BOLD:
+        lfCopy.lfWeight = m_bnFontBold.GetCheck() ? FW_BOLD : FW_NORMAL;
+        break;
+    case IDC_APP_FONT_STYLE_ITALIC:
+        lfCopy.lfItalic = m_bnFontItalic.GetCheck();
+        break;
+    case IDC_APP_FONT_STYLE_UNDERLINE:
+        lfCopy.lfUnderline = m_bnFontUndrln.GetCheck();
+        break;
+    default:
+        return false;
+    }
+    if (!m_pTheme->RefreshHFont(iFont, lfCopy)) {
+        // TODO: report RefreshHFont
+        return false;
+    }
+    WTL::CLogFont    lfNew{};
+    WTL::CFontHandle fnNew{m_pTheme->GetFont(iFont)};
+    if (!fnNew.GetLogFont(lfNew)) {
+        // TODO: report GetLogFont
+        return false;
+    }
+    LOGFONT& lfTarget = m_pTheme->GetLogFont(nItem);
+    lfTarget = lfNew;
+    // FTODO: trace/check lfTarget
+    return true;
+}
+
 bool CPageAppearance::ItemFontChanged(int nItem, PCItemAssign pAssignment, int iFontControl, bool bApply)
 {
     const int iFont = pAssignment ? pAssignment->font : IT_Invalid;
@@ -431,54 +521,22 @@ bool CPageAppearance::ItemFontChanged(int nItem, PCItemAssign pAssignment, int i
         }
         return false;
     }
-    WTL::CLogFont lfCopy = m_pTheme->GetLogFont(iFont);
     if (bApply) {
-        switch (iFontControl) {
-        case IDC_APP_FONT_SEL:{
-            const int iFamily = m_cbFont.GetCurSel();
-            if (CB_ERR == iFamily) {
-                return false;
-            }
-            ATL::CString strFamily;
-            if (CB_ERR == m_cbFont.GetLBText(iFamily, strFamily)) {
-                return false;
-            }
-            ZeroMemory(lfCopy.lfFaceName, sizeof(lfCopy.lfFaceName));
-            _tcsncpy_s(lfCopy.lfFaceName, strFamily.GetString(), std::min<size_t>(strFamily.GetLength(), sizeof(lfCopy.lfFaceName)));
-            break;
-        }
-        case IDC_APP_FONT_SIZE_SEL: break;
-        case IDC_APP_FONT_SMOOTH_SEL: break;
-        case IDC_APP_FONT_STYLE_BOLD: break;
-        case IDC_APP_FONT_STYLE_ITALIC: break;
-        case IDC_APP_FONT_STYLE_UNDERLINE: break;
-        default:
-            return false;
-        }
-        if (m_pTheme->RefreshHFont(iFont, lfCopy)) {
-            WTL::CLogFont    lfNew{};
-            WTL::CFontHandle fnNew{m_pTheme->GetFont(iFont)};
-            if (fnNew.GetLogFont(lfNew)) {
-                LOGFONT& lfTarget = m_pTheme->GetLogFont(nItem);
-                lfTarget = lfNew;
-                return true;
-            }
-            // TODO: report RefreshHFont
-        }
-        return false;
+        return ItemFontApplyChanges(nItem, pAssignment, iFont, iFontControl);
     }
+    LOGFONT const& logFont = m_pTheme->GetLogFont(iFont);
     FontEnable(TRUE);
-    FontSetFamily(lfCopy);
-    FontSetSizes(lfCopy);
+    FontSetFamily(logFont);
+    FontSetSizes(logFont);
     ItemSizeClear(IT_FontWidth);
     ItemSizeChanged(iFont, pAssignment, IT_FontWidth);
     ItemSizeChanged(iFont, pAssignment, IT_FontAngle);
     {
         ScopedBoolGuard guard(m_bLoadValues);
-        m_bnFontBold.SetCheck(lfCopy.lfWeight >= FW_BOLD);
-        m_bnFontItalic.SetCheck(lfCopy.lfItalic);
-        m_bnFontUndrln.SetCheck(lfCopy.lfUnderline);
-        ComboSetCurSelByData(m_cbFontSmooth, (DWORD_PTR)lfCopy.lfQuality);
+        m_bnFontBold.SetCheck(logFont.lfWeight >= FW_BOLD);
+        m_bnFontItalic.SetCheck(logFont.lfItalic);
+        m_bnFontUndrln.SetCheck(logFont.lfUnderline);
+        ComboSetCurSelByData(m_cbFontSmooth, (DWORD_PTR)logFont.lfQuality);
     }
     return true;
 }
@@ -522,6 +580,13 @@ void CPageAppearance::ColorPicker(int nButton)
 
 void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
+    // skip CColorButton reflected & other
+    switch (uNotifyCode) {
+    case BN_PAINT:
+    case CBN_SELENDCANCEL:
+        return ;
+    }
+    // skip during controls initialization
     if (m_bLoadValues) {
         return ;
     }

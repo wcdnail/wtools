@@ -71,6 +71,7 @@ private:
 
     void FontSetFamily(LOGFONT const& logFont);
     void FontSetSizes(LOGFONT const& logFont);
+    bool ItemFontApplyChanges(int nItem, PCItemAssign pAssignment, int iFont, int iFontControl) const;
     bool ItemFontChanged(int nItem, PCItemAssign pAssignment, int iFontControl = IT_Invalid, bool bApply = false);
 
     void OnItemSelect(int nItem);

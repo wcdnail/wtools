@@ -158,7 +158,7 @@ enum EColorIndex : int
 
 struct CTheme
 {
-    static int g_DPI;
+    static int g_DPI();
 
     ~CTheme();
     CTheme(bool loadSystemTheme);
@@ -174,8 +174,8 @@ struct CTheme
     bool LoadSysTheme();
     COLORREF GetColor(int color) const;
     bool SetColor(int iColor, COLORREF dword);
-    HBRUSH GetBrush(int color) const;
-    HFONT GetFont(int font) const;
+    WTL::CBrush const& GetBrush(int color) const;
+    WTL::CFont const& GetFont(int font) const;
     bool RefreshHFont(int font, LOGFONT const& logFont);
     LOGFONT const& GetLogFont(int font) const;
     LOGFONT& GetLogFont(int font);
@@ -196,6 +196,7 @@ private:
     ATL::CString              m_MyName;
     WTL::CLogFont         m_lfIconFont;
     WTL::CFont              m_IconFont;
+    WTL::CBrush            m_IconBrush;
     bool           m_bGradientCaptions;
     bool                  m_bFlatMenus;
     NONCLIENTMETRICS       m_ncMetrics;
@@ -236,7 +237,7 @@ inline NONCLIENTMETRICS const& CTheme::GetNcMetrcs() const { return m_ncMetrics;
 template <typename Res>
 inline Res ScaleForDpi(Res n)
 {
-    return static_cast<Res>(MulDiv(static_cast<int>(n), CTheme::g_DPI, USER_DEFAULT_SCREEN_DPI));
+    return static_cast<Res>(MulDiv(static_cast<int>(n), CTheme::g_DPI(), USER_DEFAULT_SCREEN_DPI));
 }
 
 static constexpr long DEFAULT_FONT_DPI = 72;
@@ -244,11 +245,11 @@ static constexpr long DEFAULT_FONT_DPI = 72;
 template <typename Res>
 inline Res FontLogToPt(long n)
 {
-    return -static_cast<Res>(MulDiv(n, DEFAULT_FONT_DPI, CTheme::g_DPI));
+    return -static_cast<Res>(MulDiv(n, DEFAULT_FONT_DPI, CTheme::g_DPI()));
 }
 
 template <typename Res>
 inline Res FontPtToLog(long n)
 {
-    return -static_cast<Res>(MulDiv(n, CTheme::g_DPI, DEFAULT_FONT_DPI));
+    return -static_cast<Res>(MulDiv(n, CTheme::g_DPI(), DEFAULT_FONT_DPI));
 }
