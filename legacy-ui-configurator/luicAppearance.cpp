@@ -293,7 +293,7 @@ void CPageAppearance::ItemSizeClear(int nSize)
     m_stItemSize[nSize].EnableWindow(FALSE);
     m_edItemSize[nSize].EnableWindow(FALSE);
     m_udItemSize[nSize].EnableWindow(FALSE);
-    m_edItemSize[nSize].Clear();
+    SetDlgItemTextW(m_edItemSize[nSize].GetDlgCtrlID(), L"");
 }
 
 bool CPageAppearance::ItemSizeInit(int nItem, int nSize)

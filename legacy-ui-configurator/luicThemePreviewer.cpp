@@ -303,7 +303,7 @@ int CThemePreviewer::RectIndexToElementId() const
         /* WR_MenuItem     */ EN_FlatmenuBar,
         /* WR_Menu         */ EN_Menu,
         /* WR_Caption      */ EN_SMCaption,
-        /* WR_Frame        */ EN_PaddedBorder,
+        /* WR_Frame        */ EN_InactiveBorder,
         /* WR_Border       */ EN_PaddedBorder,
         }, {               // WND_Front -------------------
         /* WR_Tooltip      */ EN_Tooltip,
@@ -319,7 +319,7 @@ int CThemePreviewer::RectIndexToElementId() const
         /* WR_Menu         */ EN_Menu,
         /* WR_Caption      */ EN_ActiveCaption,
         /* WR_Frame        */ EN_ActiveBorder,
-        /* WR_Border       */ EN_PaddedBorder,
+        /* WR_Border       */ EN_ActiveBorder,
         }, {               // WND_Back --------------------
         /* WR_Tooltip      */ EN_Tooltip,
         /* WR_Button       */ EN_3DObject,
@@ -334,7 +334,7 @@ int CThemePreviewer::RectIndexToElementId() const
         /* WR_Menu         */ EN_Menu,
         /* WR_Caption      */ EN_InactiveCaption,
         /* WR_Frame        */ EN_InactiveBorder,
-        /* WR_Border       */ EN_PaddedBorder,
+        /* WR_Border       */ EN_InactiveBorder,
         }
     };
     const int wi = m_prSelected.first;
