@@ -106,30 +106,6 @@ CTheme::CTheme(bool initFromSystem)
     }
 }
 
-PCTSTR CTheme::ColorName(int color)
-{
-}
-
-int& CTheme::GetNcMetricSize(PNONCLIENTMETRICS pncMetrics, int size)
-{
-    switch (size) {
-    case SIZE_Border:           return pncMetrics->iBorderWidth;
-    case SIZE_ScrollWidth:      return pncMetrics->iScrollWidth;
-    case SIZE_ScrollHeight:     return pncMetrics->iScrollHeight;
-    case SIZE_CaptionWidth:     return pncMetrics->iCaptionWidth;
-    case SIZE_CaptionHeight:    return pncMetrics->iCaptionHeight;
-    case SIZE_SMCaptionWidth:   return pncMetrics->iSmCaptionWidth;
-    case SIZE_SMCaptionHeight:  return pncMetrics->iSmCaptionHeight;
-    case SIZE_MenuWidth:        return pncMetrics->iMenuWidth;
-    case SIZE_MenuHeight:       return pncMetrics->iMenuHeight;
-    case SIZE_PaddedBorder:     return pncMetrics->iPaddedBorderWidth;
-    default:
-        break;
-    }
-    static int dummy = -1;
-    return dummy;
-}
-
 bool CTheme::RefreshBrushes()
 {
     WTL::CBrush tmpBrush[CLR_Count];
