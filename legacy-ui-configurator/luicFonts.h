@@ -4,6 +4,8 @@
 #include <atlstr.h>
 #include <atlgdi.h>
 
+struct CNCMetrics;
+
 enum EFontSizes : long
 {
     MIN_FONT_SIZE = 6,
@@ -19,7 +21,7 @@ enum EFontIndex : int
     FONT_Message,
     FONT_Desktop,
     FONT_Hyperlink,
-    FONTS_Count
+    FONT_Count
 };
 
 struct CFontPair
@@ -29,6 +31,7 @@ struct CFontPair
 
     bool Reset(WTL::CLogFont& logFont);
     bool Reset(WTL::CFont& hFont);
+    void Swap(CFontPair& rhs) noexcept;
 };
 
 struct CFonts
@@ -40,11 +43,15 @@ struct CFonts
 
     static PCWSTR Title(int index);
 
+    bool LoadDefaults();
+    bool LoadDefaults(CNCMetrics& ncMetrics);
+    void Swap(CFonts& rhs) noexcept;
+
     CFontPair& operator[](int index);
     CFontPair const& operator[](int index) const;
 
 private:
-    CFontPair m_Pair[FONTS_Count];
+    CFontPair m_Pair[FONT_Count];
 
     template <typename ReturnType, typename SelfRef>
     static ReturnType& getRefByIndex(SelfRef& thiz, int index);

@@ -53,6 +53,35 @@ PCWSTR CColors::Title(int index)
     return gs_name[index];
 }
 
+bool CColors::LoadDefaults()
+{
+    bool bReset = true;
+    CColorPair pair[CLR_Count];
+    for (int i = 0; i < CLR_Count; i++) {
+        bReset = pair[i].Reset(static_cast<COLORREF>(GetSysColor(i)));
+        if (!bReset) {
+            return false;
+        }
+    }
+    for (int i = 0; i < CLR_Count; i++) {
+        m_Pair[i] = pair[i];
+    }
+    return true;
+}
+
+void CColorPair::Swap(CColorPair& rhs) noexcept
+{
+    std::swap(m_Color, rhs.m_Color);
+    m_Brush.Attach(rhs.m_Brush.Detach());
+}
+
+void CColors::Swap(CColors& rhs) noexcept
+{
+    for (int i=0; i < CLR_Count; i++) {
+        rhs[i].Swap(m_Pair[i]);
+    }
+}
+
 template <typename ReturnType, typename SelfRef>
 ReturnType& CColors::getRefByIndex(SelfRef& thiz, int index)
 {
@@ -100,4 +129,11 @@ bool CColorPair::Reset(WTL::CBrush& hBrush)
     m_Color = temp.lbColor;
     m_Brush.Attach(hBrush.Detach());
     return true;
+}
+
+CColorPair& CColorPair::operator=(CColorPair& rhs) noexcept
+{
+    m_Color = rhs.m_Color;
+    m_Brush.Attach(rhs.m_Brush.Detach());
+    return *this;
 }

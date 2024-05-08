@@ -37,6 +37,9 @@ struct CNCMetrics: NONCLIENTMETRICS
     static Range const& DefaultRange(int index);
     static PCWSTR Title(int index);
 
+    bool LoadDefaults();
+    void Swap(CNCMetrics& rhs) noexcept;
+
     int& operator[](int index);
     int operator[](int index) const;
 

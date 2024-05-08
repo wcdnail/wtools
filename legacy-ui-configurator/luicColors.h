@@ -54,6 +54,9 @@ struct CColorPair
 
     bool Reset(COLORREF color);
     bool Reset(WTL::CBrush& hBrush);
+
+    CColorPair& operator = (CColorPair& rhs) noexcept;
+    void Swap(CColorPair& rhs) noexcept;
 };
 
 struct CColors
@@ -64,6 +67,9 @@ struct CColors
     CColors();
 
     static PCWSTR Title(int index);
+
+    bool LoadDefaults();
+    void Swap(CColors& rhs) noexcept;
 
     CColorPair& operator[](int index);
     CColorPair const& operator[](int index) const;

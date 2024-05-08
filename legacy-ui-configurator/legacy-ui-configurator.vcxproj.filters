@@ -81,6 +81,9 @@
     <ClInclude Include="luicColors.h">
       <Filter>theme</Filter>
     </ClInclude>
+    <ClInclude Include="luicScheme.h">
+      <Filter>theme</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -137,6 +140,9 @@
       <Filter>theme</Filter>
     </ClCompile>
     <ClCompile Include="luicColors.cpp">
+      <Filter>theme</Filter>
+    </ClCompile>
+    <ClCompile Include="luicScheme.cpp">
       <Filter>theme</Filter>
     </ClCompile>
   </ItemGroup>

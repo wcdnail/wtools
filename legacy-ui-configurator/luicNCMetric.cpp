@@ -49,6 +49,32 @@ PCWSTR CNCMetrics::Title(int index)
     return gs_name[index];
 }
 
+bool CNCMetrics::LoadDefaults()
+{
+    NONCLIENTMETRICSW ncMetrics;
+    static_assert(sizeof(*this) == sizeof(ncMetrics), "NONCLIENTMETRICS SIZEOF did not MATCH!");
+    ZeroMemory(&ncMetrics, sizeof(ncMetrics));
+    ncMetrics.cbSize = sizeof(NONCLIENTMETRICS);
+    const BOOL ret = SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(ncMetrics), &ncMetrics, 0);
+    if (!ret) {
+        return false;
+    }
+    CopyMemory(this, &ncMetrics, sizeof(ncMetrics));
+#if 0
+    Range sizeRanges[NCM_Count] = { 0 };
+    for (int i = 0; i < NCM_Count; i++) {
+        sizeRanges[i].current = DefaultRange(i).current;
+    }
+#endif
+    return true;
+
+}
+
+void CNCMetrics::Swap(CNCMetrics& rhs) noexcept
+{
+    CopyMemory(&rhs, this, sizeof(*this));
+}
+
 template <typename ReturnType, typename SelfRef>
 ReturnType& CNCMetrics::getRefByIndex(SelfRef& thiz, int index)
 {
