@@ -1,6 +1,51 @@
 ﻿#include "stdafx.h"
 
 #if 0
+
+    static constexpr long DEFAULT_FONT_DPI = 72;
+    static int g_DPI();
+
+namespace
+{
+template <typename Res>
+static inline Res GetCurrentDPI()
+{
+    int temp = USER_DEFAULT_SCREEN_DPI;
+    HDC screenDc{ GetDC(nullptr) };
+    if (screenDc) {
+        temp = GetDeviceCaps(screenDc, LOGPIXELSY);
+        ReleaseDC(nullptr, screenDc);
+    }
+    return static_cast<Res>(temp);
+}
+}
+
+int CFontsArray::g_DPI()
+{
+    static int gs_DPI = GetCurrentDPI<int>();
+    return gs_DPI;
+}
+
+template <typename Res>
+inline Res ScaleForDpi(Res n)
+{
+    return static_cast<Res>(MulDiv(static_cast<int>(n), CFontsArray::g_DPI(), USER_DEFAULT_SCREEN_DPI));
+}
+
+template <typename Res>
+inline Res FontLogToPt(Res n)
+{
+    return -static_cast<Res>(MulDiv(static_cast<int>(n), CFontsArray::DEFAULT_FONT_DPI, CFontsArray::g_DPI()));
+}
+
+template <typename Res>
+inline Res FontPtToLog(Res n)
+{
+    return -static_cast<Res>(MulDiv(static_cast<int>(n), CFontsArray::g_DPI(), CFontsArray::DEFAULT_FONT_DPI));
+}
+
+
+
 #include "luicTheme.h"
 #include "luicAppearance.h"
 #include "luicMain.h"

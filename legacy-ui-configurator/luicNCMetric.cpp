@@ -30,7 +30,7 @@ CNCMetrics::Range const& CNCMetrics::DefaultRange(int index)
 
 PCWSTR CNCMetrics::Title(int index)
 {
-    static constexpr PCTSTR gs_name[NCM_Count] = {
+    static constexpr PCWSTR gs_name[NCM_Count] = {
         L"Border Width",
         L"Scroll Width",
         L"Scroll Height",
@@ -44,7 +44,7 @@ PCWSTR CNCMetrics::Title(int index)
     };
     if (index < 0 || index > _countof(gs_name) - 1) {
         DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
-        return L"INVALID";
+        return L"INVALID METRIC";
     }
     return gs_name[index];
 }

@@ -1,126 +1,74 @@
 ﻿#include "stdafx.h"
-#include "luicThemeFonts.h"
-#include "string.utils.format.h"
-#include "resz/resource.h"
+#include "luicFonts.h"
+#include <dh.tracing.h>
+#include <string.utils.error.code.h>
 
-CThemeFonts::~CThemeFonts() = default;
+CFonts::~CFonts() = default;
+CFonts::CFonts() = default;
 
-CThemeFonts::CThemeFonts()
+PCWSTR CFonts::Title(int index)
 {
-}
-
-namespace
-{
-template <typename Res>
-static inline Res GetCurrentDPI()
-{
-    int temp = USER_DEFAULT_SCREEN_DPI;
-    HDC screenDc{ GetDC(nullptr) };
-    if (screenDc) {
-        temp = GetDeviceCaps(screenDc, LOGPIXELSY);
-        ReleaseDC(nullptr, screenDc);
-    }
-    return static_cast<Res>(temp);
-}
-}
-
-int CThemeFonts::g_DPI()
-{
-    static int gs_DPI = GetCurrentDPI<int>();
-    return gs_DPI;
-}
-
-PCTSTR CThemeFonts::FontName(int font)
-{
-    static const PCTSTR gsl_fontNames[FONTS_Count] = {
-        TEXT("Caption Font"),           // 0 = FONT_Caption
-        TEXT("Small Caption Font"),     // 1 = FONT_SMCaption
-        TEXT("Menu Font"),              // 2 = FONT_Menu
-        TEXT("Status Font"),            // 3 = FONT_Tooltip
-        TEXT("Message Font"),           // 4 = FONT_Message
-        TEXT("Desktop Font"),           // 5 = FONT_Desktop
-        TEXT("Hyperlink Font"),         // 8 = FONT_Hyperlink
+    static constexpr PCWSTR gs_name[FONTS_Count] = {
+        L"Caption Font",
+        L"Small Caption Font",
+        L"Menu Font",
+        L"Status Font",
+        L"Message Font",
+        L"Desktop Font",
+        L"Hyperlink Font",
     };
-    if (font < 0 || font >= FONTS_Count) {
-        return nullptr;
+    if (index < 0 || index > FONTS_Count - 1) {
+        DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+        return L"INVALID FONT";
     }
-    return gsl_fontNames[font];
+    return gs_name[index];
 }
 
-template <typename RetType, typename SelfType>
-RetType CThemeFonts::GetHFontT(SelfType& self, int font)
+template <typename ReturnType, typename SelfRef>
+ReturnType& CFonts::getRefByIndex(SelfRef& thiz, int index)
 {
-    switch (font) {
-    case FONT_Caption:
-    case FONT_SMCaption:
-    case FONT_Menu:
-    case FONT_Tooltip:
-    case FONT_Message:
-    case FONT_Desktop:
-    case FONT_Hyperlink:
-        return self.m_hFont[font];
-    default:
-        break;
+    if (index < 0 || index > FONTS_Count - 1) {
+        static ReturnType dummy{};
+        DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+        return dummy;
     }
-    return self.m_hFontReserved;
+    return thiz.m_Pair[index];
 }
 
-template <typename RetType, typename SelfType>
-RetType CThemeFonts::GetLogFontT(SelfType& self, int font)
+CFontPair& CFonts::operator[](int index)
 {
-    switch (font) {
-    case FONT_Caption:
-    case FONT_SMCaption:
-    case FONT_Menu:
-    case FONT_Tooltip:
-    case FONT_Message:
-    case FONT_Desktop:
-    case FONT_Hyperlink:
-        return self.m_logFont[font];
-    default:
-        break;
+    return getRefByIndex<CFontPair>(*this, index);
+}
+
+CFontPair const& CFonts::operator[](int index) const
+{
+    return getRefByIndex<const CFontPair>(*this, index);
+}
+
+bool CFontPair::Reset(WTL::CLogFont& logFont)
+{
+    const HFONT hFont = logFont.CreateFontIndirectW();
+    if (!hFont) {
+        const auto code = static_cast<HRESULT>(GetLastError());
+        const auto codeText = Str::ErrorCode<wchar_t>::SystemMessage(code);
+        DH::TPrintf(L"%s: ERROR: CreateFontIndirectW failed: %d '%s'\n", __FUNCTIONW__, code, codeText.GetString());
+        return false;
     }
-    return self.m_logFontReserved;
+    m_logFont = logFont;
+    m_hFont.Attach(hFont);
+    return true;
 }
 
-WTL::CFont const& CThemeFonts::GetFont(int font) const { return GetHFontT<WTL::CFont const&>(*this, font); }
-WTL::CFont&       CThemeFonts::GetFont(int font)       { return GetHFontT<WTL::CFont&>(*this, font); }
-LOGFONT const& CThemeFonts::GetLogFont(int font) const { return GetLogFontT<WTL::CLogFont const&>(*this, font); }
-LOGFONT&       CThemeFonts::GetLogFont(int font)       { return GetLogFontT<WTL::CLogFont&>(*this, font); }
-
-//static bool DoFontRefresh(WTL::CFont& fntTarget, LOGFONT const& logFont)
-//{
-//    WTL::CFont temp{CreateFontIndirectW(&logFont)};
-//    if (!temp.m_hFont) {
-//        // TODO: report CreateFontIndirectW
-//        return false;
-//    }
-//    fntTarget.Attach(temp.Detach());
-//    return true;
-//}
-//
-//bool CThemeFonts::RefreshHFont(int font, LOGFONT const& logFont)
-//{
-//    WTL::CFont& fntTarget = GetNcMetricHFontT<WTL::CFont&, CThemeFonts&>(*this, font);
-//    return DoFontRefresh(fntTarget, logFont);
-//}
-//
-//bool CThemeFonts::RefreshHFonts()
-//{
-//    WTL::CFont tmpFont[FONTS_Count];
-//    for (int iFont = 0; iFont < FONTS_Count; iFont++) {
-//        auto& logFont = static_cast<WTL::CLogFont&>(GetNcMetricFont(*this, iFont));
-//        tmpFont[iFont] = logFont.CreateFontIndirectW();
-//    }
-//    for (int iFont = 0; iFont < FONTS_Count; iFont++) {
-//        m_Font[iFont].Attach(tmpFont[iFont].Detach());
-//    }
-//    return true;
-//}
-
-void CThemeFonts::SetFont(int iFont, const WTL::CLogFont& lfNew, HFONT fnNew)
+bool CFontPair::Reset(WTL::CFont& hFont)
 {
-    GetLogFont(iFont) = lfNew;
-    GetFont(iFont) = fnNew;
+    WTL::CLogFont temp;
+    if (!hFont.GetLogFont(temp)) {
+        const auto code = static_cast<HRESULT>(GetLastError());
+        const auto codeText = Str::ErrorCode<wchar_t>::SystemMessage(code);
+        DH::TPrintf(L"%s: ERROR: GetLogFont failed: %d '%s'\n", __FUNCTIONW__, code, codeText.GetString());
+        return false;
+    }
+    m_logFont = temp;
+    m_hFont.Attach(hFont.Detach());
+    return true;
 }
-

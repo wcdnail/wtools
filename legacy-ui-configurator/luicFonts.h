@@ -2,7 +2,6 @@
 
 #include <atlstr.h>
 #include <atlgdi.h>
-#include <atluser.h>
 
 enum EFontSizes : long
 {
@@ -22,53 +21,28 @@ enum EFontIndex : int
     FONTS_Count
 };
 
-struct CThemeFonts
+struct CFontPair
 {
-    static constexpr long DEFAULT_FONT_DPI = 72;
+    WTL::CLogFont  m_logFont;
+    WTL::CFontHandle m_hFont;
 
-    static int g_DPI();
-    static PCTSTR FontName(int font);
-
-    ~CThemeFonts();
-    CThemeFonts();
-
-    WTL::CFont const& GetFont(int font) const;
-    WTL::CFont& GetFont(int font);
-
-    LOGFONT const& GetLogFont(int font) const;
-    LOGFONT& GetLogFont(int font);
-
-    void SetFont(int iFont, const WTL::CLogFont& lfNew, HFONT fnNew);
-
-private:
-    WTL::CFont           m_hFontReserved;
-    WTL::CLogFont      m_logFontReserved;
-    WTL::CFont      m_hFont[FONTS_Count];
-    WTL::CLogFont m_logFont[FONTS_Count];
-
-    template <typename RetType, typename SelfType>
-    static RetType GetHFontT(SelfType& self, int font);
-
-    template <typename RetType, typename SelfType>
-    static RetType GetLogFontT(SelfType& self, int font);
-
-    bool LoadCurrent();
+    bool Reset(WTL::CLogFont& logFont);
+    bool Reset(WTL::CFont& hFont);
 };
 
-template <typename Res>
-inline Res ScaleForDpi(Res n)
+struct CFonts
 {
-    return static_cast<Res>(MulDiv(static_cast<int>(n), CThemeFonts::g_DPI(), USER_DEFAULT_SCREEN_DPI));
-}
+    ~CFonts();
+    CFonts();
 
-template <typename Res>
-inline Res FontLogToPt(Res n)
-{
-    return -static_cast<Res>(MulDiv(static_cast<int>(n), CThemeFonts::DEFAULT_FONT_DPI, CThemeFonts::g_DPI()));
-}
+    static PCWSTR Title(int index);
 
-template <typename Res>
-inline Res FontPtToLog(Res n)
-{
-    return -static_cast<Res>(MulDiv(static_cast<int>(n), CThemeFonts::g_DPI(), CThemeFonts::DEFAULT_FONT_DPI));
-}
+    CFontPair& operator[](int index);
+    CFontPair const& operator[](int index) const;
+
+private:
+    CFontPair m_Pair[FONTS_Count];
+
+    template <typename ReturnType, typename SelfRef>
+    static ReturnType& getRefByIndex(SelfRef& thiz, int index);
+};
