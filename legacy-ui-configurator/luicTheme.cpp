@@ -1,30 +1,11 @@
 ﻿#include "stdafx.h"
+
+#if 0
 #include "luicTheme.h"
 #include "luicAppearance.h"
 #include "luicMain.h"
 #include "string.utils.format.h"
 #include "resz/resource.h"
-
-namespace
-{
-template <typename Res>
-static inline Res GetCurrentDPI()
-{
-    int temp = USER_DEFAULT_SCREEN_DPI;
-    HDC screenDc{ GetDC(nullptr) };
-    if (screenDc) {
-        temp = GetDeviceCaps(screenDc, LOGPIXELSY);
-        ReleaseDC(nullptr, screenDc);
-    }
-    return static_cast<Res>(temp);
-}
-}
-
-int CTheme::g_DPI()
-{
-    static int gs_DPI = GetCurrentDPI<int>();
-    return gs_DPI;
-}
 
 PCItemAssign CTheme::GetItemAssignment(int dex)
 {
@@ -59,32 +40,15 @@ PCItemAssign CTheme::GetItemAssignment(int dex)
     return &gsl_assignment[dex];
 }
 
-const SizeRange CTheme::g_DefaultSizeRange[SIZES_Count] =
-{
-    // Index                     Min  Max  Current Orig.Max
-    /* SIZE_BORDER          */  {  1,  15,  1 },   //  50
-    /* SIZE_SCROLLWIDTH     */  {  8,  70, 16 },   // 100
-    /* SIZE_SCROLLHEIGHT    */  {  8,  70, 16 },   // 100
-    /* SIZE_CAPTIONWIDTH    */  { 12,  70, 18 },   // 100
-    /* SIZE_CAPTIONHEIGHT   */  { 12,  70, 18 },   // 100
-    /* SIZE_SMCAPTIONWIDTH  */  { 12,  70, 12 },   // 100
-    /* SIZE_SMCAPTIONHEIGHT */  { 12,  70, 15 },   // 100
-    /* SIZE_MENUWIDTH       */  { 12,  70, 18 },   // 100
-    /* SIZE_MENUHEIGHT      */  { 12,  70, 18 },   // 100
-    /* SIZE_PADDEDBORDER    */  {  0,  15,  0 }    // 100
-};
-
 CTheme::~CTheme()
 {
 }
 
 CTheme::CTheme(bool initFromSystem)
     :            m_nIndex{IT_Invalid}
-    ,            m_MyName{"Native"}
-    ,        m_lfIconFont{}
+    ,             m_sName{"Native"}
     , m_bGradientCaptions{true}
     ,        m_bFlatMenus{false}
-    ,       m_fntReserved{}
     ,        m_brReserved{}
 {
     ZeroMemory(&m_ncMetrics, sizeof(m_ncMetrics));
@@ -95,43 +59,6 @@ CTheme::CTheme(bool initFromSystem)
     if (initFromSystem) {
         LoadCurrent();
     }
-}
-
-PCTSTR CTheme::SizeName(int size) // it for tooltips!
-{
-    static const PCTSTR gsl_sizeNames[SIZES_Count] = {
-        TEXT("BorderWidth"),            // 0 = SIZE_BORDER
-        TEXT("ScrollWidth"),            // 1 = SIZE_SCROLLWIDTH
-        TEXT("ScrollHeight"),           // 2 = SIZE_SCROLLHEIGHT
-        TEXT("CaptionWidth"),           // 3 = SIZE_CAPTIONWIDTH
-        TEXT("CaptionHeight"),          // 4 = SIZE_CAPTIONHEIGHT
-        TEXT("SmCaptionWidth"),         // 5 = SIZE_SMCAPTIONWIDTH
-        TEXT("SmCaptionHeight"),        // 6 = SIZE_SMCAPTIONHEIGHT
-        TEXT("MenuWidth"),              // 7 = SIZE_MENUWIDTH
-        TEXT("MenuHeight"),             // 8 = SIZE_MENUHEIGHT
-        TEXT("PaddedBorderWidth")       // 9 = SIZE_PADDEDBORDER
-    };
-    if (size < 0 || size >= SIZES_Count) {
-        return nullptr;
-    }
-    return gsl_sizeNames[size];
-}
-
-PCTSTR CTheme::FontName(int font)
-{
-    static const PCTSTR gsl_fontNames[FONTS_Count] = {
-        TEXT("Caption Font"),           // 0 = FONT_Caption
-        TEXT("Small Caption Font"),     // 1 = FONT_SMCaption
-        TEXT("Menu Font"),              // 2 = FONT_Menu
-        TEXT("Status Font"),            // 3 = FONT_Tooltip
-        TEXT("Message Font"),           // 4 = FONT_Message
-        TEXT("Desktop Font"),           // 5 = FONT_Desktop
-        TEXT("Hyperlink Font"),         // 8 = FONT_Hyperlink
-    };
-    if (font < 0 || font >= FONTS_Count) {
-        return nullptr;
-    }
-    return gsl_fontNames[font];
 }
 
 PCTSTR CTheme::ColorName(int color)
@@ -200,52 +127,6 @@ int& CTheme::GetNcMetricSize(PNONCLIENTMETRICS pncMetrics, int size)
     return dummy;
 }
 
-template <typename RetType, typename ThemeRef>
-RetType CTheme::GetNcMetricHFontT(ThemeRef theme, int font)
-{
-    switch (font) {
-    case FONT_Caption:
-    case FONT_SMCaption:
-    case FONT_Menu:
-    case FONT_Tooltip:
-    case FONT_Message:
-    case FONT_Desktop:
-    case FONT_Hyperlink:
-        return theme.m_Font[font];
-    default:
-        break;
-    }
-    return theme.m_fntReserved;
-}
-
-
-template <typename RetType, typename ThemeRef>
-RetType CTheme::GetNcMetricFontT(ThemeRef theme, int font)
-{
-    switch (font) {
-    case FONT_Caption:   return theme.m_ncMetrics.lfCaptionFont;
-    case FONT_SMCaption: return theme.m_ncMetrics.lfSmCaptionFont;
-    case FONT_Menu:      return theme.m_ncMetrics.lfMenuFont;
-    case FONT_Tooltip:   return theme.m_ncMetrics.lfStatusFont;
-    case FONT_Message:   return theme.m_ncMetrics.lfMessageFont;
-    case FONT_Hyperlink: return theme.m_lfHyperlink;
-    case FONT_Desktop:
-    default:
-        break;
-    }
-    return theme.m_lfIconFont;
-}
-
-LOGFONT const& CTheme::GetNcMetricFont(CTheme const& theme, int font)
-{
-    return GetNcMetricFontT<LOGFONT const&, CTheme const&>(theme, font);
-}
-
-LOGFONT& CTheme::GetNcMetricFont(CTheme& theme, int font)
-{
-    return GetNcMetricFontT<LOGFONT&, CTheme&>(theme, font);
-}
-
 bool CTheme::RefreshBrushes()
 {
     WTL::CBrush tmpBrush[CLR_Count];
@@ -258,36 +139,6 @@ bool CTheme::RefreshBrushes()
     }
     for (int iBrush = 0; iBrush < CLR_Count; iBrush++) {
         m_Brush[iBrush].Attach(tmpBrush[iBrush].Detach());
-    }
-    return true;
-}
-
-static bool DoFontRefresh(WTL::CFont& fntTarget, LOGFONT const& logFont)
-{
-    WTL::CFont temp{CreateFontIndirectW(&logFont)};
-    if (!temp.m_hFont) {
-        // TODO: report CreateFontIndirectW
-        return false;
-    }
-    fntTarget.Attach(temp.Detach());
-    return true;
-}
-
-bool CTheme::RefreshHFont(int font, LOGFONT const& logFont)
-{
-    WTL::CFont& fntTarget = GetNcMetricHFontT<WTL::CFont&, CTheme&>(*this, font);
-    return DoFontRefresh(fntTarget, logFont);
-}
-
-bool CTheme::RefreshHFonts()
-{
-    WTL::CFont tmpFont[FONTS_Count];
-    for (int iFont = 0; iFont < FONTS_Count; iFont++) {
-        auto& logFont = static_cast<WTL::CLogFont&>(GetNcMetricFont(*this, iFont));
-        tmpFont[iFont] = logFont.CreateFontIndirectW();
-    }
-    for (int iFont = 0; iFont < FONTS_Count; iFont++) {
-        m_Font[iFont].Attach(tmpFont[iFont].Detach());
     }
     return true;
 }
@@ -371,7 +222,7 @@ bool CTheme::LoadCurrent()
     ret &= LoadCurrentNcMetrics();
     ret &= LoadCurrentGradientCaptionsSetting();
     ret &= LoadCurrentFlatMenusSetting();
-    m_MyName = L"(Current)";
+    m_sName = L"(Current)";
     return ret;
 }
 
@@ -436,12 +287,12 @@ void CTheme::ThemesStaticInit(CPageAppearance& uiPage, CTheme& initialTheme)
 {
     WTL::CComboBox& lbCtl = uiPage.m_cbTheme;
     lbCtl.ResetContent();
-    int item = lbCtl.AddString(initialTheme.m_MyName);
+    int item = lbCtl.AddString(initialTheme.m_sName);
     if (item < 0) {
         auto code = static_cast<HRESULT>(GetLastError());
         ReportError(
             Str::ElipsisW::Format(L"Append listbox [w:%08x] item '%s' failed!", 
-                lbCtl.m_hWnd, initialTheme.m_MyName.GetString()
+                lbCtl.m_hWnd, initialTheme.m_sName.GetString()
             ), code);
         return ;
     }
@@ -595,3 +446,5 @@ void CTheme::PerformStaticInit(CPageAppearance& uiPage, CLUIApp const* pApp)
     FontsStaticInit(uiPage, pApp->GetFontMap());
     uiPage.OnThemeSelect(theme.m_nIndex);
 }
+
+#endif

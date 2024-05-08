@@ -69,6 +69,15 @@
     <ClInclude Include="luicFontDef.h">
       <Filter>theme</Filter>
     </ClInclude>
+    <ClInclude Include="luicThemeFonts.h">
+      <Filter>theme</Filter>
+    </ClInclude>
+    <ClInclude Include="luicNCMetric.h">
+      <Filter>theme</Filter>
+    </ClInclude>
+    <ClInclude Include="luicClass.h">
+      <Filter>theme</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -113,6 +122,15 @@
     <ClCompile Include="luicMainFrame.cpp" />
     <ClCompile Include="luicMainView.cpp" />
     <ClCompile Include="luicFontDef.cpp">
+      <Filter>theme</Filter>
+    </ClCompile>
+    <ClCompile Include="luicThemeFonts.cpp">
+      <Filter>theme</Filter>
+    </ClCompile>
+    <ClCompile Include="luicNCMetric.cpp">
+      <Filter>theme</Filter>
+    </ClCompile>
+    <ClCompile Include="luicClass.cpp">
       <Filter>theme</Filter>
     </ClCompile>
   </ItemGroup>
