@@ -71,7 +71,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
     if (ERROR_SUCCESS != code) {
         ReportError(L"CDrawings::StaticInit failure...", code);
     }
-#ifdef _DEBUG
+#ifdef _DEBUG_CONTROLS
     ShowWindow(SW_SHOW);
 #endif
     auto const* pApp = CLUIApp::App();

@@ -17,6 +17,8 @@ struct CPageAppearance: CPageImpl
 private:
     friend struct CTheme;
 
+    bool                          m_bLoadValues;
+
     WTL::CStatic                      m_stTheme;
     WTL::CComboBox                    m_cbTheme;
     WTL::CStatic                  m_stThemeSize;
@@ -65,11 +67,11 @@ private:
     bool ItemColorSetBtn(int nButton, int iColor);
     void ItemColorSet(int nItem);
     void ItemSizeClear(int nSize);
-    bool ItemSizeInit(int nItem, int nSize);
+    bool ItemSizeChanged(int nItem, int nSize, PCItemAssign pAssignment, bool bApply);
 
-    void FontSetFamily(LOGFONT const* pLogFont);
-    void FontSetSizes(LOGFONT const* pLogFont);
-    void FontOnItemChaged(int nItem);
+    void FontSetFamily(LOGFONT const& logFont);
+    void FontSetSizes(LOGFONT const& logFont);
+    void FontOnItemChaged(int nItem, PCItemAssign pAssignment);
 
     void OnItemSelect(int nItem);
     void OnThemeSelect(int nThemeIndex);

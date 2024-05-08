@@ -298,7 +298,7 @@ void CDrawings::CalcRects(CRect const& rcBorder, UINT captFlags, WindowRects& ta
     }
     else {
         const long nShrink = ScaleForDpi<long>(4);
-        const long  cyFont = -(m_Theme.GetLogFont(FONT_Message)->lfHeight) + 2;
+        const long  cyFont = -(m_Theme.GetLogFont(FONT_Message).lfHeight) + 2;
         rcMessage = rcWork;
         Rc::SetHeight(rcMessage, cyFont + 8);
         Rc::OffsetY(rcMessage, 4);
@@ -1074,7 +1074,7 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
             rcText.right = rects[WR_Scroll].left - 1;
             rcText.DeflateRect(rcWork.Width() / 16, 10);
             CRect  rcLine = rcText;
-            LONG       cy = -(m_Theme.GetLogFont(FONT_Desktop)->lfHeight) + 2;
+            LONG       cy = -(m_Theme.GetLogFont(FONT_Desktop).lfHeight) + 2;
             rcLine.bottom = rcLine.top + cy;
             for (int i = 0; i < params.text.lineCount; i++) {
                 if (rcLine.top > rcText.bottom) {

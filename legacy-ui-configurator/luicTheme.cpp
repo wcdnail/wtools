@@ -78,6 +78,7 @@ CTheme::CTheme(bool loadSystemTheme)
     :            m_nIndex{IT_Invalid}
     ,            m_MyName{"Native"}
     ,        m_lfIconFont{}
+    ,          m_IconFont{}
     , m_bGradientCaptions{true}
     ,        m_bFlatMenus{false}
 {
@@ -178,36 +179,50 @@ PCTSTR CTheme::ColorName(int color)
     return gsl_ColorName[color];
 }
 
-int CTheme::GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size)
+int& CTheme::GetNcMetricSize(PNONCLIENTMETRICS pncMetrics, int size)
 {
     switch (size) {
-    case SIZE_Border:           return ncMetrics->iBorderWidth;
-    case SIZE_ScrollWidth:      return ncMetrics->iScrollWidth;
-    case SIZE_ScrollHeight:     return ncMetrics->iScrollHeight;
-    case SIZE_CaptionWidth:     return ncMetrics->iCaptionWidth;
-    case SIZE_CaptionHeight:    return ncMetrics->iCaptionHeight;
-    case SIZE_SMCaptionWidth:   return ncMetrics->iSmCaptionWidth;
-    case SIZE_SMCaptionHeight:  return ncMetrics->iSmCaptionHeight;
-    case SIZE_MenuWidth:        return ncMetrics->iMenuWidth;
-    case SIZE_MenuHeight:       return ncMetrics->iMenuHeight;
-    case SIZE_PaddedBorder:     return ncMetrics->iPaddedBorderWidth;
+    case SIZE_Border:           return pncMetrics->iBorderWidth;
+    case SIZE_ScrollWidth:      return pncMetrics->iScrollWidth;
+    case SIZE_ScrollHeight:     return pncMetrics->iScrollHeight;
+    case SIZE_CaptionWidth:     return pncMetrics->iCaptionWidth;
+    case SIZE_CaptionHeight:    return pncMetrics->iCaptionHeight;
+    case SIZE_SMCaptionWidth:   return pncMetrics->iSmCaptionWidth;
+    case SIZE_SMCaptionHeight:  return pncMetrics->iSmCaptionHeight;
+    case SIZE_MenuWidth:        return pncMetrics->iMenuWidth;
+    case SIZE_MenuHeight:       return pncMetrics->iMenuHeight;
+    case SIZE_PaddedBorder:     return pncMetrics->iPaddedBorderWidth;
+    default:
+        break;
     }
-    return -1;
+    static int dummy = -1;
+    return dummy;
 }
 
-LOGFONT const* CTheme::GetNcMetricFont(CTheme const& theme, int font)
+template <typename RetType, typename ThemeRef>
+RetType CTheme::GetNcMetricFontT(ThemeRef theme, int font)
 {
     switch (font) {
-    case FONT_Caption:   return &theme.m_ncMetrics.lfCaptionFont;
-    case FONT_SMCaption: return &theme.m_ncMetrics.lfSmCaptionFont;
-    case FONT_Menu:      return &theme.m_ncMetrics.lfMenuFont;
-    case FONT_Tooltip:   return &theme.m_ncMetrics.lfStatusFont;
-    case FONT_Message:   return &theme.m_ncMetrics.lfMessageFont;
+    case FONT_Caption:   return theme.m_ncMetrics.lfCaptionFont;
+    case FONT_SMCaption: return theme.m_ncMetrics.lfSmCaptionFont;
+    case FONT_Menu:      return theme.m_ncMetrics.lfMenuFont;
+    case FONT_Tooltip:   return theme.m_ncMetrics.lfStatusFont;
+    case FONT_Message:   return theme.m_ncMetrics.lfMessageFont;
     case FONT_Desktop:
     default:
         break;
     }
-    return &theme.m_lfIconFont;
+    return theme.m_lfIconFont;
+}
+
+LOGFONT const& CTheme::GetNcMetricFont(CTheme const& theme, int font)
+{
+    return GetNcMetricFontT<LOGFONT const&, CTheme const&>(theme, font);
+}
+
+LOGFONT& CTheme::GetNcMetricFont(CTheme& theme, int font)
+{
+    return GetNcMetricFontT<LOGFONT&, CTheme&>(theme, font);
 }
 
 bool CTheme::RefreshBrushes()
@@ -226,20 +241,34 @@ bool CTheme::RefreshBrushes()
     return true;
 }
 
-bool CTheme::RefreshFonts()
+static void DoFontRefresh(WTL::CFont* pTarget, LOGFONT const& logFont)
+{
+    WTL::CFont temp{::CreateFontIndirectW(&logFont)};
+    if (!temp.m_hFont) {
+        // TODO: report CreateFontIndirectW
+    }
+    pTarget->Attach(temp.Detach());
+}
+
+void CTheme::RefreshHFont(int font, LOGFONT const& logFont)
+{
+    WTL::CFont* pTarget = &m_IconFont;
+    if (font >= 0 && font < FONTS_Count) {
+        pTarget = &m_Font[font];
+    }
+    DoFontRefresh(pTarget, logFont);
+}
+
+bool CTheme::RefreshHFonts()
 {
     WTL::CFont tmpFont[FONTS_Count];
     for (int iFont = 0; iFont < FONTS_Count; iFont++) {
-        LOGFONT const* lf = GetNcMetricFont(*this, iFont);
-        if (!lf) {
-            // ##TODO: придумать решение
-            continue;
-        }
-        WTL::CLogFont lfObj(*lf);
+        LOGFONT& lf = GetNcMetricFont(*this, iFont);
+        WTL::CLogFont lfCopy(lf);
         if (FONT_Hyperlink == iFont) {
-            lfObj.lfUnderline = TRUE;
+            lfCopy.lfUnderline = TRUE;
         }
-        tmpFont[iFont] = lfObj.CreateFontIndirectW();
+        tmpFont[iFont] = lfCopy.CreateFontIndirectW();
     }
     for (int iFont = 0; iFont < FONTS_Count; iFont++) {
         m_Font[iFont].Attach(tmpFont[iFont].Detach());
@@ -278,7 +307,7 @@ bool CTheme::LoadSysNcMetrics()
     for (int iSize = 0; iSize < SIZES_Count; iSize++) {
         m_SizeRange[iSize].current = GetNcMetricSize(&ncMetrics, iSize);
     }
-    RefreshFonts();
+    RefreshHFonts();
     return true;
 }
 
@@ -367,11 +396,6 @@ HFONT CTheme::GetFont(int font) const
         return nullptr;
     }
     return m_Font[font];
-}
-
-LOGFONT const* CTheme::GetLogFont(int font) const
-{
-    return GetNcMetricFont(*this, font);
 }
 
 SizeRange const* CTheme::GetSizeRange(int metric) const

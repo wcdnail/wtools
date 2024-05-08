@@ -195,7 +195,7 @@ void CMainView::OnResizeNotify()
 
 BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-#ifdef _DEBUG
+#ifdef _DEBUG_CONTROLS
     ShowWindow(SW_SHOW);
 #endif
 #if 0 || defined(_DEBUG_TAB_RECT)

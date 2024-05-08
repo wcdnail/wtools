@@ -167,16 +167,22 @@ struct CTheme
     static PCTSTR SizeName(int size);
     static PCTSTR FontName(int font);
     static PCTSTR ColorName(int color);
-    static int GetNcMetricSize(NONCLIENTMETRICS const* ncMetrics, int size);
-    static LOGFONT const* GetNcMetricFont(CTheme const& theme, int font);
+    static int& GetNcMetricSize(PNONCLIENTMETRICS pncMetrics, int size);
+    static LOGFONT const& GetNcMetricFont(CTheme const& theme, int font);
+    static LOGFONT& GetNcMetricFont(CTheme& theme, int font);
 
     bool LoadSysTheme();
     COLORREF GetColor(int color) const;
     bool SetColor(int iColor, COLORREF dword);
     HBRUSH GetBrush(int color) const;
     HFONT GetFont(int font) const;
-    LOGFONT const* GetLogFont(int font) const;
+    void RefreshHFont(int font, LOGFONT const& logFont);
+    LOGFONT const& GetLogFont(int font) const;
+    LOGFONT& GetLogFont(int font);
     SizeRange const* GetSizeRange(int metric) const;
+    bool& IsGradientCaptions();
+    bool& IsFlatMenus();
+    NONCLIENTMETRICS& GetNcMetrcs();
     bool IsGradientCaptions() const;
     bool IsFlatMenus() const;
     NONCLIENTMETRICS const& GetNcMetrcs() const;
@@ -189,6 +195,7 @@ private:
     int                       m_nIndex;
     ATL::CString              m_MyName;
     WTL::CLogFont         m_lfIconFont;
+    WTL::CFont              m_IconFont;
     bool           m_bGradientCaptions;
     bool                  m_bFlatMenus;
     NONCLIENTMETRICS       m_ncMetrics;
@@ -197,8 +204,11 @@ private:
     WTL::CFont     m_Font[FONTS_Count];
     SizeRange m_SizeRange[SIZES_Count];
 
+    template <typename RetType, typename ThemeRef>
+    static RetType GetNcMetricFontT(ThemeRef theme, int font);
+
     bool RefreshBrushes();
-    bool RefreshFonts();
+    bool RefreshHFonts();
     bool LoadSysColors();
     bool LoadSysNcMetrics();
     bool LoadSysIconFont();
@@ -213,6 +223,12 @@ private:
     static void FontsStaticInit(CPageAppearance& uiPage, FontMap const&);
 };
 
+inline LOGFONT&         CTheme::GetLogFont(int font) { return GetNcMetricFont(*this, font); }
+inline bool&            CTheme::IsGradientCaptions() { return m_bGradientCaptions; }
+inline bool&                   CTheme::IsFlatMenus() { return m_bFlatMenus; }
+inline NONCLIENTMETRICS&       CTheme::GetNcMetrcs() { return m_ncMetrics; }
+
+inline LOGFONT const&   CTheme::GetLogFont(int font) const { return GetNcMetricFont(*this, font); }
 inline bool             CTheme::IsGradientCaptions() const { return m_bGradientCaptions; }
 inline bool                    CTheme::IsFlatMenus() const { return m_bFlatMenus; }
 inline NONCLIENTMETRICS const& CTheme::GetNcMetrcs() const { return m_ncMetrics; }
@@ -229,4 +245,10 @@ template <typename Res>
 inline Res FontLogToPt(long n)
 {
     return -static_cast<Res>(MulDiv(n, DEFAULT_FONT_DPI, CTheme::g_DPI));
+}
+
+template <typename Res>
+inline Res FontPtToLog(long n)
+{
+    return -static_cast<Res>(MulDiv(n, CTheme::g_DPI, DEFAULT_FONT_DPI));
 }

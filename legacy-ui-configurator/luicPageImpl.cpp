@@ -116,7 +116,7 @@ void CPageImpl::OnResizeNotify()
 
 BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-#ifdef _DEBUG
+#ifdef _DEBUG_CONTROLS
     ShowWindow(SW_SHOW);
 #endif
     DBG_DUMP_WMESSAGE_EXT(LTH_CONTROL, m_Caption.c_str(), m_hWnd, WM_INITDIALOG, 0, lInitParam);
