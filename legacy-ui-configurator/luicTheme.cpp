@@ -108,48 +108,6 @@ CTheme::CTheme(bool initFromSystem)
 
 PCTSTR CTheme::ColorName(int color)
 {
-    static const PCTSTR gsl_ColorName[CLR_Count] = {
-        TEXT("Scrollbar"),              // 00 = COLOR_SCROLLBAR
-        TEXT("Background"),             // 01 = COLOR_BACKGROUND
-        // COLOR_DESKTOP -------------------------------------------------
-        TEXT("ActiveTitle"),            // 02 = COLOR_ACTIVECAPTION
-        TEXT("InactiveTitle"),          // 03 = COLOR_INACTIVECAPTION
-        TEXT("Menu"),                   // 04 = COLOR_MENU
-        TEXT("Window"),                 // 05 = COLOR_WINDOW
-        TEXT("WindowFrame"),            // 06 = COLOR_WINDOWFRAME
-        TEXT("MenuText"),               // 07 = COLOR_MENUTEXT
-        TEXT("WindowText"),             // 08 = COLOR_WINDOWTEXT
-        TEXT("TitleText"),              // 09 = COLOR_CAPTIONTEXT
-        TEXT("ActiveBorder"),           // 10 = COLOR_ACTIVEBORDER
-        TEXT("InactiveBorder"),         // 11 = COLOR_INACTIVEBORDER
-        TEXT("AppWorkSpace"),           // 12 = COLOR_APPWORKSPACE
-        TEXT("Hilight"),                // 13 = COLOR_HIGHLIGHT
-        TEXT("HilightText"),            // 14 = COLOR_HIGHLIGHTTEXT
-        TEXT("ButtonFace"),             // 15 = COLOR_BTNFACE
-        // COLOR_3DFACE --------------------------------------------------
-        TEXT("ButtonShadow"),           // 16 = COLOR_BTNSHADOW
-        // COLOR_3DSHADOW ------------------------------------------------
-        TEXT("GrayText"),               // 17 = COLOR_GRAYTEXT
-        // (Disabled menu item selection) --------------------------------
-        TEXT("ButtonText"),             // 18 = COLOR_BTNTEXT
-        TEXT("InactiveTitleText"),      // 19 = COLOR_INACTIVECAPTIONTEXT
-        TEXT("ButtonHilight"),          // 20 = COLOR_BTNHIGHLIGHT
-        TEXT("ButtonDkShadow"),         // 21 = COLOR_3DDKSHADOW
-        TEXT("ButtonLight"),            // 22 = COLOR_3DLIGHT
-        TEXT("InfoText"),               // 23 = COLOR_INFOTEXT
-        TEXT("InfoWindow"),             // 24 = COLOR_INFOBK
-        TEXT("ButtonAlternateFace"),    // 25 = COLOR_ALTERNATEBTNFACE
-        // (unused, undefined by the SDK) --------------------------------
-        TEXT("HotTrackingColor"),       // 26 = COLOR_HOTLIGHT (Hyperlink)
-        TEXT("GradientActiveTitle"),    // 27 = COLOR_GRADIENTACTIVECAPTION
-        TEXT("GradientInactiveTitle"),  // 28 = COLOR_GRADIENTINACTIVECAPTION
-        TEXT("MenuHilight"),            // 29 = COLOR_MENUHILIGHT
-        TEXT("MenuBar")                 // 30 = COLOR_MENUBAR
-    };
-    if (color < 0 || color >= CLR_Count) {
-        return nullptr;
-    }
-    return gsl_ColorName[color];
 }
 
 int& CTheme::GetNcMetricSize(PNONCLIENTMETRICS pncMetrics, int size)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <wcdafx.api.h>
 #include <winuser.h>
 
 enum ENCM_Index : int
@@ -21,6 +22,8 @@ enum ENCM_Index : int
 
 struct CNCMetrics: NONCLIENTMETRICS
 {
+    DELETE_COPY_MOVE_OF(CNCMetrics);
+
     struct Range
     {
         int     min;

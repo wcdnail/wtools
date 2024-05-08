@@ -1,0 +1,103 @@
+﻿#include "stdafx.h"
+#include "luicColors.h"
+#include <dh.tracing.h>
+#include <string.utils.error.code.h>
+
+CColors::~CColors() = default;
+CColors::CColors() = default;
+
+PCWSTR CColors::Title(int index)
+{
+    static constexpr PCTSTR gs_name[CLR_Count] = {
+        TEXT("Scrollbar"),              // 00 = COLOR_SCROLLBAR
+        TEXT("Background"),             // 01 = COLOR_BACKGROUND
+        // COLOR_DESKTOP -------------------------------------------------
+        TEXT("ActiveTitle"),            // 02 = COLOR_ACTIVECAPTION
+        TEXT("InactiveTitle"),          // 03 = COLOR_INACTIVECAPTION
+        TEXT("Menu"),                   // 04 = COLOR_MENU
+        TEXT("Window"),                 // 05 = COLOR_WINDOW
+        TEXT("WindowFrame"),            // 06 = COLOR_WINDOWFRAME
+        TEXT("MenuText"),               // 07 = COLOR_MENUTEXT
+        TEXT("WindowText"),             // 08 = COLOR_WINDOWTEXT
+        TEXT("TitleText"),              // 09 = COLOR_CAPTIONTEXT
+        TEXT("ActiveBorder"),           // 10 = COLOR_ACTIVEBORDER
+        TEXT("InactiveBorder"),         // 11 = COLOR_INACTIVEBORDER
+        TEXT("AppWorkSpace"),           // 12 = COLOR_APPWORKSPACE
+        TEXT("Hilight"),                // 13 = COLOR_HIGHLIGHT
+        TEXT("HilightText"),            // 14 = COLOR_HIGHLIGHTTEXT
+        TEXT("ButtonFace"),             // 15 = COLOR_BTNFACE
+        // COLOR_3DFACE --------------------------------------------------
+        TEXT("ButtonShadow"),           // 16 = COLOR_BTNSHADOW
+        // COLOR_3DSHADOW ------------------------------------------------
+        TEXT("GrayText"),               // 17 = COLOR_GRAYTEXT
+        // (Disabled menu item selection) --------------------------------
+        TEXT("ButtonText"),             // 18 = COLOR_BTNTEXT
+        TEXT("InactiveTitleText"),      // 19 = COLOR_INACTIVECAPTIONTEXT
+        TEXT("ButtonHilight"),          // 20 = COLOR_BTNHIGHLIGHT
+        TEXT("ButtonDkShadow"),         // 21 = COLOR_3DDKSHADOW
+        TEXT("ButtonLight"),            // 22 = COLOR_3DLIGHT
+        TEXT("InfoText"),               // 23 = COLOR_INFOTEXT
+        TEXT("InfoWindow"),             // 24 = COLOR_INFOBK
+        TEXT("ButtonAlternateFace"),    // 25 = COLOR_ALTERNATEBTNFACE
+        // (unused, undefined by the SDK) --------------------------------
+        TEXT("HotTrackingColor"),       // 26 = COLOR_HOTLIGHT (Hyperlink)
+        TEXT("GradientActiveTitle"),    // 27 = COLOR_GRADIENTACTIVECAPTION
+        TEXT("GradientInactiveTitle"),  // 28 = COLOR_GRADIENTINACTIVECAPTION
+        TEXT("MenuHilight"),            // 29 = COLOR_MENUHILIGHT
+        TEXT("MenuBar")                 // 30 = COLOR_MENUBAR
+    };
+    if (index < 0 || index > CLR_Count - 1) {
+        DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+        return L"INVALID COLOR";
+    }
+    return gs_name[index];
+}
+
+template <typename ReturnType, typename SelfRef>
+ReturnType& CColors::getRefByIndex(SelfRef& thiz, int index)
+{
+    if (index < 0 || index > CLR_Count - 1) {
+        static ReturnType dummy{};
+        DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+        return dummy;
+    }
+    return thiz.m_Pair[index];
+}
+
+CColorPair& CColors::operator[](int index)
+{
+    return getRefByIndex<CColorPair>(*this, index);
+}
+
+CColorPair const& CColors::operator[](int index) const
+{
+    return getRefByIndex<const CColorPair>(*this, index);
+}
+
+bool CColorPair::Reset(COLORREF color)
+{
+    HBRUSH hBrush = CreateSolidBrush(color);
+    if (!hBrush) {
+        const auto code = static_cast<HRESULT>(GetLastError());
+        const auto codeText = Str::ErrorCode<wchar_t>::SystemMessage(code);
+        DH::TPrintf(L"%s: ERROR: CreateSolidBrush failed: %d '%s'\n", __FUNCTIONW__, code, codeText.GetString());
+        return false;
+    }
+    m_Color = color;
+    m_Brush.Attach(hBrush);
+    return true;
+}
+
+bool CColorPair::Reset(WTL::CBrush& hBrush)
+{
+    LOGBRUSH temp;
+    if (!hBrush.GetLogBrush(&temp)) {
+        const auto code = static_cast<HRESULT>(GetLastError());
+        const auto codeText = Str::ErrorCode<wchar_t>::SystemMessage(code);
+        DH::TPrintf(L"%s: ERROR: GetLogBrush failed: %d '%s'\n", __FUNCTIONW__, code, codeText.GetString());
+        return false;
+    }
+    m_Color = temp.lbColor;
+    m_Brush.Attach(hBrush.Detach());
+    return true;
+}

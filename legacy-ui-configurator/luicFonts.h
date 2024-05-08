@@ -1,5 +1,6 @@
 #pragma once
 
+#include <wcdafx.api.h>
 #include <atlstr.h>
 #include <atlgdi.h>
 
@@ -32,6 +33,8 @@ struct CFontPair
 
 struct CFonts
 {
+    DELETE_COPY_MOVE_OF(CFonts);
+
     ~CFonts();
     CFonts();
 
