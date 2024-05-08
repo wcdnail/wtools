@@ -31,15 +31,15 @@ CNCMetrics::Range const& CNCMetrics::DefaultRange(int index)
 PCWSTR CNCMetrics::Title(int index)
 {
     static constexpr PCTSTR gs_name[NCM_Count] = {
-        L"Border Width",    
-        L"Scroll Width",    
-        L"Scroll Height",   
-        L"Caption Width",   
-        L"Caption Height",  
-        L"SmCaption Width", 
+        L"Border Width",
+        L"Scroll Width",
+        L"Scroll Height",
+        L"Caption Width",
+        L"Caption Height",
+        L"SmCaption Width",
         L"SmCaption Height",
-        L"Menu Width",      
-        L"Menu Height",     
+        L"Menu Width",
+        L"Menu Height",
         L"Padded BorderWidth"
     };
     if (index < 0 || index > _countof(gs_name) - 1) {
@@ -48,7 +48,6 @@ PCWSTR CNCMetrics::Title(int index)
     }
     return gs_name[index];
 }
-
 
 template <typename ReturnType, typename SelfRef>
 ReturnType& CNCMetrics::getRefByIndex(SelfRef& thiz, int index)

@@ -69,15 +69,13 @@
     <ClInclude Include="luicFontDef.h">
       <Filter>theme</Filter>
     </ClInclude>
-    <ClInclude Include="luicThemeFonts.h">
-      <Filter>theme</Filter>
-    </ClInclude>
     <ClInclude Include="luicNCMetric.h">
       <Filter>theme</Filter>
     </ClInclude>
     <ClInclude Include="luicClass.h">
       <Filter>theme</Filter>
     </ClInclude>
+    <ClInclude Include="luicFonts.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -124,15 +122,13 @@
     <ClCompile Include="luicFontDef.cpp">
       <Filter>theme</Filter>
     </ClCompile>
-    <ClCompile Include="luicThemeFonts.cpp">
-      <Filter>theme</Filter>
-    </ClCompile>
     <ClCompile Include="luicNCMetric.cpp">
       <Filter>theme</Filter>
     </ClCompile>
     <ClCompile Include="luicClass.cpp">
       <Filter>theme</Filter>
     </ClCompile>
+    <ClCompile Include="luicFonts.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resz\legacy-ui-configurator.rc">

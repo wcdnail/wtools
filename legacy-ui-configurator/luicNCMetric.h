@@ -28,11 +28,11 @@ struct CNCMetrics: NONCLIENTMETRICS
         int current;
     };
 
-    static Range const& DefaultRange(int index);
-    static PCWSTR Title(int index);
-
     ~CNCMetrics();
     CNCMetrics();
+
+    static Range const& DefaultRange(int index);
+    static PCWSTR Title(int index);
 
     int& operator[](int index);
     int operator[](int index) const;
