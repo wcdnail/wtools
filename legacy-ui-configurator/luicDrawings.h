@@ -1,10 +1,10 @@
 #pragma once
 
-#include "rectz.h"
+#include <rectz.h>
 #include <atlgdi.h>
 #include <memory>
 
-struct CTheme;
+struct CScheme;
 
 enum WindowRectIndex: int
 {
@@ -66,7 +66,7 @@ public:
     static UINT ConvDrawItemState(UINT diState);
 
     ~CDrawings();
-    CDrawings(CTheme const& theme);
+    CDrawings(CScheme const& scheme);
 
     void CalcRects(CRect const& rc, UINT captFlags, WindowRects& target);
 
@@ -94,7 +94,7 @@ private:
 
     static PStaticRes m_pStaticRes;
 
-    CTheme const&   m_Theme;
+    CScheme const& m_Scheme;
     int        m_BorderSize;
     WTL::CFont  m_ftMarlett;
 };

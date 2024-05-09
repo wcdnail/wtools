@@ -1,6 +1,7 @@
 #pragma once
 
 #include <winuser.h>
+#include <atlstr.h>
 
 static constexpr long DEFAULT_FONT_DPI = 72;
 
@@ -55,3 +56,9 @@ inline Res FontPtToLog(Res n)
 {
     return -static_cast<Res>(MulDiv(static_cast<int>(n), g_DPI(), DEFAULT_FONT_DPI));
 }
+
+void SetMFStatus(int status, PCWSTR format, ...);
+
+void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
+void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
+

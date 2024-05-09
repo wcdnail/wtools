@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "luicMain.h"
+#include "luicUtils.h"
 #include "luicThemePreviewer.h"
 #include "resz/resource.h"
 #include <icons.dll.h>

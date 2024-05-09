@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "luicMainFrame.h"
 #include "luicDrawings.h"
+#include "luicUtils.h"
 #include "luicMain.h"
 #include "resz/resource.h"
 #include <rect.putinto.h>

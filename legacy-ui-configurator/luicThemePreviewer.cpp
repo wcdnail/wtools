@@ -1,11 +1,14 @@
 #include "stdafx.h"
 #include "luicThemePreviewer.h"
+#include "luicScheme.h"
+#include "luicUtils.h"
 #include "luicMain.h"
-#include "dh.tracing.h"
-#include "dh.tracing.defs.h"
-#include "rect.alloc.h"
-#include "string.utils.format.h"
-#include "rect.gdi+.h"
+#include <dh.tracing.h>
+#include <dh.tracing.defs.h>
+#include <rect.alloc.h>
+#include <string.utils.format.h>
+#include <rect.gdi+.h>
+
 
 ATOM CThemePreviewer::Register(HRESULT& code)
 {
@@ -38,7 +41,7 @@ CThemePreviewer::~CThemePreviewer()
 
 CThemePreviewer::CThemePreviewer()
     :   ATL::CWindow{}
-    ,       m_pTheme{nullptr}
+    ,      m_pScheme{nullptr}
     ,      m_pcbItem{nullptr}
     ,   m_prSelected{-1, -1}
     ,    m_bLBtnDown{false}
@@ -55,16 +58,16 @@ void CThemePreviewer::SubclassIt(HWND hWnd)
     ModifyStyleEx(0, WS_EX_CLIENTEDGE);
 }
 
-void CThemePreviewer::OnSelectTheme(CTheme* pTheme, WTL::CComboBox* pcbItem)
+void CThemePreviewer::OnSchemeChanged(CScheme* pScheme, WTL::CComboBox* pcbItem)
 {
-    m_pTheme = pTheme;
+    m_pScheme = pScheme;
     m_pcbItem = pcbItem;
     InvalidateRect(nullptr, FALSE);
 }
 
-void CThemePreviewer::OnSelectItem(int nItem)
+void CThemePreviewer::OnItemSelected(int nItem)
 {
-    if (EN_Desktop == nItem) {
+    if (IT_Desktop == nItem) {
         m_prSelected = std::make_pair(-1, -1);
     }
 }
@@ -202,16 +205,16 @@ void CThemePreviewer::DrawDesktop(WTL::CDCHandle dc, CRect const& rcClient)
         WindowRects& rcTarget;
         CRect const& rcSource;
     };
-    if (!m_pTheme) {
+    if (!m_pScheme) {
         return;
     }
-    auto const*  pApp = CLUIApp::App();
-    const auto& theme = *m_pTheme;
-    const auto  hMenu = pApp->GetTestMenu();
-    CRect     rcFront;
-    CRect      rcBack;
-    CRect       rcMsg;
-    CRect      rcIcon;
+    auto const*   pApp = CLUIApp::App();
+    const auto& scheme = *m_pScheme;
+    const auto   hMenu = pApp->GetTestMenu();
+    CRect      rcFront;
+    CRect       rcBack;
+    CRect        rcMsg;
+    CRect       rcIcon;
     RectsBuild(rcClient, rcFront, rcBack, rcMsg, rcIcon);
     const DrawWindowArgs wparam[WND_Count] = {
         { L"Inactive window",                       0,   hMenu, -1, { Il_DL_Begin, _countof(Il_DL_Begin), 0 } },
@@ -223,13 +226,11 @@ void CThemePreviewer::DrawDesktop(WTL::CDCHandle dc, CRect const& rcClient)
         {  m_WndRect[WND_Front], rcFront },
         { m_WndRect[WND_MsgBox],   rcMsg },
     };
-    dc.FillSolidRect(rcClient, theme.GetColor(COLOR_BACKGROUND));
+    dc.FillSolidRect(rcClient, scheme.m_Color[COLOR_BACKGROUND].m_Color);
 
-    if (pApp->IsThemePreviewDrawWallpaper()) {
-        // TODO: borrow wallpaper drawer from CPageBackground
-    }
+    // TODO: borrow wallpaper drawer from CPageBackground
 
-    CDrawings drawings(theme);
+    CDrawings drawings(scheme);
     drawings.DrawDesktopIcon(dc, rcIcon, L"Icon Text", true);
     for (int i = 0; i < WND_Count; i++) {
         drawings.CalcRects(wrect[i].rcSource, wparam[i].captFlags, wrect[i].rcTarget);
@@ -291,59 +292,59 @@ int CThemePreviewer::RectIndexToElementId() const
 {
     static constexpr int gs_nItemIndex[WND_Count][WR_Count] = {
         {                  // WND_MsgBox ------------------
-        /* WR_Tooltip      */ EN_Tooltip,
-        /* WR_Button       */ EN_3DObject,
-        /* WR_Hyperlink    */ EN_Hyperlink,
-        /* WR_Message      */ EN_MsgBox,
-        /* WR_Scroll       */ EN_MsgBox,
-        /* WR_WinText      */ EN_MsgBox,
-        /* WR_Workspace    */ EN_MsgBox,
-        /* WR_MenuSelected */ EN_SelectedItem,
-        /* WR_MenuDisabled */ EN_DisabledItem,
-        /* WR_MenuItem     */ EN_FlatmenuBar,
-        /* WR_Menu         */ EN_Menu,
-        /* WR_Caption      */ EN_SMCaption,
-        /* WR_Frame        */ EN_InactiveBorder,
-        /* WR_Border       */ EN_PaddedBorder,
+        /* WR_Tooltip      */ IT_Tooltip,
+        /* WR_Button       */ IT_3DObject,
+        /* WR_Hyperlink    */ IT_Hyperlink,
+        /* WR_Message      */ IT_MsgBox,
+        /* WR_Scroll       */ IT_MsgBox,
+        /* WR_WinText      */ IT_MsgBox,
+        /* WR_Workspace    */ IT_MsgBox,
+        /* WR_MenuSelected */ IT_SelectedItem,
+        /* WR_MenuDisabled */ IT_DisabledItem,
+        /* WR_MenuItem     */ IT_FlatmenuBar,
+        /* WR_Menu         */ IT_Menu,
+        /* WR_Caption      */ IT_SMCaption,
+        /* WR_Frame        */ IT_InactiveBorder,
+        /* WR_Border       */ IT_PaddedBorder,
         }, {               // WND_Front -------------------
-        /* WR_Tooltip      */ EN_Tooltip,
-        /* WR_Button       */ EN_3DObject,
-        /* WR_Hyperlink    */ EN_Hyperlink,
-        /* WR_Message      */ EN_MsgBox,
-        /* WR_Scroll       */ EN_Scrollbar,
-        /* WR_WinText      */ EN_Window,
-        /* WR_Workspace    */ EN_Window,
-        /* WR_MenuSelected */ EN_SelectedItem,
-        /* WR_MenuDisabled */ EN_DisabledItem,
-        /* WR_MenuItem     */ EN_FlatmenuBar,
-        /* WR_Menu         */ EN_Menu,
-        /* WR_Caption      */ EN_ActiveCaption,
-        /* WR_Frame        */ EN_ActiveBorder,
-        /* WR_Border       */ EN_ActiveBorder,
+        /* WR_Tooltip      */ IT_Tooltip,
+        /* WR_Button       */ IT_3DObject,
+        /* WR_Hyperlink    */ IT_Hyperlink,
+        /* WR_Message      */ IT_MsgBox,
+        /* WR_Scroll       */ IT_Scrollbar,
+        /* WR_WinText      */ IT_Window,
+        /* WR_Workspace    */ IT_Window,
+        /* WR_MenuSelected */ IT_SelectedItem,
+        /* WR_MenuDisabled */ IT_DisabledItem,
+        /* WR_MenuItem     */ IT_FlatmenuBar,
+        /* WR_Menu         */ IT_Menu,
+        /* WR_Caption      */ IT_ActiveCaption,
+        /* WR_Frame        */ IT_ActiveBorder,
+        /* WR_Border       */ IT_ActiveBorder,
         }, {               // WND_Back --------------------
-        /* WR_Tooltip      */ EN_Tooltip,
-        /* WR_Button       */ EN_3DObject,
-        /* WR_Hyperlink    */ EN_Hyperlink,
-        /* WR_Message      */ EN_MsgBox,
-        /* WR_Scroll       */ EN_Scrollbar,
-        /* WR_WinText      */ EN_DisabledItem,
-        /* WR_Workspace    */ EN_AppBackground,
-        /* WR_MenuSelected */ EN_InactiveCaption,
-        /* WR_MenuDisabled */ EN_DisabledItem,
-        /* WR_MenuItem     */ EN_FlatmenuBar,
-        /* WR_Menu         */ EN_Menu,
-        /* WR_Caption      */ EN_InactiveCaption,
-        /* WR_Frame        */ EN_InactiveBorder,
-        /* WR_Border       */ EN_InactiveBorder,
+        /* WR_Tooltip      */ IT_Tooltip,
+        /* WR_Button       */ IT_3DObject,
+        /* WR_Hyperlink    */ IT_Hyperlink,
+        /* WR_Message      */ IT_MsgBox,
+        /* WR_Scroll       */ IT_Scrollbar,
+        /* WR_WinText      */ IT_DisabledItem,
+        /* WR_Workspace    */ IT_AppBackground,
+        /* WR_MenuSelected */ IT_InactiveCaption,
+        /* WR_MenuDisabled */ IT_DisabledItem,
+        /* WR_MenuItem     */ IT_FlatmenuBar,
+        /* WR_Menu         */ IT_Menu,
+        /* WR_Caption      */ IT_InactiveCaption,
+        /* WR_Frame        */ IT_InactiveBorder,
+        /* WR_Border       */ IT_InactiveBorder,
         }
     };
     const int wi = m_prSelected.first;
     const int ri = m_prSelected.second;
     if (wi < 0 || wi > WND_Count - 1) {
-        return EN_Desktop;
+        return IT_Desktop;
     }
     if (ri < 0 || ri > WR_Count - 1) {
-        return EN_Desktop;
+        return IT_Desktop;
     }
     return gs_nItemIndex[wi][ri];
 }

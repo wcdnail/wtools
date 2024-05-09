@@ -19,8 +19,8 @@ struct CPageAppearance: CPageImpl
     CPageAppearance(std::wstring&& caption);
 
 private:
+    CScheme                        m_SchemeCopy;
     bool                          m_bLoadValues;
-
     WTL::CStatic                     m_stScheme;
     WTL::CComboBox                   m_cbScheme;
     WTL::CStatic                m_stSchemeScale;
@@ -29,10 +29,8 @@ private:
     WTL::CButton                     m_bnImport;
     WTL::CButton                     m_bnRename;
     WTL::CButton                     m_bnDelete;
-                           
     WTL::CStatic                       m_stItem;
     WTL::CComboBox                     m_cbItem;
-                           
     WTL::CStatic                       m_stFont;
     WTL::CComboBox                     m_cbFont;
     WTL::CStatic                   m_stFontSize;
@@ -43,11 +41,9 @@ private:
     WTL::CButton                 m_bnFontUndrln;
     WTL::CStatic                 m_stFontSmooth;
     WTL::CComboBox               m_cbFontSmooth;
-                           
     WTL::CButton              m_bcGradientCapts;
     WTL::CButton                  m_bcFlatMenus;
     CThemePreviewer                 m_stPreview;
-
     WTL::CStatic   m_stItemColor[IT_ColorCount];
     CColorButton   m_bnItemColor[IT_ColorCount];
     WTL::CStatic     m_stItemSize[IT_SizeCount];
@@ -78,19 +74,19 @@ private:
     bool ItemColorSetBtn(int nButton, int iColor);
     void ItemColorSet(int nItem);
     void ItemSizeClear(int nSize);
-    bool ItemSizeChanged(int nItem, ItemDef pAssignment, int iSizeControl, bool bApply = false);
+    bool ItemSizeChanged(int nItem, int iSizeControl, bool bApply = false);
 
     void FontSetFamily(LOGFONT const& logFont);
     void FontSetSizes(LOGFONT const& logFont);
-    bool ItemFontApplyChanges(int nItem, ItemDef pAssignment, int iFont, int iFontControl) const;
-    bool ItemFontChanged(int nItem, ItemDef pAssignment, int iFontControl = IT_Invalid, bool bApply = false);
+    bool ItemFontApplyChanges(int nItem, ItemDef rItemDef, int iFont, int iFontControl);
+    bool ItemFontChanged(int nItem, int iFontControl = IT_Invalid, bool bApply = false);
 
     void OnItemSelect(int nItem);
-    void OnThemeSelect(int nThemeIndex);
+    void OnSchemeChanged(int nThemeIndex);
 
     void ColorPicker(int nButton);
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh) override;
-    int ItemGetSel(ItemDef& pAssignment) const;
+    int ItemGetSel() const;
     void ItemColorTryChange(int nButton);
 };

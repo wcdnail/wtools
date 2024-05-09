@@ -89,16 +89,8 @@ CFontPair const& CFonts::operator[](int index) const
 
 bool CFontPair::Reset(WTL::CLogFont& logFont)
 {
-    const HFONT hFont = logFont.CreateFontIndirectW();
-    if (!hFont) {
-        const auto code = static_cast<HRESULT>(GetLastError());
-        const auto codeText = Str::ErrorCode<wchar_t>::SystemMessage(code);
-        DH::TPrintf(L"%s: ERROR: CreateFontIndirectW failed: %d '%s'\n", __FUNCTIONW__, code, codeText.GetString());
-        return false;
-    }
-    m_logFont = logFont;
-    m_hFont.Attach(hFont);
-    return true;
+    WTL::CFont temp{logFont.CreateFontIndirectW()};
+    return Reset(temp);
 }
 
 bool CFontPair::Reset(WTL::CFont& hFont)

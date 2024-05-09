@@ -351,6 +351,6 @@ void CPageAppearance::Initialize(CLUIApp const* pApp, int initialIndex)
         m_cbFont.SetCurSel(0);
         m_cbFontSmooth.SetCurSel(0);
     }
-    OnThemeSelect(initialIndex);
+    OnSchemeChanged(initialIndex);
 }
 

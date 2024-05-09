@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "luicPageDllIcons.h"
+#include "luicUtils.h"
 #include "luicMain.h"
 #include "icons.dll.h"
 #include "string.utils.format.h"

@@ -40,11 +40,6 @@ enum MFStatus: int
     STA_Error,
 };
 
-void SetMFStatus(int status, PCWSTR format, ...);
-
-void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
-void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
-
 class CLUIApp: public WTL::CAppModule
 {
 public:

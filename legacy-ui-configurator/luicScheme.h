@@ -84,4 +84,11 @@ struct CScheme
     static Item const& ItemDef(int index);
 
     bool LoadDefaults();
+
+    COLORREF               GetColor(int index) const { return m_Color[index].m_Color; }
+    WTL::CBrush const&     GetBrush(int index) const { return m_Color[index].m_Brush; }
+    CNCMetrics const&           GetNCMetrics() const { return m_NCMetric; }
+    CNCMetrics&                 GetNCMetrics()       { return m_NCMetric; }
+    WTL::CLogFont const& GetLogFont(int index) const { return m_Font[index].m_logFont; }
+    WTL::CFontHandle        GetFont(int index) const { return m_Font[index].m_hFont; }
 };

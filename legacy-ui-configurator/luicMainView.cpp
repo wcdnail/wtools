@@ -7,11 +7,10 @@
 #include "luicPageDllIcons.h"
 #include "luicWeb.h"
 #include "luicSettings.h"
-#include "string.utils.format.h"
-#include "UT/debug.assistance.h"
+#include "luicUtils.h"
 #include "resz/resource.h"
-
-void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
+#include <string.utils.format.h>
+#include <UT/debug.assistance.h>
 
 enum PageIndex: int
 {

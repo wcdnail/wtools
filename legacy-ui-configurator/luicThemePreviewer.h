@@ -2,6 +2,8 @@
 
 #include "luicDrawings.h"
 
+struct CScheme;
+
 using SelectedPair = std::pair<int, int>;
 
 struct CThemePreviewer: ATL::CWindow
@@ -12,8 +14,8 @@ struct CThemePreviewer: ATL::CWindow
     CThemePreviewer();
 
     void SubclassIt(HWND hWnd);
-    void OnSelectTheme(CTheme* pTheme, WTL::CComboBox* pcbItem);
-    void OnSelectItem(int nItem);
+    void OnSchemeChanged(CScheme* pTheme, WTL::CComboBox* pcbItem);
+    void OnItemSelected(int nItem);
 
 private:
     static LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -27,7 +29,7 @@ private:
         WND_Count
     };
 
-    CTheme*                 m_pTheme;
+    CScheme*               m_pScheme;
     WTL::CComboBox*        m_pcbItem;
     SelectedPair        m_prSelected;
     bool                 m_bLBtnDown;
