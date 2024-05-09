@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "luicMainView.h"
-#include "luicMain.h"
 #include "luicBackground.h"
 #include "luicScreenSaver.h"
 #include "luicAppearance.h"
@@ -11,6 +10,8 @@
 #include "string.utils.format.h"
 #include "UT/debug.assistance.h"
 #include "resz/resource.h"
+
+void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 
 enum PageIndex: int
 {

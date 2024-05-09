@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "luicMain.h"
 #include "luicThemePreviewer.h"
-#include "icons.dll.h"
-#include "dh.tracing.h"
-#include "windows.uses.ole.h"
-#include "windows.uses.commoncontrols.h"
-#include "string.utils.format.h"
-#include "windows.uses.gdi+.h"
 #include "resz/resource.h"
+#include <icons.dll.h>
+#include <dh.tracing.h>
+#include <windows.uses.ole.h>
+#include <windows.uses.commoncontrols.h>
+#include <string.utils.format.h>
+#include <windows.uses.gdi+.h>
 #include <combaseapi.h>
 #include <ShObjIdl_core.h>
 
@@ -33,9 +33,7 @@ return _AtlModule.WinMain(showCmd);
 // TODO: GENERATED CODE, reserved for future use, DO NOT EARSE!!!!
 #endif
 
-CTheme CLUIApp::g_CurrentTheme{ true };
-
-CLUIApp* CLUIApp::g_pApp{ nullptr };
+CLUIApp*               CLUIApp::g_pApp{nullptr};
 std::recursive_mutex CLUIApp::g_pAppMx{};
 
 void SetMFStatus(int status, PCWSTR format, ...)
@@ -96,18 +94,14 @@ CLUIApp::~CLUIApp()
 }
 
 CLUIApp::CLUIApp()
-    :                   Super{}
-    ,              m_Settings{L"CLUIApp"}
-    ,             m_MainFrame{m_Settings}
-    ,              m_TestMenu{}
-    ,               m_FontMap{}
-    ,            m_pWallpaper{}
-    , m_bShowDesktopWallpaper{false}
+    :       Super{}
+    ,  m_Settings{L"CLUIApp"}
+    , m_MainFrame{m_Settings}
+    ,  m_TestMenu{}
+    ,   m_FontMap{}
 {
-    {
-        std::lock_guard<std::recursive_mutex> guard(g_pAppMx);
-        g_pApp = this;
-    }
+    std::lock_guard<std::recursive_mutex> guard(g_pAppMx);
+    g_pApp = this;
 }
 
 HICON CLUIApp::GetIcon(int icon) const
@@ -134,14 +128,6 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
     if (FAILED(code)) {
         return code;
     }
-    code = CoCreateInstance(CLSID_DesktopWallpaper, nullptr, CLSCTX_ALL,
-                            IID_IDesktopWallpaper, 
-                            reinterpret_cast<void**>(&m_pWallpaper)
-    );
-    if (FAILED(code)) {
-        return code;
-    }
-    FromSettings(m_Settings, m_bShowDesktopWallpaper);
     const ATOM previewClassAtom = CThemePreviewer::Register(code);
     ATLASSUME(previewClassAtom != 0);
     if (!previewClassAtom) {
@@ -271,11 +257,4 @@ HRESULT CLUIApp::Run(HINSTANCE instHnd, int showCmd)
         MessageBoxA(nullptr, ex.what(), "epic FAIL", MB_ICONERROR);
     }
     return code;
-}
-
-CTheme& CLUIApp::GetTheme(int nThemeIndex) const
-{
-    UNREFERENCED_ARG(nThemeIndex);
-    // ##TODO: implement theme manager
-    return g_CurrentTheme;
 }

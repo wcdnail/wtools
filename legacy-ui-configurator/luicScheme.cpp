@@ -6,7 +6,9 @@
 CScheme::~CScheme() = default;
 
 CScheme::CScheme(String const& name)
-    : m_Name(name)
+    : m_Name{name}
+    , m_bGradientCaptions{false}
+    , m_bFlatMenus{false}
 {
     for (int i = 0; i < NCM_Count; i++) {
         m_SizeRange[i] = CNCMetrics::DefaultRange(i);
@@ -50,9 +52,11 @@ CScheme::Item const& CScheme::ItemDef(int index)
 
 bool CScheme::LoadDefaults()
 {
-    CColors       tmpColors;
-    CNCMetrics tmpNCMetrics;
-    CFonts         tmpFonts;
+    BOOL  bGradientCaptions{FALSE};
+    BOOL         bFlatMenus{FALSE};
+    CColors       tmpColors{};
+    CNCMetrics tmpNCMetrics{};
+    CFonts         tmpFonts{};
     if (!tmpColors.LoadDefaults()) {
         DH::TPrintf(L"%s: ERROR: CColors::LoadDefaults failed\n", __FUNCTIONW__);
         return false;
@@ -69,9 +73,19 @@ bool CScheme::LoadDefaults()
         DH::TPrintf(L"%s: ERROR: CFonts::LoadDefaults for CNCMetrcs failed\n", __FUNCTIONW__);
         return false;
     }
+    if (!SystemParametersInfoW(SPI_GETGRADIENTCAPTIONS, 0, &bGradientCaptions, 0)) {
+        DH::TPrintf(L"%s: ERROR: SystemParametersInfoW failed\n", __FUNCTIONW__);
+        return false;
+    }
+    if (!SystemParametersInfoW(SPI_GETFLATMENU, 0, &bFlatMenus, 0)) {
+        DH::TPrintf(L"%s: ERROR: SystemParametersInfoW failed\n", __FUNCTIONW__);
+        return false;
+    }
     tmpFonts.Swap(m_Font);
     tmpNCMetrics.Swap(m_NCMetric);
     tmpColors.Swap(m_Color);
+    m_bFlatMenus = bFlatMenus != FALSE;
+    m_bGradientCaptions = bGradientCaptions != FALSE;
     DH::TPrintf(L"%s: OK\n", __FUNCTIONW__);
     return true;
 }

@@ -1,16 +1,13 @@
 #pragma once
 
+#include "luicSchemeManager.h"
 #include "luicMainFrame.h"
-#include "luicTheme.h"
 #include "luicFontDef.h"
 #include "settings.h"
-#include <atlcomcli.h>
 #include <atlapp.h>
 #include <mutex>
 
 #define SHELL32_PATHNAME L"%SYSTEMROOT%\\System32\\shell32.dll"
-
-using IDesktopWallpaperPtr = ATL::CComPtr<IDesktopWallpaper>;
 
 enum ImageListIndex : int
 {
@@ -62,10 +59,9 @@ public:
     HICON GetIcon(int icon) const;
     WTL::CMenuHandle GetTestMenu() const;
     WTL::CImageListManaged const& GetImageList(int index) const;
-    IDesktopWallpaper* GetWallpaperMan() const;
-    bool IsThemePreviewDrawWallpaper() const;
     FontMap const& GetFontMap() const;
-    CTheme& GetTheme(int nThemeIndex) const;
+    CSchemeManager const& SchemeManager() const;
+    CSchemeManager& SchemeManager();
 
     HRESULT Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance, const GUID* pLibID = nullptr);
     HRESULT Run(HINSTANCE instHnd, int showCmd);
@@ -74,22 +70,20 @@ private:
     friend Super;
     friend void SetMFStatus(int status, PCWSTR format, ...);
 
-    Conf::Section                  m_Settings;
-    CMainFrame                    m_MainFrame;
-    WTL::CMenu                     m_TestMenu;
-    FontMap                         m_FontMap;
-    IDesktopWallpaperPtr         m_pWallpaper;
-    bool              m_bShowDesktopWallpaper;
-    WTL::CImageListManaged m_ImList[IL_Count];
-
-    static CTheme               g_CurrentTheme;
     static CLUIApp*                    g_pApp;
     static std::recursive_mutex      g_pAppMx;
+
+    Conf::Section                  m_Settings;
+    CMainFrame                    m_MainFrame;
+    CSchemeManager            m_SchemeManager;
+    WTL::CMenu                     m_TestMenu;
+    FontMap                         m_FontMap;
+    WTL::CImageListManaged m_ImList[IL_Count];
 
     void SetMainFrameStatus(int status, ATL::CStringW&& message);
     HRESULT ImListCreate(int index, int cx, int cy);
 };
 
-inline IDesktopWallpaper* CLUIApp::GetWallpaperMan() const { return m_pWallpaper; }
-inline bool          CLUIApp::IsThemePreviewDrawWallpaper() const { return m_bShowDesktopWallpaper;  } // ##TODO: m_bShowDesktopWallpaper to settings
-inline FontMap const&          CLUIApp::GetFontMap() const { return m_FontMap; }
+inline CSchemeManager const& CLUIApp::SchemeManager() const { return m_SchemeManager; }
+inline CSchemeManager&       CLUIApp::SchemeManager()       { return m_SchemeManager; }
+inline FontMap const&           CLUIApp::GetFontMap() const { return m_FontMap; }

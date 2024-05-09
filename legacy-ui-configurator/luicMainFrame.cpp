@@ -1,15 +1,14 @@
 #include "stdafx.h"
 #include "luicMainFrame.h"
-#include "luicMain.h"
-#include "rect.putinto.h"
-#include "dh.tracing.h"
-#include "dh.tracing.defs.h"
-#include "dev.assistance/dev.assist.h"
-#include "debug.dump.msg.h"
-#include "resz/resource.h"
-#include <atlwin.h>
-
 #include "luicDrawings.h"
+#include "luicMain.h"
+#include "resz/resource.h"
+#include <rect.putinto.h>
+#include <dh.tracing.h>
+#include <dh.tracing.defs.h>
+#include <dev.assistance/dev.assist.h>
+#include <debug.dump.msg.h>
+#include <atlwin.h>
 
 CMainFrame::~CMainFrame() = default;
 
@@ -67,16 +66,25 @@ void CMainFrame::OnResizeNotify()
 int CMainFrame::OnCreate(LPCREATESTRUCT)
 {
     DBG_DUMP_WMESSAGE_EXT(LTH_MAINFRAME, L"Main", m_hWnd, WM_CREATE, 0, 0);
-    const auto code = CDrawings::StaticInit(m_hWnd);
+
+    HRESULT code{S_OK};
+    auto*   pApp{CLUIApp::App()};
+    code = pApp->SchemeManager().Initialize();
     if (ERROR_SUCCESS != code) {
+        SetLastError(static_cast<DWORD>(code));
+        ReportError(L"SchemeManager::Initialize failure...", code);
+        return -1;
+    }
+    code = CDrawings::StaticInit(m_hWnd);
+    if (ERROR_SUCCESS != code) {
+        SetLastError(static_cast<DWORD>(code));
         ReportError(L"CDrawings::StaticInit failure...", code);
+        return -1;
     }
 #ifdef _DEBUG_CONTROLS
     ShowWindow(SW_SHOW);
 #endif
-    auto const* pApp = CLUIApp::App();
-
-    HICON tempIco = pApp->GetIcon(IconMain);
+    const HICON tempIco = pApp->GetIcon(IconMain);
     SetIcon(tempIco, FALSE);
     SetIcon(tempIco, TRUE);
 
@@ -98,7 +106,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
         ReportError(L"Creation of MainView failed!", code, true, MB_ICONSTOP);
         return -1;
     }
-
     OnResizeNotify();
     m_View.ShowWindow(SW_SHOW);
 
@@ -108,7 +115,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
     pLoop->AddIdleHandler(this);
 
     DlgResize_Init(false, false);
-
     m_bInitialized = true;
     m_View.SetFocus();
     return 0;
@@ -123,7 +129,7 @@ void CMainFrame::OnDestroy()
     pLoop->RemoveIdleHandler(this);
     pLoop->RemoveMessageFilter(this);
 
-    bool isMaximized = (TRUE == IsZoomed());
+    const bool isMaximized = (TRUE == IsZoomed());
     if(!isMaximized) {
         GetWindowRect(m_rcMainFrame);
     }

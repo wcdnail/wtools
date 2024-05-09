@@ -1,32 +1,34 @@
 #pragma once
 
-#include "luicTheme.h"
+#include "luicScheme.h"
+#include "luicFontDef.h"
 #include "luicPageImpl.h"
 #include "luicThemePreviewer.h"
 #include "WTL/CColorButton.h"
 #include <atlstr.h>
 #include <atlctrls.h>
 
-struct CTheme;
+class CLUIApp;
+struct CSchemeManager;
 
 struct CPageAppearance: CPageImpl
 {
+    using ItemDef = CScheme::Item const&;
+
     ~CPageAppearance() override;
     CPageAppearance(std::wstring&& caption);
 
 private:
-    friend struct CTheme;
-
     bool                          m_bLoadValues;
 
-    WTL::CStatic                      m_stTheme;
-    WTL::CComboBox                    m_cbTheme;
-    WTL::CStatic                  m_stThemeSize;
-    WTL::CComboBox                m_cbThemeSize;
-    WTL::CButton                  m_bnThemeSave;
-    WTL::CButton                m_bnThemeImport;
-    WTL::CButton                m_bnThemeRename;
-    WTL::CButton                m_bnThemeDelete;
+    WTL::CStatic                     m_stScheme;
+    WTL::CComboBox                   m_cbScheme;
+    WTL::CStatic                m_stSchemeScale;
+    WTL::CComboBox              m_cbSchemeScale;
+    WTL::CButton                       m_bnSave;
+    WTL::CButton                     m_bnImport;
+    WTL::CButton                     m_bnRename;
+    WTL::CButton                     m_bnDelete;
                            
     WTL::CStatic                       m_stItem;
     WTL::CComboBox                     m_cbItem;
@@ -57,6 +59,15 @@ private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
 
+    void InitializeScheme(CSchemeManager const& schemeManager);
+    void InitializeScale(CScheme const& sourceScheme);
+    void InitializeItems();
+    void InitializeFonts(FontMap const& fontsMap);
+    void InitializeFontSizes();
+    void InitializeFontSmooth();
+    void InitializeFontButtons();
+    void Initialize(CLUIApp const* pApp, int initialIndex);
+
     void ThemeEnable(BOOL bEnable);
     void ItemEnable(BOOL bEnable);
     void ItemClr1Enable(BOOL bEnable);
@@ -67,12 +78,12 @@ private:
     bool ItemColorSetBtn(int nButton, int iColor);
     void ItemColorSet(int nItem);
     void ItemSizeClear(int nSize);
-    bool ItemSizeChanged(int nItem, PCItemAssign pAssignment, int iSizeControl, bool bApply = false);
+    bool ItemSizeChanged(int nItem, ItemDef pAssignment, int iSizeControl, bool bApply = false);
 
     void FontSetFamily(LOGFONT const& logFont);
     void FontSetSizes(LOGFONT const& logFont);
-    bool ItemFontApplyChanges(int nItem, PCItemAssign pAssignment, int iFont, int iFontControl) const;
-    bool ItemFontChanged(int nItem, PCItemAssign pAssignment, int iFontControl = IT_Invalid, bool bApply = false);
+    bool ItemFontApplyChanges(int nItem, ItemDef pAssignment, int iFont, int iFontControl) const;
+    bool ItemFontChanged(int nItem, ItemDef pAssignment, int iFontControl = IT_Invalid, bool bApply = false);
 
     void OnItemSelect(int nItem);
     void OnThemeSelect(int nThemeIndex);
@@ -80,6 +91,6 @@ private:
     void ColorPicker(int nButton);
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh) override;
-    int ItemGetSel(PCItemAssign& pAssignment) const;
+    int ItemGetSel(ItemDef& pAssignment) const;
     void ItemColorTryChange(int nButton);
 };

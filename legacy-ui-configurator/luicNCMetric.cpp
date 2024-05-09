@@ -55,7 +55,7 @@ bool CNCMetrics::LoadDefaults()
     static_assert(sizeof(*this) == sizeof(ncMetrics), "NONCLIENTMETRICS SIZEOF did not MATCH!");
     ZeroMemory(&ncMetrics, sizeof(ncMetrics));
     ncMetrics.cbSize = sizeof(NONCLIENTMETRICS);
-    const BOOL ret = SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(ncMetrics), &ncMetrics, 0);
+    const BOOL ret{SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(ncMetrics), &ncMetrics, 0)};
     if (!ret) {
         return false;
     }

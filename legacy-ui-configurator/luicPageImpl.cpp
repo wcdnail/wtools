@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "luicPageImpl.h"
-#include "luicTheme.h"
 #include "dh.tracing.h"
 #include "debug.dump.msg.h"
 #include "dh.tracing.defs.h"
@@ -10,10 +9,9 @@ CPageImpl::~CPageImpl()
 {
 }
 
-CPageImpl::CPageImpl(UINT idd, std::wstring&& caption, CTheme* pTheme /*= nullptr*/)
+CPageImpl::CPageImpl(UINT idd, std::wstring&& caption)
     :         IDD{idd}
     ,   m_Caption{std::move(caption)}
-    ,    m_pTheme{pTheme}
     , m_ResiseMap{}
 {
 }
@@ -50,7 +48,7 @@ BOOL CPageImpl::DoForEachImpl(HWND hWndCtl, ForeachFn const& routine)
     return TRUE;
 }
 
-void CPageImpl::DoForEach(ForeachFn const& routine)
+void CPageImpl::DoForEach(ForeachFn const& routine) const
 {
     EnumChildWindows(m_hWnd, reinterpret_cast<WNDENUMPROC>(DoForEachImpl), reinterpret_cast<LPARAM>(&routine));
 }
@@ -97,17 +95,25 @@ void CPageImpl::DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count)
 
 HBRUSH CPageImpl::OnCtlColorStatic(WTL::CDCHandle dc, HWND wndStatic)
 {
-    dc.SetTextColor(m_pTheme->GetColor(COLOR_CAPTIONTEXT));
+#if 0
+      dc.SetTextColor(m_pTheme->GetColor(COLOR_CAPTIONTEXT));
     dc.SetBkColor(m_pTheme->GetColor(COLOR_MENU));
     return m_pTheme->GetBrush(COLOR_MENU);
+#else
+    return nullptr;
+#endif
 }
 
 HBRUSH CPageImpl::OnEraseBkgnd(WTL::CDCHandle dc)
 {
+#if 0
     CRect rc;
     GetClientRect(rc);
     dc.FillSolidRect(rc, m_pTheme->GetColor(COLOR_MENU));
     return m_pTheme->GetBrush(COLOR_MENU);
+#else
+    return nullptr;
+#endif
 }
 
 void CPageImpl::OnResizeNotify()

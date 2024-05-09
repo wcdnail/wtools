@@ -257,6 +257,7 @@
     <ClInclude Include="luicSettings.h" />
     <ClInclude Include="luicTheme.h" />
     <ClInclude Include="luicThemePreviewer.h" />
+    <ClInclude Include="luicUtils.h" />
     <ClInclude Include="luicWeb.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="resz\resource.h" />
@@ -264,6 +265,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="luicAppearance.cpp" />
+    <ClCompile Include="luicAppearanceInit.cpp" />
     <ClCompile Include="luicBackground.cpp" />
     <ClCompile Include="luicClass.cpp" />
     <ClCompile Include="luicColors.cpp" />

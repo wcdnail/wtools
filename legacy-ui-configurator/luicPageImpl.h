@@ -7,7 +7,6 @@
 #include <vector>
 #include <memory>
 
-struct CTheme;
 struct CPageImpl;
 
 using  CPageImplPtr = std::unique_ptr<CPageImpl>;
@@ -34,15 +33,14 @@ protected:
 
     UINT               IDD;
     std::wstring m_Caption;
-    CTheme*       m_pTheme;
 
-    CPageImpl(UINT idd, std::wstring&& caption, CTheme* pTheme = nullptr);
+    CPageImpl(UINT idd, std::wstring&& caption);
 
     static bool ComboSetCurSelByData(WTL::CComboBox& cbControl, DWORD_PTR nData);
     static bool CtlShow(HWND hWndCtl);
     static bool CtlDisable(HWND hWndCtl);
     static BOOL DoForEachImpl(HWND hWndCtl, ForeachFn const& routine);
-    void DoForEach(ForeachFn const& routine);
+    void DoForEach(ForeachFn const& routine) const;
 
     void DlgResizeAdd(int nCtlID, DWORD dwResizeFlags);
     void DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count);
@@ -62,11 +60,9 @@ private:
     ResizeVec m_ResiseMap;
 
     BEGIN_MSG_MAP_EX(CColorsPage)
-      // TODO: temporary TURN OFF colorizing
-      //if (nullptr != m_pTheme) {
-      //    MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
-      //    MSG_WM_ERASEBKGND(OnEraseBkgnd)
-      //}
+        // TODO: temporary TURN OFF colorizing
+        //MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
+        //MSG_WM_ERASEBKGND(OnEraseBkgnd)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_COMMAND(OnCommand)
@@ -89,4 +85,3 @@ private:
 };
 
 inline PCWSTR CPageImpl::GetCaption() const { return m_Caption.c_str(); }
-

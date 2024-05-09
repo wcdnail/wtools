@@ -74,6 +74,8 @@ struct CScheme
     CColors                          m_Color;
     CNCMetrics                    m_NCMetric;
     CFonts                            m_Font;
+    bool                 m_bGradientCaptions;
+    bool                        m_bFlatMenus;
     CNCMetrics::Range m_SizeRange[NCM_Count];
 
     ~CScheme();
