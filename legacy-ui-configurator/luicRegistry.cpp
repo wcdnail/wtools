@@ -65,12 +65,13 @@ int CRegistry::ForEachValue(ForEachFn const& frRoutine) const
     return nCount;
 }
 
-bool CRegistry::GetValueImpl(StrView name, void* data, size_t dataSize, DWORD& dwType) const
+bool CRegistry::GetValueImpl(StrView name, void* data, size_t dataSize) const
 {
     if (!m_hKey) {
         DH::TPrintf(L"%s: ERROR:!m_hKey\n", __FUNCTIONW__);
         return false;
     }
+    DWORD  dwType{0};
     DWORD  dwSize{0};
     HRESULT  code{ERROR_SUCCESS};
     code = RegQueryValueExW(m_hKey, name.data(), nullptr, &dwType, nullptr, &dwSize);

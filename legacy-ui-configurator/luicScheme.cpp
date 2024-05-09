@@ -70,7 +70,7 @@ bool CScheme::LoadDefaults()
         DH::TPrintf(L"%s: ERROR: CFonts::LoadDefaults failed\n", __FUNCTIONW__);
         return false;
     }
-    if (!tmpFonts.LoadDefaults(tmpNCMetrics)) {
+    if (!tmpFonts.LoadValues(tmpNCMetrics)) {
         DH::TPrintf(L"%s: ERROR: CFonts::LoadDefaults for CNCMetrcs failed\n", __FUNCTIONW__);
         return false;
     }
@@ -103,20 +103,40 @@ void CScheme::CopyTo(CScheme& target) const
 
 bool CScheme::LoadValues(CRegistry const& regScheme)
 {
-    const DWORD bGradients{regScheme.GetValue<DWORD>(L"Gradients", FALSE)};
-    const DWORD bFlatMenus{regScheme.GetValue<DWORD>(L"FlatMenus", FALSE)};
-    CColors      tmpColors{};
+    DWORD  bGradients{FALSE};
+    DWORD  bFlatMenus{FALSE};
+    CColors tmpColors{};
     if (!tmpColors.LoadValues(regScheme)) {
         DH::TPrintf(L"%s: ERROR: CColors::LoadValues failed\n", __FUNCTIONW__);
         return false;
     }
     tmpColors.Swap(m_Color);
-    m_bFlatMenus = bFlatMenus != FALSE;
-    m_bGradientCaptions = bGradients != FALSE;
+    if (regScheme.GetValue<DWORD>(L"Gradients", bGradients)) {
+        m_bFlatMenus = bFlatMenus != FALSE;
+    }
+    if (regScheme.GetValue<DWORD>(L"FlatMenus", bFlatMenus)) {
+        m_bGradientCaptions = bGradients != FALSE;
+    }
     return true;
 }
 
 bool CScheme::LoadSizes(StrView sName, CRegistry const& regScheme)
 {
+    CNCMetrics tmpNCMetrics{};
+    CFonts         tmpFonts{};
+    if (!tmpNCMetrics.LoadValues(regScheme)) {
+        DH::TPrintf(L"%s: ERROR: CNCMetrics::LoadValues failed\n", __FUNCTIONW__);
+        return false;
+    }
+    if (!tmpFonts.LoadDefaults()) {
+        DH::TPrintf(L"%s: ERROR: CFonts::LoadDefaults failed\n", __FUNCTIONW__);
+        return false;
+    }
+    if (!tmpFonts.LoadValues(tmpNCMetrics)) {
+        DH::TPrintf(L"%s: ERROR: CFonts::LoadDefaults for CNCMetrcs failed\n", __FUNCTIONW__);
+        return false;
+    }
+    tmpFonts.Swap(m_Font);
+    tmpNCMetrics.CopyTo(m_NCMetric);
     return true;
 }

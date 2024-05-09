@@ -116,8 +116,11 @@ bool CColors::LoadValues(CRegistry const& regScheme)
     CColorPair pair[CLR_Count];
     for (int i = 0; i < CLR_Count; i++) {
         std::wstring name = L"Color" + std::to_wstring(i);
-        const DWORD dwColor = regScheme.GetValue<DWORD>(name, CLR_INVALID);
-        if (CLR_INVALID == dwColor || !pair[i].Reset(static_cast<COLORREF>(dwColor))) {
+        DWORD dwColor = CLR_INVALID;
+        if (!regScheme.GetValue<DWORD>(name, dwColor)) {
+            return false;
+        }
+        if (!pair[i].Reset(static_cast<COLORREF>(dwColor))) {
             return false;
         }
     }

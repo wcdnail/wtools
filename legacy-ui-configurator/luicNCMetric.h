@@ -3,6 +3,8 @@
 #include <wcdafx.api.h>
 #include <winuser.h>
 
+struct CRegistry;
+
 enum ENCM_Index : int
 {
     /*                    */ NCM_Invalid = -1,
@@ -38,6 +40,7 @@ struct CNCMetrics: NONCLIENTMETRICS
     static PCWSTR Title(int index);
 
     bool LoadDefaults();
+    bool LoadValues(CRegistry const& regScheme);
     void CopyTo(CNCMetrics& target) const noexcept;
 
     int& operator[](int index);

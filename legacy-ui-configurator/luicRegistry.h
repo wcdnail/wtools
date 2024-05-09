@@ -23,22 +23,17 @@ struct CRegistry
     bool IsOk() const { return nullptr != m_hKey; }
 
     template <typename ValueType>
-    ValueType GetValue(StrView name, ValueType defaultValue) const;
+    bool GetValue(StrView name, ValueType& value) const;
 
 private:
     HKEY     m_hKey;
     bool m_bCreated;
 
-    bool GetValueImpl(StrView name, void* data, size_t dataSize, DWORD& dwType) const;
+    bool GetValueImpl(StrView name, void* data, size_t dataSize) const;
 };
 
 template <typename ValueType>
-inline ValueType CRegistry::GetValue(StrView name, ValueType defaultValue) const
+inline bool CRegistry::GetValue(StrView name, ValueType& value) const
 {
-    DWORD     dwType{0};
-    ValueType result{};
-    if (GetValueImpl(name, static_cast<void*>(&result), sizeof(result), dwType)) {
-        return result;
-    }
-    return defaultValue;
+    return GetValueImpl(name, static_cast<void*>(&value), sizeof(value));
 }

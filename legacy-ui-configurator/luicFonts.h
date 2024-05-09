@@ -4,6 +4,7 @@
 #include <atlstr.h>
 #include <atlgdi.h>
 
+struct CRegistry;
 struct CNCMetrics;
 
 enum EFontSizes : long
@@ -51,7 +52,7 @@ struct CFonts
     static PCWSTR Title(int index);
 
     bool LoadDefaults();
-    bool LoadDefaults(CNCMetrics& ncMetrics);
+    bool LoadValues(CNCMetrics& ncMetrics);
     void Swap(CFonts& rhs) noexcept;
     void CopyTo(CFonts& target) const noexcept;
 

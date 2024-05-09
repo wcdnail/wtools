@@ -1,9 +1,16 @@
 ﻿#include "stdafx.h"
 #include "luicNCMetric.h"
+#include "luicRegistry.h"
+#include "luicFonts.h"
 #include "dh.tracing.h"
 
 CNCMetrics::~CNCMetrics() = default;
-CNCMetrics::CNCMetrics() = default;
+
+CNCMetrics::CNCMetrics()
+{
+    ZeroMemory(this, sizeof(*this));
+    this->cbSize = sizeof(*this);
+}
 
 CNCMetrics::Range const& CNCMetrics::DefaultRange(int index)
 {
@@ -60,6 +67,28 @@ bool CNCMetrics::LoadDefaults()
         return false;
     }
     CopyMemory(this, &ncMetrics, sizeof(ncMetrics));
+    return true;
+}
+
+bool CNCMetrics::LoadValues(CRegistry const& regScheme)
+{
+    for (int i = 0; i < NCM_Count; i++) {
+        std::wstring name = L"Size" + std::to_wstring(i);
+        DWORD dwSize = static_cast<DWORD>(-1);
+        if (!regScheme.GetValue<DWORD>(name, dwSize)) {
+            return false;
+        }
+        getRefByIndex<int>(*this, i) = static_cast<int>(dwSize);
+    }
+
+    for (int i = 0; i < NCM_Count; i++) {
+        std::wstring name = L"Size" + std::to_wstring(i);
+        DWORD dwSize = static_cast<DWORD>(-1);
+        if (!regScheme.GetValue<DWORD>(name, dwSize)) {
+            return false;
+        }
+        getRefByIndex<int>(*this, i) = static_cast<int>(dwSize);
+    }
     return true;
 }
 

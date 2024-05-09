@@ -51,7 +51,7 @@ bool CFonts::LoadDefaults()
     return true;
 }
 
-bool CFonts::LoadDefaults(CNCMetrics& ncMetrics)
+bool CFonts::LoadValues(CNCMetrics& ncMetrics)
 {
     auto&   lfCaption = static_cast<WTL::CLogFont&>(ncMetrics.lfCaptionFont);
     auto& lfSmCaption = static_cast<WTL::CLogFont&>(ncMetrics.lfSmCaptionFont);
