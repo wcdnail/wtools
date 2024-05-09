@@ -4,6 +4,7 @@
 #include "luicColors.h"
 #include "luicFonts.h"
 #include <wcdafx.api.h>
+#include <memory>
 
 enum EItemIndex : int
 {
@@ -48,9 +49,15 @@ enum EItemSize: int
     IT_SizeCount
 };
 
+struct CScheme;
+
+using CSchemePtr = std::shared_ptr<CScheme>;
+
 struct CScheme
 {
     DELETE_COPY_MOVE_OF(CScheme);
+
+    using String = std::wstring;
 
     struct Item
     {
@@ -63,12 +70,14 @@ struct CScheme
         int fontColor;
     };
 
-    CColors        m_Color;
-    CNCMetrics  m_NCMetric;
-    CFonts          m_Font;
+    String                            m_Name;
+    CColors                          m_Color;
+    CNCMetrics                    m_NCMetric;
+    CFonts                            m_Font;
+    CNCMetrics::Range m_SizeRange[NCM_Count];
 
     ~CScheme();
-    CScheme();
+    CScheme(String const& name);
 
     static Item const& ItemDef(int index);
 

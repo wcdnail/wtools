@@ -60,14 +60,7 @@ bool CNCMetrics::LoadDefaults()
         return false;
     }
     CopyMemory(this, &ncMetrics, sizeof(ncMetrics));
-#if 0
-    Range sizeRanges[NCM_Count] = { 0 };
-    for (int i = 0; i < NCM_Count; i++) {
-        sizeRanges[i].current = DefaultRange(i).current;
-    }
-#endif
     return true;
-
 }
 
 void CNCMetrics::Swap(CNCMetrics& rhs) noexcept

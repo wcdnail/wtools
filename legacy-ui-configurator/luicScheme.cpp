@@ -3,10 +3,15 @@
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
-#include "luicAppearance.h"
-
 CScheme::~CScheme() = default;
-CScheme::CScheme() = default;
+
+CScheme::CScheme(String const& name)
+    : m_Name(name)
+{
+    for (int i = 0; i < NCM_Count; i++) {
+        m_SizeRange[i] = CNCMetrics::DefaultRange(i);
+    }
+}
 
 CScheme::Item const& CScheme::ItemDef(int index)
 {
@@ -49,19 +54,24 @@ bool CScheme::LoadDefaults()
     CNCMetrics tmpNCMetrics;
     CFonts         tmpFonts;
     if (!tmpColors.LoadDefaults()) {
+        DH::TPrintf(L"%s: ERROR: CColors::LoadDefaults failed\n", __FUNCTIONW__);
         return false;
     }
     if (!tmpNCMetrics.LoadDefaults()) {
+        DH::TPrintf(L"%s: ERROR: CNCMetrics::LoadDefaults failed\n", __FUNCTIONW__);
         return false;
     }
     if (!tmpFonts.LoadDefaults()) {
+        DH::TPrintf(L"%s: ERROR: CFonts::LoadDefaults failed\n", __FUNCTIONW__);
         return false;
     }
     if (!tmpFonts.LoadDefaults(tmpNCMetrics)) {
+        DH::TPrintf(L"%s: ERROR: CFonts::LoadDefaults for CNCMetrcs failed\n", __FUNCTIONW__);
         return false;
     }
     tmpFonts.Swap(m_Font);
     tmpNCMetrics.Swap(m_NCMetric);
     tmpColors.Swap(m_Color);
+    DH::TPrintf(L"%s: OK\n", __FUNCTIONW__);
     return true;
 }

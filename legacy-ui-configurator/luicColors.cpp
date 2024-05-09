@@ -105,7 +105,7 @@ CColorPair const& CColors::operator[](int index) const
 
 bool CColorPair::Reset(COLORREF color)
 {
-    HBRUSH hBrush = CreateSolidBrush(color);
+    const HBRUSH hBrush = CreateSolidBrush(color);
     if (!hBrush) {
         const auto code = static_cast<HRESULT>(GetLastError());
         const auto codeText = Str::ErrorCode<wchar_t>::SystemMessage(code);
