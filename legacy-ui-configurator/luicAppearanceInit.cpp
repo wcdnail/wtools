@@ -192,12 +192,34 @@ void CPageAppearance::OnDestroy()
     CPageImpl::OnDestroy();
 }
 
-void CPageAppearance::InitializeScheme(CSchemeManager const& schemeManager)
+CSchemeManager::SchemeVec const& CPageAppearance::InitializeScale(CSchemeManager const& manager)
+{
+    WTL::CComboBox& lbCtl{m_cbSchemeScale};
+    lbCtl.ResetContent();
+    auto const& schemesMap = manager.SchemesMap();
+    int nIndex = 0;
+    for (const auto& it: schemesMap) {
+        const int nItem = lbCtl.AddString(it.first.c_str());
+        if (nItem < 0) {
+            const auto code{static_cast<HRESULT>(GetLastError())};
+            ReportError(Str::ElipsisW::Format(L"LB AddString [w:%08x] [%d] '%s' ERROR",
+                    lbCtl.m_hWnd, nIndex, it.first.c_str()), code);
+            continue;
+        }
+        lbCtl.SetItemData(nItem, static_cast<DWORD_PTR>(nIndex));
+        ++nIndex;
+    }
+    ATLASSUME(nIndex > 0);
+    lbCtl.SetCurSel(0);
+    return schemesMap.cbegin()->second;
+}
+
+CScheme const& CPageAppearance::InitializeScheme(CSchemeManager::SchemeVec const& schemes, int initialIndex)
 {
     WTL::CComboBox& lbCtl{m_cbScheme};
     lbCtl.ResetContent();
     int nIndex = 0;
-    for (const auto& it: schemeManager.Schemes()) {
+    for (const auto& it: schemes) {
         const int nItem = lbCtl.AddString(it->m_Name.c_str());
         if (nItem < 0) {
             const auto code{static_cast<HRESULT>(GetLastError())};
@@ -208,12 +230,9 @@ void CPageAppearance::InitializeScheme(CSchemeManager const& schemeManager)
         lbCtl.SetItemData(nItem, static_cast<DWORD_PTR>(nIndex));
         ++nIndex;
     }
-}
-
-void CPageAppearance::InitializeScale(CScheme const& sourceScheme)
-{
-    UNREFERENCED_PARAMETER(sourceScheme);
-    m_cbSchemeScale.AddString(L"Normal");
+    ATLASSUME(initialIndex >= 0 && initialIndex < schemes.size());
+    ATLASSERT(schemes[initialIndex].get() != nullptr);
+    return *schemes[initialIndex];
 }
 
 void CPageAppearance::InitializeItems()
@@ -336,9 +355,8 @@ void CPageAppearance::InitializeFontButtons()
 
 void CPageAppearance::OnSchemesChanged(CLUIApp const* pApp, int initialIndex)
 {
-    CScheme const& sourceScheme = pApp->SchemeManager()[initialIndex];
-    InitializeScheme(pApp->SchemeManager());
-    InitializeScale(sourceScheme);
+    auto const& schemes{InitializeScale(pApp->SchemeManager())};
+    auto const&  source{InitializeScheme(schemes, initialIndex)};
     {
         ScopedBoolGuard guard(m_bLoadValues);
         m_cbScheme.SetCurSel(initialIndex);
@@ -347,7 +365,7 @@ void CPageAppearance::OnSchemesChanged(CLUIApp const* pApp, int initialIndex)
         m_cbFont.SetCurSel(0);
         m_cbFontSmooth.SetCurSel(0);
     }
-    sourceScheme.CopyTo(m_SchemeCopy);
+    source.CopyTo(m_SchemeCopy);
     OnSchemeChanged(initialIndex);
 }
 

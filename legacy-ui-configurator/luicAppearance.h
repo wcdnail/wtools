@@ -8,6 +8,8 @@
 #include <atlstr.h>
 #include <atlctrls.h>
 
+#include "luicSchemeManager.h"
+
 class CLUIApp;
 struct CSchemeManager;
 
@@ -57,8 +59,8 @@ private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
 
-    void InitializeScheme(CSchemeManager const& schemeManager);
-    void InitializeScale(CScheme const& sourceScheme);
+    CSchemeManager::SchemeVec const& InitializeScale(CSchemeManager const& manager);
+    CScheme const& InitializeScheme(CSchemeManager::SchemeVec const& schemes, int initialIndex);
     void InitializeItems();
     void InitializeFonts(FontMap const& fontsMap);
     void InitializeFontSizes();

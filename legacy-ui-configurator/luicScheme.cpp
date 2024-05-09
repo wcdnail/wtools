@@ -1,11 +1,12 @@
 ﻿#include "stdafx.h"
 #include "luicScheme.h"
+#include "luicRegistry.h"
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
 CScheme::~CScheme() = default;
 
-CScheme::CScheme(String const& name)
+CScheme::CScheme(StrView name)
     : m_Name{name}
     , m_bGradientCaptions{false}
     , m_bFlatMenus{false}
@@ -98,4 +99,24 @@ void CScheme::CopyTo(CScheme& target) const
     target.m_bFlatMenus = m_bFlatMenus;
     target.m_bGradientCaptions = m_bGradientCaptions;
     target.m_Name = m_Name; // NO noecept!
+}
+
+bool CScheme::LoadValues(CRegistry const& regScheme)
+{
+    const DWORD bGradients{regScheme.GetValue<DWORD>(L"Gradients", FALSE)};
+    const DWORD bFlatMenus{regScheme.GetValue<DWORD>(L"FlatMenus", FALSE)};
+    CColors      tmpColors{};
+    if (!tmpColors.LoadValues(regScheme)) {
+        DH::TPrintf(L"%s: ERROR: CColors::LoadValues failed\n", __FUNCTIONW__);
+        return false;
+    }
+    tmpColors.Swap(m_Color);
+    m_bFlatMenus = bFlatMenus != FALSE;
+    m_bGradientCaptions = bGradients != FALSE;
+    return true;
+}
+
+bool CScheme::LoadSizes(StrView sName, CRegistry const& regScheme)
+{
+    return true;
 }

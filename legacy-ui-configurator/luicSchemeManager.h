@@ -1,29 +1,26 @@
 #pragma once
 
 #include "luicScheme.h"
+#include <unordered_map>
 #include <vector>
 
 struct CSchemeManager
 {
+    using   StrView = CScheme::StrView;
     using    String = CScheme::String;
     using SchemeVec = std::vector<CSchemePtr>;
+    using SchemeMap = std::unordered_map<String, SchemeVec>;
 
     ~CSchemeManager();
     CSchemeManager();
 
-    CScheme& operator[](int index);
-    CScheme const& operator[](int index) const;
-
     HRESULT Initialize();
 
-    SchemeVec const& Schemes() const;
+    SchemeMap const& SchemesMap() const;
 
 private:
     CScheme   m_Default;
-    SchemeVec m_Schemes;
-
-    template <typename ReturnType, typename SelfRef>
-    static ReturnType& getRefByIndex(SelfRef& thiz, int index);
+    SchemeMap m_Schemes;
 };
 
-inline CSchemeManager::SchemeVec const& CSchemeManager::Schemes() const { return m_Schemes; }
+inline CSchemeManager::SchemeMap const& CSchemeManager::SchemesMap() const { return m_Schemes; }

@@ -4,7 +4,14 @@
 #include "luicColors.h"
 #include "luicFonts.h"
 #include <wcdafx.api.h>
+#include <string_view>
+#include <string>
 #include <memory>
+
+struct CRegistry;
+struct CScheme;
+
+using CSchemePtr = std::shared_ptr<CScheme>;
 
 enum EItemIndex : int
 {
@@ -49,15 +56,12 @@ enum EItemSize: int
     IT_SizeCount
 };
 
-struct CScheme;
-
-using CSchemePtr = std::shared_ptr<CScheme>;
-
 struct CScheme
 {
     DELETE_COPY_MOVE_OF(CScheme);
 
-    using String = std::wstring;
+    using StrView = std::wstring_view;
+    using  String = std::wstring;
 
     struct Item
     {
@@ -79,12 +83,14 @@ struct CScheme
     CNCMetrics::Range m_SizeRange[NCM_Count];
 
     ~CScheme();
-    CScheme(String const& name);
+    CScheme(StrView name);
 
     static Item const& ItemDef(int index);
 
     bool LoadDefaults();
     void CopyTo(CScheme& target) const;
+    bool LoadValues(CRegistry const& regScheme);
+    bool LoadSizes(StrView sName, CRegistry const& regScheme);
 
     COLORREF               GetColor(int index) const { return m_Color[index].m_Color; }
     WTL::CBrush const&     GetBrush(int index) const { return m_Color[index].m_Brush; }

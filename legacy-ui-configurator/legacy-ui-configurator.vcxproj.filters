@@ -85,6 +85,7 @@
       <Filter>theme</Filter>
     </ClInclude>
     <ClInclude Include="luicUtils.h" />
+    <ClInclude Include="luicRegistry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="luicAppearanceInit.cpp">
       <Filter>pages</Filter>
     </ClCompile>
+    <ClCompile Include="luicRegistry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resz\legacy-ui-configurator.rc">

@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "luicColors.h"
+#include "luicRegistry.h"
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
@@ -108,6 +109,22 @@ void CColors::CopyTo(CColors& target) const noexcept
     for (int i = 0; i < CLR_Count; i++) {
         m_Pair[i].CopyTo(target.m_Pair[i]);
     }
+}
+
+bool CColors::LoadValues(CRegistry const& regScheme)
+{
+    CColorPair pair[CLR_Count];
+    for (int i = 0; i < CLR_Count; i++) {
+        std::wstring name = L"Color" + std::to_wstring(i);
+        const DWORD dwColor = regScheme.GetValue<DWORD>(name, CLR_INVALID);
+        if (CLR_INVALID == dwColor || !pair[i].Reset(static_cast<COLORREF>(dwColor))) {
+            return false;
+        }
+    }
+    for (int i = 0; i < CLR_Count; i++) {
+        m_Pair[i] = pair[i];
+    }
+    return true;
 }
 
 template <typename ReturnType, typename SelfRef>

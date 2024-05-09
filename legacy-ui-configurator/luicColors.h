@@ -2,6 +2,8 @@
 
 #include <wcdafx.api.h>
 
+struct CRegistry;
+
 enum EColors_Index : int
 {
     CLR_Invalid = -1,
@@ -78,6 +80,7 @@ struct CColors
     bool LoadDefaults();
     void Swap(CColors& rhs) noexcept;
     void CopyTo(CColors& target) const noexcept;
+    bool LoadValues(CRegistry const& regScheme);
 
     CColorPair& operator[](int index);
     CColorPair const& operator[](int index) const;

@@ -59,14 +59,14 @@ namespace DH
         WCDAFX_API DH::TraceCategory const& WTL();
     }
 
-    WCDAFX_API void Printf(_Printf_format_string_ PCSTR format, ...);
-    WCDAFX_API void Printf(_Printf_format_string_ PCWSTR format, ...);
+    WCDAFX_API void Printf(_In_z_ _Printf_format_string_ PCSTR format, ...);
+    WCDAFX_API void Printf(_In_z_ _Printf_format_string_ PCWSTR format, ...);
     
-    WCDAFX_API void TPrintf(_Printf_format_string_ PCSTR format, ...);
-    WCDAFX_API void TPrintf(_Printf_format_string_ PCWSTR format, ...);
+    WCDAFX_API void TPrintf(_In_z_ _Printf_format_string_ PCSTR format, ...);
+    WCDAFX_API void TPrintf(_In_z_ _Printf_format_string_ PCWSTR format, ...);
     
-    WCDAFX_API void TCPrintf(TraceCategory const& cat, _Printf_format_string_ PCSTR format, ...);
-    WCDAFX_API void TCPrintf(TraceCategory const& cat, _Printf_format_string_ PCWSTR format, ...);
+    WCDAFX_API void TCPrintf(TraceCategory const& cat, _In_z_ _Printf_format_string_ PCSTR format, ...);
+    WCDAFX_API void TCPrintf(TraceCategory const& cat, _In_z_ _Printf_format_string_ PCWSTR format, ...);
 
     namespace Impl
     {
