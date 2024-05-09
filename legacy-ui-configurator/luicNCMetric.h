@@ -38,7 +38,7 @@ struct CNCMetrics: NONCLIENTMETRICS
     static PCWSTR Title(int index);
 
     bool LoadDefaults();
-    void Swap(CNCMetrics& rhs) noexcept;
+    void CopyTo(CNCMetrics& target) const noexcept;
 
     int& operator[](int index);
     int operator[](int index) const;

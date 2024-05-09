@@ -11,6 +11,7 @@
 #include "resz/resource.h"
 #include <string.utils.format.h>
 #include <UT/debug.assistance.h>
+#include <ranges>
 
 enum PageIndex: int
 {
@@ -60,8 +61,8 @@ CMainView::CMainView()
 
 BOOL CMainView::PreTranslateMessage(MSG* pMsg)
 {
-    for (const auto& it: m_PagesMap) {
-        if (it.second->PreTranslateMessage(pMsg)) {
+    for (const auto& page : m_PagesMap | std::views::values) {
+        if (page->PreTranslateMessage(pMsg)) {
             return TRUE;
         }
     }
@@ -91,21 +92,37 @@ void CMainView::SelectAll()
         PagesGetCurrent()->SelectAll();
         break;
     }
+    default:
+        break;
     }
 }
 
-CPageImplPtr const& CMainView::PagesGet(int numba) const
+void CMainView::NotifySchemesChanged() const
+{
+    auto* pAppearance = PagesGetT<CPageAppearance>(PageAppearance);
+    if (!pAppearance) {
+        return ;
+    }
+    pAppearance->NotifySchemesChanged();
+}
+
+template <typename PageType>
+PageType* CMainView::PagesGetT(int numba) const
 {
     const auto& it = m_PagesMap.find(numba);
     if (it == m_PagesMap.cend()) {
         DBGTPrint(LTH_CONTROL L" Page #%d does not EXIST!\n", numba);
-        static const CPageImplPtr dmyPtr;
-        return dmyPtr;
+        return nullptr;
     }
-    return it->second;
+    return static_cast<PageType*>(it->second.get());
 }
 
-CPageImplPtr const& CMainView::PagesGetCurrent() const
+CPageImpl* CMainView::PagesGet(int numba) const
+{
+    return PagesGetT<CPageImpl>(numba);
+}
+
+CPageImpl* CMainView::PagesGetCurrent() const
 {
     return PagesGet(m_TabCtrl.GetCurSel());
 }
@@ -113,7 +130,7 @@ CPageImplPtr const& CMainView::PagesGetCurrent() const
 void CMainView::PagesGetRect()
 {
     CRect rcTab;
-    if (0) { // ##FIXME: is m_TabCtrl owns page ?
+    if constexpr (true) { // ##FIXME: is m_TabCtrl owns page ?
         CRect rcMy;
         GetWindowRect(rcMy);
         m_TabCtrl.GetWindowRect(rcTab);
@@ -144,10 +161,9 @@ void CMainView::PagesGetRect()
 #endif
 }
 
-void CMainView::PagesShow(int numba, bool show)
+void CMainView::PagesShow(int numba, bool show) const
 {
-    const auto& page = PagesGet(numba);
-    if (page) {
+    if (auto* page = PagesGet(numba)) {
         if (!show) {
             page->ShowWindow(SW_HIDE);
             page->EnableWindow(FALSE);
@@ -163,7 +179,7 @@ void CMainView::PagesShow(int numba, bool show)
 void CMainView::PagesAppend(CPageImplPtr&& pagePtr)
 {
     HRESULT code = S_FALSE;
-    int number = m_TabCtrl.InsertItem(m_TabCtrl.GetItemCount(), TCIF_TEXT, pagePtr->GetCaption(), 0, 0l);
+    const int number = m_TabCtrl.InsertItem(m_TabCtrl.GetItemCount(), TCIF_TEXT, pagePtr->GetCaption(), 0, 0l);
     if (number < 0) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"Append dialog page '%s' failed!", pagePtr->GetCaption()), code, true, MB_ICONERROR);
@@ -188,8 +204,8 @@ void CMainView::OnResizeNotify()
         return ;
     }
     PagesGetRect();
-    for (const auto& it: m_PagesMap) {
-        it.second->MoveWindow(m_rcTabClient, FALSE);
+    for (const auto& page: m_PagesMap | std::views::values) {
+        page->MoveWindow(m_rcTabClient, FALSE);
     }
 }
 
@@ -206,7 +222,7 @@ BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     GetParent().SetWindowTextW(L"Display Properties");
     PagesCreate();
 
-    const int initialPage = 0;
+    constexpr int initialPage = 0;
     m_TabCtrl.SetCurSel(initialPage);
     m_TabCtrl.EnableWindow(TRUE);
     PagesShow(initialPage, true);
@@ -234,17 +250,16 @@ LRESULT CMainView::OnNotify(int idCtrl, LPNMHDR pnmh)
 {
     switch (pnmh->code) {
     case TCN_SELCHANGE: {
-        int numba = TabCtrl_GetCurSel(pnmh->hwndFrom);
+        const int numba = TabCtrl_GetCurSel(pnmh->hwndFrom);
         PagesShow(numba, true);
         break;
     }
     case TCN_SELCHANGING: {
-        int numba = TabCtrl_GetCurSel(pnmh->hwndFrom);
+        const int numba = TabCtrl_GetCurSel(pnmh->hwndFrom);
         PagesShow(numba, false);
         break;
     }
     default:
-        //DBGTPrint(LTH_WM_NOTIFY L" Unknown: c:%4d n:%04x\n", idCtrl, pnmh->code);
         break;
     }
     return 0;
@@ -252,7 +267,7 @@ LRESULT CMainView::OnNotify(int idCtrl, LPNMHDR pnmh)
 
 void CMainView::OnSetFocus(HWND hWndOld)
 {
-    CPageImplPtr const& current = PagesGetCurrent();
+    auto* current = PagesGetCurrent();
     if (!current) {
         CPageImpl::OnSetFocus(hWndOld);
         return ;

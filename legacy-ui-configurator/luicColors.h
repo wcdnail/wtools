@@ -49,14 +49,21 @@ enum EColors_Index : int
 
 struct CColorPair
 {
+    DELETE_COPY_MOVE_OF(CColorPair);
+
     COLORREF    m_Color;
     WTL::CBrush m_Brush;
+    bool        m_bCopy;
+
+    ~CColorPair();
+    CColorPair();
 
     bool Reset(COLORREF color);
     bool Reset(WTL::CBrush& hBrush);
 
     CColorPair& operator = (CColorPair& rhs) noexcept;
     void Swap(CColorPair& rhs) noexcept;
+    void CopyTo(CColorPair& target) const noexcept;
 };
 
 struct CColors
@@ -70,6 +77,7 @@ struct CColors
 
     bool LoadDefaults();
     void Swap(CColors& rhs) noexcept;
+    void CopyTo(CColors& target) const noexcept;
 
     CColorPair& operator[](int index);
     CColorPair const& operator[](int index) const;

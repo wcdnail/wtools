@@ -176,13 +176,13 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
         m_bnItemColor[i].SetDefaultText(_T("Revert"));
         m_bnItemColor[i].SetCustomText(_T("Customize"));
     }
-
 #ifdef _DEBUG_CONTROLS
     DoForEach(CtlShow);
 #endif
+    InitializeItems();
+    InitializeFonts(pApp->GetFontMap());
 
     CtlAdjustPositions();
-    Initialize(pApp, 0);
     InitResizeMap();
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }
@@ -334,15 +334,11 @@ void CPageAppearance::InitializeFontButtons()
     m_bnFontUndrln.SetFont(gs_fntUnderline);
 }
 
-void CPageAppearance::Initialize(CLUIApp const* pApp, int initialIndex)
+void CPageAppearance::OnSchemesChanged(CLUIApp const* pApp, int initialIndex)
 {
     CScheme const& sourceScheme = pApp->SchemeManager()[initialIndex];
-
     InitializeScheme(pApp->SchemeManager());
     InitializeScale(sourceScheme);
-    InitializeItems();
-    InitializeFonts(pApp->GetFontMap());
-
     {
         ScopedBoolGuard guard(m_bLoadValues);
         m_cbScheme.SetCurSel(initialIndex);
@@ -351,6 +347,11 @@ void CPageAppearance::Initialize(CLUIApp const* pApp, int initialIndex)
         m_cbFont.SetCurSel(0);
         m_cbFontSmooth.SetCurSel(0);
     }
+    sourceScheme.CopyTo(m_SchemeCopy);
     OnSchemeChanged(initialIndex);
 }
 
+void CPageAppearance::NotifySchemesChanged()
+{
+    OnSchemesChanged(CLUIApp::App(), 0);
+}

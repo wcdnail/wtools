@@ -96,7 +96,7 @@
 //
 // Instructions on how to add CColorButton to you application:
 //
-//   1. Copy CColorButton.h and CColorButton.cpp into you application directory.
+//   1. CopyTo CColorButton.h and CColorButton.cpp into you application directory.
 //
 //   2. Add the two files into your project.
 //

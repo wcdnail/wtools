@@ -255,7 +255,6 @@
     <ClInclude Include="luicSchemeManager.h" />
     <ClInclude Include="luicScreenSaver.h" />
     <ClInclude Include="luicSettings.h" />
-    <ClInclude Include="luicTheme.h" />
     <ClInclude Include="luicThemePreviewer.h" />
     <ClInclude Include="luicUtils.h" />
     <ClInclude Include="luicWeb.h" />
@@ -298,7 +297,6 @@
     <ClCompile Include="luicSchemeManager.cpp" />
     <ClCompile Include="luicScreenSaver.cpp" />
     <ClCompile Include="luicSettings.cpp" />
-    <ClCompile Include="luicTheme.cpp" />
     <ClCompile Include="luicThemePreviewer.cpp" />
     <ClCompile Include="luicWeb.cpp" />
     <ClCompile Include="stdafx.cpp">

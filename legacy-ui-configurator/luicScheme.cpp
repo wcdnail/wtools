@@ -82,10 +82,20 @@ bool CScheme::LoadDefaults()
         return false;
     }
     tmpFonts.Swap(m_Font);
-    tmpNCMetrics.Swap(m_NCMetric);
+    tmpNCMetrics.CopyTo(m_NCMetric);
     tmpColors.Swap(m_Color);
     m_bFlatMenus = bFlatMenus != FALSE;
     m_bGradientCaptions = bGradientCaptions != FALSE;
     DH::TPrintf(L"%s: OK\n", __FUNCTIONW__);
     return true;
+}
+
+void CScheme::CopyTo(CScheme& target) const
+{
+    m_Color.CopyTo(target.m_Color);
+    m_NCMetric.CopyTo(target.m_NCMetric);
+    m_Font.CopyTo(target.m_Font);
+    target.m_bFlatMenus = m_bFlatMenus;
+    target.m_bGradientCaptions = m_bGradientCaptions;
+    target.m_Name = m_Name; // NO noecept!
 }

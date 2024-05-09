@@ -49,9 +49,6 @@
     <ClInclude Include="luicWeb.h">
       <Filter>pages</Filter>
     </ClInclude>
-    <ClInclude Include="luicTheme.h">
-      <Filter>theme</Filter>
-    </ClInclude>
     <ClInclude Include="luicThemePreviewer.h">
       <Filter>theme</Filter>
     </ClInclude>
@@ -116,9 +113,6 @@
     </ClCompile>
     <ClCompile Include="luicWeb.cpp">
       <Filter>pages</Filter>
-    </ClCompile>
-    <ClCompile Include="luicTheme.cpp">
-      <Filter>theme</Filter>
     </ClCompile>
     <ClCompile Include="luicThemePreviewer.cpp">
       <Filter>theme</Filter>

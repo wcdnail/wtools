@@ -70,18 +70,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
 
     HRESULT code{S_OK};
     auto*   pApp{CLUIApp::App()};
-    code = pApp->SchemeManager().Initialize();
-    if (ERROR_SUCCESS != code) {
-        SetLastError(static_cast<DWORD>(code));
-        ReportError(L"SchemeManager::Initialize failure...", code);
-        return -1;
-    }
+
     code = CDrawings::StaticInit(m_hWnd);
     if (ERROR_SUCCESS != code) {
         SetLastError(static_cast<DWORD>(code));
         ReportError(L"CDrawings::StaticInit failure...", code);
         return -1;
     }
+
 #ifdef _DEBUG_CONTROLS
     ShowWindow(SW_SHOW);
 #endif
@@ -116,6 +112,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
     pLoop->AddIdleHandler(this);
 
     DlgResize_Init(false, false);
+
+    code = pApp->SchemeManager().Initialize();
+    if (ERROR_SUCCESS != code) {
+        SetLastError(static_cast<DWORD>(code));
+        ReportError(L"SchemeManager::Initialize failure...", code);
+        return -1;
+    }
+    m_View.NotifySchemesChanged();
+
     m_bInitialized = true;
     m_View.SetFocus();
     return 0;

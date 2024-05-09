@@ -63,9 +63,9 @@ bool CNCMetrics::LoadDefaults()
     return true;
 }
 
-void CNCMetrics::Swap(CNCMetrics& rhs) noexcept
+void CNCMetrics::CopyTo(CNCMetrics& target) const noexcept
 {
-    CopyMemory(&rhs, this, sizeof(*this));
+    CopyMemory(&target, this, sizeof(*this));
 }
 
 template <typename ReturnType, typename SelfRef>

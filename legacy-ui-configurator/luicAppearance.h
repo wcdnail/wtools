@@ -18,6 +18,8 @@ struct CPageAppearance: CPageImpl
     ~CPageAppearance() override;
     CPageAppearance(std::wstring&& caption);
 
+    void NotifySchemesChanged();
+
 private:
     CScheme                        m_SchemeCopy;
     bool                          m_bLoadValues;
@@ -62,7 +64,7 @@ private:
     void InitializeFontSizes();
     void InitializeFontSmooth();
     void InitializeFontButtons();
-    void Initialize(CLUIApp const* pApp, int initialIndex);
+    void OnSchemesChanged(CLUIApp const* pApp, int initialIndex);
 
     void ThemeEnable(BOOL bEnable);
     void ItemEnable(BOOL bEnable);

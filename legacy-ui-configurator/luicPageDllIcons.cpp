@@ -28,7 +28,7 @@ CPageDllIcons::CPageDllIcons(std::wstring&& caption)
     ,      m_il32x32{}
     ,      m_il16x16{}
     , m_CurrFilename{}
-    ,   m_bManagedIl{ false }
+    ,   m_bManagedIl{false}
 {
 }
 

@@ -1,9 +1,22 @@
 ﻿#include "stdafx.h"
 #include "luicFonts.h"
+#include "luicNCMetric.h"
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
-#include "luicNCMetric.h"
+CFontPair::~CFontPair()
+{
+    if (m_bCopy) {
+        m_CFont.m_hFont = nullptr;
+    }
+}
+
+CFontPair::CFontPair()
+    : m_logFont{}
+    ,   m_CFont{nullptr}
+    ,   m_bCopy{false}
+{
+}
 
 CFonts::~CFonts() = default;
 CFonts::CFonts() = default;
@@ -56,13 +69,27 @@ bool CFonts::LoadDefaults(CNCMetrics& ncMetrics)
 void CFontPair::Swap(CFontPair& rhs) noexcept
 {
     std::swap(m_logFont, rhs.m_logFont);
-    m_hFont.Attach(rhs.m_hFont.Detach());
+    std::swap(m_CFont.m_hFont, rhs.m_CFont.m_hFont);
 }
 
 void CFonts::Swap(CFonts& rhs) noexcept
 {
-    for (int i=0; i < FONT_Count; i++) {
+    for (int i = 0; i < FONT_Count; i++) {
         rhs[i].Swap(m_Pair[i]);
+    }
+}
+
+void CFontPair::CopyTo(CFontPair& rhs) const noexcept
+{
+    rhs.m_logFont = m_logFont;
+    rhs.m_CFont.m_hFont = m_CFont.m_hFont;
+    rhs.m_bCopy = true;
+}
+
+void CFonts::CopyTo(CFonts& target) const noexcept
+{
+    for (int i = 0; i < FONT_Count; i++) {
+        m_Pair[i].CopyTo(target.m_Pair[i]);
     }
 }
 
@@ -103,6 +130,6 @@ bool CFontPair::Reset(WTL::CFont& hFont)
         return false;
     }
     m_logFont = temp;
-    m_hFont.Attach(hFont.Detach());
+    m_CFont.Attach(hFont.Detach());
     return true;
 }

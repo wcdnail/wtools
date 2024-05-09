@@ -3,6 +3,20 @@
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
+CColorPair::~CColorPair()
+{
+    if (m_bCopy) {
+        m_Brush.m_hBrush = nullptr;
+    }
+}
+
+CColorPair::CColorPair()
+    : m_Color{CLR_INVALID}
+    , m_Brush{nullptr}
+    , m_bCopy{false}
+{
+}
+
 CColors::~CColors() = default;
 CColors::CColors() = default;
 
@@ -72,13 +86,27 @@ bool CColors::LoadDefaults()
 void CColorPair::Swap(CColorPair& rhs) noexcept
 {
     std::swap(m_Color, rhs.m_Color);
-    m_Brush.Attach(rhs.m_Brush.Detach());
+    std::swap(m_Brush.m_hBrush, rhs.m_Brush.m_hBrush);
 }
 
 void CColors::Swap(CColors& rhs) noexcept
 {
-    for (int i=0; i < CLR_Count; i++) {
+    for (int i = 0; i < CLR_Count; i++) {
         rhs[i].Swap(m_Pair[i]);
+    }
+}
+
+void CColorPair::CopyTo(CColorPair& target) const noexcept
+{
+    target.m_Color = m_Color;
+    target.m_Brush.m_hBrush = m_Brush.m_hBrush;
+    target.m_bCopy = true;
+}
+
+void CColors::CopyTo(CColors& target) const noexcept
+{
+    for (int i = 0; i < CLR_Count; i++) {
+        m_Pair[i].CopyTo(target.m_Pair[i]);
     }
 }
 

@@ -48,6 +48,7 @@
 #include <iomanip>
 #include <utility>
 #include <string>
+#include <ranges>
 #include <memory>
 #include <vector>
 #include <mutex>

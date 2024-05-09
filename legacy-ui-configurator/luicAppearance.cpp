@@ -293,12 +293,9 @@ bool CPageAppearance::ItemFontApplyChanges(int nItem, ItemDef rItemDef, int iFon
     default:
         return false;
     }
-    CFontPair newFontPair{};
-    if (!newFontPair.Reset(lfCopy)) {
+    if (!m_SchemeCopy.m_Font[iFont].Reset(lfCopy)) {
         return false;
     }
-    m_SchemeCopy.m_Font[iFont] = newFontPair;
-    // FTODO: trace/check lfTarget
     return true;
 }
 
