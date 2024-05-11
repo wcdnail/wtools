@@ -91,16 +91,6 @@ bool CScheme::LoadDefaults()
     return true;
 }
 
-void CScheme::CopyTo(CScheme& target) const
-{
-    m_Color.CopyTo(target.m_Color);
-    m_NCMetric.CopyTo(target.m_NCMetric);
-    m_Font.CopyTo(target.m_Font);
-    target.m_bFlatMenus = m_bFlatMenus;
-    target.m_bGradientCaptions = m_bGradientCaptions;
-    target.m_Name = m_Name; // NO noecept!
-}
-
 bool CScheme::LoadValues(CRegistry const& regScheme)
 {
     DWORD  bGradients{FALSE};
@@ -139,4 +129,17 @@ bool CScheme::LoadSizes(StrView sName, CRegistry const& regScheme)
     tmpFonts.Swap(m_Font);
     tmpNCMetrics.CopyTo(m_NCMetric);
     return true;
+}
+
+void CScheme::CopyTo(CScheme& target) const
+{
+    m_Color.CopyTo(target.m_Color);
+    m_NCMetric.CopyTo(target.m_NCMetric);
+    m_Font.CopyTo(target.m_Font);
+    target.m_bFlatMenus = m_bFlatMenus;
+    target.m_bGradientCaptions = m_bGradientCaptions;
+    target.m_Name = m_Name; // NO noecept!
+    for (int i = 0; i < NCM_Count; i++) {
+        target.m_SizeRange[i] = m_SizeRange[i];
+    }
 }

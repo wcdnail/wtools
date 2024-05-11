@@ -74,7 +74,7 @@ void CPageAppearance::FontClr1Enable(BOOL bEnable)
 
 bool CPageAppearance::ItemColorSetBtn(int nButton, int iColor)
 {
-    if ((nButton < 0) || (nButton > IT_ColorCount) || (iColor < 0)) {
+    if ((nButton < 0) || (nButton > IT_ColorCount - 1) || (iColor < 0)) {
         return false;
     }
     const COLORREF clrToSet = m_SchemeCopy.m_Color[iColor].m_Color;
@@ -121,9 +121,11 @@ bool CPageAppearance::ItemSizeChanged(int nItem, int iSizeControl, bool bApply /
     if (IT_Invalid == nItem) {
         return false;
     }
-    auto const& rItemDef = CScheme::ItemDef(nItem);
-    int nMetric = IT_Invalid;
-    int  nValue = bApply ? GetDlgItemInt(m_edItemSize[iSizeControl].GetDlgCtrlID(), nullptr, FALSE) : IT_Invalid;
+    WTL::CLogFont logFont{};
+    auto const&  rItemDef{CScheme::ItemDef(nItem)};
+    int           nMetric{IT_Invalid};
+    int             nFont{IT_Invalid};
+    int            nValue{bApply ? static_cast<int>(GetDlgItemInt(m_edItemSize[iSizeControl].GetDlgCtrlID(), nullptr, FALSE)) : IT_Invalid};
     switch (iSizeControl) {
     case IT_Size1:
         nMetric = rItemDef.size1;
@@ -134,47 +136,51 @@ bool CPageAppearance::ItemSizeChanged(int nItem, int iSizeControl, bool bApply /
         if (-1 == nMetric) {
             return false;
         }
-        //if (bApply) {
-        //    CTheme::GetNcMetricSize(&m_pScheme->GetNcMetrcs(), nMetric) = nValue;
-        //}
-        //else {
-        //    nValue = CTheme::GetNcMetricSize(&m_pScheme->GetNcMetrcs(), nMetric);
-        //}
+        if (bApply) {
+            m_SchemeCopy.m_NCMetric[nMetric] = nValue;
+        }
+        else {
+            nValue = m_SchemeCopy.m_NCMetric[nMetric];
+        }
         break;
     case IT_FontWidth:
         if (-1 == rItemDef.font) {
             return false;
         }
-        //if (bApply) {
-        //    LOGFONT& lf = m_pScheme->GetLogFont(rItemDef.font);
-        //    lf.lfWidth = FontPtToLog<int>(nValue);
-        //    m_pScheme->RefreshHFont(rItemDef.font, lf);
-        //}
-        //else {
-        //    nValue = FontLogToPt<int>(m_pScheme->GetLogFont(nMetric).lfWidth);
-        //}
+        nFont = rItemDef.font;
+        if (bApply) {
+            logFont = m_SchemeCopy.m_Font[nFont].m_logFont;
+            logFont.lfWidth = FontPtToLog<int>(nValue);
+        }
+        else {
+            nValue = FontLogToPt<int>(m_SchemeCopy.GetLogFont(nFont).lfWidth);
+        }
         break;
     case IT_FontAngle:
-        //if (bApply) {
-        //    LOGFONT& lf = m_pScheme->GetLogFont(rItemDef.font);
-        //    lf.lfEscapement = nValue * 10;
-        //    m_pScheme->RefreshHFont(rItemDef.font, lf);
-        //}
-        //else {
-        //    //m_udItemSize[nSize].SetRange(0, 359);
-        //    nValue = m_pScheme->GetLogFont(nMetric).lfEscapement / 10;
-        //}
+        if (-1 == rItemDef.font) {
+            return false;
+        }
+        nFont = rItemDef.font;
+        if (bApply) {
+            logFont = m_SchemeCopy.m_Font[nFont].m_logFont;
+            logFont.lfEscapement = nValue * 10;
+        }
+        else {
+            nValue = m_SchemeCopy.GetLogFont(nFont).lfEscapement / 10;
+        }
         break;
     default:
         return false;
     }
     if (bApply) {
+        if (nFont != IT_Invalid) {
+            m_SchemeCopy.m_Font[nFont].Reset(logFont);
+        }
         return true;
     }
     if (IT_Invalid != nMetric) {
-        //if (auto const* pSizeRange = m_pScheme->GetSizeRange(nMetric)) {
-        //    m_udItemSize[iSizeControl].SetRange(pSizeRange->min, pSizeRange->max);
-        //}
+        m_udItemSize[iSizeControl].SetRange(m_SchemeCopy.m_SizeRange[nMetric].min,
+                                            m_SchemeCopy.m_SizeRange[nMetric].max);
     }
     SetDlgItemInt(m_edItemSize[iSizeControl].GetDlgCtrlID(), nValue, FALSE);
     m_stItemSize[iSizeControl].EnableWindow(TRUE);
