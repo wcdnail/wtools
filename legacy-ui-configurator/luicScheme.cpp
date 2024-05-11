@@ -72,6 +72,28 @@ CNCMetrics::Range& CScheme::GetSizeRange(int index)
     return getSizeRangeRef<CNCMetrics::Range>(*this, index);
 }
 
+CScheme::SizeItem const& CScheme::getSizeItemeRef(String const& name) const
+{
+    const auto it = m_SizesMap.find(name);
+    if (it == m_SizesMap.cend()) {
+        DH::TPrintf(L"%s: ERROR: index [%s] out of range\n", __FUNCTIONW__, name.data());
+        static SizeItem dummy{};
+        return dummy;
+    }
+    return it->second;
+}
+
+CScheme::SizeItem& CScheme::getSizeItemeRef(String const& name)
+{
+    const auto it = m_SizesMap.find(name);
+    if (it == m_SizesMap.end()) {
+        DH::TPrintf(L"%s: ERROR: index [%s] out of range\n", __FUNCTIONW__, name.data());
+        static SizeItem dummy{};
+        return dummy;
+    }
+    return it->second;
+}
+
 bool CScheme::LoadDefaults()
 {
     BOOL  bGradientCaptions{FALSE};
@@ -103,8 +125,13 @@ bool CScheme::LoadDefaults()
         DH::TPrintf(L"%s: ERROR: SystemParametersInfoW failed\n", __FUNCTIONW__);
         return false;
     }
-    tmpFonts.Swap(m_Font);
-    tmpNCMetrics.CopyTo(m_NCMetric);
+    {
+        SizeMap sizesMap{};
+        auto&      sizes{sizesMap[L"(Current)"]};
+        tmpFonts.Swap(sizes.m_Font);
+        tmpNCMetrics.CopyTo(sizes.m_NCMetric);
+        sizesMap.swap(m_SizesMap);
+    }
     tmpColors.Swap(m_Color);
     m_bFlatMenus = bFlatMenus != FALSE;
     m_bGradientCaptions = bGradientCaptions != FALSE;
@@ -147,16 +174,22 @@ bool CScheme::LoadSizes(StrView sName, CRegistry const& regScheme)
         DH::TPrintf(L"%s: ERROR: CFonts::LoadDefaults for CNCMetrcs failed\n", __FUNCTIONW__);
         return false;
     }
-    tmpFonts.Swap(m_Font);
-    tmpNCMetrics.CopyTo(m_NCMetric);
+    auto& sizes{m_SizesMap[{sName.data(), sName.length()}]};
+    tmpFonts.Swap(sizes.m_Font);
+    tmpNCMetrics.CopyTo(sizes.m_NCMetric);
     return true;
 }
 
 void CScheme::CopyTo(CScheme& target) const
 {
+    SizeMap sizesCopy{};
+    for (auto const& it: m_SizesMap) {
+        auto& targetSizes{sizesCopy[it.first]};
+        it.second.m_NCMetric.CopyTo(targetSizes.m_NCMetric);
+        it.second.m_Font.CopyTo(targetSizes.m_Font);
+    }
+    sizesCopy.swap(target.m_SizesMap);
     m_Color.CopyTo(target.m_Color);
-    m_NCMetric.CopyTo(target.m_NCMetric);
-    m_Font.CopyTo(target.m_Font);
     target.m_bFlatMenus = m_bFlatMenus;
     target.m_bGradientCaptions = m_bGradientCaptions;
     target.m_Name = m_Name; // NO noecept!

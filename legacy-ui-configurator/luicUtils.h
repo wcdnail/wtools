@@ -2,6 +2,7 @@
 
 #include <winuser.h>
 #include <atlstr.h>
+#include <string>
 
 static constexpr long DEFAULT_FONT_DPI = 72;
 
@@ -62,3 +63,13 @@ void SetMFStatus(int status, PCWSTR format, ...);
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);
 
+struct StringHash
+{
+    using      HashType = std::hash<std::wstring_view>;
+    using IsTransparent = void;
+ 
+    std::size_t operator()(const wchar_t* str) const      { return HashType{}(str); }
+    std::size_t operator()(std::wstring_view str) const   { return HashType{}(str); }
+    std::size_t operator()(std::wstring const& str) const { return HashType{}(str); }
+};
+ 
