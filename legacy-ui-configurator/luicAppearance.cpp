@@ -137,10 +137,10 @@ bool CPageAppearance::ItemSizeChanged(int nItem, int iSizeControl, bool bApply /
             return false;
         }
         if (bApply) {
-            m_SchemeCopy.GetNCMetric(nMetric) = nValue;
+            m_SchemeCopy.GetNCMetric(m_sCurrentSize, nMetric) = nValue;
         }
         else {
-            nValue = m_SchemeCopy.GetNCMetric(nMetric);
+            nValue = m_SchemeCopy.GetNCMetric(m_sCurrentSize, nMetric);
         }
         break;
     case IT_FontWidth:
@@ -149,11 +149,11 @@ bool CPageAppearance::ItemSizeChanged(int nItem, int iSizeControl, bool bApply /
         }
         nFont = rItemDef.font;
         if (bApply) {
-            logFont = m_SchemeCopy.GetLogFont(nFont);
+            logFont = m_SchemeCopy.GetLogFont(m_sCurrentSize, nFont);
             logFont.lfWidth = FontPtToLog<int>(nValue);
         }
         else {
-            nValue = FontLogToPt<int>(m_SchemeCopy.GetLogFont(nFont).lfWidth);
+            nValue = FontLogToPt<int>(m_SchemeCopy.GetLogFont(m_sCurrentSize, nFont).lfWidth);
         }
         break;
     case IT_FontAngle:
@@ -162,11 +162,11 @@ bool CPageAppearance::ItemSizeChanged(int nItem, int iSizeControl, bool bApply /
         }
         nFont = rItemDef.font;
         if (bApply) {
-            logFont = m_SchemeCopy.GetLogFont(nFont);
+            logFont = m_SchemeCopy.GetLogFont(m_sCurrentSize, nFont);
             logFont.lfEscapement = nValue * 10;
         }
         else {
-            nValue = m_SchemeCopy.GetLogFont(nFont).lfEscapement / 10;
+            nValue = m_SchemeCopy.GetLogFont(m_sCurrentSize, nFont).lfEscapement / 10;
         }
         break;
     default:
@@ -174,7 +174,7 @@ bool CPageAppearance::ItemSizeChanged(int nItem, int iSizeControl, bool bApply /
     }
     if (bApply) {
         if (nFont != IT_Invalid) {
-            m_SchemeCopy.GetFontPair(nFont).Reset(logFont);
+            m_SchemeCopy.GetFontPair(m_sCurrentSize, nFont).Reset(logFont);
         }
         return true;
     }
@@ -266,7 +266,7 @@ static bool CBGetCurTextInt(WTL::CComboBox const& ctlCombo, int& result)
 
 bool CPageAppearance::ItemFontApplyChanges(int nItem, ItemDef rItemDef, int iFont, int iFontControl)
 {
-    WTL::CLogFont lfCopy = m_SchemeCopy.GetLogFont(iFont);
+    WTL::CLogFont lfCopy = m_SchemeCopy.GetLogFont(m_sCurrentSize, iFont);
     switch (iFontControl) {
     case IDC_APP_FONT_SEL:{
         ATL::CString strFamily;
@@ -299,7 +299,7 @@ bool CPageAppearance::ItemFontApplyChanges(int nItem, ItemDef rItemDef, int iFon
     default:
         return false;
     }
-    if (!m_SchemeCopy.GetFontPair(iFont).Reset(lfCopy)) {
+    if (!m_SchemeCopy.GetFontPair(m_sCurrentSize, iFont).Reset(lfCopy)) {
         return false;
     }
     return true;
@@ -318,7 +318,7 @@ bool CPageAppearance::ItemFontChanged(int nItem, int iFontControl, bool bApply)
     if (bApply) {
         return ItemFontApplyChanges(nItem, rItemDef, iFont, iFontControl);
     }
-    LOGFONT const& logFont = m_SchemeCopy.GetLogFont(iFont);
+    WTL::CLogFont const& logFont = m_SchemeCopy.GetLogFont(m_sCurrentSize, iFont);
     FontEnable(TRUE);
     FontSetFamily(logFont);
     FontSetSizes(logFont);

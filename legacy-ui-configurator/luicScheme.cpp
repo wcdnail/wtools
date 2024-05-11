@@ -4,6 +4,8 @@
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
+CSizePair::~CSizePair() = default;
+CSizePair::CSizePair() = default;
 CScheme::~CScheme() = default;
 
 CScheme::CScheme(StrView name)
@@ -72,23 +74,13 @@ CNCMetrics::Range& CScheme::GetSizeRange(int index)
     return getSizeRangeRef<CNCMetrics::Range>(*this, index);
 }
 
-CScheme::SizeItem const& CScheme::getSizeItemeRef(String const& name) const
+template <typename ReturnType, typename SelfRef>
+ReturnType& CScheme::getSizeItemeRef(SelfRef& thiz, String const& name)
 {
-    const auto it = m_SizesMap.find(name);
-    if (it == m_SizesMap.cend()) {
-        DH::TPrintf(L"%s: ERROR: index [%s] out of range\n", __FUNCTIONW__, name.data());
-        static SizeItem dummy{};
-        return dummy;
-    }
-    return it->second;
-}
-
-CScheme::SizeItem& CScheme::getSizeItemeRef(String const& name)
-{
-    const auto it = m_SizesMap.find(name);
-    if (it == m_SizesMap.end()) {
-        DH::TPrintf(L"%s: ERROR: index [%s] out of range\n", __FUNCTIONW__, name.data());
-        static SizeItem dummy{};
+    const auto it = thiz.m_SizesMap.find(name);
+    if (it == thiz.m_SizesMap.cend()) {
+        DH::TPrintf(L"%s: ERROR: index [%s] out of range\n", __FUNCTIONW__, name.c_str());
+        static CSizePair dummy{};
         return dummy;
     }
     return it->second;

@@ -3,7 +3,6 @@
 #include "luicNCMetric.h"
 #include "luicColors.h"
 #include "luicFonts.h"
-#include "luicUtils.h"
 #include <wcdafx.api.h>
 #include <string_view>
 #include <string>
@@ -58,19 +57,27 @@ enum EItemSize: int
     IT_SizeCount
 };
 
+struct CSizePair
+{
+    DELETE_COPY_MOVE_OF(CSizePair);
+
+    CNCMetrics m_NCMetric;
+    CFonts         m_Font;
+
+    ~CSizePair();
+    CSizePair();
+
+    WTL::CLogFont const& GetLogFont(int index) const { return m_Font[index].m_logFont; }
+    WTL::CFontHandle        GetFont(int index) const { return m_Font[index].m_CFont.m_hFont; }
+};
+
 struct CScheme
 {
     DELETE_COPY_MOVE_OF(CScheme);
 
-    struct SizeItem
-    {
-        CNCMetrics m_NCMetric;
-        CFonts         m_Font;
-    };
-
     using StrView = std::wstring_view;
     using  String = std::wstring;
-    using SizeMap = std::unordered_map<String, SizeItem, StringHash>;
+    using SizeMap = std::unordered_map<String, CSizePair>;
 
     struct Item
     {
@@ -100,12 +107,14 @@ struct CScheme
     WTL::CBrush const&                         GetBrush(int index) const { return m_Color[index].m_Brush; }
     CColorPair const&                      GetColorPair(int index) const { return m_Color[index]; }
     CColorPair&                            GetColorPair(int index)       { return m_Color[index]; }
-    int                 GetNCMetric(String const& name, int index) const { return getSizeItemeRef(name).m_NCMetric[index]; }
-    int&                GetNCMetric(String const& name, int index)       { return getSizeItemeRef(name).m_NCMetric[index]; }
-    WTL::CLogFont const& GetLogFont(String const& name, int index) const { return getSizeItemeRef(name).m_Font[index].m_logFont; }
-    WTL::CFontHandle        GetFont(String const& name, int index) const { return getSizeItemeRef(name).m_Font[index].m_CFont.m_hFont; }
-    CFontPair const&    GetFontPair(String const& name, int index) const { return getSizeItemeRef(name).m_Font[index]; }
-    CFontPair&          GetFontPair(String const& name, int index)       { return getSizeItemeRef(name).m_Font[index]; }
+    int                 GetNCMetric(String const& name, int index) const { return getSizeItemeRef<CSizePair const>(*this, name).m_NCMetric[index]; }
+    int&                GetNCMetric(String const& name, int index)       { return getSizeItemeRef<CSizePair      >(*this, name).m_NCMetric[index]; }
+    WTL::CLogFont const& GetLogFont(String const& name, int index) const { return getSizeItemeRef<CSizePair const>(*this, name).m_Font[index].m_logFont; }
+    WTL::CFontHandle        GetFont(String const& name, int index) const { return getSizeItemeRef<CSizePair const>(*this, name).m_Font[index].m_CFont.m_hFont; }
+    CFontPair const&    GetFontPair(String const& name, int index) const { return getSizeItemeRef<CSizePair const>(*this, name).m_Font[index]; }
+    CFontPair&          GetFontPair(String const& name, int index)       { return getSizeItemeRef<CSizePair      >(*this, name).m_Font[index]; }
+    SizeMap const&                                   GetSizesMap() const { return m_SizesMap; };
+    SizeMap&                                         GetSizesMap()       { return m_SizesMap; };
     CNCMetrics::Range const&               GetSizeRange(int index) const;
     CNCMetrics::Range&                     GetSizeRange(int index);
 
@@ -119,7 +128,7 @@ private:
 
     template <typename ReturnType, typename SelfRef>
     static ReturnType& getSizeRangeRef(SelfRef& thiz, int index);
-    
-    SizeItem const& getSizeItemeRef(String const& name) const;
-    SizeItem& getSizeItemeRef(String const& name);
+
+    template <typename ReturnType, typename SelfRef>
+    static ReturnType& getSizeItemeRef(SelfRef& thiz, String const& name);
 };

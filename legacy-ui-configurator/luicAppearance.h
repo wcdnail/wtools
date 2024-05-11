@@ -4,11 +4,10 @@
 #include "luicFontDef.h"
 #include "luicPageImpl.h"
 #include "luicThemePreviewer.h"
+#include "luicSchemeManager.h"
 #include "WTL/CColorButton.h"
 #include <atlstr.h>
 #include <atlctrls.h>
-
-#include "luicSchemeManager.h"
 
 class CLUIApp;
 struct CSchemeManager;
@@ -16,6 +15,7 @@ struct CSchemeManager;
 struct CPageAppearance: CPageImpl
 {
     using ItemDef = CScheme::Item const&;
+    using  String = CScheme::String;
 
     ~CPageAppearance() override;
     CPageAppearance(std::wstring&& caption);
@@ -24,6 +24,7 @@ struct CPageAppearance: CPageImpl
 
 private:
     CScheme                        m_SchemeCopy;
+    String                       m_sCurrentSize;
     bool                          m_bLoadValues;
     WTL::CStatic                     m_stScheme;
     WTL::CComboBox                   m_cbScheme;
@@ -59,8 +60,8 @@ private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
 
-    CSchemeManager::SchemeVec const& InitializeScale(CSchemeManager const& manager);
-    CScheme const& InitializeScheme(CSchemeManager::SchemeVec const& schemes, int initialIndex);
+    CScheme const& InitializeScheme(CSchemeManager const& manager, int initialIndex);
+    void InitializeSizes(CScheme const& scheme);
     void InitializeItems();
     void InitializeFonts(FontMap const& fontsMap);
     void InitializeFontSizes();

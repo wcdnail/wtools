@@ -60,6 +60,8 @@ struct CFonts
     CFontPair& operator[](int index);
     CFontPair const& operator[](int index) const;
 
+    WTL::CLogFont const& GetLogFont(int index) const { return (*this)[index].m_logFont; }
+
 private:
     CFontPair m_Pair[FONT_Count];
 

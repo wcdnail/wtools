@@ -4,6 +4,7 @@
 #include <atlgdi.h>
 #include <memory>
 
+struct CSizePair;
 struct CScheme;
 
 enum WindowRectIndex: int
@@ -66,7 +67,7 @@ public:
     static UINT ConvDrawItemState(UINT diState);
 
     ~CDrawings();
-    CDrawings(CScheme const& scheme);
+    CDrawings(CScheme const& scheme, CSizePair const& sizePair);
 
     void CalcRects(CRect const& rc, UINT captFlags, WindowRects& target);
 
@@ -94,7 +95,8 @@ private:
 
     static PStaticRes m_pStaticRes;
 
-    CScheme const& m_Scheme;
-    int        m_BorderSize;
-    WTL::CFont  m_ftMarlett;
+    CScheme const&     m_Scheme;
+    CSizePair const& m_SizePair;
+    int            m_BorderSize;
+    WTL::CFont      m_ftMarlett;
 };

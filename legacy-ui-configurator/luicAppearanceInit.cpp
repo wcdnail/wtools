@@ -192,33 +192,12 @@ void CPageAppearance::OnDestroy()
     CPageImpl::OnDestroy();
 }
 
-CSchemeManager::SchemeVec const& CPageAppearance::InitializeScale(CSchemeManager const& manager)
-{
-    WTL::CComboBox& lbCtl{m_cbSchemeScale};
-    lbCtl.ResetContent();
-    auto const& schemesMap = manager.SchemesMap();
-    int nIndex = 0;
-    for (const auto& it: schemesMap) {
-        const int nItem = lbCtl.AddString(it.first.c_str());
-        if (nItem < 0) {
-            const auto code{static_cast<HRESULT>(GetLastError())};
-            ReportError(Str::ElipsisW::Format(L"LB AddString [w:%08x] [%d] '%s' ERROR",
-                    lbCtl.m_hWnd, nIndex, it.first.c_str()), code);
-            continue;
-        }
-        lbCtl.SetItemData(nItem, static_cast<DWORD_PTR>(nIndex));
-        ++nIndex;
-    }
-    ATLASSUME(nIndex > 0);
-    lbCtl.SetCurSel(0);
-    return schemesMap.cbegin()->second;
-}
-
-CScheme const& CPageAppearance::InitializeScheme(CSchemeManager::SchemeVec const& schemes, int initialIndex)
+CScheme const& CPageAppearance::InitializeScheme(CSchemeManager const& manager, int initialIndex)
 {
     WTL::CComboBox& lbCtl{m_cbScheme};
     lbCtl.ResetContent();
-    int nIndex = 0;
+    auto const& schemes{manager.GetSchemes()};
+    int          nIndex{0};
     for (const auto& it: schemes) {
         const int nItem = lbCtl.AddString(it->Name().c_str());
         if (nItem < 0) {
@@ -233,6 +212,27 @@ CScheme const& CPageAppearance::InitializeScheme(CSchemeManager::SchemeVec const
     ATLASSUME(initialIndex >= 0 && initialIndex < schemes.size());
     ATLASSERT(schemes[initialIndex].get() != nullptr);
     return *schemes[initialIndex];
+}
+
+void CPageAppearance::InitializeSizes(CScheme const& scheme)
+{
+    WTL::CComboBox& lbCtl{m_cbSchemeScale};
+    lbCtl.ResetContent();
+    
+    int nIndex = 0;
+    for (const auto& key: scheme.GetSizesMap() | std::views::keys) {
+        const int nItem = lbCtl.AddString(key.c_str());
+        if (nItem < 0) {
+            const auto code{static_cast<HRESULT>(GetLastError())};
+            ReportError(Str::ElipsisW::Format(L"LB AddString [w:%08x] [%d] '%s' ERROR",
+                    lbCtl.m_hWnd, nIndex, key.c_str()), code);
+            continue;
+        }
+        lbCtl.SetItemData(nItem, static_cast<DWORD_PTR>(nIndex));
+        ++nIndex;
+    }
+    ATLASSUME(nIndex > 0);
+    lbCtl.SetCurSel(0);
 }
 
 void CPageAppearance::InitializeItems()
@@ -355,8 +355,8 @@ void CPageAppearance::InitializeFontButtons()
 
 void CPageAppearance::OnSchemesChanged(CLUIApp const* pApp, int initialIndex)
 {
-    auto const& schemes{InitializeScale(pApp->SchemeManager())};
-    auto const&  source{InitializeScheme(schemes, initialIndex)};
+    auto const&  source{InitializeScheme(pApp->SchemeManager(), initialIndex)};
+    InitializeSizes(source);
     {
         ScopedBoolGuard guard(m_bLoadValues);
         m_cbScheme.SetCurSel(initialIndex);

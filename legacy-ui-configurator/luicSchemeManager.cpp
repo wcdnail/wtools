@@ -9,16 +9,14 @@ static constexpr wchar_t REG_ClassicSchemes[] = L"Control Panel\\Appearance\\Cla
 CSchemeManager::~CSchemeManager() = default;
 
 CSchemeManager::CSchemeManager()
-    : m_Default{L"<<INVALID>>"}
-    , m_Schemes{}
+    : m_Schemes{}
 {
 }
 
 HRESULT CSchemeManager::Initialize()
 {
     HRESULT           code{S_OK};
-    SchemeMap  tempSchemes{};
-    SchemeVec& vNormScheme{tempSchemes[L"Normal"]};
+    SchemeVec  tempSchemes{};
 
     {
         auto pCurrent = std::make_shared<CScheme>(L"(Current)");
@@ -27,7 +25,7 @@ HRESULT CSchemeManager::Initialize()
             return code;
         }
         pCurrent->CopyTo(m_Default);
-        vNormScheme.emplace_back(std::move(pCurrent));
+        tempSchemes.emplace_back(std::move(pCurrent));
     }
 
     CRegistry regClassics{HKEY_CURRENT_USER, REG_ClassicSchemes};
