@@ -53,6 +53,7 @@ struct CFonts
 
     bool LoadDefaults();
     bool LoadValues(CNCMetrics& ncMetrics);
+    bool LoadValues(CRegistry const& regScheme);
     void Swap(CFonts& rhs) noexcept;
     void CopyTo(CFonts& target) const noexcept;
 

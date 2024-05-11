@@ -128,7 +128,7 @@ bool CScheme::LoadSizes(StrView sName, CRegistry const& regScheme)
         DH::TPrintf(L"%s: ERROR: CNCMetrics::LoadValues failed\n", __FUNCTIONW__);
         return false;
     }
-    if (!tmpFonts.LoadDefaults()) {
+    if (!tmpFonts.LoadValues(regScheme)) {
         DH::TPrintf(L"%s: ERROR: CFonts::LoadDefaults failed\n", __FUNCTIONW__);
         return false;
     }

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "luicFonts.h"
 #include "luicNCMetric.h"
+#include "luicRegistry.h"
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
@@ -63,6 +64,18 @@ bool CFonts::LoadValues(CNCMetrics& ncMetrics)
     m_Pair[FONT_Menu].Reset(lfMenu);
     m_Pair[FONT_Tooltip].Reset(lfTooltip);
     m_Pair[FONT_Message].Reset(lfMsgBox);
+    return true;
+}
+
+bool CFonts::LoadValues(CRegistry const& regScheme)
+{
+    WTL::CLogFont lfTemp;
+    if (!regScheme.GetValue<LOGFONTW>(L"Font5", lfTemp)) {
+        return false;
+    }
+    m_Pair[FONT_Desktop].Reset(lfTemp);
+    lfTemp.lfUnderline = TRUE;
+    m_Pair[FONT_Hyperlink].Reset(lfTemp);
     return true;
 }
 

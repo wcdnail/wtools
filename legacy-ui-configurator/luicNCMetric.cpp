@@ -81,13 +81,21 @@ bool CNCMetrics::LoadValues(CRegistry const& regScheme)
         getRefByIndex<int>(*this, i) = static_cast<int>(dwSize);
     }
 
-    for (int i = 0; i < NCM_Count; i++) {
-        std::wstring name = L"Size" + std::to_wstring(i);
-        DWORD dwSize = static_cast<DWORD>(-1);
-        if (!regScheme.GetValue<DWORD>(name, dwSize)) {
+    LOGFONTW* logFont[FONT_Desktop] = {
+        &this->lfCaptionFont,
+        &this->lfSmCaptionFont,
+        &this->lfMenuFont,
+        &this->lfStatusFont,
+        &this->lfMessageFont,
+    };
+
+    for (int i = 0; i < _countof(logFont); i++) {
+        std::wstring name = L"Font" + std::to_wstring(i);
+        LOGFONTW tempLogFont;
+        if (!regScheme.GetValue<LOGFONTW>(name, tempLogFont)) {
             return false;
         }
-        getRefByIndex<int>(*this, i) = static_cast<int>(dwSize);
+        *logFont[i] = tempLogFont;
     }
     return true;
 }
@@ -128,3 +136,4 @@ int CNCMetrics::operator[](int index) const
 {
     return getRefByIndex<int const>(*this, index);
 }
+
