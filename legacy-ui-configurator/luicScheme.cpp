@@ -51,6 +51,27 @@ CScheme::Item const& CScheme::ItemDef(int index)
     return gs_item[index];
 }
 
+template <typename ReturnType, typename SelfRef>
+ReturnType& CScheme::getSizeRangeRef(SelfRef& thiz, int index)
+{
+    if (index < 0 || index > NCM_Count - 1) {
+        DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+        static ReturnType dummy{NCM_Invalid};
+        return dummy;
+    }
+    return thiz.m_SizeRange[index];
+}
+
+CNCMetrics::Range const& CScheme::GetSizeRange(int index) const
+{
+    return getSizeRangeRef<CNCMetrics::Range const>(*this, index);
+}
+
+CNCMetrics::Range& CScheme::GetSizeRange(int index)
+{
+    return getSizeRangeRef<CNCMetrics::Range>(*this, index);
+}
+
 bool CScheme::LoadDefaults()
 {
     BOOL  bGradientCaptions{FALSE};

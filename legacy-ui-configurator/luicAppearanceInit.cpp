@@ -220,11 +220,11 @@ CScheme const& CPageAppearance::InitializeScheme(CSchemeManager::SchemeVec const
     lbCtl.ResetContent();
     int nIndex = 0;
     for (const auto& it: schemes) {
-        const int nItem = lbCtl.AddString(it->m_Name.c_str());
+        const int nItem = lbCtl.AddString(it->Name().c_str());
         if (nItem < 0) {
             const auto code{static_cast<HRESULT>(GetLastError())};
             ReportError(Str::ElipsisW::Format(L"LB AddString [w:%08x] [%d] '%s' ERROR",
-                    lbCtl.m_hWnd, nIndex, it->m_Name.c_str()), code);
+                    lbCtl.m_hWnd, nIndex, it->Name().c_str()), code);
             continue;
         }
         lbCtl.SetItemData(nItem, static_cast<DWORD_PTR>(nIndex));

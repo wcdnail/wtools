@@ -226,7 +226,7 @@ void CThemePreviewer::DrawDesktop(WTL::CDCHandle dc, CRect const& rcClient)
         {  m_WndRect[WND_Front], rcFront },
         { m_WndRect[WND_MsgBox],   rcMsg },
     };
-    dc.FillSolidRect(rcClient, scheme.m_Color[COLOR_BACKGROUND].m_Color);
+    dc.FillSolidRect(rcClient, scheme.GetColor(COLOR_BACKGROUND));
 
     // TODO: borrow wallpaper drawer from CPageBackground
 

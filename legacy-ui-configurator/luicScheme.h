@@ -74,14 +74,6 @@ struct CScheme
         int fontColor;
     };
 
-    String                            m_Name;
-    CColors                          m_Color;
-    CNCMetrics                    m_NCMetric;
-    CFonts                            m_Font;
-    bool                 m_bGradientCaptions;
-    bool                        m_bFlatMenus;
-    CNCMetrics::Range m_SizeRange[NCM_Count];
-
     ~CScheme();
     CScheme(StrView name);
 
@@ -92,10 +84,34 @@ struct CScheme
     bool LoadValues(CRegistry const& regScheme);
     bool LoadSizes(StrView sName, CRegistry const& regScheme);
 
+    String const&                       Name() const { return m_Name; }
+    bool                  IsGradientCaptions() const { return m_bGradientCaptions; }
+    bool                         IsFlatMenus() const { return m_bFlatMenus; }
     COLORREF               GetColor(int index) const { return m_Color[index].m_Color; }
     WTL::CBrush const&     GetBrush(int index) const { return m_Color[index].m_Brush; }
+    CColorPair const&  GetColorPair(int index) const { return m_Color[index]; }
+    CColorPair&        GetColorPair(int index)       { return m_Color[index]; }
     CNCMetrics const&           GetNCMetrics() const { return m_NCMetric; }
     CNCMetrics&                 GetNCMetrics()       { return m_NCMetric; }
+    int                 GetNCMetric(int index) const { return m_NCMetric[index]; }
+    int&                GetNCMetric(int index)       { return m_NCMetric[index]; }
     WTL::CLogFont const& GetLogFont(int index) const { return m_Font[index].m_logFont; }
     WTL::CFontHandle        GetFont(int index) const { return m_Font[index].m_CFont.m_hFont; }
+    CFontPair const&    GetFontPair(int index) const { return m_Font[index]; }
+    CFontPair&          GetFontPair(int index)       { return m_Font[index]; }
+
+    CNCMetrics::Range const& GetSizeRange(int index) const;
+    CNCMetrics::Range&       GetSizeRange(int index);
+
+private:
+    String                            m_Name;
+    CColors                          m_Color;
+    CNCMetrics                    m_NCMetric;
+    CFonts                            m_Font;
+    bool                 m_bGradientCaptions;
+    bool                        m_bFlatMenus;
+    CNCMetrics::Range m_SizeRange[NCM_Count];
+
+    template <typename ReturnType, typename SelfRef>
+    static ReturnType& getSizeRangeRef(SelfRef& thiz, int index);
 };

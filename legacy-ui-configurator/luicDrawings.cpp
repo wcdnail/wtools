@@ -761,7 +761,7 @@ void CDrawings::DrawMenuBar(WTL::CDCHandle dc, CRect const& rc, HMENU hMenu, HFO
     CRect        rcText{};
     SIZE           size{};
 
-    if (m_Scheme.m_bFlatMenus) {
+    if (m_Scheme.IsFlatMenus()) {
         backColorIndex = COLOR_MENUBAR;
     }
     if (SystemParametersInfoW(SPI_GETKEYBOARDCUES, 0, &bKbdCues, 0) && !bKbdCues) {
@@ -800,7 +800,7 @@ void CDrawings::DrawMenuBar(WTL::CDCHandle dc, CRect const& rc, HMENU hMenu, HFO
         rcText.right = rcItem.right - margin;
         const UINT state = GetMenuState(hMenu, iMenuItem, MF_BYPOSITION);
         if ((state & MF_GRAYED) || (state & MF_DISABLED)) {
-            if ((m_Scheme.GetColor(COLOR_MENU) == m_Scheme.GetColor(COLOR_3DFACE)) || m_Scheme.m_bFlatMenus) {
+            if ((m_Scheme.GetColor(COLOR_MENU) == m_Scheme.GetColor(COLOR_3DFACE)) || m_Scheme.IsFlatMenus()) {
                 DrawDisabledMenuText(dc, text, rcText, txtFormat);
             }
             else {
@@ -808,7 +808,7 @@ void CDrawings::DrawMenuBar(WTL::CDCHandle dc, CRect const& rc, HMENU hMenu, HFO
             }
         }
         else if ((state & MF_HILITE) || (iMenuItem == selIt)) {
-            if (m_Scheme.m_bFlatMenus) {
+            if (m_Scheme.IsFlatMenus()) {
                 FrameRect(dc, rcItem, m_Scheme.GetBrush(COLOR_HIGHLIGHT));
                 InflateRect(rcItem, -1, -1);
                 dc.FillRect(rcItem, m_Scheme.GetBrush(COLOR_MENUHILIGHT));
@@ -1007,7 +1007,7 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
         else          { captIcon = icons[CStaticRes::ICON_InactiveWnd]; }
         if (captIcon) { captFlags |= DC_ICON; }
     }
-    if (m_Scheme.m_bGradientCaptions) {
+    if (m_Scheme.IsGradientCaptions()) {
         captFlags |= DC_GRADIENT;
     }
     if (isActive) {
