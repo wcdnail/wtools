@@ -3,62 +3,49 @@
 #include "luicScheme.h"
 #include "luicUtils.h"
 #include "luicMain.h"
-#include <dh.tracing.h>
-#include <dh.tracing.defs.h>
-#include <rect.alloc.h>
-#include <string.utils.format.h>
 #include <rect.gdi+.h>
+#include <dh.tracing.h>
+#include <rect.alloc.h>
+#include <rect.putinto.h>
+#include <dh.tracing.defs.h>
+#include <string.utils.format.h>
+#include <dev.assistance/dev.assist.h>
 
-#include "rect.putinto.h"
+ATOM CThemePreviewer::gs_Atom{0};
 
-
-ATOM CThemePreviewer::Register(HRESULT& code)
+HRESULT CThemePreviewer::PreCreateWindow()
 {
-    WNDCLASSEXW wc;
-
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.style = 0;
-    wc.lpfnWndProc = CThemePreviewer::WndProc;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hInstance = GetModuleHandleW(nullptr);
-    wc.hIcon = nullptr;
-    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wc.hbrBackground = static_cast<HBRUSH>(nullptr);
-    wc.lpszMenuName = nullptr;
-    wc.lpszClassName = L"CThemePreviewer";
-    wc.hIconSm = nullptr;
-
-    const ATOM atom = RegisterClassExW(&wc);
-    if (!atom) {
-        code = static_cast<HRESULT>(GetLastError());
-        ReportError(Str::ElipsisW::Format(L"Register WCLASS '%s' failure!", wc.lpszClassName), code, true, MB_ICONERROR);
+    HRESULT code = S_OK;
+    // ##TODO: gs_Atom is not ThreadSafe!
+    // look at CStaticDataInitCriticalSectionLock lock;
+    if (!gs_Atom) {
+        const ATOM atom = ATL::AtlModuleRegisterClassExW(nullptr, &GetWndClassInfo().m_wc);
+        if (!atom) {
+            code = static_cast<HRESULT>(GetLastError());
+            return code;
+        }
+        // ##TODO: gs_Atom is not ThreadSafe!
+        gs_Atom = atom;
     }
-    return atom;
+    if (!m_thunk.Init(nullptr, nullptr)) {
+        code = static_cast<HRESULT>(ERROR_OUTOFMEMORY);
+        SetLastError(static_cast<DWORD>(code));
+        return code;
+    }
+    WTL::ModuleHelper::AddCreateWndData(&m_thunk.cd, this);
+    return S_OK;
 }
 
-CThemePreviewer::~CThemePreviewer()
-{
-}
+CThemePreviewer::~CThemePreviewer() = default;
 
 CThemePreviewer::CThemePreviewer()
-    :   ATL::CWindow{}
-    ,      m_pScheme{nullptr}
-    ,    m_pSizePair{nullptr}
-    ,      m_pcbItem{nullptr}
-    ,   m_prSelected{-1, -1}
-    ,    m_bLBtnDown{false}
+    :        Super{}
+    ,    m_pScheme{nullptr}
+    ,  m_pSizePair{nullptr}
+    ,    m_pcbItem{nullptr}
+    , m_prSelected{-1, -1}
+    ,  m_bLBtnDown{false}
 {
-}
-
-void CThemePreviewer::SubclassIt(HWND hWnd)
-{
-    ATLASSUME(hWnd != nullptr);
-    const auto CThemePreviewer_pUserData = reinterpret_cast<void*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
-    ATLASSUME(CThemePreviewer_pUserData == nullptr);
-    ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-    m_hWnd = hWnd;
-    ModifyStyleEx(0, WS_EX_CLIENTEDGE);
 }
 
 void CThemePreviewer::OnSchemeChanged(CScheme& pScheme, CSizePair& pSizePair, WTL::CComboBox& pcbItem)
@@ -79,46 +66,16 @@ void CThemePreviewer::OnItemSelected(int nItem)
     }
 }
 
-LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    const LONG_PTR winUD = ::GetWindowLongPtrW(hWnd, GWLP_USERDATA);
-    if (WM_NCDESTROY == uMsg) {
-        if (winUD) {
-            reinterpret_cast<CThemePreviewer*>(winUD)->m_hWnd = nullptr;
-            ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(nullptr));
-        }
-    }
-    else {
-        if (winUD) {
-            auto* self = reinterpret_cast<CThemePreviewer*>(winUD);
-            switch (uMsg) {
-            case WM_PAINT:{
-                self->OnPaint({reinterpret_cast<HDC>(wParam)});
-                return 0;
-            }
-            case WM_LBUTTONDOWN:
-            case WM_LBUTTONDBLCLK:{
-                self->OnLButton(static_cast<UINT>(wParam), CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
-                return 0;
-            }
-            }
-        }
-    }
-    return DefWindowProcW(hWnd, uMsg, wParam, lParam);
-}
-
 int CThemePreviewer::OnCreate(LPCREATESTRUCT pCS)
 {
+    //DWORD dwStyle = GetWindowLongW(GWL_STYLE);
+    //ModifyStyle(0xffffffff, WS_CHILD | WS_VISIBLE | WS_TABSTOP);
+    //dwStyle = GetWindowLongW(GWL_STYLE);
     return 0;
 }
 
-void CThemePreviewer::OnPaint(WTL::CDCHandle dcParam)
+void CThemePreviewer::DoPaint(WTL::CDCHandle dc, RECT& rc)
 {
-    UNREFERENCED_PARAMETER(dcParam);
-    const WTL::CPaintDC dcPaint{m_hWnd};
-    const WTL::CDCHandle dc{dcPaint};
-    CRect rc;
-    GetClientRect(rc);
     DrawDesktop(dc, rc);
 }
 

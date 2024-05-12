@@ -2,24 +2,30 @@
 
 #include "luicDrawings.h"
 #include <wcdafx.api.h>
+#include <atltheme.h>
 
 using SelectedPair = std::pair<int, int>;
 
-struct CThemePreviewer: ATL::CWindow
+struct CThemePreviewer: WTL::CBufferedPaintWindowImpl<CThemePreviewer>
 {
+    using      Super = WTL::CBufferedPaintWindowImpl<CThemePreviewer>;
+    using SuperPaint = WTL::CBufferedPaintImpl<CThemePreviewer>;
+
     DELETE_COPY_MOVE_OF(CThemePreviewer);
+    DECLARE_WND_CLASS_EX(_T("CThemePreviewer"), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, COLOR_APPWORKSPACE)
 
-    static ATOM Register(HRESULT& code);
+    static ATOM gs_Atom;
 
-    ~CThemePreviewer();
+    ~CThemePreviewer() override;
     CThemePreviewer();
 
-    void SubclassIt(HWND hWnd);
+    HRESULT PreCreateWindow();
     void OnSchemeChanged(CScheme& pScheme, CSizePair& pSizePair, WTL::CComboBox& pcbItem);
     void OnItemSelected(int nItem);
 
 private:
-    static LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    friend Super;
+    friend SuperPaint;
 
     enum WND_Index : int
     {
@@ -42,8 +48,15 @@ private:
     CRect GetSeletcedRect();
     void SetSelectedRect(int wr, int ri);
     int OnCreate(LPCREATESTRUCT pCS);
-    void OnPaint(WTL::CDCHandle dc);
+    void DoPaint(WTL::CDCHandle dc, RECT& rc);
     void OnLButton(UINT nFlags, CPoint point);
     int RectIndexToElementId() const;
     void NotifyParent() const;
+
+    BEGIN_MSG_MAP_EX(CThemePreviewer)
+        CHAIN_MSG_MAP(Super)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_LBUTTONDOWN(OnLButton)
+        MSG_WM_LBUTTONDBLCLK(OnLButton)
+    END_MSG_MAP()
 };

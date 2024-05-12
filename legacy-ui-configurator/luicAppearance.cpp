@@ -58,6 +58,10 @@ CPageAppearance::CPageAppearance(std::wstring&& caption)
     , m_nPrevScheme{IT_Invalid}
     ,   m_nPrevSize{IT_Invalid}
 {
+    const HRESULT code = m_stPreview.PreCreateWindow();
+    if (FAILED(code)) {
+        ReportError(L"CThemePreviewer registration failed!", code, true);
+    }
 }
 
 void CPageAppearance::SchemeEnable(BOOL bEnable)

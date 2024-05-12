@@ -165,8 +165,6 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_bcGradientCapts.Attach(GetDlgItem(IDC_APP_CB_TTILEBAR_GRAD));
     m_bcFlatMenus.Attach(GetDlgItem(IDC_APP_CB_FLATMENUS));
 
-    m_stPreview.SubclassIt(GetDlgItem(IDC_APP_PREVIEW));
-
     m_bnSave.SetIcon(pApp->GetIcon(IconFloppy));
     m_bnRename.SetIcon(pApp->GetIcon(IconEditField));
     m_bnDelete.SetIcon(pApp->GetIcon(IconHatchCross));

@@ -34,9 +34,7 @@ struct CColorPicker: CColorPickerBase
 
 __declspec(selectany) ATOM CColorPicker::gs_Atom{0};
 
-inline CColorPicker::~CColorPicker()
-{
-}
+inline CColorPicker::~CColorPicker() = default;
 
 inline CColorPicker::CColorPicker()
     : CColorPickerBase{}

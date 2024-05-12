@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "luicMain.h"
 #include "luicUtils.h"
-#include "luicThemePreviewer.h"
 #include "resz/resource.h"
 #include <icons.dll.h>
 #include <dh.tracing.h>
@@ -129,11 +128,11 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
     if (FAILED(code)) {
         return code;
     }
-    const ATOM previewClassAtom = CThemePreviewer::Register(code);
-    ATLASSUME(previewClassAtom != 0);
-    if (!previewClassAtom) {
-        return code;
-    }
+    //const ATOM previewClassAtom = CThemePreviewer::PreCreateWindow(code);
+    //ATLASSUME(previewClassAtom != 0);
+    //if (!previewClassAtom) {
+    //    return code;
+    //}
     static const ATL::CStringW shell32dll = SHELL32_PATHNAME;
     CIconCollectionFile shellIcons;
     if (!shellIcons.Load(shell32dll.GetString(), true)) {
