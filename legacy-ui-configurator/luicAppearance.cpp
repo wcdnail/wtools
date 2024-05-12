@@ -8,12 +8,53 @@
 #include <UT/debug.assistance.h>
 #include <atldlgs.h>
 
+namespace
+{
+    bool CBGetCurText(WTL::CComboBox const& ctlCombo, ATL::CString& result)
+    {
+        const int item = ctlCombo.GetCurSel();
+        if (CB_ERR == item) {
+            return false;
+        }
+        return CB_ERR != ctlCombo.GetLBText(item, result);
+    }
+
+    bool CBGetCurData(WTL::CComboBox const& ctlCombo, int& result)
+    {
+        const int item = ctlCombo.GetCurSel();
+        if (CB_ERR == item) {
+            return false;
+        }
+        const int temp = static_cast<int>(ctlCombo.GetItemData(item));
+        if (CB_ERR == temp) {
+            return false;
+        }
+        result = temp;
+        return true;
+    }
+
+    bool CBGetCurTextInt(WTL::CComboBox const& ctlCombo, int& result)
+    {
+        ATL::CString strTemp;
+        if (!CBGetCurText(ctlCombo, strTemp)) {
+            return false;
+        }
+        int temp = CB_ERR;
+        if (_stscanf_s(strTemp.GetString(), _T("%d"), &temp) < 0) {
+            return false;
+        }
+        result = temp;
+        return true;
+    }
+}
+
 CPageAppearance::~CPageAppearance() = default;
 
 CPageAppearance::CPageAppearance(std::wstring&& caption)
     :     CPageImpl{IDD_PAGE_APPEARANCE, std::move(caption)}
     ,  m_SchemeCopy{L"<<COPY>>"}
     , m_bLoadValues{false}
+    , m_nPrevScheme{IT_Invalid}
 {
 }
 
@@ -226,44 +267,6 @@ void CPageAppearance::FontSetSizes(LOGFONT const& logFont)
     m_cbFontSize.SetWindowTextW(szSize);
 }
 
-static bool CBGetCurText(WTL::CComboBox const& ctlCombo, ATL::CString& result)
-{
-    const int item = ctlCombo.GetCurSel();
-    if (CB_ERR == item) {
-        return false;
-    }
-    return CB_ERR != ctlCombo.GetLBText(item, result);
-}
-
-static bool CBGetCurData(WTL::CComboBox const& ctlCombo, int& result)
-{
-    const int item = ctlCombo.GetCurSel();
-    if (CB_ERR == item) {
-        return false;
-    }
-    const int temp = static_cast<int>(ctlCombo.GetItemData(item));
-    if (CB_ERR == temp) {
-        return false;
-    }
-    result = temp;
-    return true;
-}
-
-static bool CBGetCurTextInt(WTL::CComboBox const& ctlCombo, int& result)
-{
-    ATL::CString strTemp;
-    if (!CBGetCurText(ctlCombo, strTemp)) {
-        return false;
-    }
-    int temp = CB_ERR;
-    if (_stscanf_s(strTemp.GetString(), _T("%d"), &temp) < 0) {
-        return false;
-    }
-    result = temp;
-    return true;
-}
-
-
 bool CPageAppearance::ItemFontApplyChanges(int nItem, ItemDef rItemDef, int iFont, int iFontControl)
 {
     WTL::CLogFont lfCopy = m_SchemeCopy.GetLogFont(m_sCurrentSize, iFont);
@@ -356,9 +359,11 @@ void CPageAppearance::OnSchemeSizeChanged()
         String{sTemp.GetString(), static_cast<size_t>(sTemp.GetLength())}.swap(m_sCurrentSize);
     }
     else {
-        //// TODO: report m_cbSchemeSize.GetCurSel
+        // TODO: report m_cbSchemeSize.GetCurSel
         m_sCurrentSize = m_SchemeCopy.GetSizesMap().cbegin()->first;
     }
+    m_stPreview.OnSchemeChanged(m_SchemeCopy, m_SchemeCopy.GetSizePair(m_sCurrentSize), m_cbItem);
+    m_stPreview.InvalidateRect(nullptr, FALSE);
 }
 
 void CPageAppearance::OnSchemeSelected(CScheme const& source)
@@ -374,12 +379,11 @@ void CPageAppearance::OnSchemeSelected(CScheme const& source)
         m_cbFontSmooth.SetCurSel(0);
     }
     OnSchemeSizeChanged();
-    m_stPreview.OnSchemeChanged(m_SchemeCopy, m_SchemeCopy.GetSizePair(m_sCurrentSize), m_cbItem);
-    m_stPreview.EnableWindow(TRUE);
     ThemeEnable(TRUE);
     OnItemSelect(IT_Desktop);
     m_bcGradientCapts.SetCheck(m_SchemeCopy.IsGradientCaptions() ? TRUE : FALSE);
     m_bcFlatMenus.SetCheck(m_SchemeCopy.IsFlatMenus() ? TRUE : FALSE);
+    m_nPrevScheme = m_cbScheme.GetCurSel();
 }
 
 #if 0
@@ -392,84 +396,6 @@ void CPageAppearance::ColorPicker(int nButton)
     dlgColorPicker.DoModal(m_hWnd);
 }
 #endif
-
-void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
-{
-    // skip during controls initialization
-    if (m_bLoadValues) {
-        return ;
-    }
-    // skip CColorButton reflected & other
-    switch (uNotifyCode) {
-    case BN_PAINT:
-    case BN_UNHILITE:
-    case BN_DISABLE:
-    case BN_KILLFOCUS:
-    case CBN_SELENDCANCEL:
-    case CBN_CLOSEUP:
-        SetMsgHandled(FALSE);
-        return ;
-    }
-    int iItem = IT_Invalid;
-    int iSize = IT_Invalid;
-    switch (nID) {
-    case IDC_APP_THEME_SEL: {
-        int nScheme = IT_Invalid;
-        if (!CBGetCurData(m_cbScheme, nScheme)) {
-            return ;
-        }
-        auto const& manager{CLUIApp::App()->SchemeManager()};
-        auto const&  source{manager[nScheme]};
-        if (!source) {
-            return ;
-        }
-        OnSchemeSelected(*source);
-        return ;
-    }
-    case IDC_APP_ITEM_SEL: {
-        OnItemSelect(m_cbItem.GetCurSel());
-        return ;
-    }
-    case IDC_APP_ITEM_COLOR1_SEL:
-    case IDC_APP_ITEM_COLOR2_SEL:
-    case IDC_APP_FONT_COLOR_SEL:
-        SetMsgHandled(FALSE);
-        return ;
-    case IDC_APP_ITEM_SIZE1_EDIT:       iSize = IT_Size1; goto SizeChanged;
-    case IDC_APP_ITEM_SIZE2_EDIT:       iSize = IT_Size2; goto SizeChanged;
-    case IDC_APP_FONT_WDTH_EDIT:        iSize = IT_FontWidth; goto SizeChanged;
-    case IDC_APP_FONT_STYLE_ANGLE_EDIT: iSize = IT_FontAngle; goto SizeChanged;
-    SizeChanged:
-        iItem = ItemGetSel();
-        if (ItemSizeChanged(iItem, iSize, true)) {
-            m_stPreview.InvalidateRect(nullptr, FALSE);
-        }
-        return ;
-    case IDC_APP_FONT_SEL:
-    case IDC_APP_FONT_SIZE_SEL:
-    case IDC_APP_FONT_SMOOTH_SEL:
-    case IDC_APP_FONT_STYLE_BOLD:
-    case IDC_APP_FONT_STYLE_ITALIC:
-    case IDC_APP_FONT_STYLE_UNDERLINE:
-        switch (uNotifyCode) {
-        case CBN_SELENDOK:
-        case BN_CLICKED:
-            iItem = ItemGetSel();
-            if (ItemFontChanged(iItem, nID, true)) {
-                m_stPreview.InvalidateRect(nullptr, FALSE);
-            }
-            return ;
-        }
-        break;
-    default:
-        break;
-    }
-    SetMsgHandled(FALSE);
-    if constexpr (true) {
-        DBGTPrint(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
-            nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
-    }
-}
 
 LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
 {
@@ -534,5 +460,91 @@ void CPageAppearance::ItemColorTryChange(int nButton)
     if (bSuccess) {
         m_stPreview.InvalidateRect(nullptr, FALSE);
     }
-    
+}
+
+void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
+{
+    // skip during controls initialization
+    if (m_bLoadValues) {
+        return ;
+    }
+    // skip CColorButton reflected & other
+    switch (uNotifyCode) {
+    case BN_PAINT:
+    case BN_UNHILITE:
+    case BN_DISABLE:
+    case BN_KILLFOCUS:
+    case CBN_SELENDCANCEL:
+    case CBN_CLOSEUP:
+        SetMsgHandled(FALSE);
+        return ;
+    }
+    int iItem = IT_Invalid;
+    int iSize = IT_Invalid;
+    switch (nID) {
+    case IDC_APP_THEME_SEL: {
+        int nScheme = IT_Invalid;
+        if (m_nPrevScheme == m_cbScheme.GetCurSel()) {
+            return ;
+        }
+        if (!CBGetCurData(m_cbScheme, nScheme)) {
+            m_cbScheme.SetCurSel(m_nPrevScheme);
+            return ;
+        }
+        auto const& manager{CLUIApp::App()->SchemeManager()};
+        auto const&  source{manager[nScheme]};
+        if (!source) {
+            m_cbScheme.SetCurSel(m_nPrevScheme);
+            return ;
+        }
+        OnSchemeSelected(*source);
+        return ;
+    }
+    case IDC_APP_SIZE_SEL: {
+        OnSchemeSizeChanged();
+        return ;
+    }
+    case IDC_APP_ITEM_SEL: {
+        OnItemSelect(m_cbItem.GetCurSel());
+        return ;
+    }
+    case IDC_APP_ITEM_COLOR1_SEL:
+    case IDC_APP_ITEM_COLOR2_SEL:
+    case IDC_APP_FONT_COLOR_SEL:
+        SetMsgHandled(FALSE);
+        return ;
+    case IDC_APP_ITEM_SIZE1_EDIT:       iSize = IT_Size1; goto SizeChanged;
+    case IDC_APP_ITEM_SIZE2_EDIT:       iSize = IT_Size2; goto SizeChanged;
+    case IDC_APP_FONT_WDTH_EDIT:        iSize = IT_FontWidth; goto SizeChanged;
+    case IDC_APP_FONT_STYLE_ANGLE_EDIT: iSize = IT_FontAngle; goto SizeChanged;
+    SizeChanged:
+        iItem = ItemGetSel();
+        if (ItemSizeChanged(iItem, iSize, true)) {
+            m_stPreview.InvalidateRect(nullptr, FALSE);
+        }
+        return ;
+    case IDC_APP_FONT_SEL:
+    case IDC_APP_FONT_SIZE_SEL:
+    case IDC_APP_FONT_SMOOTH_SEL:
+    case IDC_APP_FONT_STYLE_BOLD:
+    case IDC_APP_FONT_STYLE_ITALIC:
+    case IDC_APP_FONT_STYLE_UNDERLINE:
+        switch (uNotifyCode) {
+        case CBN_SELENDOK:
+        case BN_CLICKED:
+            iItem = ItemGetSel();
+            if (ItemFontChanged(iItem, nID, true)) {
+                m_stPreview.InvalidateRect(nullptr, FALSE);
+            }
+            return ;
+        }
+        break;
+    default:
+        break;
+    }
+    SetMsgHandled(FALSE);
+    if constexpr (true) {
+        DBGTPrint(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
+            nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+    }
 }

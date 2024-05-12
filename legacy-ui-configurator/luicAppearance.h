@@ -6,14 +6,17 @@
 #include "luicThemePreviewer.h"
 #include "luicSchemeManager.h"
 #include "WTL/CColorButton.h"
-#include <atlstr.h>
+#include <wcdafx.api.h>
 #include <atlctrls.h>
+#include <atlstr.h>
 
 class CLUIApp;
 struct CSchemeManager;
 
 struct CPageAppearance: CPageImpl
 {
+    DELETE_COPY_MOVE_OF(CPageAppearance);
+
     using ItemDef = CScheme::Item const&;
     using  String = CScheme::String;
 
@@ -26,6 +29,7 @@ private:
     CScheme                        m_SchemeCopy;
     String                       m_sCurrentSize;
     bool                          m_bLoadValues;
+    int                           m_nPrevScheme;
     WTL::CStatic                     m_stScheme;
     WTL::CComboBox                   m_cbScheme;
     WTL::CStatic                m_stSchemeScale;

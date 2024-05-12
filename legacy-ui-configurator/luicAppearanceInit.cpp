@@ -184,6 +184,7 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 
     CtlAdjustPositions();
     InitResizeMap();
+    m_stPreview.EnableWindow(TRUE);
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }
 
