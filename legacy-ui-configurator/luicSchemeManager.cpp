@@ -38,7 +38,6 @@ HRESULT CSchemeManager::Initialize()
 {
     HRESULT           code{S_OK};
     SchemeVec  tempSchemes{};
-
     {
         auto pCurrent = std::make_shared<CScheme>(L"(Current)");
         if (!pCurrent->LoadDefaults()) {
@@ -47,10 +46,10 @@ HRESULT CSchemeManager::Initialize()
         }
         tempSchemes.emplace_back(std::move(pCurrent));
     }
-
     const CRegistry regClassics{HKEY_CURRENT_USER, REG_ClassicSchemes};
     if (!regClassics.IsOk()) {
         code = static_cast<HRESULT>(GetLastError());
+        tempSchemes.swap(m_Schemes);
         return code;
     }
     const int nCount = regClassics.ForEachValue([&tempSchemes](HKEY hKey, PCWSTR szSchemename, int nLen) -> bool {
@@ -79,7 +78,6 @@ HRESULT CSchemeManager::Initialize()
         DH::TPrintf(L"%s: WARNING: CRegistry::ForEachValue failed: %d '%s'\n", __FUNCTIONW__,
             code, codeText.GetString());
     }
-
     tempSchemes.swap(m_Schemes);
     return code;
 }

@@ -60,7 +60,7 @@ CPageAppearance::CPageAppearance(std::wstring&& caption)
 {
 }
 
-void CPageAppearance::ThemeEnable(BOOL bEnable)
+void CPageAppearance::SchemeEnable(BOOL bEnable)
 {
     m_stScheme.EnableWindow(bEnable);
     m_cbScheme.EnableWindow(bEnable);
@@ -70,6 +70,8 @@ void CPageAppearance::ThemeEnable(BOOL bEnable)
     m_bnSave.EnableWindow(bEnable);
     m_bnRename.EnableWindow(bEnable);
     m_bnDelete.EnableWindow(bEnable);
+    m_bcGradientCapts.EnableWindow(bEnable);
+    m_bcFlatMenus.EnableWindow(bEnable);
 }
 
 void CPageAppearance::ItemEnable(BOOL bEnable)
@@ -384,7 +386,7 @@ void CPageAppearance::OnSchemeSelected(CSchemePtr& pSource)
         m_cbFontSmooth.SetCurSel(0);
     }
     OnSchemeSizeChanged();
-    ThemeEnable(TRUE);
+    SchemeEnable(TRUE);
     OnItemSelect(IT_Desktop);
     m_bcGradientCapts.SetCheck(m_SchemeCopy.IsGradientCaptions() ? TRUE : FALSE);
     m_bcFlatMenus.SetCheck(m_SchemeCopy.IsFlatMenus() ? TRUE : FALSE);
@@ -560,6 +562,14 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
             return ;
         }
         break;
+    case IDC_APP_CB_TTILEBAR_GRAD:
+        m_SchemeCopy.SetGradientCaptions(m_bcGradientCapts.GetCheck() != 0);
+        goto UpdatePreview;
+    case IDC_APP_CB_FLATMENUS:
+        m_SchemeCopy.SetFlatMenus(m_bcFlatMenus.GetCheck() != 0);
+    UpdatePreview:
+        m_stPreview.InvalidateRect(nullptr, FALSE);
+        return ;
     default:
         break;
     }

@@ -123,6 +123,9 @@ struct CScheme
     CSizePair const& GetSizePair(String const& name) const;
     CSizePair& GetSizePair(String const& name);
 
+    void SetGradientCaptions(bool bValue) { m_bGradientCaptions = bValue; }
+    void        SetFlatMenus(bool bValue) { m_bFlatMenus = bValue; }
+
     bool IsNotEqual(CScheme const& rhs) const;
 
 private:

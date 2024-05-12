@@ -74,7 +74,7 @@ private:
     void InitializeFontButtons();
     void OnSchemesLoad(CLUIApp* pApp, int nInitialIndex);
 
-    void ThemeEnable(BOOL bEnable);
+    void SchemeEnable(BOOL bEnable);
     void ItemEnable(BOOL bEnable);
     void ItemClr1Enable(BOOL bEnable);
     void ItemClr2Enable(BOOL bEnable);
