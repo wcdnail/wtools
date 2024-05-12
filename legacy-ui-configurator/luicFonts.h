@@ -39,7 +39,7 @@ struct CFontPair
     bool Reset(WTL::CLogFont& logFont);
     bool Reset(WTL::CFont& hFont);
     void Swap(CFontPair& rhs) noexcept;
-    void CopyTo(CFontPair& rhs) const noexcept;
+    void CopyTo(CFontPair& target) const noexcept;
 };
 
 struct CFonts
@@ -61,6 +61,8 @@ struct CFonts
     CFontPair const& operator[](int index) const;
 
     WTL::CLogFont const& GetLogFont(int index) const { return (*this)[index].m_logFont; }
+
+    bool IsNotEqual(CFonts const& rhs) const;
 
 private:
     CFontPair m_Pair[FONT_Count];

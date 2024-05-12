@@ -19,6 +19,7 @@ struct CSchemeManager
     SchemeVec const& GetSchemes() const;
 
     CSchemePtr const& operator[](int index) const;
+    CSchemePtr& operator[](int index);
 
 private:
     SchemeVec m_Schemes;

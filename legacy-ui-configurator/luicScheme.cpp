@@ -6,12 +6,13 @@
 
 CSizePair::~CSizePair() = default;
 CSizePair::CSizePair() = default;
+
 CScheme::~CScheme() = default;
 
 CScheme::CScheme(StrView name)
-    : m_Name{name}
+    :              m_Name{name}
     , m_bGradientCaptions{false}
-    , m_bFlatMenus{false}
+    ,        m_bFlatMenus{false}
 {
     for (int i = 0; i < NCM_Count; i++) {
         m_SizeRange[i] = CNCMetrics::DefaultRange(i);
@@ -94,6 +95,52 @@ CSizePair const& CScheme::GetSizePair(String const& name) const
 CSizePair& CScheme::GetSizePair(String const& name)
 {
     return getSizeItemeRef<CSizePair>(*this, name);
+}
+
+bool CSizePair::IsNotEqual(CSizePair const& rhs) const
+{
+    return m_NCMetric.IsNotEqual(rhs.m_NCMetric)
+        || m_Font.IsNotEqual(rhs.m_Font)
+        ;
+}
+
+bool CScheme::IsNotEqual(CScheme const& rhs) const
+{
+    return (m_Name != rhs.m_Name)
+        || (m_bGradientCaptions != rhs.m_bGradientCaptions)
+        || (m_bFlatMenus != rhs.m_bFlatMenus)
+        || m_Color.IsNotEqual(rhs.m_Color)
+        || IsSizesNotEqual(m_SizesMap, rhs.m_SizesMap)
+        || IsSizeRangesNotEqual(m_SizeRange, rhs.m_SizeRange)
+        ;
+}
+
+bool CScheme::IsSizesNotEqual(SizeMap const& lhs, SizeMap const& rhs)
+{
+    if (lhs.size() != rhs.size()) {
+        return true;
+    }
+    for (const auto& it: lhs) {
+        const auto& jt = rhs.find(it.first);
+        if (jt == rhs.cend()) {
+            return true;
+        }
+        if (it.second.IsNotEqual(jt->second)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CScheme::IsSizeRangesNotEqual(CNCMetrics::Range const (&lhs)[NCM_Count], CNCMetrics::Range const (&rhs)[NCM_Count])
+{
+    for (int i = 0; i < NCM_Count; i++) {
+        if ((lhs[i].min != rhs[i].min)
+         || (lhs[i].max != rhs[i].max)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool CScheme::LoadDefaults()

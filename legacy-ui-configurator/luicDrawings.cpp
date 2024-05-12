@@ -657,7 +657,7 @@ LONG CDrawings::DrawCaptionButtons(WTL::CDCHandle dc, CRect const& rcCaption, bo
     return rc.left;
 }
 
-void CDrawings::DrawCaption(WTL::CDCHandle dc, CRect const& rcParam, HFONT fnMarlet, HICON hIcon, PCWSTR str, UINT uFlags) const
+void CDrawings::DrawCaption(WTL::CDCHandle dc, CRect const& rcParam, HFONT hFont, HICON hIcon, PCWSTR str, UINT uFlags) const
 {
     CRect rcTmp = rcParam;
     int iColor1 = COLOR_INACTIVECAPTION;
@@ -703,7 +703,7 @@ void CDrawings::DrawCaption(WTL::CDCHandle dc, CRect const& rcParam, HFONT fnMar
     else {
         dc.FillRect(rcTmp, m_Scheme.GetBrush(iColor1));
     }
-    const HFONT prevFont = dc.SelectFont(fnMarlet);
+    const HFONT prevFont = dc.SelectFont(hFont);
     if (uFlags & DC_ACTIVE) {
         SetTextColor(dc, m_Scheme.GetColor(COLOR_CAPTIONTEXT));
     }
@@ -819,11 +819,10 @@ void CDrawings::DrawMenuBar(WTL::CDCHandle dc, CRect const& rc, HMENU hMenu, HFO
 
 void CDrawings::DrawScrollbar(WTL::CDCHandle dc, CRect const& rcParam, BOOL enabled)
 {
-    CRect               rc{};
-    int       buttonHeight{m_SizePair.m_NCMetric.iScrollHeight};
-    // TODO: USE GetNCMetrics().iScrollWidth!!!
-    UINT frameControlFlags{static_cast<UINT>(enabled ? 0 : DFCS_INACTIVE)};
-    HBRUSH     hbrScrollBk{m_Scheme.GetBrush(COLOR_SCROLLBAR)};
+    CRect                     rc{};
+    int             buttonHeight{m_SizePair.m_NCMetric.iScrollHeight};
+    const UINT frameControlFlags{static_cast<UINT>(enabled ? 0 : DFCS_INACTIVE)};
+    const HBRUSH     hbrScrollBk{m_Scheme.GetBrush(COLOR_SCROLLBAR)};
     rc.left = rcParam.left;
     rc.right = rcParam.right;
     if (rcParam.bottom - rcParam.top - buttonHeight * 2 <= 0) {
@@ -856,7 +855,7 @@ void CDrawings::DrawScrollbar(WTL::CDCHandle dc, CRect const& rcParam, BOOL enab
     && (m_Scheme.GetColor(COLOR_SCROLLBAR) != m_Scheme.GetColor(COLOR_3DHILIGHT)
      || m_Scheme.GetColor(COLOR_WINDOW) == m_Scheme.GetColor(COLOR_SCROLLBAR))) {
         dc.SetTextColor(m_Scheme.GetColor(COLOR_3DFACE));
-        COLORREF previousColor = dc.SetBkColor(m_Scheme.GetColor(COLOR_3DHILIGHT));
+        const COLORREF previousColor = dc.SetBkColor(m_Scheme.GetColor(COLOR_3DHILIGHT));
         if (previousColor == CLR_INVALID) {
             dc.FillRect(rc, m_Scheme.GetBrush(COLOR_SCROLLBAR));
         }

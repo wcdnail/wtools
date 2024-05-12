@@ -92,11 +92,16 @@ void CFonts::Swap(CFonts& rhs) noexcept
     }
 }
 
-void CFontPair::CopyTo(CFontPair& rhs) const noexcept
+void CFontPair::CopyTo(CFontPair& target) const noexcept
 {
-    rhs.m_logFont = m_logFont;
-    rhs.m_CFont.m_hFont = m_CFont.m_hFont;
-    rhs.m_bCopy = true;
+    target.m_logFont = m_logFont;
+    if (!target.m_bCopy && target.m_CFont.m_hFont) {
+        target.m_CFont.Attach(m_CFont.m_hFont);
+    }
+    else {
+        target.m_CFont.m_hFont = m_CFont.m_hFont;
+        target.m_bCopy = true;
+    }
 }
 
 void CFonts::CopyTo(CFonts& target) const noexcept
@@ -127,6 +132,17 @@ CFontPair const& CFonts::operator[](int index) const
     return getRefByIndex<const CFontPair>(*this, index);
 }
 
+bool CFonts::IsNotEqual(CFonts const& rhs) const
+{
+    for (int i = 0; i < FONT_Count; i++) {
+        const SIZE_T nCmpRes = RtlCompareMemory(&m_Pair[i].m_logFont, &rhs.m_Pair[i].m_logFont, sizeof(m_Pair[i].m_logFont));
+        if (sizeof(m_Pair[i].m_logFont) != nCmpRes) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CFontPair::Reset(WTL::CLogFont& logFont)
 {
     WTL::CFont temp{logFont.CreateFontIndirectW()};
@@ -143,6 +159,10 @@ bool CFontPair::Reset(WTL::CFont& hFont)
         return false;
     }
     m_logFont = temp;
+    if (m_bCopy) {
+        m_CFont.m_hFont = nullptr;
+        m_bCopy = false;
+    }
     m_CFont.Attach(hFont.Detach());
     return true;
 }

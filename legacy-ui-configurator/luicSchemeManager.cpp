@@ -29,6 +29,11 @@ CSchemePtr const& CSchemeManager::operator[](int index) const
     return getSchemeRef<CSchemePtr const>(*this, index);
 }
 
+CSchemePtr& CSchemeManager::operator[](int index)
+{
+    return getSchemeRef<CSchemePtr>(*this, index);
+}
+
 HRESULT CSchemeManager::Initialize()
 {
     HRESULT           code{S_OK};

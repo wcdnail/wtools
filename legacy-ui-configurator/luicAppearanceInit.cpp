@@ -348,16 +348,16 @@ void CPageAppearance::InitializeFontButtons()
     m_bnFontUndrln.SetFont(gs_fntUnderline);
 }
 
-void CPageAppearance::OnSchemesLoad(CLUIApp const* pApp, int nInitialIndex)
+void CPageAppearance::OnSchemesLoad(CLUIApp* pApp, int nInitialIndex)
 {
-    auto const& manager{pApp->SchemeManager()};
-    auto const&  source{manager[nInitialIndex]};
-    if (!source) {
+    auto& manager{pApp->SchemeManager()};
+    auto& pSource{manager[nInitialIndex]};
+    if (!pSource) {
         return ;
     }
     InitializeSchemes(manager);
     m_cbScheme.SetCurSel(nInitialIndex);
-    OnSchemeSelected(*source);
+    OnSchemeSelected(pSource);
 }
 
 void CPageAppearance::NotifySchemesChanged()

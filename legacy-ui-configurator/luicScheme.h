@@ -69,6 +69,8 @@ struct CSizePair
 
     WTL::CLogFont const& GetLogFont(int index) const { return m_Font[index].m_logFont; }
     WTL::CFontHandle        GetFont(int index) const { return m_Font[index].m_CFont.m_hFont; }
+
+    bool IsNotEqual(CSizePair const& rhs) const;
 };
 
 struct CScheme
@@ -115,18 +117,24 @@ struct CScheme
     CFontPair&          GetFontPair(String const& name, int index)       { return GetSizePair(name).m_Font[index]; }
     SizeMap const&                                   GetSizesMap() const { return m_SizesMap; };
     SizeMap&                                         GetSizesMap()       { return m_SizesMap; };
-    CNCMetrics::Range const&               GetSizeRange(int index) const;
-    CNCMetrics::Range&                     GetSizeRange(int index);
-    CSizePair const&               GetSizePair(String const& name) const;
-    CSizePair&                     GetSizePair(String const& name);
+
+    CNCMetrics::Range const& GetSizeRange(int index) const;
+    CNCMetrics::Range& GetSizeRange(int index);
+    CSizePair const& GetSizePair(String const& name) const;
+    CSizePair& GetSizePair(String const& name);
+
+    bool IsNotEqual(CScheme const& rhs) const;
 
 private:
     String                            m_Name;
-    CColors                          m_Color;
     bool                 m_bGradientCaptions;
     bool                        m_bFlatMenus;
+    CColors                          m_Color;
     SizeMap                       m_SizesMap;
     CNCMetrics::Range m_SizeRange[NCM_Count];
+
+    static bool IsSizesNotEqual(SizeMap const& lhs, SizeMap const& rhs);
+    static bool IsSizeRangesNotEqual(CNCMetrics::Range const (&lhs)[NCM_Count], CNCMetrics::Range const (&rhs)[NCM_Count]);
 
     template <typename ReturnType, typename SelfRef>
     static ReturnType& getSizeRangeRef(SelfRef& thiz, int index);

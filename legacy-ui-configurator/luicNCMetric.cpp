@@ -137,3 +137,8 @@ int CNCMetrics::operator[](int index) const
     return getRefByIndex<int const>(*this, index);
 }
 
+bool CNCMetrics::IsNotEqual(CNCMetrics const& rhs) const
+{
+    return sizeof(*this) != RtlCompareMemory(this, &rhs, sizeof(*this));
+}
+

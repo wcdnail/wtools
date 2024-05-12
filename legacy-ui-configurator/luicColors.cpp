@@ -151,6 +151,16 @@ CColorPair const& CColors::operator[](int index) const
     return getRefByIndex<const CColorPair>(*this, index);
 }
 
+bool CColors::IsNotEqual(CColors const& rhs) const
+{
+    for (int i = 0; i < CLR_Count; i++) {
+        if (m_Pair[i].m_Color != rhs.m_Pair[i].m_Color) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CColorPair::Reset(COLORREF color)
 {
     const HBRUSH hBrush = CreateSolidBrush(color);

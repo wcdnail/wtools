@@ -85,6 +85,8 @@ struct CColors
     CColorPair& operator[](int index);
     CColorPair const& operator[](int index) const;
 
+    bool IsNotEqual(CColors const& rhs) const;
+
 private:
     CColorPair m_Pair[CLR_Count];
 

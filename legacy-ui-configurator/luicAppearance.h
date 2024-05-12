@@ -11,7 +11,6 @@
 #include <atlstr.h>
 
 class CLUIApp;
-struct CSchemeManager;
 
 struct CPageAppearance: CPageImpl
 {
@@ -26,10 +25,12 @@ struct CPageAppearance: CPageImpl
     void NotifySchemesChanged();
 
 private:
+    CSchemePtr                        m_pSource;
     CScheme                        m_SchemeCopy;
     String                       m_sCurrentSize;
     bool                          m_bLoadValues;
     int                           m_nPrevScheme;
+    int                             m_nPrevSize;
     WTL::CStatic                     m_stScheme;
     WTL::CComboBox                   m_cbScheme;
     WTL::CStatic                m_stSchemeScale;
@@ -71,7 +72,7 @@ private:
     void InitializeFontSizes();
     void InitializeFontSmooth();
     void InitializeFontButtons();
-    void OnSchemesLoad(CLUIApp const* pApp, int nInitialIndex);
+    void OnSchemesLoad(CLUIApp* pApp, int nInitialIndex);
 
     void ThemeEnable(BOOL bEnable);
     void ItemEnable(BOOL bEnable);
@@ -92,11 +93,12 @@ private:
 
     void OnItemSelect(int nItem);
     void OnSchemeSizeChanged();
-    void OnSchemeSelected(CScheme const& scheme);
+    void OnSchemeSelected(CSchemePtr& pSource);
 
     void ColorPicker(int nButton);
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh) override;
     int ItemGetSel() const;
     void ItemColorTryChange(int nButton);
+    void ApplyPendingChanges() const;
 };

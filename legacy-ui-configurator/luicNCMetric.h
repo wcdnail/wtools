@@ -46,6 +46,8 @@ struct CNCMetrics: NONCLIENTMETRICS
     int& operator[](int index);
     int operator[](int index) const;
 
+    bool IsNotEqual(CNCMetrics const& rhs) const;
+
 private:
     template <typename ReturnType, typename SelfRef>
     static ReturnType& getRefByIndex(SelfRef& thiz, int index);

@@ -52,9 +52,11 @@ CPageAppearance::~CPageAppearance() = default;
 
 CPageAppearance::CPageAppearance(std::wstring&& caption)
     :     CPageImpl{IDD_PAGE_APPEARANCE, std::move(caption)}
+    ,     m_pSource{}
     ,  m_SchemeCopy{L"<<COPY>>"}
     , m_bLoadValues{false}
     , m_nPrevScheme{IT_Invalid}
+    ,   m_nPrevSize{IT_Invalid}
 {
 }
 
@@ -364,11 +366,14 @@ void CPageAppearance::OnSchemeSizeChanged()
     }
     m_stPreview.OnSchemeChanged(m_SchemeCopy, m_SchemeCopy.GetSizePair(m_sCurrentSize), m_cbItem);
     m_stPreview.InvalidateRect(nullptr, FALSE);
+    m_nPrevSize = m_cbSchemeSize.GetCurSel();
 }
 
-void CPageAppearance::OnSchemeSelected(CScheme const& source)
+void CPageAppearance::OnSchemeSelected(CSchemePtr& pSource)
 {
-    source.CopyTo(m_SchemeCopy);
+    m_pSource = pSource;
+    ATLASSUME(pSource.get() != nullptr);
+    m_pSource->CopyTo(m_SchemeCopy);
     InitializeSizes();
     {
         ScopedBoolGuard guard(m_bLoadValues);
@@ -462,6 +467,18 @@ void CPageAppearance::ItemColorTryChange(int nButton)
     }
 }
 
+void CPageAppearance::ApplyPendingChanges() const
+{
+    if (!m_pSource->IsNotEqual(m_SchemeCopy)) {
+        return ;
+    }
+    const int nAnswer = ::MessageBoxW(m_hWnd, L"Reject current changes?", L"Changes pending...", MB_YESNO | MB_ICONQUESTION);
+    if (IDYES == nAnswer) {
+        return ;
+    }
+    m_SchemeCopy.CopyTo(*m_pSource);
+}
+
 void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
     // skip during controls initialization
@@ -487,20 +504,24 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         if (m_nPrevScheme == m_cbScheme.GetCurSel()) {
             return ;
         }
+        ApplyPendingChanges();
         if (!CBGetCurData(m_cbScheme, nScheme)) {
             m_cbScheme.SetCurSel(m_nPrevScheme);
             return ;
         }
-        auto const& manager{CLUIApp::App()->SchemeManager()};
-        auto const&  source{manager[nScheme]};
+        auto& manager{CLUIApp::App()->SchemeManager()};
+        auto&  source{manager[nScheme]};
         if (!source) {
             m_cbScheme.SetCurSel(m_nPrevScheme);
             return ;
         }
-        OnSchemeSelected(*source);
+        OnSchemeSelected(source);
         return ;
     }
     case IDC_APP_SIZE_SEL: {
+        if (m_nPrevSize == m_cbSchemeSize.GetCurSel()) {
+            return ;
+        }
         OnSchemeSizeChanged();
         return ;
     }
