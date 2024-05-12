@@ -897,14 +897,14 @@ void CDrawings::DrawToolTip(WTL::CDCHandle dc, CRect& rcParam, ATL::CStringW&& t
 #define IsDarkColor(color) \
     ((GetRValue(color) * 2 + GetGValue(color) * 5 + GetBValue(color)) <= 128 * 8)
 
-void CDrawings::DrawDesktopIcon(WTL::CDCHandle dc, CRect const& rcParam, ATL::CStringW&& text, bool drawCursor) const
+void CDrawings::DrawDesktopIcon(WTL::CDCHandle dc, CRect& rcParam, ATL::CStringW&& text, bool drawCursor) const
 {
     ATLASSERT(m_pStaticRes.get() != nullptr);
     const HICON hIcon{m_pStaticRes->m_hIcon[CStaticRes::ICON_Desktop1]};
     //FillRect(dc, rcParam, m_Scheme.GetBrush(COLOR_APPWORKSPACE)); // DEBUG
     CRect rcIcon{0, 0, 64, 64}; // ##TODO: get desktop icon dimensions
     Rc::PutInto(rcParam, rcIcon, Rc::Center);
-    //DrawBorder(dc, rcIcon, 1, m_Scheme.GetBrush(COLOR_INFOTEXT)); // DEBUG
+    rcParam = rcIcon;
     dc.DrawIconEx(rcIcon.TopLeft(), hIcon, rcIcon.Size(), 0, nullptr, DI_NORMAL);
     CSize szText;
     CRect rcText = rcIcon;
@@ -1023,17 +1023,19 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
         if (params.hMenu) {
             DrawMenuBar(dc, rects[WR_Menu], params.hMenu, menuFont, params.selectedMenu, rects);
         }
+        const COLORREF clrWinBk = m_Scheme.GetColor(workspaceColorIndex);
         CRect rcWork = rects[WR_Workspace];
-        dc.FillSolidRect(rcWork, m_Scheme.GetColor(workspaceColorIndex));
+        dc.FillSolidRect(rcWork, clrWinBk);
         DrawEdge(dc, rcWork, EDGE_SUNKEN, BF_RECT | BF_ADJUST);
 
         if (params.text.lineCount > 0) {
-            const int textColorIndex = isActive ? COLOR_WINDOWTEXT : COLOR_GRAYTEXT;
-            const HFONT      prevFnt = dc.SelectFont(m_SizePair.GetFont(FONT_Desktop));
-            const COLORREF   prevClr = dc.SetTextColor(m_Scheme.GetColor(textColorIndex));
-            const COLORREF prevBkClr = dc.SetBkColor(m_Scheme.GetColor(workspaceColorIndex));
-            const int     prevBkMode = dc.SetBkMode(TRANSPARENT);
-            CRect             rcText = rcWork;
+            const int  textColorIndex{isActive ? COLOR_WINDOWTEXT : COLOR_GRAYTEXT};
+            const COLORREF clrWinText{m_Scheme.GetColor(textColorIndex)};
+            const HFONT       prevFnt{dc.SelectFont(m_SizePair.GetFont(FONT_Desktop))};
+            const COLORREF    prevClr{dc.SetTextColor(clrWinText == clrWinBk ? RGB(GetRValue(clrWinText) - 16, GetGValue(clrWinText) - 16, GetBValue(clrWinText) - 16) : clrWinText)};
+            const COLORREF  prevBkClr{dc.SetBkColor(m_Scheme.GetColor(workspaceColorIndex))};
+            const int      prevBkMode{dc.SetBkMode(TRANSPARENT)};
+            CRect              rcText{rcWork};
             rcText.right = rects[WR_Scroll].left - 1;
             rcText.DeflateRect(rcWork.Width() / 16, 10);
             CRect  rcLine = rcText;

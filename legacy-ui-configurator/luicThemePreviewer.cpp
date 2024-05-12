@@ -9,6 +9,8 @@
 #include <string.utils.format.h>
 #include <rect.gdi+.h>
 
+#include "rect.putinto.h"
+
 
 ATOM CThemePreviewer::Register(HRESULT& code)
 {
@@ -235,7 +237,10 @@ void CThemePreviewer::DrawDesktop(WTL::CDCHandle dc, CRect const& rcClient)
         drawings.CalcRects(wrect[i].rcSource, wparam[i].captFlags, wrect[i].rcTarget);
         drawings.DrawWindow(dc, wparam[i], wrect[i].rcTarget);
     }
-    drawings.DrawToolTip(dc, m_WndRect[WND_MsgBox][WR_Tooltip], L"TooTip Hint");
+    CRect& rcTooltip = m_WndRect[WND_MsgBox][WR_Tooltip];
+    rcTooltip = rcIcon;
+    rcTooltip.OffsetRect(rcIcon.Width(), -rcIcon.Height()/2);
+    drawings.DrawToolTip(dc, rcTooltip, L"TooTip Hint");
     auto rcSel = GetSeletcedRect();
     if (!rcSel.IsRectEmpty()) {
         if constexpr (true) { // ##TODO: configure selection type

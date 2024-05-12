@@ -31,7 +31,6 @@ struct CFontPair
 
     WTL::CLogFont  m_logFont;
     WTL::CFont       m_CFont;
-    bool             m_bCopy;
 
     ~CFontPair();
     CFontPair();
@@ -39,7 +38,7 @@ struct CFontPair
     bool Reset(WTL::CLogFont& logFont);
     bool Reset(WTL::CFont& hFont);
     void Swap(CFontPair& rhs) noexcept;
-    void CopyTo(CFontPair& target) const noexcept;
+    void CopyTo(CFontPair& target) const;
 };
 
 struct CFonts
@@ -55,7 +54,7 @@ struct CFonts
     bool LoadValues(CNCMetrics& ncMetrics);
     bool LoadValues(CRegistry const& regScheme);
     void Swap(CFonts& rhs) noexcept;
-    void CopyTo(CFonts& target) const noexcept;
+    void CopyTo(CFonts& target) const;
 
     CFontPair& operator[](int index);
     CFontPair const& operator[](int index) const;

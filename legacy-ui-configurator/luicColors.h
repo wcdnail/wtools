@@ -55,7 +55,6 @@ struct CColorPair
 
     COLORREF    m_Color;
     WTL::CBrush m_Brush;
-    bool        m_bCopy;
 
     ~CColorPair();
     CColorPair();

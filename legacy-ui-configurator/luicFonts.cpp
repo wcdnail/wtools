@@ -5,17 +5,11 @@
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
-CFontPair::~CFontPair()
-{
-    if (m_bCopy) {
-        m_CFont.m_hFont = nullptr;
-    }
-}
+CFontPair::~CFontPair() = default;
 
 CFontPair::CFontPair()
     : m_logFont{}
     ,   m_CFont{nullptr}
-    ,   m_bCopy{false}
 {
 }
 
@@ -92,19 +86,13 @@ void CFonts::Swap(CFonts& rhs) noexcept
     }
 }
 
-void CFontPair::CopyTo(CFontPair& target) const noexcept
+void CFontPair::CopyTo(CFontPair& target) const
 {
-    if (m_bCopy && target.m_CFont.m_hFont) {
-        target.m_CFont.Attach(m_CFont.m_hFont);
-    }
-    else {
-        target.m_CFont.m_hFont = m_CFont.m_hFont;
-        target.m_bCopy = true;
-    }
-    target.m_logFont = m_logFont;
+    WTL::CLogFont logFont = m_logFont;
+    target.Reset(logFont);
 }
 
-void CFonts::CopyTo(CFonts& target) const noexcept
+void CFonts::CopyTo(CFonts& target) const
 {
     for (int i = 0; i < FONT_Count; i++) {
         m_Pair[i].CopyTo(target.m_Pair[i]);
@@ -159,10 +147,6 @@ bool CFontPair::Reset(WTL::CFont& hFont)
         return false;
     }
     m_logFont = temp;
-    if (m_bCopy) {
-        m_CFont.m_hFont = nullptr;
-        m_bCopy = false;
-    }
     m_CFont.Attach(hFont.Detach());
     return true;
 }

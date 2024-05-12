@@ -4,17 +4,11 @@
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
-CColorPair::~CColorPair()
-{
-    if (m_bCopy) {
-        m_Brush.m_hBrush = nullptr;
-    }
-}
+CColorPair::~CColorPair() = default;
 
 CColorPair::CColorPair()
     : m_Color{CLR_INVALID}
     , m_Brush{nullptr}
-    , m_bCopy{false}
 {
 }
 
@@ -99,14 +93,7 @@ void CColors::Swap(CColors& rhs) noexcept
 
 void CColorPair::CopyTo(CColorPair& target) const noexcept
 {
-    if (m_bCopy && target.m_Brush.m_hBrush) {
-        target.m_Brush.Attach(m_Brush.m_hBrush);
-    }
-    else {
-        target.m_Brush.m_hBrush = m_Brush.m_hBrush;
-        target.m_bCopy = true;
-    }
-    target.m_Color = m_Color;
+    target.Reset(m_Color);
 }
 
 void CColors::CopyTo(CColors& target) const noexcept
@@ -176,10 +163,6 @@ bool CColorPair::Reset(COLORREF color)
         return false;
     }
     m_Color = color;
-    if (m_bCopy) {
-        m_Brush.m_hBrush = nullptr;
-        m_bCopy = false;
-    }
     m_Brush.Attach(hBrush);
     return true;
 }
