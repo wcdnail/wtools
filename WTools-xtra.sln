@@ -17,6 +17,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "afx", "afx", "{35068A65-987
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "exa", "exa", "{F694488A-5AC2-411E-9B1F-9BA107E43530}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root", "root", "{B17E5119-0A69-48B5-A572-3A8A5BC130E6}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Console|x64 = Debug Console|x64
