@@ -228,7 +228,8 @@ int CSchemeManager::LoadIni98(Path const& path)
         { "Control Panel\\Colors", Ini98LoadColors },
     };
     CSchemePtr pScheme{};
-    const bool  bFound{FindOrCreate(path.filename().native(), pScheme)};
+    auto const  flName{path.filename().native()};
+    const bool  bFound{FindOrCreate(flName, pScheme)};
     pScheme->SetGradientCaptions(false);
     pScheme->SetFlatMenus(false);
     for (auto const& sd: gs_Sections) {
@@ -249,6 +250,11 @@ int CSchemeManager::LoadIni98(Path const& path)
     }
     if (!bFound) {
         m_Schemes.emplace_back(std::move(pScheme));
+    }
+    else {
+        code = static_cast<HRESULT>(0);
+        ReportError(Str::ElipsisW::Format(L"Already loaded\r\n'%s'\r\n",
+            flName.c_str()), code, true, MB_ICONWARNING);
     }
     return static_cast<int>(m_Schemes.size()) - 1;
 }

@@ -65,7 +65,7 @@ void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox/* = false*
     if (showMBox) {
         ATL::CStringW userMsg;
         userMsg.Format(L"%s\r\n%s\r\n", caption.GetString(), msg.GetString());
-        MessageBoxW(nullptr, userMsg.GetString(), L"ERROR", mbType);
+        MessageBoxW(nullptr, userMsg.GetString(), code ? L"ERROR" : L"INFO", mbType);
     }
 }
 
