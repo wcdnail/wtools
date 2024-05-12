@@ -61,9 +61,7 @@ struct CColorPair
     CColorPair();
 
     bool Reset(COLORREF color);
-    bool Reset(WTL::CBrush& hBrush);
 
-    CColorPair& operator = (CColorPair& rhs) noexcept;
     void Swap(CColorPair& rhs) noexcept;
     void CopyTo(CColorPair& target) const noexcept;
 };

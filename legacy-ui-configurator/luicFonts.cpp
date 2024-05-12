@@ -96,7 +96,6 @@ void CFontPair::CopyTo(CFontPair& target) const noexcept
 {
     if (m_bCopy && target.m_CFont.m_hFont) {
         target.m_CFont.Attach(m_CFont.m_hFont);
-        target.m_bCopy = false;
     }
     else {
         target.m_CFont.m_hFont = m_CFont.m_hFont;

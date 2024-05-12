@@ -79,7 +79,7 @@ bool CColors::LoadDefaults()
         }
     }
     for (int i = 0; i < CLR_Count; i++) {
-        m_Pair[i] = pair[i];
+        m_Pair[i].Swap(pair[i]);
     }
     return true;
 }
@@ -101,7 +101,6 @@ void CColorPair::CopyTo(CColorPair& target) const noexcept
 {
     if (m_bCopy && target.m_Brush.m_hBrush) {
         target.m_Brush.Attach(m_Brush.m_hBrush);
-        target.m_bCopy = false;
     }
     else {
         target.m_Brush.m_hBrush = m_Brush.m_hBrush;
@@ -131,7 +130,7 @@ bool CColors::LoadValues(CRegistry const& regScheme)
         }
     }
     for (int i = 0; i < CLR_Count; i++) {
-        m_Pair[i] = pair[i];
+        m_Pair[i].Swap(pair[i]);
     }
     return true;
 }
@@ -177,35 +176,10 @@ bool CColorPair::Reset(COLORREF color)
         return false;
     }
     m_Color = color;
+    if (m_bCopy) {
+        m_Brush.m_hBrush = nullptr;
+        m_bCopy = false;
+    }
     m_Brush.Attach(hBrush);
     return true;
-}
-
-bool CColorPair::Reset(WTL::CBrush& hBrush)
-{
-    LOGBRUSH temp;
-    if (!hBrush.GetLogBrush(&temp)) {
-        const auto code = static_cast<HRESULT>(GetLastError());
-        const auto codeText = Str::ErrorCode<wchar_t>::SystemMessage(code);
-        DH::TPrintf(L"%s: ERROR: GetLogBrush failed: %d '%s'\n", __FUNCTIONW__, code, codeText.GetString());
-        return false;
-    }
-    m_Color = temp.lbColor;
-    if (m_bCopy) {
-        m_Brush.m_hBrush = nullptr;
-        m_bCopy = false;
-    }
-    m_Brush.Attach(hBrush.Detach());
-    return true;
-}
-
-CColorPair& CColorPair::operator=(CColorPair& rhs) noexcept
-{
-    m_Color = rhs.m_Color;
-    if (m_bCopy) {
-        m_Brush.m_hBrush = nullptr;
-        m_bCopy = false;
-    }
-    m_Brush.Attach(rhs.m_bCopy ? rhs.m_Brush.m_hBrush : rhs.m_Brush.Detach());
-    return *this;
 }
