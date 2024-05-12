@@ -130,7 +130,7 @@ CPageImpl* CMainView::PagesGetCurrent() const
 void CMainView::PagesGetRect()
 {
     CRect rcTab;
-    if constexpr (true) { // ##FIXME: is m_TabCtrl owns page ?
+    if constexpr (false) { // ##FIXME: is m_TabCtrl owns page ?
         CRect rcMy;
         GetWindowRect(rcMy);
         m_TabCtrl.GetWindowRect(rcTab);
