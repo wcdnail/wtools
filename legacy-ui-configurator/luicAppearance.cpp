@@ -296,8 +296,14 @@ bool CPageAppearance::ItemFontApplyChanges(int nItem, ItemDef rItemDef, int iFon
         lfCopy.lfHeight = FontPtToLog<LONG>(nSize);
         break;
     }
-    case IDC_APP_FONT_SMOOTH_SEL:
+    case IDC_APP_FONT_SMOOTH_SEL:{
+        int nSmooth = IT_Invalid;
+        if (!CBGetCurData(m_cbFontSmooth, nSmooth) || IT_Invalid == nSmooth) {
+            return false;
+        }
+        lfCopy.lfQuality = nSmooth;
         break;
+    }
     case IDC_APP_FONT_STYLE_BOLD:
         lfCopy.lfWeight = m_bnFontBold.GetCheck() ? FW_BOLD : FW_NORMAL;
         break;
@@ -576,7 +582,7 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         return ;
 
     case IDC_APP_THEME_BN_IMPORT: {
-        WTL::CShellFileOpenDialog dlg{ L"*.theme", FOS_FORCESHOWHIDDEN | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST };
+        WTL::CShellFileOpenDialog dlg{ L"*.theme;*.the", FOS_FORCESHOWHIDDEN | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST };
         const auto rv = dlg.DoModal(m_hWnd);
         if (IDOK != rv) {
             SetMFStatus(STA_Warning, L"Import canceled");

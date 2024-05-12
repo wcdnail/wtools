@@ -40,8 +40,8 @@ CScheme::Item const& CScheme::ItemDef(int index)
     /*13*/ {            L"Selected Item", -1,                  -1,                  COLOR_HIGHLIGHT,        -1,                             -1,             COLOR_HIGHLIGHTTEXT         },
     /*14*/ {            L"Disabled Item", -1,                  -1,                  -1,                     -1,                             -1,             COLOR_GRAYTEXT              },
     /*15*/ {                  L"ToolTip", -1,                  -1,                  COLOR_INFOBK,           -1,                             FONT_Tooltip,   COLOR_INFOTEXT              },
-    /*16*/ {              L"Message Box", -1,                  -1,                  -1,                     -1,                             FONT_Message,   COLOR_WINDOWTEXT            },
-    /*17*/ {                L"Hyperlink", -1,                  -1,                  -1,                     -1,                             -1,             COLOR_HOTLIGHT              },
+    /*16*/ {              L"Message Box", -1,                  -1,                  COLOR_3DFACE,           COLOR_3DSHADOW,                 FONT_Message,   COLOR_WINDOWTEXT            },
+    /*17*/ {                L"Hyperlink", -1,                  -1,                  COLOR_3DFACE,           COLOR_3DSHADOW,                 FONT_Hyperlink, COLOR_HOTLIGHT              },
     /*18*/ {          L"Menu Bar (Flat)", -1,                  -1,                  COLOR_MENUBAR,          COLOR_MENUHILIGHT,              -1,             -1                          },
     /*19*/ {     L"Window Padded Border", NCM_PaddedBorder,    -1,                  -1,                     -1,                             -1,             -1                          },
     };
