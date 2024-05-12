@@ -23,6 +23,7 @@ struct CSchemeManager
     CSchemePtr const& operator[](int index) const;
     CSchemePtr& operator[](int index);
 
+    bool FindOrCreate(String const& name, CSchemePtr& pointee) const;
     int LoadIni98(Path const& path);
 
 private:

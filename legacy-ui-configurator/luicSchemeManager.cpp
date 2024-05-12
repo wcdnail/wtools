@@ -39,6 +39,18 @@ CSchemePtr& CSchemeManager::operator[](int index)
     return getSchemeRef<CSchemePtr>(*this, index);
 }
 
+bool CSchemeManager::FindOrCreate(String const& name, CSchemePtr& pointee) const
+{
+    for (auto const& it: m_Schemes) {
+        if (it->Name() == name) {
+            pointee = it;
+            return true;
+        }
+    }
+    pointee = std::make_shared<CScheme>(name);
+    return false;
+}
+
 HRESULT CSchemeManager::Initialize()
 {
     HRESULT           code{S_OK};
@@ -200,9 +212,8 @@ int CSchemeManager::LoadIni98(Path const& path)
     IniParser  iniParser{};
     if (!fsInput.is_open()) {
         code = static_cast<HRESULT>(GetLastError());
-        const auto codeText = Str::ErrorCode<>::SystemMessage(code);
-        DH::TPrintf(L"%s: ERROR: open stream '%s' failed: %d '%s'\n", __FUNCTIONW__,
-            pathname.c_str(), code, codeText.GetString());
+        ReportError(Str::ElipsisW::Format(L"ERROR: open win98 theme FAILED!\r\n'%s'\r\n",
+            pathname.c_str()), code, true);
         return IT_Invalid;
     }
     iniParser.parse(fsInput);
@@ -216,25 +227,28 @@ int CSchemeManager::LoadIni98(Path const& path)
         { "Metrics", Ini98LoadMetrics },
         { "Control Panel\\Colors", Ini98LoadColors },
     };
-    auto pTempScheme = std::make_shared<CScheme>(path.filename().native());
-    pTempScheme->SetGradientCaptions(true);
-    pTempScheme->SetFlatMenus(false);
+    CSchemePtr pScheme{};
+    const bool  bFound{FindOrCreate(path.filename().native(), pScheme)};
+    pScheme->SetGradientCaptions(false);
+    pScheme->SetFlatMenus(false);
     for (auto const& sd: gs_Sections) {
         const auto it = iniParser.sections.find(sd.name);
         if (it == iniParser.sections.cend()) {
             code = static_cast<HRESULT>(ERROR_ACCESS_DENIED);
-            ReportError(Str::ElipsisW::Format(L"ERROR: section '%S' is not found in '%s'",
+            ReportError(Str::ElipsisW::Format(L"ERROR: section '%S' is not found int win98 theme\r\n'%s'\r\n",
                 sd.name.c_str(), pathname.c_str()), code, true, MB_ICONSTOP);
             return IT_Invalid;
         }
         auto& iniMap{it->second};
-        if (!sd.loader(*pTempScheme, iniMap)) {
+        if (!sd.loader(*pScheme, iniMap)) {
             code = static_cast<HRESULT>(ERROR_ACCESS_DENIED);
-            ReportError(Str::ElipsisW::Format(L"ERROR: section '%S' in '%s' is INVALID\n",
+            ReportError(Str::ElipsisW::Format(L"ERROR: section '%S' is INVALID\r\n'%s'\r\n",
                 sd.name.c_str(), pathname.c_str()), code, true, MB_ICONHAND);
             return IT_Invalid;
         }
     }
-    m_Schemes.emplace_back(std::move(pTempScheme));
+    if (!bFound) {
+        m_Schemes.emplace_back(std::move(pScheme));
+    }
     return static_cast<int>(m_Schemes.size()) - 1;
 }
