@@ -5,7 +5,6 @@
 #include "luicMain.h"
 #include <dh.tracing.h>
 #include <rect.putinto.h>
-#include <string.utils.error.code.h>
 #include <atltheme.h>
 #include <utility>
 
@@ -27,42 +26,42 @@ namespace
  *
  */
 
-static const signed char LTInnerNormal[] = {
+static constexpr signed char LTInnerNormal[] = {
     -1,               -1,                -1,                -1,
     -1,               COLOR_3DHILIGHT,   COLOR_3DHILIGHT,   -1,
     -1,               COLOR_3DDKSHADOW,  COLOR_3DDKSHADOW,  -1,
     -1,               -1,                -1,                -1
 };
 
-static const signed char LTOuterNormal[] = {
+static constexpr signed char LTOuterNormal[] = {
     -1,               COLOR_3DLIGHT,     COLOR_3DSHADOW,    -1,
     COLOR_3DHILIGHT,  COLOR_3DLIGHT,     COLOR_3DSHADOW,    -1,
     COLOR_3DDKSHADOW, COLOR_3DLIGHT,     COLOR_3DSHADOW,    -1,
     -1,               COLOR_3DLIGHT,     COLOR_3DSHADOW,    -1
 };
 
-static const signed char RBInnerNormal[] = {
+static constexpr signed char RBInnerNormal[] = {
     -1,               -1,                -1,                -1,
     -1,               COLOR_3DSHADOW,    COLOR_3DSHADOW,    -1,
     -1,               COLOR_3DLIGHT,     COLOR_3DLIGHT,     -1,
     -1,               -1,                -1,                -1
 };
 
-static const signed char RBOuterNormal[] = {
+static constexpr signed char RBOuterNormal[] = {
     -1,               COLOR_3DDKSHADOW,  COLOR_3DHILIGHT,   -1,
     COLOR_3DSHADOW,   COLOR_3DDKSHADOW,  COLOR_3DHILIGHT,   -1,
     COLOR_3DLIGHT,    COLOR_3DDKSHADOW,  COLOR_3DHILIGHT,   -1,
     -1,               COLOR_3DDKSHADOW,  COLOR_3DHILIGHT,   -1
 };
 
-static const signed char LTRBOuterMono[] = {
+static constexpr signed char LTRBOuterMono[] = {
     -1,               COLOR_WINDOWFRAME, COLOR_WINDOWFRAME, COLOR_WINDOWFRAME,
     COLOR_WINDOW,     COLOR_WINDOWFRAME, COLOR_WINDOWFRAME, COLOR_WINDOWFRAME,
     COLOR_WINDOW,     COLOR_WINDOWFRAME, COLOR_WINDOWFRAME, COLOR_WINDOWFRAME,
     COLOR_WINDOW,     COLOR_WINDOWFRAME, COLOR_WINDOWFRAME, COLOR_WINDOWFRAME,
 };
 
-static const signed char LTRBInnerMono[] = {
+static constexpr signed char LTRBInnerMono[] = {
     -1,               -1,                -1,                -1,
     -1,               COLOR_WINDOW,      COLOR_WINDOW,      COLOR_WINDOW,
     -1,               COLOR_WINDOW,      COLOR_WINDOW,      COLOR_WINDOW,
@@ -85,10 +84,7 @@ struct CDrawings::CInTheme: WTL::CThemeImpl<CInTheme>
 
     HRESULT Init(HWND hWnd);
 
-    DWORD GetExStyle() const throw()
-    {
-        return static_cast<DWORD>(::GetWindowLongW(m_hWnd, GWL_EXSTYLE));
-    }
+    DWORD GetExStyle() const;
 
     bool TextPut(WTL::CDCHandle       dc,
                  CRect&           rcDraw,
@@ -97,19 +93,10 @@ struct CDrawings::CInTheme: WTL::CThemeImpl<CInTheme>
                  int             nPartId,
                  int            nStateId,
                  DWORD           dwFlags,
-                 const PDTTOPTS pOptions)
-    {
-        if (!m_hTheme) {
-            return false;
-        }
-        const HRESULT code = DrawThemeTextEx(dc, nPartId, nStateId, szText, nLen, dwFlags, rcDraw, pOptions);
-        return SUCCEEDED(code);
-    }
+                 const PDTTOPTS pOptions);
 };
 
-CDrawings::CInTheme::~CInTheme()
-{
-}
+CDrawings::CInTheme::~CInTheme() = default;
 
 CDrawings::CInTheme::CInTheme()
     : WTL::CThemeImpl<CInTheme>{}
@@ -149,6 +136,21 @@ HRESULT CDrawings::CInTheme::Init(HWND hWnd)
     return S_OK;
 }
 
+DWORD CDrawings::CInTheme::GetExStyle() const
+{
+    return static_cast<DWORD>(::GetWindowLongW(m_hWnd, GWL_EXSTYLE));
+}
+
+bool CDrawings::CInTheme::TextPut(WTL::CDCHandle dc, CRect& rcDraw, PCWSTR szText, int nLen, int nPartId, int nStateId,
+    DWORD dwFlags, const PDTTOPTS pOptions)
+{
+    if (!m_hTheme) {
+        return false;
+    }
+    const HRESULT code = DrawThemeTextEx(dc, nPartId, nStateId, szText, nLen, dwFlags, rcDraw, pOptions);
+    return SUCCEEDED(code);
+}
+
 //-----------------------------------------------------------------------------
 //
 // CStaticRes misc global resoursec
@@ -174,6 +176,7 @@ struct CDrawings::CStaticRes
     CStaticRes();
 
     HRESULT Init(HWND hWnd);
+    HICON const* GetIcons();
 
 private:
     template <typename T>
@@ -220,16 +223,20 @@ WTL::CFontHandle CDrawings::CStaticRes::CreateMarlettFont(LONG height)
 
 HRESULT CDrawings::CStaticRes::Init(HWND hWnd)
 {
-    HRESULT code = S_OK;
+    auto const& ilBig = CLUIApp::App()->GetImageList(IL_OwnBig);
+    m_hIcon[ICON_Desktop1] = ilBig.GetIcon(IconMyComp); // IconMatreshka
+    m_hIcon[ICON_Cursor1] = (HICON)LoadCursorW(nullptr, IDC_APPSTARTING);
+    return m_InTheme.Init(hWnd);
+}
+
+HICON const* CDrawings::CStaticRes::GetIcons()
+{
     srand(static_cast<int>(time(nullptr)));
-    auto const&   ilBig = CLUIApp::App()->GetImageList(IL_OwnBig);
     auto const& ilSmall = CLUIApp::App()->GetImageList(IL_SHELL_16x16);
     const int  maxCount = ilSmall.GetImageCount() - 1;
     m_hIcon[ICON_ActiveWnd]   = ilSmall.GetIcon(rand() % maxCount);
     m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
-    m_hIcon[ICON_Desktop1]    = ilBig.GetIcon(IconMyComp); // IconMatreshka
-    m_hIcon[ICON_Cursor1]     = (HICON)LoadCursorW(nullptr, IDC_APPSTARTING);
-    return m_InTheme.Init(hWnd);
+    return m_hIcon;
 }
 
 //-----------------------------------------------------------------------------
@@ -252,7 +259,7 @@ CDrawings::CDrawings(CScheme const& scheme, CSizePair const& sizePair)
 
 void CDrawings::CalcRects(CRect const& rcBorder, UINT captFlags, WindowRects& target)
 {
-    const long  brdScale{ScaleForDpi<long>(2)}; // TODO: investigate, why 2?
+    const long  brdScale{ScaleForDpi<long>(2)}; // make it more conviniet to select borders
     const bool isToolWnd{0 != (DC_SMALLCAP & captFlags)};
     CRect        rcFrame{};
     CRect         rcCapt{};
@@ -365,11 +372,11 @@ UINT CDrawings::ConvDrawItemState(UINT diState)
     return result;
 }
 
-void CDrawings::DrawBorder(WTL::CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const
+void CDrawings::DrawBorder(WTL::CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush)
 {
-    CRect     rc = rcParam;
-    auto hPrevBr = dc.SelectBrush(hBrush); 
-    auto  length = rc.bottom - rc.top;
+    CRect           rc{rcParam};
+    const auto hPrevBr{dc.SelectBrush(hBrush)};
+    auto        length{rc.bottom - rc.top};
     dc.PatBlt(rc.left, rc.top, borderWidth, length, PATCOPY);
     rc.left += borderWidth;
     rc.right -= borderWidth;
@@ -421,9 +428,9 @@ void CDrawings::DrawEdge(WTL::CDCHandle dc, CRect& rcParam, UINT edge, UINT uFla
 #else
     HPEN hPen = CreatePen(PS_SOLID, 1, m_Scheme.GetColor(LTOuterI);
     prevPen = (HPEN)SelectObject(dc, hPen);
-#define SetPenColor(border)                              \
-    SelectObject(dc, prevPen);                            \
-    DeleteObject(hPen);                                    \
+#define SetPenColor(border)                               \
+    SelectObject(dc, prevPen);                             \
+    DeleteObject(hPen);                                     \
     hPen = CreatePen(PS_SOLID, 1, m_Scheme.GetColor(border); \
     SelectObject(dc, hPen)
 #endif
@@ -516,10 +523,10 @@ void CDrawings::DrawFrameButton(WTL::CDCHandle dc, CRect& rcParam, UINT uState) 
 
 static CRect MakeSquareRect(CRect const& rcSrc)
 {
-    const int     width = rcSrc.right - rcSrc.left;
-    const int    height = rcSrc.bottom - rcSrc.top;
-    const int smallDiam = ((width > height) ? height : width);
-    CRect         rcDst = rcSrc;
+    const int     width{rcSrc.right - rcSrc.left};
+    const int    height{rcSrc.bottom - rcSrc.top};
+    const int smallDiam{((width > height) ? height : width)};
+    CRect         rcDst{rcSrc};
     /* Make it a square box */
     if (width < height)       /* smallDiam == width */ {
         rcDst.top += (height - width) / 2;
@@ -975,7 +982,7 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
 {
     ATLASSERT(m_pStaticRes.get() != nullptr);
 
-    HICON const*      icons = m_pStaticRes->m_hIcon;
+    HICON const*      icons = m_pStaticRes->GetIcons();
     const HFONT    menuFont = m_SizePair.GetFont(FONT_Menu);
     const HFONT    captFont = m_SizePair.GetFont(FONT_Caption);
     HICON          captIcon = nullptr;
@@ -1041,10 +1048,12 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
             CRect  rcLine = rcText;
             const LONG cy = FontPtToLog<LONG>(m_SizePair.GetLogFont(FONT_Desktop).lfHeight);
             rcLine.bottom = rcLine.top + cy;
-            // TODO: calc text RECT within TextExtent...
             for (int i = 0; i < params.text.lineCount; i++) {
                 if (rcLine.top > rcText.bottom) {
                     break;
+                }
+                if (rcLine.bottom > rcText.bottom) {
+                    rcLine.bottom = rcText.bottom;
                 }
                 const auto& line = params.text.line[i];
                 if (line.flags & WT_Select) {

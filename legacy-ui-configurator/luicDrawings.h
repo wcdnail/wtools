@@ -71,7 +71,7 @@ public:
 
     void CalcRects(CRect const& rc, UINT captFlags, WindowRects& target);
 
-    void DrawBorder(WTL::CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush) const;
+    static void DrawBorder(WTL::CDCHandle dc, CRect const& rcParam, int borderWidth, HBRUSH hBrush);
     void DrawEdge(WTL::CDCHandle dc, CRect& pRect, UINT edge, UINT uFlags) const;
     void DrawFrameButton(WTL::CDCHandle dc, CRect& rcParam, UINT uState) const;
     void DrawFrameCaption(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags);
