@@ -94,14 +94,15 @@ void CFonts::Swap(CFonts& rhs) noexcept
 
 void CFontPair::CopyTo(CFontPair& target) const noexcept
 {
-    target.m_logFont = m_logFont;
-    if (!target.m_bCopy && target.m_CFont.m_hFont) {
+    if (m_bCopy && target.m_CFont.m_hFont) {
         target.m_CFont.Attach(m_CFont.m_hFont);
+        target.m_bCopy = false;
     }
     else {
         target.m_CFont.m_hFont = m_CFont.m_hFont;
         target.m_bCopy = true;
     }
+    target.m_logFont = m_logFont;
 }
 
 void CFonts::CopyTo(CFonts& target) const noexcept

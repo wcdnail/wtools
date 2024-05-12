@@ -231,13 +231,22 @@ bool CScheme::LoadSizes(StrView sName, CRegistry const& regScheme)
 
 void CScheme::CopyTo(CScheme& target) const
 {
-    SizeMap sizesCopy{};
-    for (auto const& it: m_SizesMap) {
-        auto& targetSizes{sizesCopy[it.first]};
-        it.second.m_NCMetric.CopyTo(targetSizes.m_NCMetric);
-        it.second.m_Font.CopyTo(targetSizes.m_Font);
+    if (IsSizesNotEqual(m_SizesMap, target.m_SizesMap)) {
+        SizeMap sizesCopy{};
+        for (auto const& it: m_SizesMap) {
+            auto& targetSizes{sizesCopy[it.first]};
+            it.second.m_NCMetric.CopyTo(targetSizes.m_NCMetric);
+            it.second.m_Font.CopyTo(targetSizes.m_Font);
+        }
+        sizesCopy.swap(target.m_SizesMap);
     }
-    sizesCopy.swap(target.m_SizesMap);
+    else {
+        for (auto const& it: m_SizesMap) {
+            auto& targetSizes{target.m_SizesMap[it.first]};
+            it.second.m_NCMetric.CopyTo(targetSizes.m_NCMetric);
+            it.second.m_Font.CopyTo(targetSizes.m_Font);
+        }
+    }
     m_Color.CopyTo(target.m_Color);
     target.m_bFlatMenus = m_bFlatMenus;
     target.m_bGradientCaptions = m_bGradientCaptions;

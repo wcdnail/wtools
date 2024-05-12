@@ -99,9 +99,15 @@ void CColors::Swap(CColors& rhs) noexcept
 
 void CColorPair::CopyTo(CColorPair& target) const noexcept
 {
+    if (m_bCopy && target.m_Brush.m_hBrush) {
+        target.m_Brush.Attach(m_Brush.m_hBrush);
+        target.m_bCopy = false;
+    }
+    else {
+        target.m_Brush.m_hBrush = m_Brush.m_hBrush;
+        target.m_bCopy = true;
+    }
     target.m_Color = m_Color;
-    target.m_Brush.m_hBrush = m_Brush.m_hBrush;
-    target.m_bCopy = true;
 }
 
 void CColors::CopyTo(CColors& target) const noexcept
@@ -185,6 +191,10 @@ bool CColorPair::Reset(WTL::CBrush& hBrush)
         return false;
     }
     m_Color = temp.lbColor;
+    if (m_bCopy) {
+        m_Brush.m_hBrush = nullptr;
+        m_bCopy = false;
+    }
     m_Brush.Attach(hBrush.Detach());
     return true;
 }
@@ -192,6 +202,10 @@ bool CColorPair::Reset(WTL::CBrush& hBrush)
 CColorPair& CColorPair::operator=(CColorPair& rhs) noexcept
 {
     m_Color = rhs.m_Color;
-    m_Brush.Attach(rhs.m_Brush.Detach());
+    if (m_bCopy) {
+        m_Brush.m_hBrush = nullptr;
+        m_bCopy = false;
+    }
+    m_Brush.Attach(rhs.m_bCopy ? rhs.m_Brush.m_hBrush : rhs.m_Brush.Detach());
     return *this;
 }
