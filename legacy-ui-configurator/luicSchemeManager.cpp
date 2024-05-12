@@ -143,35 +143,45 @@ namespace
     bool Ini98LoadColors(CScheme& scheme, IniMap& iniFields)
     {
         static const IniString clrName[] = {
-            "Scrollbar"         // CLR_Scrollbar
-        ,   "Background"        // CLR_Background
-        ,   "ActiveTitle"       // CLR_ActiveTitle
-        ,   "InactiveTitle"     // CLR_InactiveTitle
-        ,   "Menu"              // CLR_Menu
-        ,   "Window"            // CLR_Window
-        ,   "WindowFrame"       // CLR_WindowFrame
-        ,   "MenuText"          // CLR_MenuText
-        ,   "WindowText"        // CLR_WindowText
-        ,   "TitleText"         // CLR_TitleText
-        ,   "ActiveBorder"      // CLR_ActiveBorder
-        ,   "InactiveBorder"    // CLR_InactiveBorder
-        ,   "AppWorkspace"      // CLR_AppWorkspace
-        ,   "Hilight"           // CLR_Hilight
-        ,   "HilightText"       // CLR_HilightText
-        ,   "ButtonFace"        // CLR_ButtonFace
-        ,   "ButtonShadow"      // CLR_ButtonShadow
-        ,   "GrayText"          // CLR_GrayText
-        ,   "ButtonText"        // CLR_ButtonText
-        ,   "InactiveTitleText" // CLR_InactiveTitleText
-        ,   "ButtonHilight"     // CLR_ButtonHilight
-        ,   "ButtonDkShadow"    // CLR_ButtonDkShadow
-        ,   "ButtonLight"       // CLR_ButtonLight
-        ,   "InfoText"          // CLR_InfoText
-        ,   "InfoWindow"        // CLR_InfoWindow
+          "Scrollbar"               // CLR_Scrollbar
+        , "Background"              // CLR_Background
+        , "ActiveTitle"             // CLR_ActiveTitle
+        , "InactiveTitle"           // CLR_InactiveTitle
+        , "Menu"                    // CLR_Menu
+        , "Window"                  // CLR_Window
+        , "WindowFrame"             // CLR_WindowFrame
+        , "MenuText"                // CLR_MenuText
+        , "WindowText"              // CLR_WindowText
+        , "TitleText"               // CLR_TitleText
+        , "ActiveBorder"            // CLR_ActiveBorder
+        , "InactiveBorder"          // CLR_InactiveBorder
+        , "AppWorkspace"            // CLR_AppWorkspace
+        , "Hilight"                 // CLR_Hilight
+        , "HilightText"             // CLR_HilightText
+        , "ButtonFace"              // CLR_ButtonFace
+        , "ButtonShadow"            // CLR_ButtonShadow
+        , "GrayText"                // CLR_GrayText
+        , "ButtonText"              // CLR_ButtonText
+        , "InactiveTitleText"       // CLR_InactiveTitleText
+        , "ButtonHilight"           // CLR_ButtonHilight
+        , "ButtonDkShadow"          // CLR_ButtonDkShadow
+        , "ButtonLight"             // CLR_ButtonLight
+        , "InfoText"                // CLR_InfoText
+        , "InfoWindow"              // CLR_InfoWindow
+        , "ButtonAlternateFace"     // CLR_ButtonAlternateFace
+        , "HotTrackingColor"        // CLR_HotTrackingColor
+        , "GradientActiveTitle"     // CLR_GradientActiveTitle
+        , "GradientInactiveTitle"   // CLR_GradientInactiveTitle
+        , "MenuHilight"             // CLR_MenuHilight
+        , "MenuBar"                 // CLR_MenuBar
         };
         for (int iColor = 0; iColor < _countof(clrName); iColor++) {
-            COLORREF clrTemp = CLR_DEFAULT;
-            if (3 != IniStrToBinary(iniFields[clrName[iColor]], reinterpret_cast<LPBYTE>(&clrTemp), sizeof(clrTemp))) {
+            COLORREF clrTemp = 0;
+            auto const& it = iniFields.find(clrName[iColor]);
+            if (it == iniFields.cend()) {
+                clrTemp = GetSysColor(iColor); // TODO: get WIN98 pallete 
+            }
+            else if (3 != IniStrToBinary(it->second, reinterpret_cast<LPBYTE>(&clrTemp), sizeof(clrTemp))) {
                 return false;
             }
             if (!scheme.GetColorPair(iColor).Reset(clrTemp)) {
