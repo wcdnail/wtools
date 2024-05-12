@@ -300,6 +300,7 @@
     <ClCompile Include="luicScreenSaver.cpp" />
     <ClCompile Include="luicSettings.cpp" />
     <ClCompile Include="luicThemePreviewer.cpp" />
+    <ClCompile Include="luicUtils.cpp" />
     <ClCompile Include="luicWeb.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

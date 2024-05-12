@@ -40,6 +40,8 @@ struct CNCMetrics: NONCLIENTMETRICS
     static PCWSTR Title(int index);
 
     bool LoadDefaults();
+    bool LoadValues(CNCMetrics const& metrics);
+    bool LoadValues(NONCLIENTMETRICSA const& ncMetrics);
     bool LoadValues(CRegistry const& regScheme);
     void CopyTo(CNCMetrics& target) const noexcept;
 

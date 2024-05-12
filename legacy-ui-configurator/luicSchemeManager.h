@@ -2,6 +2,7 @@
 
 #include "luicScheme.h"
 #include <wcdafx.api.h>
+#include <filesystem>
 #include <vector>
 
 struct CSchemeManager
@@ -11,6 +12,7 @@ struct CSchemeManager
     using   StrView = CScheme::StrView;
     using    String = CScheme::String;
     using SchemeVec = std::vector<CSchemePtr>;
+    using      Path = std::filesystem::path;
 
     ~CSchemeManager();
     CSchemeManager();
@@ -20,6 +22,8 @@ struct CSchemeManager
 
     CSchemePtr const& operator[](int index) const;
     CSchemePtr& operator[](int index);
+
+    int LoadIni98(Path const& path);
 
 private:
     SchemeVec m_Schemes;

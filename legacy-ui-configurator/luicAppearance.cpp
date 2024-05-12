@@ -570,6 +570,31 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     UpdatePreview:
         m_stPreview.InvalidateRect(nullptr, FALSE);
         return ;
+
+    case IDC_APP_THEME_BN_IMPORT: {
+        WTL::CShellFileOpenDialog dlg{ L"*.theme", FOS_FORCESHOWHIDDEN | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST };
+        const auto rv = dlg.DoModal(m_hWnd);
+        if (IDOK != rv) {
+            SetMFStatus(STA_Warning, L"Import canceled");
+            return ;
+        }
+        std::wstring tempFilename;
+        const HRESULT code = IFileDialog_GetDisplayName(*dlg.m_spFileDlg, tempFilename);
+        if (FAILED(code)) {
+            ReportError(L"File dialog failed", code);
+            return ;
+        }
+        const auto path{CSchemeManager::Path{tempFilename}};
+        auto*      pApp{CLUIApp::App()};
+        auto&   manager{pApp->SchemeManager()};
+        const int index{manager.LoadIni98(path)};
+        if (IT_Invalid != index) {
+            //auto const& pScheme = manager[index];
+            ApplyPendingChanges();
+            OnSchemesLoad(pApp, index);
+        }
+        return ;
+    }
     default:
         break;
     }

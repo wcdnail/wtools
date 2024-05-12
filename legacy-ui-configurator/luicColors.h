@@ -20,7 +20,7 @@ enum EColors_Index : int
     CLR_TitleText,              // 09 = COLOR_CAPTIONTEXT
     CLR_ActiveBorder,           // 10 = COLOR_ACTIVEBORDER
     CLR_InactiveBorder,         // 11 = COLOR_INACTIVEBORDER
-    CLR_AppWorkSpace,           // 12 = COLOR_APPWORKSPACE
+    CLR_AppWorkspace,           // 12 = COLOR_APPWORKSPACE
     CLR_Hilight,                // 13 = COLOR_HIGHLIGHT
     CLR_HilightText,            // 14 = COLOR_HIGHLIGHTTEXT
     CLR_ButtonFace,             // 15 = COLOR_BTNFACE

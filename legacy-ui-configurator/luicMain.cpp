@@ -138,7 +138,7 @@ HRESULT CLUIApp::Initialize(ATL::_ATL_OBJMAP_ENTRY* pObjMap, HINSTANCE hInstance
     CIconCollectionFile shellIcons;
     if (!shellIcons.Load(shell32dll.GetString(), true)) {
         code = static_cast<HRESULT>(GetLastError());
-        ReportError(Str::ElipsisW::Format(L"Load DLL '%s' icon collection failed!", shell32dll.GetString()), code, false, MB_ICONWARNING);
+        ReportError(Str::ElipsisW::Format(L"LoadIni98 DLL '%s' icon collection failed!", shell32dll.GetString()), code, false, MB_ICONWARNING);
     }
     else {
         const auto shellIconCount = shellIcons.GetArray().size();
@@ -217,7 +217,7 @@ HRESULT CLUIApp::ImListCreate(int index, int cx, int cy)
         tempIco.LoadIconW(it, cx, cy);
         if (!tempIco.m_hIcon) {
             code = static_cast<HRESULT>(GetLastError());
-            ReportError(Str::ElipsisW::Format(L"Load icon (%d) failed!", it), code);
+            ReportError(Str::ElipsisW::Format(L"LoadIni98 icon (%d) failed!", it), code);
             continue;
         }
         m_ImList[index].AddIcon(tempIco.Detach());

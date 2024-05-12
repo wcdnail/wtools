@@ -92,7 +92,7 @@ struct CScheme
         int fontColor;
     };
 
-    ~CScheme();
+    virtual ~CScheme();
     CScheme(StrView name);
 
     static Item const& ItemDef(int index);

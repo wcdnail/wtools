@@ -8,6 +8,7 @@ CNCMetrics::~CNCMetrics() = default;
 
 CNCMetrics::CNCMetrics()
 {
+    static_assert(sizeof(*this) == sizeof(NONCLIENTMETRICS), "NONCLIENTMETRICS SIZEOF did not MATCH!");
     ZeroMemory(this, sizeof(*this));
     this->cbSize = sizeof(*this);
 }
@@ -58,15 +59,57 @@ PCWSTR CNCMetrics::Title(int index)
 
 bool CNCMetrics::LoadDefaults()
 {
-    NONCLIENTMETRICSW ncMetrics;
-    static_assert(sizeof(*this) == sizeof(ncMetrics), "NONCLIENTMETRICS SIZEOF did not MATCH!");
-    ZeroMemory(&ncMetrics, sizeof(ncMetrics));
-    ncMetrics.cbSize = sizeof(NONCLIENTMETRICS);
+    CNCMetrics ncMetrics;
     const BOOL ret{SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(ncMetrics), &ncMetrics, 0)};
     if (!ret) {
         return false;
     }
+    return LoadValues(ncMetrics);
+}
+
+bool CNCMetrics::LoadValues(CNCMetrics const& ncMetrics)
+{
     CopyMemory(this, &ncMetrics, sizeof(ncMetrics));
+    return true;
+}
+
+static void ConvertLogFont(LOGFONTW& target, LOGFONTA const& source)
+{
+    target.lfHeight = source.lfHeight;
+    target.lfWidth = source.lfWidth;
+    target.lfEscapement = source.lfEscapement;
+    target.lfOrientation = source.lfOrientation;
+    target.lfWeight = source.lfWeight;
+    target.lfItalic = source.lfItalic;
+    target.lfUnderline = source.lfUnderline;
+    target.lfStrikeOut = source.lfStrikeOut;
+    target.lfCharSet = source.lfCharSet;
+    target.lfOutPrecision = source.lfOutPrecision;
+    target.lfClipPrecision = source.lfClipPrecision;
+    target.lfQuality = source.lfQuality;
+    target.lfPitchAndFamily = source.lfPitchAndFamily;
+    MultiByteToWideChar(CP_ACP, 0, source.lfFaceName, LF_FACESIZE, target.lfFaceName, LF_FACESIZE);
+}
+
+bool CNCMetrics::LoadValues(NONCLIENTMETRICSA const& ncMetrics)
+{
+    CNCMetrics temp;
+    temp.iBorderWidth = ncMetrics.iBorderWidth;
+    temp.iScrollWidth = ncMetrics.iScrollWidth;
+    temp.iScrollHeight = ncMetrics.iScrollHeight;
+    temp.iCaptionWidth = ncMetrics.iCaptionWidth;
+    temp.iCaptionHeight = ncMetrics.iCaptionHeight;
+    temp.iSmCaptionWidth = ncMetrics.iSmCaptionWidth;
+    temp.iSmCaptionHeight = ncMetrics.iSmCaptionHeight;
+    temp.iMenuWidth = ncMetrics.iMenuWidth;
+    temp.iMenuHeight = ncMetrics.iMenuHeight;
+    temp.iPaddedBorderWidth = ncMetrics.iPaddedBorderWidth;
+    ConvertLogFont(temp.lfCaptionFont, ncMetrics.lfCaptionFont);
+    ConvertLogFont(temp.lfSmCaptionFont, ncMetrics.lfSmCaptionFont);
+    ConvertLogFont(temp.lfMenuFont, ncMetrics.lfMenuFont);
+    ConvertLogFont(temp.lfStatusFont, ncMetrics.lfStatusFont);
+    ConvertLogFont(temp.lfMessageFont, ncMetrics.lfMessageFont);
+    temp.CopyTo(*this);
     return true;
 }
 

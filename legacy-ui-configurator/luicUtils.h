@@ -72,4 +72,5 @@ struct StringHash
     std::size_t operator()(std::wstring_view str) const   { return HashType{}(str); }
     std::size_t operator()(std::wstring const& str) const { return HashType{}(str); }
 };
- 
+
+HRESULT IFileDialog_GetDisplayName(IFileDialog& dlgImpl, std::wstring& target);

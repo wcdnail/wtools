@@ -137,7 +137,7 @@ void CPageDllIcons::PopulateViews()
         if (ERROR_SUCCESS == code) {
             code = ERROR_INVALID_FUNCTION;
         }
-        ReportError(Str::ElipsisA::Format("Load icon view '%s' failed! %s",
+        ReportError(Str::ElipsisA::Format("LoadIni98 icon view '%s' failed! %s",
             m_CurrFilename.c_str(), ex.what()
         ), code, false, MB_ICONWARNING);
     }
@@ -170,24 +170,6 @@ BOOL CPageDllIcons::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     DlgResizeAdd(IDC_BN_EXPORT_SEL, DLSZ_MOVE_X);
     DlgResizeAdd(IDC_LV_VIEW, DLSZ_SIZE_X | DLSZ_SIZE_Y);
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
-}
-
-static HRESULT IFileDialog_GetDisplayName(IFileDialog& dlgImpl, std::wstring& target)
-{
-    ATL::CComPtr<IShellItem> pShellItem;
-    HRESULT code = dlgImpl.GetResult(&pShellItem);
-    if (FAILED(code)) {
-        return code;
-    }
-    PWSTR lpstrName;
-    code = pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &lpstrName);
-    if (FAILED(code)) {
-        return code;
-    }
-    int len = lstrlenW(lpstrName);
-    std::wstring{ lpstrName, static_cast<size_t>(len) }.swap(target);
-    CoTaskMemFree(lpstrName);
-    return S_OK;
 }
 
 void CPageDllIcons::ExportMultiple(UINT count)

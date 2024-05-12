@@ -40,6 +40,12 @@ bool CFonts::LoadDefaults()
     if (!SystemParametersInfoW(SPI_GETICONTITLELOGFONT, sizeof(lfTemp), &lfTemp, 0)) {
         return false;
     }
+    return LoadValues(lfTemp);
+}
+
+bool CFonts::LoadValues(WTL::CLogFont const& logFont)
+{
+    WTL::CLogFont lfTemp = logFont;
     m_Pair[FONT_Desktop].Reset(lfTemp);
     lfTemp.lfUnderline = TRUE;
     m_Pair[FONT_Hyperlink].Reset(lfTemp);
