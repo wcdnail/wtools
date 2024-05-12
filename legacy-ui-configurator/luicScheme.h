@@ -107,16 +107,18 @@ struct CScheme
     WTL::CBrush const&                         GetBrush(int index) const { return m_Color[index].m_Brush; }
     CColorPair const&                      GetColorPair(int index) const { return m_Color[index]; }
     CColorPair&                            GetColorPair(int index)       { return m_Color[index]; }
-    int                 GetNCMetric(String const& name, int index) const { return getSizeItemeRef<CSizePair const>(*this, name).m_NCMetric[index]; }
-    int&                GetNCMetric(String const& name, int index)       { return getSizeItemeRef<CSizePair      >(*this, name).m_NCMetric[index]; }
-    WTL::CLogFont const& GetLogFont(String const& name, int index) const { return getSizeItemeRef<CSizePair const>(*this, name).m_Font[index].m_logFont; }
-    WTL::CFontHandle        GetFont(String const& name, int index) const { return getSizeItemeRef<CSizePair const>(*this, name).m_Font[index].m_CFont.m_hFont; }
-    CFontPair const&    GetFontPair(String const& name, int index) const { return getSizeItemeRef<CSizePair const>(*this, name).m_Font[index]; }
-    CFontPair&          GetFontPair(String const& name, int index)       { return getSizeItemeRef<CSizePair      >(*this, name).m_Font[index]; }
+    int                 GetNCMetric(String const& name, int index) const { return GetSizePair(name).m_NCMetric[index]; }
+    int&                GetNCMetric(String const& name, int index)       { return GetSizePair(name).m_NCMetric[index]; }
+    WTL::CLogFont const& GetLogFont(String const& name, int index) const { return GetSizePair(name).m_Font[index].m_logFont; }
+    WTL::CFontHandle        GetFont(String const& name, int index) const { return GetSizePair(name).m_Font[index].m_CFont.m_hFont; }
+    CFontPair const&    GetFontPair(String const& name, int index) const { return GetSizePair(name).m_Font[index]; }
+    CFontPair&          GetFontPair(String const& name, int index)       { return GetSizePair(name).m_Font[index]; }
     SizeMap const&                                   GetSizesMap() const { return m_SizesMap; };
     SizeMap&                                         GetSizesMap()       { return m_SizesMap; };
     CNCMetrics::Range const&               GetSizeRange(int index) const;
     CNCMetrics::Range&                     GetSizeRange(int index);
+    CSizePair const&               GetSizePair(String const& name) const;
+    CSizePair&                     GetSizePair(String const& name);
 
 private:
     String                            m_Name;

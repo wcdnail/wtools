@@ -86,6 +86,16 @@ ReturnType& CScheme::getSizeItemeRef(SelfRef& thiz, String const& name)
     return it->second;
 }
 
+CSizePair const& CScheme::GetSizePair(String const& name) const
+{
+    return getSizeItemeRef<CSizePair const>(*this, name);
+}
+
+CSizePair& CScheme::GetSizePair(String const& name)
+{
+    return getSizeItemeRef<CSizePair>(*this, name);
+}
+
 bool CScheme::LoadDefaults()
 {
     BOOL  bGradientCaptions{FALSE};

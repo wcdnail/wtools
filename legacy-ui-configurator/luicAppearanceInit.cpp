@@ -124,7 +124,7 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     m_stScheme.Attach(GetDlgItem(IDC_APP_THEME_CAP));
     m_cbScheme.Attach(GetDlgItem(IDC_APP_THEME_SEL));
     m_stSchemeScale.Attach(GetDlgItem(IDC_APP_SIZE_CAP));
-    m_cbSchemeScale.Attach(GetDlgItem(IDC_APP_SIZE_SEL));
+    m_cbSchemeSize.Attach(GetDlgItem(IDC_APP_SIZE_SEL));
     m_bnImport.Attach(GetDlgItem(IDC_APP_THEME_BN_IMPORT));
     m_bnSave.Attach(GetDlgItem(IDC_APP_THEME_BN_SAVE));
     m_bnRename.Attach(GetDlgItem(IDC_APP_THEME_BN_RENAME));
@@ -192,7 +192,7 @@ void CPageAppearance::OnDestroy()
     CPageImpl::OnDestroy();
 }
 
-CScheme const& CPageAppearance::InitializeScheme(CSchemeManager const& manager, int initialIndex)
+void CPageAppearance::InitializeSchemes(CSchemeManager const& manager)
 {
     WTL::CComboBox& lbCtl{m_cbScheme};
     lbCtl.ResetContent();
@@ -209,18 +209,14 @@ CScheme const& CPageAppearance::InitializeScheme(CSchemeManager const& manager, 
         lbCtl.SetItemData(nItem, static_cast<DWORD_PTR>(nIndex));
         ++nIndex;
     }
-    ATLASSUME(initialIndex >= 0 && initialIndex < schemes.size());
-    ATLASSERT(schemes[initialIndex].get() != nullptr);
-    return *schemes[initialIndex];
 }
 
-void CPageAppearance::InitializeSizes(CScheme const& scheme)
+void CPageAppearance::InitializeSizes()
 {
-    WTL::CComboBox& lbCtl{m_cbSchemeScale};
+    WTL::CComboBox& lbCtl{m_cbSchemeSize};
     lbCtl.ResetContent();
-    
     int nIndex = 0;
-    for (const auto& key: scheme.GetSizesMap() | std::views::keys) {
+    for (const auto& key: m_SchemeCopy.GetSizesMap() | std::views::keys) {
         const int nItem = lbCtl.AddString(key.c_str());
         if (nItem < 0) {
             const auto code{static_cast<HRESULT>(GetLastError())};
@@ -231,8 +227,6 @@ void CPageAppearance::InitializeSizes(CScheme const& scheme)
         lbCtl.SetItemData(nItem, static_cast<DWORD_PTR>(nIndex));
         ++nIndex;
     }
-    ATLASSUME(nIndex > 0);
-    lbCtl.SetCurSel(0);
 }
 
 void CPageAppearance::InitializeItems()
@@ -353,23 +347,19 @@ void CPageAppearance::InitializeFontButtons()
     m_bnFontUndrln.SetFont(gs_fntUnderline);
 }
 
-void CPageAppearance::OnSchemesChanged(CLUIApp const* pApp, int initialIndex)
+void CPageAppearance::OnSchemesLoad(CLUIApp const* pApp, int nInitialIndex)
 {
-    auto const&  source{InitializeScheme(pApp->SchemeManager(), initialIndex)};
-    InitializeSizes(source);
-    {
-        ScopedBoolGuard guard(m_bLoadValues);
-        m_cbScheme.SetCurSel(initialIndex);
-        m_cbSchemeScale.SetCurSel(0);
-        m_cbItem.SetCurSel(IT_Desktop);
-        m_cbFont.SetCurSel(0);
-        m_cbFontSmooth.SetCurSel(0);
+    auto const& manager{pApp->SchemeManager()};
+    auto const&  source{manager[nInitialIndex]};
+    if (!source) {
+        return ;
     }
-    source.CopyTo(m_SchemeCopy);
-    OnSchemeChanged(initialIndex);
+    InitializeSchemes(manager);
+    m_cbScheme.SetCurSel(nInitialIndex);
+    OnSchemeSelected(*source);
 }
 
 void CPageAppearance::NotifySchemesChanged()
 {
-    OnSchemesChanged(CLUIApp::App(), 0);
+    OnSchemesLoad(CLUIApp::App(), 0);
 }

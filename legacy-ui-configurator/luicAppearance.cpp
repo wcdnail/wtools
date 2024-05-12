@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "luicAppearance.h"
 #include "luicUtils.h"
+#include "luicMain.h"
 #include "resz/resource.h"
 #include <string.utils.format.h>
 #include <dev.assistance/dev.assist.h>
@@ -21,7 +22,7 @@ void CPageAppearance::ThemeEnable(BOOL bEnable)
     m_stScheme.EnableWindow(bEnable);
     m_cbScheme.EnableWindow(bEnable);
     m_stSchemeScale.EnableWindow(bEnable);
-    m_cbSchemeScale.EnableWindow(bEnable);
+    m_cbSchemeSize.EnableWindow(bEnable);
     m_bnImport.EnableWindow(bEnable);
     m_bnSave.EnableWindow(bEnable);
     m_bnRename.EnableWindow(bEnable);
@@ -234,20 +235,19 @@ static bool CBGetCurText(WTL::CComboBox const& ctlCombo, ATL::CString& result)
     return CB_ERR != ctlCombo.GetLBText(item, result);
 }
 
-#if 0
 static bool CBGetCurData(WTL::CComboBox const& ctlCombo, int& result)
 {
     const int item = ctlCombo.GetCurSel();
     if (CB_ERR == item) {
         return false;
     }
-    int temp = ctlCombo.GetItemData(item);
+    const int temp = static_cast<int>(ctlCombo.GetItemData(item));
     if (CB_ERR == temp) {
         return false;
     }
     result = temp;
+    return true;
 }
-#endif
 
 static bool CBGetCurTextInt(WTL::CComboBox const& ctlCombo, int& result)
 {
@@ -349,11 +349,33 @@ void CPageAppearance::OnItemSelect(int nItem)
     ItemFontChanged(nItem);
 }
 
-void CPageAppearance::OnSchemeChanged(int nThemeIndex)
+void CPageAppearance::OnSchemeSizeChanged()
 {
-    m_stPreview.OnSchemeChanged(&m_SchemeCopy, &m_cbItem);
+    ATL::CString sTemp;
+    if (CBGetCurText(m_cbSchemeSize, sTemp)) {
+        String{sTemp.GetString(), static_cast<size_t>(sTemp.GetLength())}.swap(m_sCurrentSize);
+    }
+    else {
+        //// TODO: report m_cbSchemeSize.GetCurSel
+        m_sCurrentSize = m_SchemeCopy.GetSizesMap().cbegin()->first;
+    }
+}
+
+void CPageAppearance::OnSchemeSelected(CScheme const& source)
+{
+    source.CopyTo(m_SchemeCopy);
+    InitializeSizes();
+    {
+        ScopedBoolGuard guard(m_bLoadValues);
+        m_cbSchemeSize.SetCurSel(0);
+        m_cbItem.SetCurSel(IT_Desktop);
+        m_cbFont.SetCurSel(0);
+        m_cbFontSize.SetCurSel(0);
+        m_cbFontSmooth.SetCurSel(0);
+    }
+    OnSchemeSizeChanged();
+    m_stPreview.OnSchemeChanged(m_SchemeCopy, m_SchemeCopy.GetSizePair(m_sCurrentSize), m_cbItem);
     m_stPreview.EnableWindow(TRUE);
-    m_cbScheme.SetCurSel(nThemeIndex);
     ThemeEnable(TRUE);
     OnItemSelect(IT_Desktop);
     m_bcGradientCapts.SetCheck(m_SchemeCopy.IsGradientCaptions() ? TRUE : FALSE);
@@ -373,28 +395,39 @@ void CPageAppearance::ColorPicker(int nButton)
 
 void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
+    // skip during controls initialization
+    if (m_bLoadValues) {
+        return ;
+    }
     // skip CColorButton reflected & other
     switch (uNotifyCode) {
     case BN_PAINT:
     case BN_UNHILITE:
     case BN_DISABLE:
+    case BN_KILLFOCUS:
     case CBN_SELENDCANCEL:
+    case CBN_CLOSEUP:
         SetMsgHandled(FALSE);
-        return ;
-    }
-    // skip during controls initialization
-    if (m_bLoadValues) {
         return ;
     }
     int iItem = IT_Invalid;
     int iSize = IT_Invalid;
     switch (nID) {
-    case IDC_APP_ITEM_SEL:{
-        switch (uNotifyCode) {
-        case CBN_SELENDOK:
-            OnItemSelect(m_cbItem.GetCurSel());
-            break;
+    case IDC_APP_THEME_SEL: {
+        int nScheme = IT_Invalid;
+        if (!CBGetCurData(m_cbScheme, nScheme)) {
+            return ;
         }
+        auto const& manager{CLUIApp::App()->SchemeManager()};
+        auto const&  source{manager[nScheme]};
+        if (!source) {
+            return ;
+        }
+        OnSchemeSelected(*source);
+        return ;
+    }
+    case IDC_APP_ITEM_SEL: {
+        OnItemSelect(m_cbItem.GetCurSel());
         return ;
     }
     case IDC_APP_ITEM_COLOR1_SEL:

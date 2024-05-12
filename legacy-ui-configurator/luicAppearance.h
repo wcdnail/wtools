@@ -29,7 +29,7 @@ private:
     WTL::CStatic                     m_stScheme;
     WTL::CComboBox                   m_cbScheme;
     WTL::CStatic                m_stSchemeScale;
-    WTL::CComboBox              m_cbSchemeScale;
+    WTL::CComboBox               m_cbSchemeSize;
     WTL::CButton                       m_bnSave;
     WTL::CButton                     m_bnImport;
     WTL::CButton                     m_bnRename;
@@ -60,14 +60,14 @@ private:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;
     void OnDestroy() override;
 
-    CScheme const& InitializeScheme(CSchemeManager const& manager, int initialIndex);
-    void InitializeSizes(CScheme const& scheme);
+    void InitializeSchemes(CSchemeManager const& manager);
+    void InitializeSizes();
     void InitializeItems();
     void InitializeFonts(FontMap const& fontsMap);
     void InitializeFontSizes();
     void InitializeFontSmooth();
     void InitializeFontButtons();
-    void OnSchemesChanged(CLUIApp const* pApp, int initialIndex);
+    void OnSchemesLoad(CLUIApp const* pApp, int nInitialIndex);
 
     void ThemeEnable(BOOL bEnable);
     void ItemEnable(BOOL bEnable);
@@ -87,7 +87,8 @@ private:
     bool ItemFontChanged(int nItem, int iFontControl = IT_Invalid, bool bApply = false);
 
     void OnItemSelect(int nItem);
-    void OnSchemeChanged(int nThemeIndex);
+    void OnSchemeSizeChanged();
+    void OnSchemeSelected(CScheme const& scheme);
 
     void ColorPicker(int nButton);
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;

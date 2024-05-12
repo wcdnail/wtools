@@ -1,20 +1,21 @@
 #pragma once
 
 #include "luicDrawings.h"
-
-struct CScheme;
+#include <wcdafx.api.h>
 
 using SelectedPair = std::pair<int, int>;
 
 struct CThemePreviewer: ATL::CWindow
 {
+    DELETE_COPY_MOVE_OF(CThemePreviewer);
+
     static ATOM Register(HRESULT& code);
 
     ~CThemePreviewer();
     CThemePreviewer();
 
     void SubclassIt(HWND hWnd);
-    void OnSchemeChanged(CScheme* pTheme, WTL::CComboBox* pcbItem);
+    void OnSchemeChanged(CScheme& pScheme, CSizePair& pSizePair, WTL::CComboBox& pcbItem);
     void OnItemSelected(int nItem);
 
 private:
@@ -30,6 +31,7 @@ private:
     };
 
     CScheme*               m_pScheme;
+    CSizePair*           m_pSizePair;
     WTL::CComboBox*        m_pcbItem;
     SelectedPair        m_prSelected;
     bool                 m_bLBtnDown;

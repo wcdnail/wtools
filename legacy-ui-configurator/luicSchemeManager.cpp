@@ -13,6 +13,22 @@ CSchemeManager::CSchemeManager()
 {
 }
 
+template <typename ReturnType, typename SelfRef>
+ReturnType& CSchemeManager::getSchemeRef(SelfRef& thiz, int index)
+{
+    if (index < 0 || index > static_cast<int>(thiz.m_Schemes.size()) - 1) {
+        static ReturnType dummy{};
+        DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+        return dummy;
+    }
+    return thiz.m_Schemes[index];
+}
+
+CSchemePtr const& CSchemeManager::operator[](int index) const
+{
+    return getSchemeRef<CSchemePtr const>(*this, index);
+}
+
 HRESULT CSchemeManager::Initialize()
 {
     HRESULT           code{S_OK};
@@ -24,33 +40,32 @@ HRESULT CSchemeManager::Initialize()
             code = static_cast<HRESULT>(GetLastError());
             return code;
         }
-        pCurrent->CopyTo(m_Default);
         tempSchemes.emplace_back(std::move(pCurrent));
     }
 
-    CRegistry regClassics{HKEY_CURRENT_USER, REG_ClassicSchemes};
+    const CRegistry regClassics{HKEY_CURRENT_USER, REG_ClassicSchemes};
     if (!regClassics.IsOk()) {
         code = static_cast<HRESULT>(GetLastError());
         return code;
     }
     const int nCount = regClassics.ForEachValue([&tempSchemes](HKEY hKey, PCWSTR szSchemename, int nLen) -> bool {
-        CRegistry regScheme{hKey, szSchemename};
+        const CRegistry regScheme{hKey, szSchemename};
         auto pScheme = std::make_shared<CScheme>(StrView{szSchemename, static_cast<size_t>(nLen)});
         if (!pScheme->LoadValues(regScheme)) {
             return false;
         }
         const int nSizeCount = regScheme.ForEachValue([&pScheme, &tempSchemes](HKEY hKey, PCWSTR szSizeName, int nLen) -> bool {
-            CRegistry regSizes{hKey, szSizeName};
-            String sName{szSizeName, static_cast<size_t>(nLen)};
+            const CRegistry regSizes{hKey, szSizeName};
+            const String       sName{szSizeName, static_cast<size_t>(nLen)};
             if (!pScheme->LoadSizes(sName, regSizes)) {
                 return false;
             }
-            tempSchemes[sName].push_back(pScheme);
             return true;
         });
         if (CRegistry::ResultFail == nSizeCount) {
             return false;
         }
+        tempSchemes.emplace_back(std::move(pScheme));
         return true;
     });
     if (CRegistry::ResultFail == nCount) {

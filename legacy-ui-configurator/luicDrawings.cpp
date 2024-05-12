@@ -572,10 +572,10 @@ void CDrawings::DrawFrameScroll(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags)
     TCHAR symbol = 0;
     switch (uFlags & 0xff) {
     case DFCS_SCROLLCOMBOBOX:
-    case DFCS_SCROLLDOWN:       symbol = TEXT('6'); break;
-    case DFCS_SCROLLUP:         symbol = TEXT('5'); break;
-    case DFCS_SCROLLLEFT:       symbol = TEXT('3'); break;
-    case DFCS_SCROLLRIGHT:      symbol = TEXT('4'); break;
+    case DFCS_SCROLLDOWN:  symbol = TEXT('6'); break;
+    case DFCS_SCROLLUP:    symbol = TEXT('5'); break;
+    case DFCS_SCROLLLEFT:  symbol = TEXT('3'); break;
+    case DFCS_SCROLLRIGHT: symbol = TEXT('4'); break;
     default: break;
     }
     DrawEdge(dc, rcParam,
@@ -583,17 +583,14 @@ void CDrawings::DrawFrameScroll(WTL::CDCHandle dc, CRect& rcParam, UINT uFlags)
         (uFlags & DFCS_FLAT) | BF_MIDDLE | BF_RECT);
     CRect rcSymbol = MakeSquareRect(rcParam);
     rcSymbol.DeflateRect(2, 2);
-    //Rc::SetWidth(rcSymbol, m_SizePair.m_NCMetric.iScrollWidth);
-    //Rc::SetHeight(rcSymbol, m_SizePair.m_NCMetric.iScrollHeight);
     if (uFlags & DFCS_PUSHED) {
         OffsetRect(rcSymbol, 1, 1);
     }
     if (0 == symbol) {
         return ;
     }
-    if (!m_ftMarlett.m_hFont) {
-        m_ftMarlett = CStaticRes::CreateMarlettFont(rcSymbol.bottom - rcSymbol.top);
-    }
+    auto fnMarlett = CStaticRes::CreateMarlettFont(rcSymbol.bottom - rcSymbol.top);
+    m_ftMarlett.Attach(fnMarlett.Detach());
     const HFONT prevFont = dc.SelectFont(m_ftMarlett);
     const int   prevMode = dc.SetBkMode(TRANSPARENT);
     if (uFlags & DFCS_INACTIVE) {
@@ -618,11 +615,10 @@ void CDrawings::DrawFrameControl(WTL::CDCHandle dc, CRect& rcParam, UINT uType, 
 
 LONG CDrawings::DrawCaptionButtons(WTL::CDCHandle dc, CRect const& rcCaption, bool withMinMax, UINT uFlags)
 {
-    static const int margin = 2;
-    int         buttonWidth = m_SizePair.m_NCMetric.iCaptionWidth;
+    static constexpr int margin = 2;
+    int             buttonWidth = m_SizePair.m_NCMetric.iCaptionWidth;
     buttonWidth -= margin;
     int iColor;
-#if WINVER >= WINVER_2K
     if (uFlags & DC_GRADIENT) {
         if (uFlags & DC_ACTIVE) {
             iColor = COLOR_GRADIENTACTIVECAPTION;
@@ -631,9 +627,7 @@ LONG CDrawings::DrawCaptionButtons(WTL::CDCHandle dc, CRect const& rcCaption, bo
             iColor = COLOR_GRADIENTINACTIVECAPTION;
         }
     }
-    else
-#endif
-    {
+    else {
         if (uFlags & DC_ACTIVE) {
             iColor = COLOR_ACTIVECAPTION;
         }
@@ -671,9 +665,9 @@ void CDrawings::DrawCaption(WTL::CDCHandle dc, CRect const& rcParam, HFONT fnMar
         iColor1 = COLOR_ACTIVECAPTION;
     }
     if (hIcon) {
-        int        iconSize = GetSystemMetrics(SM_CYSMICON);  /* Same as SM_CXSMICON */
-        int totalIconMargin = rcTmp.bottom - rcTmp.top - iconSize;
-        int      iconMargin = totalIconMargin / 2;
+        const int        iconSize = GetSystemMetrics(SM_CYSMICON);  /* Same as SM_CXSMICON */
+        const int totalIconMargin = rcTmp.bottom - rcTmp.top - iconSize;
+        const int      iconMargin = totalIconMargin / 2;
         rcTmp.right = rcTmp.left + iconSize + totalIconMargin;
         dc.FillRect(rcTmp, m_Scheme.GetBrush(iColor1));
         if (DrawIconEx(dc, rcTmp.left + iconMargin + 1, rcTmp.top + iconMargin, hIcon, 0, 0, 0, nullptr, DI_NORMAL) != 0) {
@@ -681,8 +675,6 @@ void CDrawings::DrawCaption(WTL::CDCHandle dc, CRect const& rcParam, HFONT fnMar
         }
         rcTmp.right = rcParam.right;
     }
-
-#if WINVER >= WINVER_2K
     if (uFlags & DC_GRADIENT) {
         GRADIENT_RECT gcap = { 0, 1 };
         TRIVERTEX  vert[2];
@@ -706,19 +698,12 @@ void CDrawings::DrawCaption(WTL::CDCHandle dc, CRect const& rcParam, HFONT fnMar
         vert[1].Green = static_cast<COLOR16>(colors[1] & 0xFF00);
         vert[1].Blue = static_cast<COLOR16>((colors[1] >> 8) & 0xFF00);
         vert[1].Alpha = 0;
-#if defined(WINVER_IS_98)
-        GradientFill(dc, vert, 2, &gcap, 1, GRADIENT_FILL_RECT_H);
-#else
         GdiGradientFill(dc, vert, 2, &gcap, 1, GRADIENT_FILL_RECT_H);
-#endif
     }
-    else
-#endif
-    {
+    else {
         dc.FillRect(rcTmp, m_Scheme.GetBrush(iColor1));
     }
-
-    HFONT prevFont = dc.SelectFont(fnMarlet);
+    const HFONT prevFont = dc.SelectFont(fnMarlet);
     if (uFlags & DC_ACTIVE) {
         SetTextColor(dc, m_Scheme.GetColor(COLOR_CAPTIONTEXT));
     }
@@ -1017,7 +1002,7 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
     }
 
     if (isToolWnd) {
-        static const int nmbBorder = 4;
+        static constexpr int nmbBorder = 4;
         CRect rcBrd = rects[WR_Frame];
         rcBrd.InflateRect(nmbBorder, nmbBorder);
         DrawBorder(dc, rcBrd, nmbBorder, m_Scheme.GetBrush(COLOR_3DFACE));

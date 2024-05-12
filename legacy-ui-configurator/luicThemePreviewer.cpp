@@ -42,6 +42,7 @@ CThemePreviewer::~CThemePreviewer()
 CThemePreviewer::CThemePreviewer()
     :   ATL::CWindow{}
     ,      m_pScheme{nullptr}
+    ,    m_pSizePair{nullptr}
     ,      m_pcbItem{nullptr}
     ,   m_prSelected{-1, -1}
     ,    m_bLBtnDown{false}
@@ -58,10 +59,14 @@ void CThemePreviewer::SubclassIt(HWND hWnd)
     ModifyStyleEx(0, WS_EX_CLIENTEDGE);
 }
 
-void CThemePreviewer::OnSchemeChanged(CScheme* pScheme, WTL::CComboBox* pcbItem)
+void CThemePreviewer::OnSchemeChanged(CScheme& pScheme, CSizePair& pSizePair, WTL::CComboBox& pcbItem)
 {
-    m_pScheme = pScheme;
-    m_pcbItem = pcbItem;
+    m_pScheme = &pScheme;
+    m_pSizePair = &pSizePair;
+    m_pcbItem = &pcbItem;
+    ATLASSUME(nullptr != m_pScheme);
+    ATLASSUME(nullptr != m_pSizePair);
+    ATLASSUME(nullptr != m_pcbItem);
     InvalidateRect(nullptr, FALSE);
 }
 
@@ -74,17 +79,16 @@ void CThemePreviewer::OnItemSelected(int nItem)
 
 LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    const LONG_PTR winUD = ::GetWindowLongPtrW(hWnd, GWLP_USERDATA);
     if (WM_NCDESTROY == uMsg) {
-        LONG_PTR tempLP = ::GetWindowLongPtrW(hWnd, GWLP_USERDATA);
-        if (tempLP) {
-            reinterpret_cast<CThemePreviewer*>(tempLP)->m_hWnd = nullptr;
+        if (winUD) {
+            reinterpret_cast<CThemePreviewer*>(winUD)->m_hWnd = nullptr;
             ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(nullptr));
         }
     }
     else {
-        LONG_PTR tempLP = ::GetWindowLongPtrW(hWnd, GWLP_USERDATA);
-        if (tempLP) {
-            auto* self = reinterpret_cast<CThemePreviewer*>(tempLP);
+        if (winUD) {
+            auto* self = reinterpret_cast<CThemePreviewer*>(winUD);
             switch (uMsg) {
             case WM_PAINT:{
                 self->OnPaint({reinterpret_cast<HDC>(wParam)});
@@ -92,15 +96,10 @@ LRESULT CThemePreviewer::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             }
             case WM_LBUTTONDOWN:
             case WM_LBUTTONDBLCLK:{
-                self->OnLButton(static_cast<UINT>(wParam), ::CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+                self->OnLButton(static_cast<UINT>(wParam), CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
                 return 0;
             }
             }
-            ///// CHAIN_MSG_MAP(Cf::DoubleBuffered)
-            //LRESULT lRes = 0;
-            //if (self->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lRes, 0)) {
-            //    return lRes;
-            //}
         }
     }
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
@@ -123,19 +122,19 @@ void CThemePreviewer::OnPaint(WTL::CDCHandle dcParam)
 
 void CThemePreviewer::RectsBuild(CRect const& rcClient, CRect& rcFront, CRect& rcBack, CRect& rcMsg, CRect& rcIcon)
 {
-    const double   sx = 5.;
-    const double   sy = 5.;
+    constexpr double sx{5.};
+    constexpr double sy{5.};
     DRect rcFull = FromCRect<double>(rcClient);
     rcFull.Shrink(sx, sy);
     const double fCX = rcFull.Width();
     const double fCY = rcFull.Height();
 
     CF::RectzAllocator<double> rcAlloc{ rcFull };
-    DRect rcIcon1 = rcAlloc.Next(fCX / 3., fCY / 3., sx, sy);
+    const DRect rcIcon1 = rcAlloc.Next(fCX / 3., fCY / 3., sx, sy);
     DRect  rcWin1 = rcAlloc.NextFromRight(fCX, fCY / 1.2, sx, sy);
 
     rcAlloc.Shift(0, -(rcWin1.Height() - rcIcon1.Height()));
-    DRect rcIcon2 = rcAlloc.Next(fCX / 5., fCY / 2., sx, sy);
+    const DRect rcIcon2 = rcAlloc.Next(fCX / 5., fCY / 2., sx, sy);
     DRect  rcWin2 = rcAlloc.Next(fCX, fCY, sx, sy);
 
     rcAlloc.Shift(0, -(rcWin2.Height() - rcIcon2.Height()));
@@ -230,7 +229,7 @@ void CThemePreviewer::DrawDesktop(WTL::CDCHandle dc, CRect const& rcClient)
 
     // TODO: borrow wallpaper drawer from CPageBackground
 
-    CDrawings drawings(scheme);
+    CDrawings drawings{scheme, *m_pSizePair};
     drawings.DrawDesktopIcon(dc, rcIcon, L"Icon Text", true);
     for (int i = 0; i < WND_Count; i++) {
         drawings.CalcRects(wrect[i].rcSource, wparam[i].captFlags, wrect[i].rcTarget);
@@ -239,7 +238,7 @@ void CThemePreviewer::DrawDesktop(WTL::CDCHandle dc, CRect const& rcClient)
     drawings.DrawToolTip(dc, m_WndRect[WND_MsgBox][WR_Tooltip], L"TooTip Hint");
     auto rcSel = GetSeletcedRect();
     if (!rcSel.IsRectEmpty()) {
-        if (1) { // ##TODO: configure selection type
+        if constexpr (true) { // ##TODO: configure selection type
             rcSel.DeflateRect(1, 1);
             dc.DrawFocusRect(rcSel);
         }
