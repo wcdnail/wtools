@@ -25,12 +25,19 @@ struct CPageAppearance: CPageImpl
     void NotifySchemesChanged();
 
 private:
+    enum MenuIDs
+    {
+        IDM_IMPORT_WIN98THEME = 7201,
+        IDM_IMPORT_WINXPREGFILE,
+    };
+
     CSchemePtr                        m_pSource;
     CScheme                        m_SchemeCopy;
     String                       m_sCurrentSize;
     bool                          m_bLoadValues;
     int                           m_nPrevScheme;
     int                             m_nPrevSize;
+    WTL::CMenu                      m_mnuImport;
     WTL::CStatic                     m_stScheme;
     WTL::CComboBox                   m_cbScheme;
     WTL::CStatic                m_stSchemeScale;
@@ -60,6 +67,7 @@ private:
     WTL::CEdit       m_edItemSize[IT_SizeCount];
     WTL::CUpDownCtrl m_udItemSize[IT_SizeCount];
 
+    static void ImportMenuInit(WTL::CMenu& cMenu);
     void InitResizeMap();
     void CtlAdjustPositions();
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam) override;

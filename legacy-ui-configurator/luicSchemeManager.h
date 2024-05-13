@@ -25,6 +25,7 @@ struct CSchemeManager
 
     bool FindOrCreate(String const& name, CSchemePtr& pointee) const;
     int LoadIni98(Path const& path);
+    int LoadXPRegistry(Path const& path);
 
 private:
     SchemeVec m_Schemes;

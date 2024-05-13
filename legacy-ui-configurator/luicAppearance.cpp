@@ -508,8 +508,9 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         SetMsgHandled(FALSE);
         return ;
     }
-    int iItem = IT_Invalid;
-    int iSize = IT_Invalid;
+    int       iItem{IT_Invalid};
+    int       iSize{IT_Invalid};
+    PCWSTR oDlgExts{nullptr};
     switch (nID) {
     case IDC_APP_THEME_SEL: {
         int nScheme = IT_Invalid;
@@ -582,7 +583,19 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         return ;
 
     case IDC_APP_THEME_BN_IMPORT: {
-        WTL::CShellFileOpenDialog dlg{ L"*.theme;*.the", FOS_FORCESHOWHIDDEN | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST };
+        CPoint      pt{};
+        CRect rcButton{};
+        m_bnImport.GetWindowRect(rcButton);
+        pt.x = rcButton.left < 0 ? 0 : rcButton.left;
+        pt.y = rcButton.bottom;
+        m_mnuImport.TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON, pt.x, pt.y, m_hWnd);
+        return ;
+    }
+    case IDM_IMPORT_WIN98THEME: oDlgExts = L"*.theme;*.the"; goto ImportFile;
+    case IDM_IMPORT_WINXPREGFILE: {
+        oDlgExts = L"*.reg";
+    ImportFile:
+        WTL::CShellFileOpenDialog dlg{ oDlgExts, FOS_FORCESHOWHIDDEN | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST };
         const auto rv = dlg.DoModal(m_hWnd);
         if (IDOK != rv) {
             SetMFStatus(STA_Warning, L"Import canceled");
@@ -597,9 +610,12 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         const auto path{CSchemeManager::Path{tempFilename}};
         auto*      pApp{CLUIApp::App()};
         auto&   manager{pApp->SchemeManager()};
-        const int index{manager.LoadIni98(path)};
+        int       index{IT_Invalid};
+        switch (nID) {
+        case IDM_IMPORT_WIN98THEME:   index = manager.LoadIni98(path); break;
+        case IDM_IMPORT_WINXPREGFILE: index = manager.LoadXPRegistry(path); break;
+        }
         if (IT_Invalid != index) {
-            //auto const& pScheme = manager[index];
             ApplyPendingChanges();
             OnSchemesLoad(pApp, index);
         }

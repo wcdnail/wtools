@@ -8,6 +8,14 @@
 #include <UT/debug.assistance.h>
 #include <atldlgs.h>
 
+void CPageAppearance::ImportMenuInit(WTL::CMenu& cMenu)
+{
+    if (cMenu.CreatePopupMenu()) {
+        cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_WIN98THEME, L"Import &WIN98 Theme");
+        cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_WINXPREGFILE, L"Import WINXP &Registry File");
+    }
+}
+
 void CPageAppearance::InitResizeMap()
 {
     static const WTL::_AtlDlgResizeMap ctrlResizeMap[] = {
@@ -114,6 +122,8 @@ void CPageAppearance::CtlAdjustPositions()
 BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
     auto const* pApp{CLUIApp::App()};
+
+    ImportMenuInit(m_mnuImport);
 
 #ifdef _DEBUG_CONTROLS
     ShowWindow(SW_SHOW);

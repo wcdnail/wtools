@@ -180,10 +180,11 @@ public:
         }
     }
 
-    void parse(std::basic_istream<CharT> & is) {
+    void parse(std::basic_istream<CharT> & is, std::locale&& locParam = std::locale{"C"})
+    {
         String line;
         String section;
-        const std::locale loc{"C"};
+        const std::locale loc = std::move(locParam);
         while (std::getline(is, line)) {
             detail::ltrim(line, loc);
             detail::rtrim(line, loc);

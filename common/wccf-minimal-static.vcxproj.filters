@@ -67,6 +67,9 @@
     <ClInclude Include="WTL\CColorButton.h">
       <Filter>WTL</Filter>
     </ClInclude>
+    <ClInclude Include="WTL\CButtonMenu.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

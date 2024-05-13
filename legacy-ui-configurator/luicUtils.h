@@ -73,4 +73,20 @@ struct StringHash
     std::size_t operator()(std::wstring const& str) const { return HashType{}(str); }
 };
 
+template <typename CharType>
+inline std::basic_string<CharType>& StrUnquote(std::basic_string<CharType>& str)
+{
+    if (str.length() > 1) {
+        if (str.front() == static_cast<CharType>('"') && str.back() == static_cast<CharType>('"')) {
+            if (str.length() == 2) {
+                str.erase();
+            } else {
+                str.erase(str.begin());
+                str.erase(str.end() - 1);
+            }
+        }
+    }
+    return str;
+}
+
 HRESULT IFileDialog_GetDisplayName(IFileDialog& dlgImpl, std::wstring& target);

@@ -100,7 +100,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_ATL_NO_AUTOMATIC_NAMESPACE;_WTL_NO_AUTOMATIC_NAMESPACE;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_ATL_NO_AUTOMATIC_NAMESPACE;_WTL_NO_AUTOMATIC_NAMESPACE;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -133,7 +133,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_ATL_NO_AUTOMATIC_NAMESPACE;_WTL_NO_AUTOMATIC_NAMESPACE;WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_ATL_NO_AUTOMATIC_NAMESPACE;_WTL_NO_AUTOMATIC_NAMESPACE;WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -167,7 +167,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>_ATL_NO_AUTOMATIC_NAMESPACE;_WTL_NO_AUTOMATIC_NAMESPACE;WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_ATL_NO_AUTOMATIC_NAMESPACE;_WTL_NO_AUTOMATIC_NAMESPACE;WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -203,7 +203,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>_ATL_NO_AUTOMATIC_NAMESPACE;_WTL_NO_AUTOMATIC_NAMESPACE;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_ATL_NO_AUTOMATIC_NAMESPACE;_WTL_NO_AUTOMATIC_NAMESPACE;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -243,6 +243,7 @@
     <ClInclude Include="luicEffects.h" />
     <ClInclude Include="luicFontDef.h" />
     <ClInclude Include="luicFonts.h" />
+    <ClInclude Include="luicIniParser.h" />
     <ClInclude Include="luicMain.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="luicMainFrame.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="luicEffects.cpp" />
     <ClCompile Include="luicFontDef.cpp" />
     <ClCompile Include="luicFonts.cpp" />
+    <ClCompile Include="luicIni98Loader.cpp" />
     <ClCompile Include="luicMain.cpp" />
     <ClCompile Include="idl\legacy-ui-configurator_i.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -302,6 +304,7 @@
     <ClCompile Include="luicThemePreviewer.cpp" />
     <ClCompile Include="luicUtils.cpp" />
     <ClCompile Include="luicWeb.cpp" />
+    <ClCompile Include="luicXPRegistryLoader.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
