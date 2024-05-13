@@ -26,8 +26,7 @@ template <typename Res>
 static inline Res GetCurrentDPI()
 {
     int temp = USER_DEFAULT_SCREEN_DPI;
-    HDC screenDc{GetDC(nullptr)};
-    if (screenDc) {
+    if (const HDC screenDc{GetDC(nullptr)}) {
         temp = GetDeviceCaps(screenDc, LOGPIXELSY);
         ReleaseDC(nullptr, screenDc);
     }

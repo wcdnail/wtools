@@ -21,7 +21,7 @@ CScheme::CScheme(StrView name, int nNumba /*= 0*/)
 
 CScheme::String CScheme::DisplayName() const
 {
-    return m_nNumba > 0 ? m_Name + L" #" + std::to_wstring(m_nNumba) : m_Name;
+    return m_nNumba > 0 ? m_Name + L" (" + std::to_wstring(m_nNumba) + L")" : m_Name;
 }
 
 CScheme::Item const& CScheme::ItemDef(int index)

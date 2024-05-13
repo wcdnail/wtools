@@ -653,30 +653,33 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         if (nID == IDCANCEL) {
             return;
         }
-        const String strOldName{m_SchemeCopy.Name()};
+        ATLASSUME(m_pSource.get() != nullptr);
+        const String strOldName{m_pSource->Name()};
+        const String strOldDisp{m_pSource->DisplayName()};
         ATL::CStringW  sNewName{};
         m_edSchemeName.GetWindowTextW(sNewName);
-        const auto sMessage{Str::ElipsisW::Format(L"Rename current scheme '%s' to:\r\n'%s' ?\r\n", strOldName.c_str(), sNewName.GetString())};
+        const auto sMessage{Str::ElipsisW::Format(L"Rename current scheme '%s' to:\r\n'%s' ?\r\n", strOldDisp.c_str(), sNewName.GetString())};
         const int   nAnswer{::MessageBoxW(m_hWnd, sMessage.GetString(), L"Are You Sure?", MB_YESNO | MB_ICONQUESTION)};
         if (IDYES != nAnswer) {
             return ;
         }
-        const int comboIndex{m_cbScheme.FindStringExact(CB_ERR, strOldName.c_str())};
+        const int comboIndex{m_cbScheme.FindStringExact(CB_ERR, strOldDisp.c_str())};
         if (CB_ERR == comboIndex) {
             SetMFStatus(STA_Warning, L"Renaming error: target Combo FindStringExact failed!");
             return ;
         }
+        const String strNewName{sNewName.GetString(), static_cast<size_t>(sNewName.GetLength())};
+        m_SchemeCopy.SetName(strNewName);
         const int nOldData{static_cast<int>(m_cbScheme.GetItemData(comboIndex))};
-        const int nNewItem{m_cbScheme.InsertString(comboIndex, sNewName.GetString())};
+        const int nNewItem{m_cbScheme.InsertString(comboIndex, m_pSource->DisplayName().c_str())};
         if (CB_ERR == nNewItem) {
+            m_SchemeCopy.SetName(strOldName);
             SetMFStatus(STA_Warning, L"Renaming error: target Combo InsertString failed!");
             return ;
         }
         m_cbScheme.DeleteString(nNewItem + 1);
         m_cbScheme.SetItemData(nNewItem, nOldData);
         m_cbScheme.SetCurSel(nNewItem);
-        const String strNewName{sNewName.GetString(), static_cast<size_t>(sNewName.GetLength())};
-        m_SchemeCopy.SetName(strNewName);
         m_pSource->SetName(strNewName);
         return;
     }

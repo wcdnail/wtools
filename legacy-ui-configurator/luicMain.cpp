@@ -9,7 +9,6 @@
 #include <string.utils.format.h>
 #include <windows.uses.gdi+.h>
 #include <combaseapi.h>
-#include <ShObjIdl_core.h>
 
 #if 0
 // TODO: GENERATED CODE, reserved for future use, DO NOT EARSE!!!!
@@ -33,7 +32,7 @@ return _AtlModule.WinMain(showCmd);
 // TODO: GENERATED CODE, reserved for future use, DO NOT EARSE!!!!
 #endif
 
-CLUIApp*               CLUIApp::g_pApp{nullptr};
+CLUIApp* CLUIApp::g_pApp{nullptr};
 std::recursive_mutex CLUIApp::g_pAppMx{};
 
 void SetMFStatus(int status, PCWSTR format, ...)
@@ -222,9 +221,6 @@ HRESULT CLUIApp::ImListCreate(int index, int cx, int cy)
 
 HRESULT CLUIApp::Run(HINSTANCE instHnd, int showCmd)
 {
-    static constexpr int MF_Initial_CX = 1000;
-    static constexpr int MF_Initial_CY = 600;
-
     HRESULT code = S_FALSE;
     try {
         WTL::CMessageLoop  loop;
