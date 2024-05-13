@@ -143,25 +143,38 @@ static bool WinXPRegLoadNCMectrics(CNCMetrics& ncMetrics, CFonts& fonts, IniMapW
             ncMetrics[i] = static_cast<int>(qwMetric);
         }
     }
-    WTL::CLogFont logFont[FONT_Hyperlink];
+    WTL::CLogFont logFontDesktop;
+    LOGFONTW* logFont[FONT_Hyperlink] = {
+        &ncMetrics.lfCaptionFont,
+        &ncMetrics.lfSmCaptionFont,
+        &ncMetrics.lfMenuFont,
+        &ncMetrics.lfStatusFont,
+        &ncMetrics.lfMessageFont,
+        &logFontDesktop,
+    };
     for (int i = 0; i < FONT_Hyperlink; i++) {
-        IniStringW    name{L"\"Font #" + std::to_wstring(i) + L"\""};
-        const size_t nSize{WinXPRegBinary(StrUnquote(iniMap[name]), reinterpret_cast<LPBYTE>(&logFont[i]), sizeof(logFont[i]))};
-        if (sizeof(logFont[i]) != nSize) {
+        IniStringW name{L"\"Font #" + std::to_wstring(i) + L"\""};
+        if (!WinXPRegBinary(StrUnquote(iniMap[name]), reinterpret_cast<LPBYTE>(logFont[i]), sizeof(LOGFONTW))) {
             SetLastError(ERROR_CANTOPEN);
             return false;
         }
     }
-    return true;
+    if (!fonts.LoadValues(logFontDesktop)) {
+        SetLastError(ERROR_CANTOPEN);
+        return false;
+    }
+    return fonts.LoadValues(ncMetrics);
 }
 
-static bool WinXPRegParseScheme(CSchemeManager const& manager, CSchemePtr& pScheme, bool& bFound,
-                            IniStringW& sCurrentName,
-                            IniStringW const& sIndex,
-                            IniMapW& iniMap)
+static bool WinXPRegParseScheme(CSchemeManager const& manager,
+                                CSchemePtr& pScheme,
+                                bool& bFound,
+                                IniStringW& sCurrentName,
+                                IniStringW const& sIndex,
+                                IniMapW& iniMap)
 {
     CNCMetrics ncMetrics{};
-    CFonts         fonts{};
+    CFonts      schFonts{};
     DWORD    dwFlatMenus{0};
     auto&    sLegacyName{iniMap[L"\"LegacyName\""]};
     if (sLegacyName.empty()) {
@@ -170,10 +183,6 @@ static bool WinXPRegParseScheme(CSchemeManager const& manager, CSchemePtr& pSche
     if (sLegacyName.empty()) {
         SetLastError(ERROR_BADDB);
         return false;
-    }
-    if (sLegacyName != sCurrentName) {
-        DH::TPrintf(L"%s: Scheme legacy & current names does not match: %s != %s\n", __FUNCTIONW__,
-            sLegacyName.c_str(), sCurrentName.c_str());
     }
     bFound = manager.FindOrCreate(StrUnquote(sLegacyName), pScheme);
     sCurrentName = pScheme->Name();
@@ -184,15 +193,12 @@ static bool WinXPRegParseScheme(CSchemeManager const& manager, CSchemePtr& pSche
     if (!WinXPRegLoadColors(pScheme, iniMap)) {
         return false;
     }
-    if (!WinXPRegLoadNCMectrics(ncMetrics, fonts, iniMap)) {
-        return false;
-    }
-    if (!fonts.LoadValues(ncMetrics)) {
+    if (!WinXPRegLoadNCMectrics(ncMetrics, schFonts, iniMap)) {
         return false;
     }
     CSizePair& sizePair = pScheme->GetSizesMap()[L"Default"];
     ncMetrics.CopyTo(sizePair.m_NCMetric);
-    fonts.Swap(sizePair.m_Font);
+    schFonts.Swap(sizePair.m_Font);
     return true;
 }
 
