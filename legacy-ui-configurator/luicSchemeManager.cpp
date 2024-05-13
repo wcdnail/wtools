@@ -12,10 +12,7 @@ static constexpr wchar_t REG_ClassicSchemes[] = L"Control Panel\\Appearance\\Cla
 
 CSchemeManager::~CSchemeManager() = default;
 
-CSchemeManager::CSchemeManager()
-    : m_Schemes{}
-{
-}
+CSchemeManager::CSchemeManager() = default;
 
 template <typename ReturnType, typename SelfRef>
 ReturnType& CSchemeManager::getSchemeRef(SelfRef& thiz, int index)
@@ -117,11 +114,13 @@ int CSchemeManager::Remove(CScheme const& scheme)
     if (m_Schemes.size() < 2) {
         return IT_Invalid;
     }
+    int nCount = 0;
     for (auto  it = m_Schemes.begin(); it != m_Schemes.end(); ++it) {
         if (((*it)->Name() == scheme.Name()) && ((*it)->Numba() == scheme.Numba())) {
             m_Schemes.erase(it);
-            return 0;
+            return nCount ? --nCount : 0;
         }
+        ++nCount;
     }
     return IT_Invalid;
 }
