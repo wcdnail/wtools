@@ -38,16 +38,15 @@ CSchemePtr& CSchemeManager::operator[](int index)
     return getSchemeRef<CSchemePtr>(*this, index);
 }
 
-bool CSchemeManager::FindOrCreate(String const& name, CSchemePtr& pointee) const
+int CSchemeManager::CountWithSameName(String const& name) const
 {
+    int nCount = 0;
     for (auto const& it: m_Schemes) {
         if (it->Name() == name) {
-            pointee = it;
-            return true;
+            ++nCount;
         }
     }
-    pointee = std::make_shared<CScheme>(name);
-    return false;
+    return nCount;
 }
 
 int CSchemeManager::LoadRegistry()
@@ -59,9 +58,11 @@ int CSchemeManager::LoadRegistry()
         return IT_Invalid;
     }
     tempSchemes.reserve(m_Schemes.size() + 1);
-    const int nCount = regClassics.ForEachValue([&tempSchemes](HKEY hKey, PCWSTR szSchemename, int nLen) -> bool {
+    const int nCount = regClassics.ForEachValue([this, &tempSchemes](HKEY hKey, PCWSTR szSchemename, int nLen) -> bool {
         const CRegistry regScheme{hKey, szSchemename};
-        auto pScheme = std::make_shared<CScheme>(StrView{szSchemename, static_cast<size_t>(nLen)});
+        const String        sName{szSchemename, static_cast<size_t>(nLen)};
+        const int          nCount{CountWithSameName(sName)};
+        auto pScheme = std::make_shared<CScheme>(sName, nCount);
         if (!pScheme->LoadValues(regScheme)) {
             return false;
         }
@@ -100,4 +101,13 @@ HRESULT CSchemeManager::Initialize()
     }
     m_Schemes.emplace_back(std::move(pCurrent));
     return code;
+}
+
+int CSchemeManager::VanishAllExceptLast()
+{
+    SchemeVec tempSchemes{};
+    tempSchemes.reserve(1);
+    tempSchemes.emplace_back(m_Schemes.back());
+    tempSchemes.swap(m_Schemes);
+    return 0;
 }

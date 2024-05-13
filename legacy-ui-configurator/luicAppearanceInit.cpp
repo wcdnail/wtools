@@ -10,11 +10,14 @@
 
 void CPageAppearance::ImportMenuInit(WTL::CMenu& cMenu)
 {
-    if (cMenu.CreatePopupMenu()) {
-        cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_REGISTRY, L"Import From &Registry");
-        cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_WIN98THEME, L"Import &WIN98 Theme");
-        cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_WINXPREGFILE, L"Import WIN&XP Registry File");
+    if (!cMenu.CreatePopupMenu()) {
+        return;
     }
+    cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_REGISTRY, L"Import From &Registry");
+    cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_WIN98THEME, L"Import &WIN98 Theme");
+    cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_WINXPREGFILE, L"Import WIN&XP Registry File");
+    cMenu.AppendMenuW(MF_SEPARATOR);
+    cMenu.AppendMenuW(MF_STRING, IDM_CLEAR_SCHEMES, L"Cle&ar schemes");
 }
 
 void CPageAppearance::InitResizeMap()
@@ -209,7 +212,8 @@ void CPageAppearance::InitializeSchemes(CSchemeManager const& manager)
     auto const& schemes{manager.GetSchemes()};
     int          nIndex{0};
     for (const auto& it: schemes) {
-        const int nItem = lbCtl.AddString(it->Name().c_str());
+        auto const sName{it->DisplayName()};
+        int const  nItem{lbCtl.AddString(sName.c_str())};
         if (nItem < 0) {
             const auto code{static_cast<HRESULT>(GetLastError())};
             ReportError(Str::ElipsisW::Format(L"LB AddString [w:%08x] [%d] '%s' ERROR",

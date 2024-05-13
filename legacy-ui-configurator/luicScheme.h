@@ -93,7 +93,7 @@ struct CScheme
     };
 
     virtual ~CScheme();
-    CScheme(StrView name);
+    CScheme(StrView name, int nNumba = 0);
 
     static Item const& ItemDef(int index);
 
@@ -102,6 +102,7 @@ struct CScheme
     bool LoadValues(CRegistry const& regScheme);
     bool LoadSizes(StrView sName, CRegistry const& regScheme);
 
+    String                                           DisplayName() const;
     String const&                                           Name() const { return m_Name; }
     bool                                      IsGradientCaptions() const { return m_bGradientCaptions; }
     bool                                             IsFlatMenus() const { return m_bFlatMenus; }
@@ -130,6 +131,7 @@ struct CScheme
 
 private:
     String                            m_Name;
+    int                             m_nNumba;
     bool                 m_bGradientCaptions;
     bool                        m_bFlatMenus;
     CColors                          m_Color;

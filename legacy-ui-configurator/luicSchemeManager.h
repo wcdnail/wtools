@@ -23,10 +23,13 @@ struct CSchemeManager
     CSchemePtr const& operator[](int index) const;
     CSchemePtr& operator[](int index);
 
-    bool FindOrCreate(String const& name, CSchemePtr& pointee) const;
+    int CountWithSameName(String const& name) const;
+
     int LoadRegistry();
     int LoadWin98THeme(Path const& path);
     int LoadXPRegistry(Path const& path);
+
+    int VanishAllExceptLast();
 
 private:
     SchemeVec m_Schemes;

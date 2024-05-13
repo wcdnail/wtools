@@ -630,6 +630,15 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         }
         return ;
     }
+    case IDM_CLEAR_SCHEMES: {
+        auto*       pApp{CLUIApp::App()};
+        const int nIndex{pApp->SchemeManager().VanishAllExceptLast()};
+        if (IT_Invalid != nIndex) {
+            ApplyPendingChanges();
+            OnSchemesLoad(pApp, nIndex);
+        }
+        return ;
+    }
     default:
         break;
     }

@@ -8,14 +8,20 @@ CSizePair::~CSizePair() = default;
 CSizePair::CSizePair() = default;
 CScheme::~CScheme() = default;
 
-CScheme::CScheme(StrView name)
+CScheme::CScheme(StrView name, int nNumba /*= 0*/)
     :              m_Name{name}
+    ,            m_nNumba{nNumba}
     , m_bGradientCaptions{false}
     ,        m_bFlatMenus{false}
 {
     for (int i = 0; i < NCM_Count; i++) {
         m_SizeRange[i] = CNCMetrics::DefaultRange(i);
     }
+}
+
+CScheme::String CScheme::DisplayName() const
+{
+    return m_nNumba > 0 ? m_Name + L" #" + std::to_wstring(m_nNumba) : m_Name;
 }
 
 CScheme::Item const& CScheme::ItemDef(int index)

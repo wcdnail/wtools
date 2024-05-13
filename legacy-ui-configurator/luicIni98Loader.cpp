@@ -112,15 +112,14 @@ int CSchemeManager::LoadWin98THeme(Path const& path)
     HRESULT         code{S_OK};
     const auto& pathname{path.native()};
     InutStream   fsInput{pathname};
-    IniParser  iniParser{};
     if (!fsInput.is_open()) {
         code = static_cast<HRESULT>(GetLastError());
         ReportError(Str::ElipsisW::Format(L"ERROR: open win98 theme FAILED!\r\n'%s'\r\n",
             pathname.c_str()), code, true);
         return IT_Invalid;
     }
+    IniParser iniParser{};
     iniParser.parse(fsInput);
-
     struct SectionDef
     {
         std::string     name;
@@ -130,9 +129,10 @@ int CSchemeManager::LoadWin98THeme(Path const& path)
         { "Metrics", Ini98LoadMetrics },
         { "Control Panel\\Colors", Ini98LoadColors },
     };
-    CSchemePtr pScheme{};
-    auto const  flName{path.filename().native()};
-    const bool  bFound{FindOrCreate(flName, pScheme)};
+    SchemeVec tempSchemes{};
+    auto const     flName{path.filename().native()};
+    const int      nCount{CountWithSameName(flName)};
+    CSchemePtr    pScheme{std::make_shared<CScheme>(flName, nCount)};
     pScheme->SetGradientCaptions(false);
     pScheme->SetFlatMenus(false);
     for (auto const& sd: gs_Sections) {
@@ -151,13 +151,9 @@ int CSchemeManager::LoadWin98THeme(Path const& path)
             return IT_Invalid;
         }
     }
-    if (!bFound) {
-        m_Schemes.emplace_back(std::move(pScheme));
-    }
-    else {
-        code = static_cast<HRESULT>(0);
-        ReportError(Str::ElipsisW::Format(L"Already loaded\r\n'%s'\r\n",
-            flName.c_str()), code, true, MB_ICONWARNING);
-    }
-    return static_cast<int>(m_Schemes.size()) - 1;
+    tempSchemes.reserve(m_Schemes.size() + 1);
+    tempSchemes.emplace_back(std::move(pScheme));
+    tempSchemes.append_range(m_Schemes);
+    tempSchemes.swap(m_Schemes);
+    return 0;
 }

@@ -30,6 +30,7 @@ private:
         IDM_IMPORT_REGISTRY = 7327,
         IDM_IMPORT_WIN98THEME,
         IDM_IMPORT_WINXPREGFILE,
+        IDM_CLEAR_SCHEMES,
     };
 
     CSchemePtr                        m_pSource;

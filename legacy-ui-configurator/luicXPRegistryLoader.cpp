@@ -166,12 +166,7 @@ static bool WinXPRegLoadNCMectrics(CNCMetrics& ncMetrics, CFonts& fonts, IniMapW
     return fonts.LoadValues(ncMetrics);
 }
 
-static bool WinXPRegParseScheme(CSchemeManager const& manager,
-                                CSchemePtr& pScheme,
-                                bool& bFound,
-                                IniStringW& sCurrentName,
-                                IniStringW const& sIndex,
-                                IniMapW& iniMap)
+static bool WinXPRegParseScheme(CSchemeManager const& manager, CSchemePtr& pScheme, IniStringW& sCurrentName, IniMapW& iniMap)
 {
     CNCMetrics ncMetrics{};
     CFonts      schFonts{};
@@ -184,7 +179,8 @@ static bool WinXPRegParseScheme(CSchemeManager const& manager,
         SetLastError(ERROR_BADDB);
         return false;
     }
-    bFound = manager.FindOrCreate(StrUnquote(sLegacyName), pScheme);
+    const int nCount{manager.CountWithSameName(StrUnquote(sLegacyName))};
+    pScheme = std::make_shared<CScheme>(sLegacyName, nCount);
     sCurrentName = pScheme->Name();
     pScheme->SetGradientCaptions(true);
     if (WinXPRegDWORD(StrUnquote(iniMap[L"\"Flat Menus\""]), dwFlatMenus)) {
@@ -217,6 +213,8 @@ int CSchemeManager::LoadXPRegistry(Path const& path)
     std::wistream  fsInputW{&fsBufConv};
     IniParserW    iniParser{};
     IniStringW sCurrentName{};
+    SchemeVec   tempSchemes{};
+    tempSchemes.reserve(m_Schemes.size() + 1);
     iniParser.parse(fsInputW);
     for (auto& sd: iniParser.sections) {
         auto const& sectName{sd.first};
@@ -240,27 +238,21 @@ int CSchemeManager::LoadXPRegistry(Path const& path)
             if (iParam < SchemeSizeIndex) {
                 continue;
             }
-            CSchemePtr pScheme{};
-            bool        bFound{false};
             if (sCurrentName.empty()) {
                 sCurrentName = sParam[SchemeIndex];
             }
-            if (!WinXPRegParseScheme(*this, pScheme, bFound, sCurrentName, sParam[SchemeIndex], sd.second)) {
+            CSchemePtr pScheme{};
+            if (!WinXPRegParseScheme(*this, pScheme, sCurrentName, sd.second)) {
                 code = static_cast<HRESULT>(GetLastError());
                 ReportError(Str::ElipsisW::Format(L"Scheme Load failed\r\n'%s'\r\n",
                     sCurrentName.c_str()), code, true, MB_ICONERROR);
                 return IT_Invalid;
             }
-            if (!bFound) {
-                m_Schemes.emplace_back(std::move(pScheme));
-            }
-            else {
-                code = static_cast<HRESULT>(0);
-                ReportError(Str::ElipsisW::Format(L"Scheme Already Loaded\r\n'%s'\r\n",
-                    sCurrentName.c_str()), code, true, MB_ICONWARNING);
-            }
+            tempSchemes.emplace_back(std::move(pScheme));
             IniStringW{}.swap(sCurrentName);
         }
     }
-    return static_cast<int>(m_Schemes.size()) - 1;
+    tempSchemes.append_range(m_Schemes);
+    tempSchemes.swap(m_Schemes);
+    return 0;
 }

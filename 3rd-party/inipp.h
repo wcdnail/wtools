@@ -317,12 +317,10 @@ private:
 
     String&& get_whole_line(std::basic_istream<CharT>& is, std::locale const& loc, String&& result)
     {
-        if (!format->is_line_continue(result.back())) {
+        if (result.empty() || !format->is_line_continue(result.back())) {
             return std::move(result);
         }
-        if (!result.empty()) {
-            result.erase(result.end() - 1);
-        }
+        result.erase(result.end() - 1);
         String next{};
         while (std::getline(is, next)) {
             detail::ltrim(next, loc);
