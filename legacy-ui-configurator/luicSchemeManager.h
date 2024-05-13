@@ -30,6 +30,7 @@ struct CSchemeManager
     int LoadXPRegistry(Path const& path);
 
     int VanishAllExceptLast();
+    int Remove(CScheme const& scheme);
 
 private:
     SchemeVec m_Schemes;

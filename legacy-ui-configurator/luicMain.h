@@ -33,13 +33,6 @@ enum IconIndex : int
     IconCount
 };
 
-enum MFStatus: int
-{
-    STA_Info = 0,
-    STA_Warning,
-    STA_Error,
-};
-
 class CLUIApp: public WTL::CAppModule
 {
 public:

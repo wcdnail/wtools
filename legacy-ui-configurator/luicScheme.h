@@ -104,6 +104,7 @@ struct CScheme
 
     String                                           DisplayName() const;
     String const&                                           Name() const { return m_Name; }
+    int                                                    Numba() const { return m_nNumba; }
     bool                                      IsGradientCaptions() const { return m_bGradientCaptions; }
     bool                                             IsFlatMenus() const { return m_bFlatMenus; }
     COLORREF                                   GetColor(int index) const { return m_Color[index].m_Color; }

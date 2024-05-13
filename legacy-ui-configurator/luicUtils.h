@@ -58,6 +58,13 @@ inline Res FontPtToLog(Res n)
     return -static_cast<Res>(MulDiv(static_cast<int>(n), g_DPI(), DEFAULT_FONT_DPI));
 }
 
+enum MFStatus: int
+{
+    STA_Info = 0,
+    STA_Warning,
+    STA_Error,
+};
+
 void SetMFStatus(int status, PCWSTR format, ...);
 
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox = false, UINT mbType = MB_ICONERROR);

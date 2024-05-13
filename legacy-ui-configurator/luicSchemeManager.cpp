@@ -111,3 +111,17 @@ int CSchemeManager::VanishAllExceptLast()
     tempSchemes.swap(m_Schemes);
     return 0;
 }
+
+int CSchemeManager::Remove(CScheme const& scheme)
+{
+    if (m_Schemes.size() < 2) {
+        return IT_Invalid;
+    }
+    for (auto  it = m_Schemes.begin(); it != m_Schemes.end(); ++it) {
+        if (((*it)->Name() == scheme.Name()) && ((*it)->Numba() == scheme.Numba())) {
+            m_Schemes.erase(it);
+            return 0;
+        }
+    }
+    return IT_Invalid;
+}

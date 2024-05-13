@@ -486,6 +486,7 @@ void CPageAppearance::ApplyPendingChanges() const
     }
     const int nAnswer = ::MessageBoxW(m_hWnd, L"Reject current changes?", L"Changes pending...", MB_YESNO | MB_ICONQUESTION);
     if (IDYES == nAnswer) {
+        SetMFStatus(STA_Info, L"Pending changes rejected...");
         return ;
     }
     m_SchemeCopy.CopyTo(*m_pSource);
@@ -633,6 +634,24 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     case IDM_CLEAR_SCHEMES: {
         auto*       pApp{CLUIApp::App()};
         const int nIndex{pApp->SchemeManager().VanishAllExceptLast()};
+        if (IT_Invalid != nIndex) {
+            ApplyPendingChanges();
+            OnSchemesLoad(pApp, nIndex);
+        }
+        return ;
+    }
+    case IDC_APP_THEME_BN_REMOVE: {
+        auto*    pApp{CLUIApp::App()};
+        auto& manager{pApp->SchemeManager()};
+        if (manager.GetSchemes().size() < 2) {
+            SetMFStatus(STA_Warning, L"Remove is imposible - no more schemes loaded");
+            return ;
+        }
+        const int nAnswer{::MessageBoxW(m_hWnd, L"Remove current scheme?", L"Remove confirmation", MB_YESNO | MB_ICONQUESTION)};
+        if (IDYES != nAnswer) {
+            return ;
+        }
+        const int nIndex{manager.Remove(m_SchemeCopy)};
         if (IT_Invalid != nIndex) {
             ApplyPendingChanges();
             OnSchemesLoad(pApp, nIndex);
