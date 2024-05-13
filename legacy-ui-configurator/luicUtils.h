@@ -97,3 +97,7 @@ inline std::basic_string<CharType>& StrUnquote(std::basic_string<CharType>& str)
 }
 
 HRESULT IFileDialog_GetDisplayName(IFileDialog& dlgImpl, std::wstring& target);
+
+bool CBGetCurText(WTL::CComboBox const& ctlCombo, ATL::CString& result);
+bool CBGetCurData(WTL::CComboBox const& ctlCombo, int& result);
+bool CBGetCurTextInt(WTL::CComboBox const& ctlCombo, int& result);
