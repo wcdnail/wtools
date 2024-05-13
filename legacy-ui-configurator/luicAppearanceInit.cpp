@@ -25,6 +25,7 @@ void CPageAppearance::InitResizeMap()
     static const WTL::_AtlDlgResizeMap ctrlResizeMap[] = {
         { IDC_APP_THEME_CAP,                DLSZ_MOVE_Y },
         { IDC_APP_THEME_SEL,                DLSZ_SIZE_X | DLSZ_MOVE_Y },
+        { IDC_APP_THEME_NAME_EDIT,          DLSZ_SIZE_X | DLSZ_MOVE_Y },
         { IDC_APP_SIZE_CAP,                 DLSZ_MOVE_X | DLSZ_MOVE_Y },
         { IDC_APP_SIZE_SEL,                 DLSZ_MOVE_X | DLSZ_MOVE_Y },
         { IDC_APP_THEME_BN_IMPORT,          DLSZ_MOVE_X | DLSZ_MOVE_Y },
@@ -178,6 +179,16 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 
     m_bcGradientCapts.Attach(GetDlgItem(IDC_APP_CB_TTILEBAR_GRAD));
     m_bcFlatMenus.Attach(GetDlgItem(IDC_APP_CB_FLATMENUS));
+
+    m_edSchemeName.Attach(GetDlgItem(IDC_APP_THEME_NAME_EDIT));
+    {
+        CRect rcDlg;
+        GetWindowRect(rcDlg);
+        CRect rcSchemeCombo;
+        m_cbScheme.GetWindowRect(rcSchemeCombo);
+        rcSchemeCombo.OffsetRect(-rcDlg.left, -rcDlg.top);
+        m_edSchemeName.MoveWindow(rcSchemeCombo);
+    }
 
     m_bnSave.SetIcon(pApp->GetIcon(IconFloppy));
     m_bnRename.SetIcon(pApp->GetIcon(IconEditField));

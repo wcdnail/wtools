@@ -93,6 +93,7 @@
 #define IDC_APP_PREVIEW                 3040
 #define IDC_APP_THEME_BN_IMPORT         3041
 #define IDC_APP_FONT_STYLE_ANGLE_SPIN2  3044
+#define IDC_APP_THEME_NAME_EDIT         3045
 #define ID_ACC_ALT_ENTER                32769
 #define ID_ACC_ALT_TAB                  32771
 #define ID_ACC_SELECT_ALL               32772

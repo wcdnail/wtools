@@ -42,6 +42,7 @@ private:
     WTL::CMenu                      m_mnuImport;
     WTL::CStatic                     m_stScheme;
     WTL::CComboBox                   m_cbScheme;
+    WTL::CEdit                   m_edSchemeName;
     WTL::CStatic                m_stSchemeScale;
     WTL::CComboBox               m_cbSchemeSize;
     WTL::CButton                       m_bnSave;
@@ -111,4 +112,5 @@ private:
     int ItemGetSel() const;
     void ItemColorTryChange(int nButton);
     void ApplyPendingChanges() const;
+    void SchemeRenameShow(bool bShow);
 };

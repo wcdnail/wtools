@@ -18,7 +18,7 @@ CPageImpl::CPageImpl(UINT idd, std::wstring&& caption)
 
 bool CPageImpl::ComboSetCurSelByData(WTL::CComboBox& cbControl, DWORD_PTR nData)
 {
-    int nCount = cbControl.GetCount();
+    const int nCount = cbControl.GetCount();
     for (int n = 0; n < nCount; n++) {
         if (nData == cbControl.GetItemData(n)) {
             cbControl.SetCurSel(n);
@@ -96,7 +96,7 @@ void CPageImpl::DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count)
 HBRUSH CPageImpl::OnCtlColorStatic(WTL::CDCHandle dc, HWND wndStatic)
 {
 #if 0
-      dc.SetTextColor(m_pTheme->GetColor(COLOR_CAPTIONTEXT));
+    dc.SetTextColor(m_pTheme->GetColor(COLOR_CAPTIONTEXT));
     dc.SetBkColor(m_pTheme->GetColor(COLOR_MENU));
     return m_pTheme->GetBrush(COLOR_MENU);
 #else
@@ -153,7 +153,7 @@ void CPageImpl::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         DBG_DUMP_WMESSAGE_EXT(LTH_CANCEL, m_Caption.c_str(), m_hWnd, 0, 0, 0);
         DBGTPrint(LTH_WM_COMMAND L" ** CANCEL ** request\n");
         // ##TODO: PREVENT destroy this!
-        // ##TODO: No Nicht Nein DestroyWindow() here
+        // ##TODO: No - Nicht - Nein - DestroyWindow() here!!!
         return;
     default:
         //DBGTPrint(LTH_WM_COMMAND L" Unhandled: id:%-4d nc:%-4d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));

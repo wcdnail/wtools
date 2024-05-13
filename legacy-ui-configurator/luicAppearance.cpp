@@ -492,6 +492,23 @@ void CPageAppearance::ApplyPendingChanges() const
     m_SchemeCopy.CopyTo(*m_pSource);
 }
 
+void CPageAppearance::SchemeRenameShow(bool bShow)
+{
+    if (!bShow) {
+        m_cbScheme.ShowWindow(SW_SHOW);
+        m_edSchemeName.EnableWindow(FALSE);
+        m_edSchemeName.ShowWindow(SW_HIDE);
+        m_cbScheme.SetFocus();
+        return ;
+    }
+    m_cbScheme.ShowWindow(SW_HIDE);
+    m_edSchemeName.EnableWindow(TRUE);
+    m_edSchemeName.ShowWindow(SW_SHOW);
+    m_edSchemeName.SetFocus();
+    m_edSchemeName.SetWindowTextW(m_SchemeCopy.Name().c_str());
+    m_edSchemeName.SetSelAll(FALSE);
+}
+
 void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
     // skip during controls initialization
@@ -507,6 +524,15 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     case CBN_SELENDCANCEL:
     case CBN_CLOSEUP:
         SetMsgHandled(FALSE);
+        return ;
+    case EN_KILLFOCUS:
+        if (m_edSchemeName.IsWindowVisible()) {
+            SchemeRenameShow(false);
+        }
+        return ;
+    case EN_SETFOCUS:
+    case EN_UPDATE:
+    case EN_CHANGE:
         return ;
     }
     int       iItem{IT_Invalid};
@@ -656,6 +682,46 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
             ApplyPendingChanges();
             OnSchemesLoad(pApp, nIndex);
         }
+        return ;
+    }
+    case IDOK:
+    case IDCANCEL: {
+        if (!m_edSchemeName.IsWindowVisible()) {
+            return;
+        }
+        SchemeRenameShow(false);
+        if (nID == IDCANCEL) {
+            return;
+        }
+        const String strOldName{m_SchemeCopy.Name()};
+        ATL::CStringW  sNewName{};
+        m_edSchemeName.GetWindowTextW(sNewName);
+        const auto sMessage{Str::ElipsisW::Format(L"Rename current scheme '%s' to:\r\n'%s' ?\r\n", strOldName.c_str(), sNewName.GetString())};
+        const int   nAnswer{::MessageBoxW(m_hWnd, sMessage.GetString(), L"Are You Sure?", MB_YESNO | MB_ICONQUESTION)};
+        if (IDYES != nAnswer) {
+            return ;
+        }
+        const int comboIndex{m_cbScheme.FindStringExact(CB_ERR, strOldName.c_str())};
+        if (CB_ERR == comboIndex) {
+            SetMFStatus(STA_Warning, L"Renaming error: target Combo FindStringExact failed!");
+            return ;
+        }
+        const int nOldData{static_cast<int>(m_cbScheme.GetItemData(comboIndex))};
+        const int nNewItem{m_cbScheme.InsertString(comboIndex, sNewName.GetString())};
+        if (CB_ERR == nNewItem) {
+            SetMFStatus(STA_Warning, L"Renaming error: target Combo InsertString failed!");
+            return ;
+        }
+        m_cbScheme.DeleteString(nNewItem + 1);
+        m_cbScheme.SetItemData(nNewItem, nOldData);
+        m_cbScheme.SetCurSel(nNewItem);
+        const String strNewName{sNewName.GetString(), static_cast<size_t>(sNewName.GetLength())};
+        m_SchemeCopy.SetName(strNewName);
+        m_pSource->SetName(strNewName);
+        return;
+    }
+    case IDC_APP_THEME_BN_RENAME: {
+        SchemeRenameShow(0 == m_edSchemeName.IsWindowVisible());
         return ;
     }
     default:
