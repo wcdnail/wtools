@@ -119,7 +119,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
         ReportError(L"SchemeManager::Initialize failure...", code);
         return -1;
     }
-#ifdef _DEBUG
+#ifdef _DEBUG_WINXP_REG_SCHEMES
     pApp->SchemeManager().LoadXPRegistry(L"temes/ControlPanel.reg");
 #endif
     m_View.NotifySchemesChanged();

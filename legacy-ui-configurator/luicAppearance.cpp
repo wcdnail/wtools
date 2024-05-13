@@ -591,6 +591,15 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         m_mnuImport.TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON, pt.x, pt.y, m_hWnd);
         return ;
     }
+    case IDM_IMPORT_REGISTRY:{
+        auto*       pApp{CLUIApp::App()};
+        const int nIndex{pApp->SchemeManager().LoadRegistry()};
+        if (IT_Invalid != nIndex) {
+            ApplyPendingChanges();
+            OnSchemesLoad(pApp, nIndex);
+        }
+        return ;
+    }
     case IDM_IMPORT_WIN98THEME: oDlgExts = L"*.theme;*.the"; goto ImportFile;
     case IDM_IMPORT_WINXPREGFILE: {
         oDlgExts = L"*.reg";
@@ -612,7 +621,7 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
         auto&   manager{pApp->SchemeManager()};
         int       index{IT_Invalid};
         switch (nID) {
-        case IDM_IMPORT_WIN98THEME:   index = manager.LoadIni98(path); break;
+        case IDM_IMPORT_WIN98THEME:   index = manager.LoadWin98THeme(path); break;
         case IDM_IMPORT_WINXPREGFILE: index = manager.LoadXPRegistry(path); break;
         }
         if (IT_Invalid != index) {

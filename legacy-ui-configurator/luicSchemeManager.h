@@ -24,7 +24,8 @@ struct CSchemeManager
     CSchemePtr& operator[](int index);
 
     bool FindOrCreate(String const& name, CSchemePtr& pointee) const;
-    int LoadIni98(Path const& path);
+    int LoadRegistry();
+    int LoadWin98THeme(Path const& path);
     int LoadXPRegistry(Path const& path);
 
 private:

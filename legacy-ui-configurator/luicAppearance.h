@@ -27,7 +27,8 @@ struct CPageAppearance: CPageImpl
 private:
     enum MenuIDs
     {
-        IDM_IMPORT_WIN98THEME = 7201,
+        IDM_IMPORT_REGISTRY = 7327,
+        IDM_IMPORT_WIN98THEME,
         IDM_IMPORT_WINXPREGFILE,
     };
 

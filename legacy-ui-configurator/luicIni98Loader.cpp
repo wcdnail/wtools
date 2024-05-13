@@ -107,7 +107,7 @@ namespace
     }
 }
 
-int CSchemeManager::LoadIni98(Path const& path)
+int CSchemeManager::LoadWin98THeme(Path const& path)
 {
     HRESULT         code{S_OK};
     const auto& pathname{path.native()};

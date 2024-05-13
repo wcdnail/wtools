@@ -11,8 +11,9 @@
 void CPageAppearance::ImportMenuInit(WTL::CMenu& cMenu)
 {
     if (cMenu.CreatePopupMenu()) {
+        cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_REGISTRY, L"Import From &Registry");
         cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_WIN98THEME, L"Import &WIN98 Theme");
-        cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_WINXPREGFILE, L"Import WINXP &Registry File");
+        cMenu.AppendMenuW(MF_STRING, IDM_IMPORT_WINXPREGFILE, L"Import WIN&XP Registry File");
     }
 }
 

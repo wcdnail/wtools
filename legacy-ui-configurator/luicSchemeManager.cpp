@@ -50,24 +50,15 @@ bool CSchemeManager::FindOrCreate(String const& name, CSchemePtr& pointee) const
     return false;
 }
 
-HRESULT CSchemeManager::Initialize()
+int CSchemeManager::LoadRegistry()
 {
-    HRESULT           code{S_OK};
-    SchemeVec  tempSchemes{};
-    {
-        auto pCurrent = std::make_shared<CScheme>(L"(Current)");
-        if (!pCurrent->LoadDefaults()) {
-            code = static_cast<HRESULT>(GetLastError());
-            return code;
-        }
-        tempSchemes.emplace_back(std::move(pCurrent));
-    }
+    HRESULT                code{S_OK};
+    SchemeVec       tempSchemes{};
     const CRegistry regClassics{HKEY_CURRENT_USER, REG_ClassicSchemes};
     if (!regClassics.IsOk()) {
-        code = static_cast<HRESULT>(GetLastError());
-        tempSchemes.swap(m_Schemes);
-        return code;
+        return IT_Invalid;
     }
+    tempSchemes.reserve(m_Schemes.size() + 1);
     const int nCount = regClassics.ForEachValue([&tempSchemes](HKEY hKey, PCWSTR szSchemename, int nLen) -> bool {
         const CRegistry regScheme{hKey, szSchemename};
         auto pScheme = std::make_shared<CScheme>(StrView{szSchemename, static_cast<size_t>(nLen)});
@@ -94,6 +85,19 @@ HRESULT CSchemeManager::Initialize()
         DH::TPrintf(L"%s: WARNING: CRegistry::ForEachValue failed: %d '%s'\n", __FUNCTIONW__,
             code, codeText.GetString());
     }
+    tempSchemes.append_range(m_Schemes);
     tempSchemes.swap(m_Schemes);
+    return 0;
+ }
+
+HRESULT CSchemeManager::Initialize()
+{
+    HRESULT code{S_OK};
+    auto pCurrent = std::make_shared<CScheme>(L"(Current)");
+    if (!pCurrent->LoadDefaults()) {
+        code = static_cast<HRESULT>(GetLastError());
+        return code;
+    }
+    m_Schemes.emplace_back(std::move(pCurrent));
     return code;
 }
