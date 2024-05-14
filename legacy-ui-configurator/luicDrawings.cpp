@@ -259,7 +259,7 @@ CDrawings::CDrawings(CScheme const& scheme, CSizePair const& sizePair)
 
 void CDrawings::CalcRects(CRect const& rcBorder, UINT captFlags, WindowRects& target)
 {
-    const long  brdScale{ScaleForDpi<long>(2)}; // make it more conviniet to select borders
+    const long  brdScale{0}; // ScaleForDpi<long>(2)}; // make it more conviniet to select borders
     const bool isToolWnd{0 != (DC_SMALLCAP & captFlags)};
     CRect        rcFrame{};
     CRect         rcCapt{};
