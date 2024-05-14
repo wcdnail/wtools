@@ -4,17 +4,17 @@
 #include <atlcrack.h>
 #include <memory>
 
-struct CSpectrumColorPicker: ATL::CWindowImpl<CSpectrumColorPicker>
+struct CColorPicker: ATL::CWindowImpl<CColorPicker>
 {
-    using Super = ATL::CWindowImpl<CSpectrumColorPicker>;
+    using Super = ATL::CWindowImpl<CColorPicker>;
 
-    DECLARE_WND_CLASS(_T("CSpectrumColorPicker"))
+    DECLARE_WND_CLASS(_T("WCCF::CColorPicker"))
 
-    ~CSpectrumColorPicker() override;
-    CSpectrumColorPicker();
+    ~CColorPicker() override;
+    CColorPicker();
 
     HRESULT PreCreateWindow();
-    CSpectrumColorPicker& operator = (HWND hWnd); // make compatible with WTL/DDX
+    CColorPicker& operator = (HWND hWnd); // make compatible with WTL/DDX
 
 private:
     friend Super;
@@ -22,12 +22,15 @@ private:
 
     static ATOM           gs_Atom;
     std::unique_ptr<Impl> m_pImpl;
+    BOOL            m_bMsgHandled;
 
-    BEGIN_MSG_MAP_EX(CSpectrumColorPicker)
-        MSG_WM_CREATE(OnCreate)
-        MSG_WM_SIZE(OnSize)
-    END_MSG_MAP()
+    BOOL IsMsgHandled() const { return m_bMsgHandled; }
+    void SetMsgHandled(BOOL bHandled) { m_bMsgHandled = bHandled; }
 
+    BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
+    BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
+
+    void OnNcPaint(WTL::CRgnHandle rgn);
     int OnCreate(LPCREATESTRUCT lpCreateStruct);
     void OnSize(UINT nType, CSize size);
 };

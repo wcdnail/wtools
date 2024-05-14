@@ -18,7 +18,7 @@ public:
         MSG_OCM_DRAWITEM(OnReflectedDrawItem)
         MSG_WM_MOUSEMOVE(OnMouseMove)
         DEFAULT_REFLECTION_HANDLER()
-        END_MSG_MAP()
+    END_MSG_MAP()
 
 public:
     CRect m_rect;

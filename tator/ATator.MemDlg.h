@@ -27,7 +27,7 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
         IDC_DLG_ICON,
     };
 
-    CSpectrumColorPicker m_ccColorPicker;
+    CColorPicker m_ccColorPicker;
 
     BOOL PreTranslateMessage(MSG* pMsg) override
     {
@@ -43,7 +43,6 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
     }
 
     BEGIN_DDX_MAP(CTatorMainDlg)
-        //DDX_CONTROL_HANDLE(IDC_CUSTOM_CTL1, m_ccColorPicker)
     END_DDX_MAP()
 
     BEGIN_DIALOG(0, 0, DIALOG_CX, DIALOG_CY)
@@ -56,9 +55,8 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
 
     BEGIN_CONTROLS_MAP()
         CONTROL_GROUPBOX(_T("Tator Expo"), IDC_GRP_BEVEL, 6, 6, DIALOG_CX-12, DIALOG_CY-12, WS_GROUP, 0)
-        CONTROL_CONTROL(_T(""), IDC_CUSTOM_CTL1, _T("CSpectrumColorPicker"), WS_BORDER, 14, 14, DIALOG_CX-28, DIALOG_CY-54, 0)
+        CONTROL_CONTROL(_T(""), IDC_CUSTOM_CTL1, _T("WCCF::CColorPicker"), 0, 14, 14, DIALOG_CX-28, DIALOG_CY-54, 0)
         CONTROL_ICON(MAKEINTRESOURCE(IDI_ICON1), IDC_DLG_ICON, 14, DIALOG_CY-32, 18, 20, 0, 0)
-        //CONTROL_DEFPUSHBUTTON(_T("OK"), IDOK, 130, 81, 50, 14, 0, 0)
     END_CONTROLS_MAP()
 
     BEGIN_DLGRESIZE_MAP(CTatorMainDlg)
