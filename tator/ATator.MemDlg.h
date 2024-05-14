@@ -1,5 +1,6 @@
 #pragma once
 
+#include "WTL/CColorButton.h"
 #include "WTL/CColorPicker.h"
 #include "resource.h"
 #include <atlframe.h>
@@ -14,23 +15,19 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
 {
     enum Sizes: short
     {
-        DIALOG_X = 0,
-        DIALOG_Y = 0,
         DIALOG_CX = 500,
-        DIALOG_CY = 250,
-        DIALOG_BRD_CX = 6,
-        DIALOG_BRD_CY = 6,
+        DIALOG_CY = 280,
     };
 
     enum ControlIds: int
     {
-        BEFORE_FIRST_CONTROL_ID = 26999,
-        IDC_DLG_ICON,
+        BEFORE_FIRST_CONTROL_ID = 771,
         IDC_GRP_BEVEL,
         IDC_CUSTOM_CTL1,
+        IDC_DLG_ICON,
     };
 
-    CColorPicker m_ccColorPicker;
+    CSpectrumColorPicker m_ccColorPicker;
 
     BOOL PreTranslateMessage(MSG* pMsg) override
     {
@@ -49,19 +46,19 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
         //DDX_CONTROL_HANDLE(IDC_CUSTOM_CTL1, m_ccColorPicker)
     END_DDX_MAP()
 
-    BEGIN_DIALOG(DIALOG_X, DIALOG_Y, DIALOG_CX, DIALOG_CY)
+    BEGIN_DIALOG(0, 0, DIALOG_CX, DIALOG_CY)
         DIALOG_CAPTION(_T("TATOR [XYZ]"))
-        DIALOG_STYLE(WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_SYSMENU) // DS_MODALFRAME
+        DIALOG_STYLE(WS_OVERLAPPEDWINDOW)
         DIALOG_EXSTYLE(WS_EX_APPWINDOW)
         DIALOG_MENU(MAKEINTRESOURCE(IDR_MENU1))
         DIALOG_FONT(8, _T("MS Shell Dlg 2"))
     END_DIALOG()
 
     BEGIN_CONTROLS_MAP()
+        CONTROL_GROUPBOX(_T("Tator Expo"), IDC_GRP_BEVEL, 6, 6, DIALOG_CX-12, DIALOG_CY-12, WS_GROUP, 0)
+        CONTROL_CONTROL(_T(""), IDC_CUSTOM_CTL1, _T("CSpectrumColorPicker"), WS_BORDER, 14, 14, DIALOG_CX-28, DIALOG_CY-54, 0)
+        CONTROL_ICON(MAKEINTRESOURCE(IDI_ICON1), IDC_DLG_ICON, 14, DIALOG_CY-32, 18, 20, 0, 0)
         //CONTROL_DEFPUSHBUTTON(_T("OK"), IDOK, 130, 81, 50, 14, 0, 0)
-        CONTROL_CTEXT(_T(""), IDC_GRP_BEVEL, DIALOG_BRD_CX, DIALOG_BRD_CY, DIALOG_CX - DIALOG_BRD_CX*2, DIALOG_CY - DIALOG_BRD_CY*2, SS_SUNKEN | WS_GROUP, 0)
-        CONTROL_CONTROL(_T(""), IDC_CUSTOM_CTL1, _T("CColorPicker"), WS_GROUP, DIALOG_BRD_CX+8, DIALOG_BRD_CX+8, DIALOG_CX - (DIALOG_BRD_CX+8)*2, DIALOG_CY - (DIALOG_BRD_CY+8)*2 - 24, 0)
-    CONTROL_ICON(MAKEINTRESOURCE(IDI_ICON1), IDC_DLG_ICON, DIALOG_BRD_CX+8, DIALOG_CY - DIALOG_BRD_CY*2 - 20, 18, 20, WS_GROUP, 0)
     END_CONTROLS_MAP()
 
     BEGIN_DLGRESIZE_MAP(CTatorMainDlg)
@@ -82,13 +79,11 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
         UNREFERENCED_PARAMETER(wndFocus);
         UNREFERENCED_PARAMETER(lInitParam);
 
-        ATLASSUME(m_ccColorPicker.m_hWnd != nullptr);
-
-        WTL::CIcon icon(LoadIconW(WTL::ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
+        WTL::CIcon const icon(LoadIconW(WTL::ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
         SetIcon(icon, TRUE);
         SetIcon(icon, FALSE);
 
-        DlgResize_Init(false, false);
+        DlgResize_Init(true, true, 0);
         CenterWindow(GetParent());
         return TRUE;
     }
@@ -104,5 +99,4 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
         }
         return 0;
     }
-
 };

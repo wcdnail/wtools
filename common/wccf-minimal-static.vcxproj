@@ -44,6 +44,7 @@
     <ClCompile Include="windows.uses.gdi+.cpp" />
     <ClCompile Include="windows.wtl.buffered.paint.cpp" />
     <ClCompile Include="WTL\CColorButton.cpp" />
+    <ClCompile Include="WTL\CColorPicker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="debug.dump.msg.h" />

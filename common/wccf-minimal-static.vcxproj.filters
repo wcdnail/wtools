@@ -22,6 +22,9 @@
     <ClCompile Include="WTL\CColorButton.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
+    <ClCompile Include="WTL\CColorPicker.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />

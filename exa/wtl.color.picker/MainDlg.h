@@ -1,4 +1,4 @@
-// MainDlg.h : interface of the CMainDlg class
+ï»¿// MainDlg.h : interface of the CMainDlg class
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -46,7 +46,7 @@ struct SColour
     unsigned short h1, s1, l;   // H S L
     unsigned short a;           // Alpha
 
-    // ÑÕÉ«¿Õ¼ä×ª»»
+    // é¢œè‰²ç©ºé—´è½¬æ¢
     void UpdateRGB();           // Updates RGB from HSV
     void UpdateHSV();           // Updates HSV from RGB
     void UpdateHSL();           // Updates HSL from RGB
@@ -78,7 +78,7 @@ public:
         MESSAGE_HANDLER(WM_NCHITTEST, OnNcHitTest)
         MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
         MESSAGE_HANDLER(WM_CTLCOLORSTATIC, OnCtlColorStatic)
-        MESSAGE_HANDLER(WM_UPDATECOLOR, OnUpdateColor) // ¸üĞÂÑÕÉ«
+        MESSAGE_HANDLER(WM_UPDATECOLOR, OnUpdateColor) // æ›´æ–°é¢œè‰²
         COMMAND_CODE_HANDLER_EX(CBN_SELCHANGE, OnComboBoxSelectChange)
         COMMAND_HANDLER_EX(IDC_COMMENU, CBN_DROPDOWN, OnDropDown)
         MSG_WM_MOUSEMOVE(OnMouseMove)
@@ -127,9 +127,9 @@ public:
 
 
 public:
-    int m_ncHeight = 28;  // ±êÌâÀ¸¸ß¶È
+    int m_ncHeight = 28;  // æ ‡é¢˜æ é«˜åº¦
 
-    // ¿Ø¼ş×Ô»æ
+    // æ§ä»¶è‡ªç»˜
     CBitmapBtn m_close, m_cancel, m_ok, m_min;
     CGroupBoxEx m_grColor, m_grRgb, m_grHsl, m_grHsv;
     CEditEx m_eRed, m_eBlue, m_eGreen;
@@ -150,18 +150,18 @@ public:
     void SetRGB_F_ASS();
     void SetAlpha(unsigned short a);
 
-    // »ñÈ¡½á¹¹ÌåÊıÖµ
+    // è·å–ç»“æ„ä½“æ•°å€¼
     SColour GetCurrentColour();
 
-    GdiPlusIniter gdi;      // ³õÊ¼»¯ GDI
-    void SetSel2(int nID);  // ´¦ÀíÎÄ±¾¿ò¹â±êÎ»ÖÃ
+    GdiPlusIniter gdi;      // åˆå§‹åŒ– GDI
+    void SetSel2(int nID);  // å¤„ç†æ–‡æœ¬æ¡†å…‰æ ‡ä½ç½®
     void ColorFromPos();    
     void UpdateValues(struct SColour col);
 
     BOOL m_bColor; // mouse in color1
     BOOL m_bHue;   // mouse in color2
     BOOL m_bAlpha; // mouse in alpha
-    CGdiPlusBitmapResource m_DropPng;   // ¼ÓÔØpng
+    CGdiPlusBitmapResource m_DropPng;   // åŠ è½½png
     CDropDlg m_drop;
     CSelColDlg m_selcol;
     CPicColDlg m_piccol;
@@ -174,7 +174,7 @@ private:
 
 public:
 
-//Ìî³äÊı¾İ
+//å¡«å……æ•°æ®
 
     BITMAPINFO bmp_info;
     HBITMAP bmp_handle;
@@ -209,6 +209,6 @@ public:
 
 public:
     void SetClipboardText(CString str);
-    BOOL m_bText;  // ÏÔÊ¾ÌáÊ¾ĞÅÏ¢
+    BOOL m_bText;  // æ˜¾ç¤ºæç¤ºä¿¡æ¯
     HCURSOR m_arrow;
 };
