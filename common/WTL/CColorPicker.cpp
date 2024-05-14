@@ -42,6 +42,12 @@ private:
         HLCY = HDlg3CY/4,
     };
 
+    enum Styles: DWORD
+    {
+        TB_VERT = TBS_VERT | TBS_NOTICKS | TBS_DOWNISLEFT | WS_TABSTOP,
+    };
+
+
     enum ControlIds: int
     {
         BEFORE_FIRST_CONTROL_ID = 1726,
@@ -50,6 +56,7 @@ private:
         CID_SPEC_COLOR_CAP,
         CID_SPEC_COLOR_SEL,
         CID_SPECTRUM_PIC,
+        CID_SPECTRUM_SLD,
         CID_GRP_RGB,
         CID_GRP_HSL,
         CID_GRP_HSV,
@@ -59,15 +66,16 @@ private:
     int m_nSpectrumKind{SPEC_HSV_Hue};
 
     BEGIN_CONTROLS_MAP()
-        CONTROL_GROUPBOX(_T("Spectrum Color"),   CID_GRP_SPECTRUM,                    4,             4,         HDlgCX,       DlgCY-8, 0, 0)
-        CONTROL_COMBOBOX(                          CID_SPEC_COMBO,                   16,            18,         HHCX-8,       DlgCY-8, CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP, 0)
-        CONTROL_RTEXT(           _T("Color:"), CID_SPEC_COLOR_CAP, HDlgCX-HHCY-HHCX/2-8,            18,       HHCX/2-8,          HLCY, SS_SUNKEN | SS_CENTERIMAGE, 0)
-        CONTROL_CTEXT(            _T("COLOR"), CID_SPEC_COLOR_SEL,        HDlgCX-HHCY-8,            18,           HHCY,          HHCY, SS_SUNKEN | SS_CENTERIMAGE, 0)
-        CONTROL_CTEXT( _T("CID:SPECTRUM:PIC"),   CID_SPECTRUM_PIC,                   16,       24+HLCY, HDlgCX-HHCY-32, DlgCY-HLCY-36, SS_SUNKEN | SS_CENTERIMAGE, 0)
-        CONTROL_GROUPBOX(     _T("RGB Color"),        CID_GRP_RGB,           8+HDlgCX+4,             4,         HDlgCX,       HDlg3CY, 0, 0)
-        CONTROL_GROUPBOX(     _T("HSL Color"),        CID_GRP_HSL,           8+HDlgCX+4,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
-        CONTROL_GROUPBOX(     _T("HSV Color"),        CID_GRP_HSV,  8+HDlgCX+HDlgCX/2+8,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
-        CONTROL_GROUPBOX(  _T("Color Picker"),     CID_GRP_PICKER,           8+HDlgCX+4, 4+HDlg3CY*2+8,         HDlgCX,     HDlg3CY+8, 0, 0)
+        CONTROL_GROUPBOX(   _T("Spectrum Color"),   CID_GRP_SPECTRUM,                      4,             4,         HDlgCX,       DlgCY-8, 0, 0)
+        CONTROL_COMBOBOX(                             CID_SPEC_COMBO,                     16,            18,         HHCX-8,       DlgCY-8, CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP, 0)
+        CONTROL_RTEXT(              _T("Color:"), CID_SPEC_COLOR_CAP,   HDlgCX-HHCY-HHCX/2-8,            18,       HHCX/2-8,          HLCY, SS_SUNKEN | SS_CENTERIMAGE, 0)
+        CONTROL_CTEXT(               _T("COLOR"), CID_SPEC_COLOR_SEL,          HDlgCX-HHCY-8,            18,         HHCY+2,          HHCY, SS_SUNKEN | SS_CENTERIMAGE, 0)
+        CONTROL_CTEXT(    _T("CID:SPECTRUM:PIC"),   CID_SPECTRUM_PIC,                     16,       24+HLCY, HDlgCX-HHCY-32, DlgCY-HLCY-36, SS_SUNKEN | SS_CENTERIMAGE, 0)
+        CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,     TRACKBAR_CLASS, TB_VERT, HDlgCX-HHCY-8,       24+HHCY,      HHCX/2-12, DlgCY-HHCY-36, 0)
+        CONTROL_GROUPBOX(        _T("RGB Color"),        CID_GRP_RGB,             8+HDlgCX+4,             4,         HDlgCX,       HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(        _T("HSL Color"),        CID_GRP_HSL,             8+HDlgCX+4,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(        _T("HSV Color"),        CID_GRP_HSV,    8+HDlgCX+HDlgCX/2+8,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(     _T("Color Picker"),     CID_GRP_PICKER,             8+HDlgCX+4, 4+HDlg3CY*2+8,         HDlgCX,     HDlg3CY+8, 0, 0)
     END_CONTROLS_MAP()
 
     BEGIN_DIALOG(0, 0, DlgCX, DlgCY)
@@ -85,6 +93,7 @@ private:
         DLGRESIZE_CONTROL(CID_SPEC_COLOR_CAP, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_SPEC_COLOR_SEL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_SPECTRUM_PIC, DLSZ_SIZE_Y | DLSZ_SIZE_X)
+        DLGRESIZE_CONTROL(CID_SPECTRUM_SLD, DLSZ_SIZE_Y | DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_RGB, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSV, DLSZ_MOVE_X)
