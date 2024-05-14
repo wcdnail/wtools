@@ -1,16 +1,28 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "CColorPicker.h"
+#include <atlctrls.h>
+#include <atlcrack.h>
 #include <atldlgs.h>
 #include <atlddx.h>
-#include <atlcrack.h>
 
 ATOM CColorPicker::gs_Atom{0};
 
 struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
-                           WTL::CDialogResize<Impl>
+                           WTL::CDialogResize<Impl>,
+                           WTL::CWinDataExchange<Impl>
 {
     using   ImplSuper = WTL::CIndirectDialogImpl<Impl>;
     using ImplResizer = WTL::CDialogResize<Impl>;
+
+    enum SpectrumIndex: int
+    {
+        SPEC_RGB_Red = 0,
+        SPEC_RGB_Green,
+        SPEC_RGB_Blue,
+        SPEC_HSV_Hue,
+        SPEC_HSV_Saturation,
+        SPEC_HSV_Brightness,
+    };
 
     ~Impl() override = default;
     Impl() = default;
@@ -26,6 +38,7 @@ private:
         HDlgCX = DlgCX/2-6,
         HDlg3CY = DlgCY/3-8,
         HHCX = HDlgCX/2-8,
+        HHCY = HDlg3CY/2+8,
         HLCY = HDlg3CY/4,
     };
 
@@ -34,19 +47,25 @@ private:
         BEFORE_FIRST_CONTROL_ID = 1726,
         CID_GRP_SPECTRUM,
         CID_SPEC_COMBO,
+        CID_SPEC_COLOR_CAP,
+        CID_SPEC_COLOR_SEL,
         CID_GRP_RGB,
         CID_GRP_HSL,
         CID_GRP_HSV,
         CID_GRP_PICKER,
     };
 
+    int m_nSpectrumKind{SPEC_HSV_Hue};
+
     BEGIN_CONTROLS_MAP()
-        CONTROL_GROUPBOX(_T("Spectrum Color"), CID_GRP_SPECTRUM,                   4,             4,     HDlgCX,   DlgCY-8, 0, 0)
-        CONTROL_COMBOBOX(                        CID_SPEC_COMBO,                  16,            22,     HHCX-8,      HLCY, WS_TABSTOP | CBS_DROPDOWNLIST, 0)
-        CONTROL_GROUPBOX(_T("RGB Color"),           CID_GRP_RGB,          8+HDlgCX+4,             4,     HDlgCX,   HDlg3CY, 0, 0)
-        CONTROL_GROUPBOX(_T("HSL Color"),           CID_GRP_HSL,          8+HDlgCX+4,   4+HDlg3CY+4, HDlgCX/2-4,   HDlg3CY, 0, 0)
-        CONTROL_GROUPBOX(_T("HSV Color"),           CID_GRP_HSV, 8+HDlgCX+HDlgCX/2+8,   4+HDlg3CY+4, HDlgCX/2-4,   HDlg3CY, 0, 0)
-        CONTROL_GROUPBOX(_T("Color Picker"),     CID_GRP_PICKER,          8+HDlgCX+4, 4+HDlg3CY*2+8,     HDlgCX, HDlg3CY+8, 0, 0)
+        CONTROL_GROUPBOX(_T("Spectrum Color"),   CID_GRP_SPECTRUM,                    4,             4,     HDlgCX,   DlgCY-8, 0, 0)
+        CONTROL_COMBOBOX(                          CID_SPEC_COMBO,                   16,            18,     HHCX-8,   DlgCY-8, CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP, 0)
+        CONTROL_RTEXT(           _T("Color:"), CID_SPEC_COLOR_CAP, HDlgCX-HHCY-HHCX/2-8,            18,   HHCX/2-8,      HLCY, SS_SUNKEN | SS_CENTERIMAGE, 0)
+        CONTROL_CTEXT(           _T("COLOR"),  CID_SPEC_COLOR_SEL,        HDlgCX-HHCY-8,            18,       HHCY,      HHCY, SS_SUNKEN | SS_CENTERIMAGE, 0)
+        CONTROL_GROUPBOX(     _T("RGB Color"),        CID_GRP_RGB,           8+HDlgCX+4,             4,     HDlgCX,   HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(     _T("HSL Color"),        CID_GRP_HSL,           8+HDlgCX+4,   4+HDlg3CY+4, HDlgCX/2-4,   HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(     _T("HSV Color"),        CID_GRP_HSV,  8+HDlgCX+HDlgCX/2+8,   4+HDlg3CY+4, HDlgCX/2-4,   HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(  _T("Color Picker"),     CID_GRP_PICKER,           8+HDlgCX+4, 4+HDlg3CY*2+8,     HDlgCX, HDlg3CY+8, 0, 0)
     END_CONTROLS_MAP()
 
     BEGIN_DIALOG(0, 0, DlgCX, DlgCY)
@@ -55,11 +74,14 @@ private:
     END_DIALOG()
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
+        DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
     END_DDX_MAP()
 
     BEGIN_DLGRESIZE_MAP(CTatorMainDlg)
         DLGRESIZE_CONTROL(CID_GRP_SPECTRUM, DLSZ_SIZE_Y | DLSZ_SIZE_X)
         DLGRESIZE_CONTROL(CID_SPEC_COMBO, DLSZ_SIZE_X)
+        DLGRESIZE_CONTROL(CID_SPEC_COLOR_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_SPEC_COLOR_SEL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_RGB, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSV, DLSZ_MOVE_X)
@@ -76,9 +98,15 @@ private:
         UNREFERENCED_PARAMETER(wndFocus);
         UNREFERENCED_PARAMETER(lInitParam);
 
-        CRect rc;
-        GetClientRect(rc);
+        WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
+        cbSpectrum.AddString(L"RGB/红");
+        cbSpectrum.AddString(L"RGB/绿");
+        cbSpectrum.AddString(L"RGB/蓝");
+        cbSpectrum.AddString(L"HSV/色调");
+        cbSpectrum.AddString(L"HSV/饱和度");
+        cbSpectrum.AddString(L"HSV/明度");
 
+        DoDataExchange(FALSE);
         DlgResize_Init(false, true, 0);
         return TRUE;
     }
