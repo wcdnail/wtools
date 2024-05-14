@@ -25,6 +25,9 @@
     <ClCompile Include="WTL\CColorPicker.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
+    <ClCompile Include="WTL\CSpectrumImage.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -71,6 +74,9 @@
       <Filter>WTL</Filter>
     </ClInclude>
     <ClInclude Include="WTL\CButtonMenu.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
+    <ClInclude Include="WTL\CSpectrumImage.h">
       <Filter>WTL</Filter>
     </ClInclude>
   </ItemGroup>
