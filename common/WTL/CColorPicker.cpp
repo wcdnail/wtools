@@ -15,16 +15,6 @@ struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
     using   ImplSuper = WTL::CIndirectDialogImpl<Impl>;
     using ImplResizer = WTL::CDialogResize<Impl>;
 
-    enum SpectrumIndex: int
-    {
-        SPEC_RGB_Red = 0,
-        SPEC_RGB_Green,
-        SPEC_RGB_Blue,
-        SPEC_HSV_Hue,
-        SPEC_HSV_Saturation,
-        SPEC_HSV_Brightness,
-    };
-
     ~Impl() override = default;
     Impl() = default;
 
@@ -57,7 +47,6 @@ private:
         TB_VERT = TBS_VERT | TBS_NOTICKS | TBS_DOWNISLEFT | WS_TABSTOP,
         CC_CHILD = WS_CHILD | WS_VISIBLE,
     };
-
 
     enum ControlIds: int
     {

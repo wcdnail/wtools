@@ -2,6 +2,16 @@
 
 #include <atlwin.h>
 
+enum SpectrumIndex: int
+{
+    SPEC_RGB_Red = 0,
+    SPEC_RGB_Green,
+    SPEC_RGB_Blue,
+    SPEC_HSV_Hue,
+    SPEC_HSV_Saturation,
+    SPEC_HSV_Brightness,
+};
+
 struct CSpectrumImage: ATL::CWindowImpl<CSpectrumImage>
 {
     using Super = ATL::CWindowImpl<CSpectrumImage>;
