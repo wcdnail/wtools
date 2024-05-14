@@ -95,7 +95,13 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
 
     LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
     {
-        EndDialog(wID);
+        if (m_bModal) {
+            EndDialog(wID);
+        }
+        else {
+            DestroyWindow();
+            PostQuitMessage(wID);
+        }
         return 0;
     }
 

@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Color.cpp" />
+    <ClCompile Include="GTDrawHelper.cpp" />
+    <ClCompile Include="MainDlg.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="BitmapBtn.h" />
+    <ClInclude Include="CGdiPlusBitmap.h" />
+    <ClInclude Include="ComboBoxFx.h" />
+    <ClInclude Include="ComboMenu.h" />
+    <ClInclude Include="DropPerWnd.h" />
+    <ClInclude Include="EditEx.h" />
+    <ClInclude Include="GDI+.h" />
+    <ClInclude Include="GTDrawHelper.h" />
+    <ClInclude Include="ListBoxEx.h" />
+    <ClInclude Include="PicColWnd.h" />
+    <ClInclude Include="GroupBoxEx.h" />
+    <ClInclude Include="MainDlg.h" />
+    <ClInclude Include="SelColWnd.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="resource.h">
+      <Filter>rez</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\Color.ico" />
+    <Image Include="res\ab.png">
+      <Filter>rez</Filter>
+    </Image>
+    <Image Include="res\close.png">
+      <Filter>rez</Filter>
+    </Image>
+    <Image Include="res\ddd.bmp">
+      <Filter>rez</Filter>
+    </Image>
+    <Image Include="res\droplist.png">
+      <Filter>rez</Filter>
+    </Image>
+    <Image Include="..\..\Color16 - 副本\Color\res\dropper.ico">
+      <Filter>rez</Filter>
+    </Image>
+    <Image Include="res\dropper.ico">
+      <Filter>rez</Filter>
+    </Image>
+    <Image Include="res\dropper.png">
+      <Filter>rez</Filter>
+    </Image>
+    <Image Include="res\menu.png">
+      <Filter>rez</Filter>
+    </Image>
+    <Image Include="res\min.png">
+      <Filter>rez</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\dropcur.cur" />
+    <None Include="res\arrow blue.cur">
+      <Filter>rez</Filter>
+    </None>
+    <None Include="res\ibeam blue.cur">
+      <Filter>rez</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="rez">
+      <UniqueIdentifier>{b77156f0-550f-4836-a832-fe91345eabce}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Color.rc">
+      <Filter>rez</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

@@ -9,89 +9,75 @@
 #include <fstream>
 #include <iostream>
 
-WTL::CAppModule _Module;
+WTL::CAppModule _Module{};
 
-static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
+static HRESULT GetErrorCode(HRESULT code)                   // если диалог содержит каcтомный контрол,
+{                                                           // класс которого НЕ зарегистрирован, ф-ция
+    if (ERROR_SUCCESS != code) {                            // CDialogImpl::Create вернет NULL
+        return code;                                        // а GetLastError вернет 0...
+    }                                                       // И как, спрашивается, узнать код ошибки?
+    code = static_cast<HRESULT>(CommDlgExtendedError());    //
+    if (ERROR_SUCCESS != code) {                            //
+        return code;
+    }
+    code = static_cast<HRESULT>(WSAGetLastError());         //
+    if (ERROR_SUCCESS != code) {                            //
+        return code;
+    }
+    DWORD      dwCode{ERROR_SUCCESS};                       // GetExitCodeThread хотя бы вернет значение, отличное от 0
+    const BOOL thrRes{GetExitCodeThread(GetCurrentThread(), &dwCode)};
+    if (!thrRes) {                                          // но это значение не будет актуальным кодом ошибки...
+        return static_cast<HRESULT>(GetLastError());
+    }
+    return static_cast<HRESULT>(dwCode);
+}
+
+static int Run(LPTSTR lpstrCmdLine, int nCmdShow)
 {
     HRESULT  code = ERROR_SUCCESS;
     int      nRet = 0;
-    bool bRunLoop = true;
     bool   bError = false;
 
     WTL::CMessageLoop theLoop;
     _Module.AddMessageLoop(&theLoop);
 
-    //CTatorMainDlg dlg;
-    //HRESULT code = dlg.Initialize();
-    CDefaultWin32Dlg dlg;
-    if (ERROR_SUCCESS == code) {
-        if constexpr (true) {
-            bRunLoop = false;
-            nRet = static_cast<int>(dlg.DoModal());
-            if (-1 == nRet) {
-                code = static_cast<HRESULT>(GetLastError()); // ##TODO: Try CommDlgExtendedError 
-                bError = true;
-            }
+    if constexpr (false) {
+        CDefaultWin32Dlg dlg;
+        nRet = static_cast<int>(dlg.DoModal());
+        if (-1 == nRet) {
+            code = static_cast<HRESULT>(GetLastError());
+            bError = true;
+        }
+    }
+    else {
+        CTatorMainDlg dlg;
+        if (ERROR_SUCCESS != (code = dlg.Initialize())) {
+            bError = true;
         }
         else {
-            const HWND hWndDlg = dlg.Create(GetActiveWindow());
-            if (hWndDlg) {
+            if (dlg.Create(GetActiveWindow())) {
                 theLoop.AddMessageFilter(&dlg);
-                dlg.ShowWindow(SW_SHOW);
+                dlg.ShowWindow(nCmdShow);
+
+                nRet = theLoop.Run();
+                theLoop.RemoveMessageFilter(&dlg);
             }
             else {
                 code = static_cast<HRESULT>(GetLastError());
                 bError = true;
             }
         }
-        
-        if (bError && (ERROR_SUCCESS == code)) {                // если диалог содержит каcтомный контрол,
-            code = static_cast<HRESULT>(WSAGetLastError());     // класс которого НЕ зарегистрирован, ф-ция Create вернет NULL
-            if (ERROR_SUCCESS == code) {                        // а GetLastError вернет 0...
-                DWORD dwCode = ERROR_SUCCESS;                   // GetExitCodeThread хотя бы вернет значение, отличное от 0
-                BOOL  thrRes = GetExitCodeThread(GetCurrentThread(), &dwCode);
-                if (!thrRes) {
-                    code = static_cast<HRESULT>(GetLastError());
-                }
-                else {
-                    code = static_cast<HRESULT>(dwCode);
-                }
-            }
-        }
     }
-    if (ERROR_SUCCESS != code) {
+    if (bError) {
+        code = GetErrorCode(code);
         ATL::CString codeMessage = Str::ErrorCode<TCHAR>::SystemMessage(code);
         ATL::CString  strMessage;
         strMessage.Format(_T("Не могу создать диалоговое окно.\r\n[%s]"), codeMessage.GetString());
         MessageBox(GetActiveWindow(), strMessage.GetString(), _T("FATAL"), MB_ICONSTOP);
         return static_cast<int>(code);
     }
-    if (bRunLoop) {
-        nRet = theLoop.Run();
-        theLoop.RemoveMessageFilter(&dlg);
-    }
     _Module.RemoveMessageLoop();
     return nRet;
-}
-
-void tryIni()
-{
-    inipp::Ini<char> ini;
-    std::ifstream is("C:/_/wtools/legacy-ui-configurator/temes/themes-win98-plus/Inside your Computer (high color).theme");
-    ini.parse(is);
-
-    std::ostringstream iniStm;
-    ini.generate(iniStm);
-
-    auto const* sectName = "DEFAULT";
-
-    std::ostringstream sectStm;
-    ini.default_section(ini.sections[sectName]);
-    ini.interpolate();
-    ini.generate(sectStm);
-
-    DH::TPrintf("INI:\n", iniStm.str().c_str());
-    DH::TPrintf("[%s]:\n", sectName, sectStm.str().c_str());
 }
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int nCmdShow)
@@ -109,8 +95,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
     DefWindowProc(nullptr, 0, 0, 0L);
 
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
-
-    tryIni();
 
     WTL::AtlInitCommonControls(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
 
