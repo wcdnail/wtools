@@ -1,7 +1,6 @@
 #pragma once
 
 #include <atlwin.h>
-#include <atlcrack.h>
 #include <memory>
 
 struct CColorPicker: ATL::CWindowImpl<CColorPicker>
@@ -14,7 +13,6 @@ struct CColorPicker: ATL::CWindowImpl<CColorPicker>
     CColorPicker();
 
     HRESULT PreCreateWindow();
-    CColorPicker& operator = (HWND hWnd); // make compatible with WTL/DDX
 
 private:
     friend Super;

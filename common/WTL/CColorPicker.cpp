@@ -2,22 +2,15 @@
 #include "CColorPicker.h"
 #include <atldlgs.h>
 #include <atlddx.h>
+#include <atlcrack.h>
 
 ATOM CColorPicker::gs_Atom{0};
 
 struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
-                                   WTL::CDialogResize<Impl>
+                           WTL::CDialogResize<Impl>
 {
     using   ImplSuper = WTL::CIndirectDialogImpl<Impl>;
     using ImplResizer = WTL::CDialogResize<Impl>;
-
-    enum Sizes: short
-    {
-        DEFAULT_CX = 460,
-        DEFAULT_CY = 205,
-        SPEC_CX = DEFAULT_CX/2-6,
-        SPEC_CY = DEFAULT_CY/3-8,
-    };
 
     ~Impl() override = default;
     Impl() = default;
@@ -26,39 +19,51 @@ private:
     friend ImplSuper;
     friend ImplResizer;
 
-    BEGIN_DIALOG(0, 0, DEFAULT_CX, DEFAULT_CY)
-        DIALOG_STYLE(WS_CHILD | WS_VISIBLE)
-        DIALOG_FONT(8, _T("MS Shell Dlg 2"))
-    END_DIALOG()
+    enum Sizes: short
+    {
+        DlgCX = 460,
+        DlgCY = 205,
+        HDlgCX = DlgCX/2-6,
+        HDlg3CY = DlgCY/3-8,
+        HHCX = HDlgCX/2-8,
+        HLCY = HDlg3CY/4,
+    };
 
     enum ControlIds: int
     {
         BEFORE_FIRST_CONTROL_ID = 1726,
-        IDC_GRP_SPECTRUM,
-        IDC_GRP_RGB,
-        IDC_GRP_HSL,
-        IDC_GRP_HSV,
-        IDC_GRP_PICKER,
+        CID_GRP_SPECTRUM,
+        CID_SPEC_COMBO,
+        CID_GRP_RGB,
+        CID_GRP_HSL,
+        CID_GRP_HSV,
+        CID_GRP_PICKER,
     };
 
     BEGIN_CONTROLS_MAP()
-        CONTROL_GROUPBOX(_T("Spectrum Color"), IDC_GRP_SPECTRUM,                     4,             4,     SPEC_CX, DEFAULT_CY-8, 0, 0)
-        CONTROL_GROUPBOX(_T("RGB Color"),           IDC_GRP_RGB,           8+SPEC_CX+4,             4,     SPEC_CX,      SPEC_CY, 0, 0)
-        CONTROL_GROUPBOX(_T("HSL Color"),           IDC_GRP_HSL,           8+SPEC_CX+4,   4+SPEC_CY+4, SPEC_CX/2-4,      SPEC_CY, 0, 0)
-        CONTROL_GROUPBOX(_T("HSV Color"),           IDC_GRP_HSV, 8+SPEC_CX+SPEC_CX/2+8,   4+SPEC_CY+4, SPEC_CX/2-4,      SPEC_CY, 0, 0)
-        CONTROL_GROUPBOX(_T("Color Picker"),     IDC_GRP_PICKER,           8+SPEC_CX+4, 4+SPEC_CY*2+8,     SPEC_CX,    SPEC_CY+8, 0, 0)
+        CONTROL_GROUPBOX(_T("Spectrum Color"), CID_GRP_SPECTRUM,                   4,             4,     HDlgCX,   DlgCY-8, 0, 0)
+        CONTROL_COMBOBOX(                        CID_SPEC_COMBO,                  16,            22,     HHCX-8,      HLCY, WS_TABSTOP | CBS_DROPDOWNLIST, 0)
+        CONTROL_GROUPBOX(_T("RGB Color"),           CID_GRP_RGB,          8+HDlgCX+4,             4,     HDlgCX,   HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(_T("HSL Color"),           CID_GRP_HSL,          8+HDlgCX+4,   4+HDlg3CY+4, HDlgCX/2-4,   HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(_T("HSV Color"),           CID_GRP_HSV, 8+HDlgCX+HDlgCX/2+8,   4+HDlg3CY+4, HDlgCX/2-4,   HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(_T("Color Picker"),     CID_GRP_PICKER,          8+HDlgCX+4, 4+HDlg3CY*2+8,     HDlgCX, HDlg3CY+8, 0, 0)
     END_CONTROLS_MAP()
 
+    BEGIN_DIALOG(0, 0, DlgCX, DlgCY)
+        DIALOG_STYLE(WS_CHILD | WS_VISIBLE)
+        DIALOG_FONT(8, _T("MS Shell Dlg 2"))
+    END_DIALOG()
+
     BEGIN_DDX_MAP(CSpectrumColorPicker)
-        //DDX_CONTROL_HANDLE(IDC_CUSTOM_CTL1, m_ccColorPicker)
     END_DDX_MAP()
 
     BEGIN_DLGRESIZE_MAP(CTatorMainDlg)
-        DLGRESIZE_CONTROL(IDC_GRP_SPECTRUM, DLSZ_SIZE_Y | DLSZ_SIZE_X)
-        DLGRESIZE_CONTROL(IDC_GRP_RGB, DLSZ_MOVE_X)
-        DLGRESIZE_CONTROL(IDC_GRP_HSL, DLSZ_MOVE_X)
-        DLGRESIZE_CONTROL(IDC_GRP_HSV, DLSZ_MOVE_X)
-        DLGRESIZE_CONTROL(IDC_GRP_PICKER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_GRP_SPECTRUM, DLSZ_SIZE_Y | DLSZ_SIZE_X)
+        DLGRESIZE_CONTROL(CID_SPEC_COMBO, DLSZ_SIZE_X)
+        DLGRESIZE_CONTROL(CID_GRP_RGB, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_GRP_HSL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_GRP_HSV, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_GRP_PICKER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
     END_DLGRESIZE_MAP()
 
     BEGIN_MSG_MAP_EX(CSpectrumColorPicker)
@@ -111,12 +116,6 @@ HRESULT CColorPicker::PreCreateWindow()
     return S_OK;
 }
 
-CColorPicker& CColorPicker::operator=(HWND hWnd) // make compatible with WTL/DDX
-{
-    Attach(hWnd);
-    return *this;
-}
-
 #if 0
 struct CDCEx: WTL::CWindowDC
 {
@@ -146,7 +145,7 @@ BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
 BOOL CColorPicker::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
-    BOOL bHandled = TRUE;
+    BOOL bHandled{TRUE};
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) { 
     case 0:
