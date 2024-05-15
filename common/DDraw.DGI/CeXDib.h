@@ -31,67 +31,62 @@
 //      Italy
 //
 //
-#ifndef _CEXDIB_H_
-#define _CEXDIB_H_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
-#ifndef HDIB
-#define HDIB    HANDLE
-#endif
+#include <cstdint>
+#include <memory>
 
-#ifndef WIDTHBYTES
-#define WIDTHBYTES(bits)    (((bits) + 31) / 32 * 4)
-#endif
-
-#ifndef BFT_BITMAP
-#define BFT_BITMAP 0x4d42   // 'BM'
-#endif
-
-class CCeXDib  
+template <typename T>
+static constexpr auto BytesInBPP(T bits) -> T
 {
-public:
-    CCeXDib();
-    virtual ~CCeXDib();
+    return (((bits) + 31) / 32 * 4);
+}
 
-    HDIB Create(DWORD dwWidth, DWORD dwHeight, WORD wBitCount);
-    void Clone(CCeXDib* src);
+struct CCeXDib
+{
+    using LPDIB = uint8_t*;
+
+    virtual ~CCeXDib();
+    CCeXDib();
+
+    LPDIB Create(LONG nWidth, LONG nHeight, LONG nBitCount);
+    void Swap(CCeXDib& rhs) noexcept;
+    bool Clone(CCeXDib const& src);
     void Draw(HDC hDC, DWORD dwX, DWORD dwY);
     void Copy(HDC hDC, DWORD dwX, DWORD dwY);
-    LPBYTE GetBits();
-    void Clear(BYTE byVal = 0);
+    LPBYTE GetBits() const;
+    void Clear(int byVal = 0) const;
 
     void SetGrayPalette();
-    void SetPaletteIndex(BYTE byIdx, BYTE byR, BYTE byG, BYTE byB);
-    void SetPixelIndex(DWORD dwX, DWORD dwY, BYTE byI);
-    void BlendPalette(COLORREF crColor, DWORD dwPerc);
+    void SetPaletteIndex(DWORD byIdx, BYTE byR, BYTE byG, BYTE byB) const;
+    void SetPixelIndex(LONG dwX, LONG dwY, BYTE byI) const;
+    void BlendPalette(COLORREF crColor, DWORD dwPerc) const;
 
-    WORD GetBitCount();
-    DWORD GetLineWidth();
-    DWORD GetWidth();
-    DWORD GetHeight();
+    WORD GetBitCount() const;
+    DWORD GetStride() const;
+    LONG GetWidth() const;
+    LONG GetHeight() const;
     WORD GetNumColors();
 
     BOOL WriteBMP(LPCTSTR bmpFileName);
 
 private:
-    void FreeResources();
+    using DIBPtr = std::unique_ptr<uint8_t[]>;
 
-    DWORD GetPaletteSize();
-    DWORD GetSize();
+    void FreeResources();
+    LPBITMAPINFOHEADER GetInfoHdr() const;
+    LPBYTE GetPaletteBits() const;
+
+    static DWORD GetPaletteSize(LONG wColors);
+    static DWORD GetSize(BITMAPINFOHEADER const& biHdr, LONG wColors);
 
     RGBQUAD RGB2RGBQUAD(COLORREF cr);
 
-    HDIB                m_hDib;
-    BITMAPINFOHEADER    m_bi;
-    DWORD               m_dwLineWidth;
-    WORD                m_wColors;
-
-    HBITMAP             m_hBitmap;  // Handle to bitmap
-    HDC                 m_hMemDC;   // Handle to memory DC
-    LPVOID              m_lpBits;   // Pointer to actual bitmap bits
+    DIBPtr         m_pDib;
+    LONG        m_nStride;
+    LONG        m_nColors;
+    HDC          m_hMemDC;  // Handle to memory DC
+    HBITMAP     m_hBitmap;  // Handle to bitmap
+    LPVOID       m_lpBits;  // Pointer to actual bitmap bits
 };
-
-#endif 

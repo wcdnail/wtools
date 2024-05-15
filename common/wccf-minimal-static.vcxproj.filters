@@ -28,6 +28,9 @@
     <ClCompile Include="WTL\CSpectrumImage.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
+    <ClCompile Include="DDraw.DGI\CeXDib.cpp">
+      <Filter>DDraw.DGI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -79,6 +82,9 @@
     <ClInclude Include="WTL\CSpectrumImage.h">
       <Filter>WTL</Filter>
     </ClInclude>
+    <ClInclude Include="DDraw.DGI\CeXDib.h">
+      <Filter>DDraw.DGI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">
@@ -89,6 +95,9 @@
     </Filter>
     <Filter Include="WTL">
       <UniqueIdentifier>{f06b3532-bd6a-4f40-ac4f-ea9c849e4bf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DDraw.DGI">
+      <UniqueIdentifier>{1e6f2916-ae30-47df-94ea-361edd95b386}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

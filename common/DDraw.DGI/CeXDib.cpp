@@ -1,22 +1,14 @@
 #include "stdafx.h"
 #include "CeXDib.h"
 
-#ifndef _MFC_VER
-#include <windows.h>
-#include <tchar.h>
-#endif
-
 CCeXDib::CCeXDib()
+    :        m_pDib{nullptr}
+    , m_nStride{0}
+    ,     m_nColors{0}
+    ,      m_hMemDC{nullptr}
+    ,     m_hBitmap{nullptr}
+    ,      m_lpBits{nullptr}
 {
-    m_hDib = NULL;
-    m_dwLineWidth = 0;
-    m_wColors = 0;
-
-    m_hMemDC = NULL;
-    m_hBitmap = NULL;
-    m_lpBits = NULL;
-
-    FreeResources();
 }
 
 CCeXDib::~CCeXDib()
@@ -26,251 +18,274 @@ CCeXDib::~CCeXDib()
 
 void CCeXDib::FreeResources()
 {
-    if (m_hMemDC)   
-        ::DeleteDC(m_hMemDC);
-    if (m_hBitmap)  
-        ::DeleteObject(m_hBitmap);
-    if (m_hDib)     
-        delete m_hDib;
+    if (m_hMemDC) {
+        DeleteDC(m_hMemDC);
+    }
+    if (m_hBitmap) {
+        DeleteObject(m_hBitmap);
+    }
+    DIBPtr{}.swap(m_pDib);
+    m_hBitmap = nullptr;
+    m_hMemDC = nullptr;
+    m_lpBits = nullptr;
+}
 
-    m_hDib = NULL;
-    m_hMemDC = NULL;
-    m_hBitmap = NULL;
-    m_lpBits = NULL;
-    memset(&m_bi, 0, sizeof(m_bi));
-} // End of FreeResources
-
-HDIB CCeXDib::Create(DWORD dwWidth, DWORD dwHeight, WORD wBitCount)
+DWORD CCeXDib::GetSize(BITMAPINFOHEADER const& biHdr, LONG wColors)
 {
-    LPBITMAPINFOHEADER  lpbi = NULL;    // Pointer to BITMAPINFOHEADER
-    DWORD               dwLen = 0;      // Size of memory block
+    return biHdr.biSize + biHdr.biSizeImage + GetPaletteSize(wColors);
+} // End of GetSize
 
-    FreeResources();
+DWORD CCeXDib::GetPaletteSize(LONG wColors)
+{
+    return (wColors * sizeof(RGBQUAD));
+} // End of GetPaletteSize
+
+LPBITMAPINFOHEADER CCeXDib::GetInfoHdr() const
+{
+    return reinterpret_cast<LPBITMAPINFOHEADER>(m_pDib.get());
+} // End of GetInfoHdr
+
+LPBYTE CCeXDib::GetPaletteBits() const
+{
+    if (!m_pDib) {
+        return nullptr;
+    }
+    return (m_pDib.get() + GetInfoHdr()->biSize);
+} // End of GetBits
+
+LPBYTE CCeXDib::GetBits() const
+{
+    if (!m_pDib) {
+        return nullptr;
+    }
+    return (GetPaletteBits() + GetPaletteSize(m_nColors));
+} // End of GetBits
+
+LONG CCeXDib::GetWidth() const
+{
+    return m_pDib ? GetInfoHdr()->biWidth : 0;
+} // End of GetWidth
+
+LONG CCeXDib::GetHeight() const
+{
+    return m_pDib ? GetInfoHdr()->biHeight : 0;
+} // End of GetHeight
+
+DWORD CCeXDib::GetStride() const
+{
+    return m_nStride;
+} // End of GetStride
+
+WORD CCeXDib::GetBitCount() const
+{
+    return GetInfoHdr()->biBitCount;
+} // End of GetBitCount
+
+CCeXDib::LPDIB CCeXDib::Create(LONG nWidth, LONG nHeight, LONG nBitCount)
+{
+    BITMAPINFOHEADER biHdr{0};
+    DWORD       dwMemBytes{0};
+    LONG           wColors{0};
+    LONG const     nStride{nWidth * BytesInBPP<LONG>(nBitCount)};
 
     // Following <switch> is taken from
     // CDIBSectionLite class by Chris Maunder
-    switch (wBitCount) 
-    {
-        case 1:  m_wColors = 2;   break;
+    switch (nBitCount) {
+        case 1:  wColors = 2;   break;
 #ifdef _WIN32_WCE
-        case 2:  m_wColors = 4;   break;   // winCE only       
+        case 2:  wColors = 4;   break;  // winCE only       
 #endif
-        case 4:  m_wColors = 16;  break;
-        case 8:  m_wColors = 256; break;
+        case 4:  wColors = 16;  break;
+        case 8:  wColors = 256; break;
         case 16:
         case 24:
-        case 32: m_wColors = 0;   break;   // 16,24 or 32 bpp have no color table
-
-        default:
-           m_wColors = 0;
+        case 32:
+        default: wColors = 0;   break;  // 16, 24 or 32 bpp have no color table
     } // switch
-/*
+#if 0
     // Make sure bits per pixel is valid
-    if (wBitCount <= 1)         wBitCount = 1;
-    else if (wBitCount <= 4)    wBitCount = 4;
-    else if (wBitCount <= 8)    wBitCount = 8;
-    else                        wBitCount = 24;
+    if (nBitCount <= 1)         nBitCount = 1;
+    else if (nBitCount <= 4)    nBitCount = 4;
+    else if (nBitCount <= 8)    nBitCount = 8;
+    else                        nBitCount = 24;
 
-    switch (wBitCount)
+    switch (nBitCount)
     {
         case 1:
-            m_wColors = 2;
+            m_nColors = 2;
             break;
         case 4:
-            m_wColors = 16;
+            m_nColors = 16;
             break;
         case 8:
-            m_wColors = 256;
+            m_nColors = 256;
             break;
         default:
-            m_wColors = 0;
+            m_nColors = 0;
             break;
     } // switch
-*/
-    m_dwLineWidth = WIDTHBYTES(wBitCount * dwWidth);
-
+#endif
     // Initialize BITMAPINFOHEADER
-    m_bi.biSize = sizeof(BITMAPINFOHEADER);
-    m_bi.biWidth = dwWidth;         // fill in width from parameter
-    m_bi.biHeight = dwHeight;       // fill in height from parameter
-    m_bi.biPlanes = 1;              // must be 1
-    m_bi.biBitCount = wBitCount;    // from parameter
-    m_bi.biCompression = BI_RGB;    
-    m_bi.biSizeImage = m_dwLineWidth * dwHeight;
-    m_bi.biXPelsPerMeter = 0;
-    m_bi.biYPelsPerMeter = 0;
-    m_bi.biClrUsed = 0;
-    m_bi.biClrImportant = 0;
+    biHdr.biSize = sizeof(biHdr);
+    biHdr.biWidth = nWidth;        // fill in width from parameter
+    biHdr.biHeight = nHeight;      // fill in height from parameter
+    biHdr.biPlanes = 1;            // must be 1
+    biHdr.biBitCount = static_cast<WORD>(nBitCount);
+    biHdr.biCompression = BI_RGB;
+    biHdr.biSizeImage = nStride * nHeight;
+    biHdr.biXPelsPerMeter = 0;
+    biHdr.biYPelsPerMeter = 0;
+    biHdr.biClrUsed = 0;
+    biHdr.biClrImportant = 0;
 
     // Calculate size of memory block required to store the DIB.  This
     // block should be big enough to hold the BITMAPINFOHEADER, the color
     // table, and the bits.
-    dwLen = GetSize();
+    dwMemBytes = GetSize(biHdr, wColors);
 
-    m_hDib = new HDIB[dwLen]; // Allocate memory block to store our bitmap
-    if (m_hDib == NULL) return NULL;
+    DIBPtr pDib = std::make_unique<uint8_t[]>(dwMemBytes);
 
     // Use our bitmap info structure to fill in first part of
     // our DIB with the BITMAPINFOHEADER
-    lpbi = (LPBITMAPINFOHEADER)(m_hDib);
-    *lpbi = m_bi;
+    *reinterpret_cast<LPBITMAPINFOHEADER>(pDib.get()) = biHdr;
 
-    return m_hDib; // Return handle to the DIB
+    pDib.swap(m_pDib);
+    m_nStride = nStride;
+    m_nColors = wColors;
+    return m_pDib.get(); // Return handle to the DIB
 } // End of Create
 
-DWORD CCeXDib::GetSize()
+void CCeXDib::Swap(CCeXDib& rhs) noexcept
 {
-    return m_bi.biSize + m_bi.biSizeImage + GetPaletteSize();
-} // End of GetSize
+    std::swap(m_pDib,    rhs.m_pDib);
+    std::swap(m_nStride, rhs.m_nStride);
+    std::swap(m_nColors, rhs.m_nColors);
+    std::swap(m_hMemDC,  rhs.m_hMemDC);
+    std::swap(m_hBitmap, rhs.m_hBitmap);
+    std::swap(m_lpBits,  rhs.m_lpBits);
+}
 
-DWORD CCeXDib::GetPaletteSize()
+bool CCeXDib::Clone(CCeXDib const& src)
 {
-    return (m_wColors * sizeof(RGBQUAD));
-} // End of GetPaletteSize
+    if (!src.GetBits()) {
+        return false;
+    }
+    CCeXDib temp{};
+    if (!temp.Create(src.GetWidth(), src.GetHeight(), src.GetBitCount())) {
+        return false;
+    }
+    memcpy(temp.m_pDib.get(), src.m_pDib.get(), GetSize(*temp.GetInfoHdr(), temp.m_nColors));
+    temp.Swap(*this);
+    return true;
+} // End of Clone
 
-LPBYTE CCeXDib::GetBits()
+void CCeXDib::BlendPalette(COLORREF crColor, DWORD dwPerc) const
 {
-    if (m_hDib) 
-        return ((LPBYTE)m_hDib + *(LPDWORD)m_hDib + GetPaletteSize()); 
-
-    return NULL;
-} // End of GetBits
-
-DWORD CCeXDib::GetWidth()
-{
-    return m_bi.biWidth;
-} // End of GetWidth
-
-DWORD CCeXDib::GetHeight()
-{
-    return m_bi.biHeight;
-} // End of GetHeight
-
-DWORD CCeXDib::GetLineWidth()
-{
-    return m_dwLineWidth;
-} // End of GetLineWidth
-
-void CCeXDib::BlendPalette(COLORREF crColor, DWORD dwPerc)
-{
-    if (m_hDib == NULL || m_wColors == 0) 
+    if (!m_pDib || !m_nColors) {
         return;
-
-    LPBYTE iDst = (LPBYTE)(m_hDib) + sizeof(BITMAPINFOHEADER);
-
-    long i,r,g,b;
-
-    RGBQUAD* pPal = (RGBQUAD*)iDst;
-
-    r = GetRValue(crColor);
-    g = GetGValue(crColor);
-    b = GetBValue(crColor);
-
-    if (dwPerc > 100) 
+    }
+    const LPBYTE pDst{GetPaletteBits()};
+    RGBQUAD*     pPal{reinterpret_cast<RGBQUAD*>(pDst)};
+    LONG const      R{GetRValue(crColor)};
+    LONG const      G{GetGValue(crColor)};
+    LONG const      B{GetBValue(crColor)};
+    if (dwPerc > 100) {
         dwPerc = 100;
-
-    for (i = 0; i < m_wColors; i++)
-    {
-        pPal[i].rgbBlue = (BYTE)((pPal[i].rgbBlue * (100 - dwPerc) + b * dwPerc) / 100);
-        pPal[i].rgbGreen = (BYTE)((pPal[i].rgbGreen * (100 - dwPerc) + g * dwPerc) / 100);
-        pPal[i].rgbRed = (BYTE)((pPal[i].rgbRed * (100 - dwPerc) + r * dwPerc) / 100);
+    }
+    for (LONG i = 0; i < m_nColors; i++) {
+        pPal[i].rgbBlue  = static_cast<BYTE>((pPal[i].rgbBlue  * (100 - dwPerc) + B * dwPerc) / 100);
+        pPal[i].rgbGreen = static_cast<BYTE>((pPal[i].rgbGreen * (100 - dwPerc) + G * dwPerc) / 100);
+        pPal[i].rgbRed   = static_cast<BYTE>((pPal[i].rgbRed   * (100 - dwPerc) + R * dwPerc) / 100);
     } // for
 } // End of BlendPalette
 
-void CCeXDib::Clear(BYTE byVal)
+void CCeXDib::Clear(int byVal) const
 {
-    if (m_hDib) 
-        memset(GetBits(), byVal, m_bi.biSizeImage);
+    if (!m_pDib) {
+        return ;
+    }
+    memset(GetBits(), byVal, GetInfoHdr()->biSizeImage);
 } // End of Clear
 
-void CCeXDib::SetPixelIndex(DWORD dwX, DWORD dwY, BYTE byI)
+void CCeXDib::SetPixelIndex(LONG dwX, LONG dwY, BYTE byI) const
 {
-    if ((m_hDib == NULL) || (m_wColors == 0) ||
-        ((long)dwX < 0) || ((long)dwY < 0) || (dwX >= (DWORD)m_bi.biWidth) || (dwY >= (DWORD)m_bi.biHeight)) return;
+    if (!m_pDib || !m_nColors ||
+        (dwX < 0) || (dwY < 0) ||
+        (dwX >= GetInfoHdr()->biWidth) ||
+        (dwY >= GetInfoHdr()->biHeight)) {
+        return;
+    }
 
-    LPBYTE iDst = GetBits();
-    iDst[(m_bi.biHeight - dwY - 1) * m_dwLineWidth + dwX] = byI;
+    const LPBYTE iDst = GetBits();
+    iDst[(GetInfoHdr()->biHeight - dwY - 1) * m_nStride + dwX] = byI;
 } // End of SetPixelIndex
 
-void CCeXDib::Clone(CCeXDib* src)
+void CCeXDib::SetPaletteIndex(DWORD byIdx, BYTE byR, BYTE byG, BYTE byB) const
 {
-    Create(src->GetWidth(), src->GetHeight(), src->GetBitCount());
-    if (m_hDib) 
-        memcpy(m_hDib, src->m_hDib, GetSize());
-} // End of Clone
-
-WORD CCeXDib::GetBitCount()
-{
-    return m_bi.biBitCount;
-} // End of GetBitCount
-
-void CCeXDib::SetPaletteIndex(BYTE byIdx, BYTE byR, BYTE byG, BYTE byB)
-{
-    if (m_hDib && m_wColors)
-    {
-        LPBYTE iDst = (LPBYTE)(m_hDib) + sizeof(BITMAPINFOHEADER);
-        if ((byIdx >= 0) && (byIdx < m_wColors))
-        {   
-            long ldx = byIdx * sizeof(RGBQUAD);
-            iDst[ldx++] = (BYTE)byB;
-            iDst[ldx++] = (BYTE)byG;
-            iDst[ldx++] = (BYTE)byR;
-            iDst[ldx] = (BYTE)0;
-        } // if
+    if (!m_pDib || !m_nColors) {
+        return ;
+    }
+    const LPBYTE iDst = GetPaletteBits();
+    if ((byIdx >= 0) && (byIdx < m_nColors)) {
+        DWORD lOffset = byIdx * sizeof(RGBQUAD);
+        iDst[lOffset++] = byB;
+        iDst[lOffset++] = byG;
+        iDst[lOffset++] = byR;
+        iDst[lOffset] = 0;
     } // if
 } // End of SetPaletteIndex
 
 void CCeXDib::Draw(HDC hDC, DWORD dwX, DWORD dwY)
 {
-    HBITMAP hBitmap = NULL;
-    HBITMAP hOldBitmap = NULL;
-    HDC     hMemDC = NULL;
+    HBITMAP    hBitmap{nullptr};
+    HBITMAP hOldBitmap{nullptr};
+    HDC         hMemDC{nullptr};
 
-    if (m_hBitmap == NULL)
-    {
-        m_hBitmap = CreateDIBSection(hDC, (BITMAPINFO*)m_hDib, DIB_RGB_COLORS, &m_lpBits, NULL, 0);
-        if (m_hBitmap == NULL)  return;
-        if (m_lpBits == NULL)
-        {
-            ::DeleteObject(m_hBitmap);
-            m_hBitmap = NULL;
+    if (m_hBitmap == nullptr) {
+        m_hBitmap = CreateDIBSection(hDC, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &m_lpBits, nullptr, 0);
+        if (m_hBitmap == nullptr) {
+            return;
+        }
+        if (m_lpBits == nullptr) {
+            DeleteObject(m_hBitmap);
+            m_hBitmap = nullptr;
             return;
         } // if
     } // if
 
-    memcpy(m_lpBits, GetBits(), m_bi.biSizeImage);
+    memcpy(m_lpBits, GetBits(), GetInfoHdr()->biSizeImage);
 
-    if (m_hMemDC == NULL)
+    if (m_hMemDC == nullptr)
     {
         m_hMemDC = CreateCompatibleDC(hDC);
-        if (m_hMemDC == NULL)   return;
+        if (m_hMemDC == nullptr)   return;
     } // if
 
     hOldBitmap = (HBITMAP)SelectObject(m_hMemDC, m_hBitmap);
 
-    BitBlt(hDC, dwX, dwY, m_bi.biWidth, m_bi.biHeight, m_hMemDC, 0, 0, SRCCOPY);
+    BitBlt(hDC, dwX, dwY, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, m_hMemDC, 0, 0, SRCCOPY);
 
     SelectObject(m_hMemDC, hOldBitmap);
 } // End of Draw
 
 void CCeXDib::Copy(HDC hDC, DWORD dwX, DWORD dwY)
 {
-    if (m_hBitmap == NULL)
+    if (m_hBitmap == nullptr)
     {
-        m_hBitmap = CreateDIBSection(hDC, (BITMAPINFO*)m_hDib, DIB_RGB_COLORS, &m_lpBits, NULL, 0);
-        if (m_hBitmap == NULL)
+        m_hBitmap = CreateDIBSection(hDC, (BITMAPINFO*)m_pDib.get(), DIB_RGB_COLORS, &m_lpBits, nullptr, 0);
+        if (m_hBitmap == nullptr)
             return;
-        if (m_lpBits == NULL)
+        if (m_lpBits == nullptr)
         {
             ::DeleteObject(m_hBitmap);
-            m_hBitmap = NULL;
+            m_hBitmap = nullptr;
             return;
         } // if
     } // if
     
     HDC hMemDC = ::CreateCompatibleDC(hDC);
     HBITMAP hOldBitmap = (HBITMAP)::SelectObject(hMemDC, m_hBitmap);
-    ::BitBlt(hMemDC, 0, 0, m_bi.biWidth, m_bi.biHeight, hDC, dwX, dwY, SRCCOPY);
+    ::BitBlt(hMemDC, 0, 0, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, hDC, dwX, dwY, SRCCOPY);
     ::SelectObject(hMemDC, hOldBitmap);
 } // End of Copy
 
@@ -281,19 +296,19 @@ void CCeXDib::SetGrayPalette()
     LPBYTE      iDst;
     int         ni;
 
-    if (m_hDib == NULL || m_wColors == 0) return;
+    if (m_pDib == nullptr || m_nColors == 0) return;
 
     ppal = (RGBQUAD*)&pal[0];
-    iDst = (LPBYTE)(m_hDib) + sizeof(BITMAPINFOHEADER);
-    for (ni = 0; ni < m_wColors; ni++)
+    iDst = (LPBYTE)(m_pDib.get()) + sizeof(BITMAPINFOHEADER);
+    for (ni = 0; ni < m_nColors; ni++)
     {
         pal[ni] = RGB2RGBQUAD(RGB(ni,ni,ni));
     } // for
 
     pal[0] = RGB2RGBQUAD(RGB(0,0,0));
-    pal[m_wColors-1] = RGB2RGBQUAD(RGB(255,255,255));
+    pal[m_nColors-1] = RGB2RGBQUAD(RGB(255,255,255));
 
-    memcpy(iDst, ppal, GetPaletteSize());
+    memcpy(iDst, ppal, GetPaletteSize(m_nColors));
 } // End of SetGrayPalette
 
 RGBQUAD CCeXDib::RGB2RGBQUAD(COLORREF cr)
@@ -308,34 +323,38 @@ RGBQUAD CCeXDib::RGB2RGBQUAD(COLORREF cr)
 
 WORD CCeXDib::GetNumColors()
 {
-    return m_wColors;
+    return m_nColors;
 } // End of GetNumColors
 
 BOOL CCeXDib::WriteBMP(LPCTSTR bmpFileName)
 {
+    static constexpr WORD BITMAP_HDR = 0x4d42; // 'BM'
+
     BITMAPFILEHEADER    hdr;
     HANDLE  hFile;
     DWORD   nByteWrite;
 
-    if (*bmpFileName == _T('\0') || m_hDib == 0) return 0;
+    if (*bmpFileName == _T('\0') || !m_pDib) {
+        return 0;
+    }
+    DWORD dwMySize{GetSize(*GetInfoHdr(), m_nColors)};
 
     hFile=CreateFile(           // open if exist ini file
         bmpFileName,            // pointer to name of the file 
         GENERIC_WRITE,          // access mode 
         0,                      // share mode 
-        NULL,                   // pointer to security descriptor 
+        nullptr,                   // pointer to security descriptor 
         CREATE_ALWAYS,          // how to create 
         FILE_ATTRIBUTE_NORMAL,  // file attributes 
-        NULL                    // handle to file with attributes to copy  
+        nullptr                    // handle to file with attributes to copy  
         );
     if (hFile == INVALID_HANDLE_VALUE) return FALSE;
 
     // Fill in the fields of the file header
-    hdr.bfType = BFT_BITMAP;
-    hdr.bfSize = GetSize() + sizeof(BITMAPFILEHEADER);
+    hdr.bfType = BITMAP_HDR;
+    hdr.bfSize = dwMySize + sizeof(BITMAPFILEHEADER);
     hdr.bfReserved1 = hdr.bfReserved2 = 0;
-    hdr.bfOffBits = (DWORD) sizeof(BITMAPFILEHEADER)+
-                    m_bi.biSize + GetPaletteSize();
+    hdr.bfOffBits = sizeof(BITMAPFILEHEADER) + GetInfoHdr()->biSize + GetPaletteSize(m_nColors);
 
     // Write the file header
     WriteFile(                      // write ini (sync mode <-> no overlapped)
@@ -343,16 +362,16 @@ BOOL CCeXDib::WriteBMP(LPCTSTR bmpFileName)
         (LPSTR) &hdr,               // address of buffer that contains data  
         sizeof(BITMAPFILEHEADER),   // number of bytes to write 
         &nByteWrite,                // address of number of bytes written 
-        NULL                        // address of structure for data 
+        nullptr                     // address of structure for data 
         );
 
     // Write the DIB header and the bits
     WriteFile(                      // write ini (sync mode <-> no overlapped)
         hFile,                      // handle of file to write 
-        (LPSTR) m_hDib,             // address of buffer that contains data  
-        GetSize(),                  // number of bytes to write 
+        (LPSTR)m_pDib.get(),        // address of buffer that contains data  
+        dwMySize,                   // number of bytes to write 
         &nByteWrite,                // address of number of bytes written 
-        NULL                        // address of structure for data 
+        nullptr                     // address of structure for data 
         );
 
     CloseHandle(hFile);             // free file handle
