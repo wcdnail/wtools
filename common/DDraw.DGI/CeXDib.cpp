@@ -1,92 +1,80 @@
 #include "stdafx.h"
 #include "CeXDib.h"
 
-CCeXDib::CCeXDib()
-    :        m_pDib{nullptr}
+CDibEx::~CDibEx() = default;
+CDibDC::~CDibDC() = default;
+
+CDibEx::CDibEx()
+    :    m_pDib{nullptr}
     , m_nStride{0}
-    ,     m_nColors{0}
-    ,      m_hMemDC{nullptr}
-    ,     m_hBitmap{nullptr}
-    ,      m_lpBits{nullptr}
+    , m_nColors{0}
 {
 }
 
-CCeXDib::~CCeXDib()
+CDibDC::CDibDC()
+    :  m_DC{}
+    , m_Bitmap{}
+    ,  m_lpBits{nullptr}
 {
-    FreeResources();
 }
 
-void CCeXDib::FreeResources()
-{
-    if (m_hMemDC) {
-        DeleteDC(m_hMemDC);
-    }
-    if (m_hBitmap) {
-        DeleteObject(m_hBitmap);
-    }
-    DIBPtr{}.swap(m_pDib);
-    m_hBitmap = nullptr;
-    m_hMemDC = nullptr;
-    m_lpBits = nullptr;
-}
-
-DWORD CCeXDib::GetSize(BITMAPINFOHEADER const& biHdr, LONG wColors)
+DWORD CDibEx::GetSize(BITMAPINFOHEADER const& biHdr, LONG wColors)
 {
     return biHdr.biSize + biHdr.biSizeImage + GetPaletteSize(wColors);
 } // End of GetSize
 
-DWORD CCeXDib::GetPaletteSize(LONG wColors)
+DWORD CDibEx::GetPaletteSize(LONG wColors)
 {
     return (wColors * sizeof(RGBQUAD));
 } // End of GetPaletteSize
 
-LPBITMAPINFOHEADER CCeXDib::GetInfoHdr() const
+LPBITMAPINFOHEADER CDibEx::GetInfoHdr() const
 {
     return reinterpret_cast<LPBITMAPINFOHEADER>(m_pDib.get());
 } // End of GetInfoHdr
 
-LPBYTE CCeXDib::GetPaletteBits() const
+LPBYTE CDibEx::GetPaletteBits() const
 {
     if (!m_pDib) {
         return nullptr;
     }
     return (m_pDib.get() + GetInfoHdr()->biSize);
-} // End of GetBits
+} // End of GetData
 
-LPBYTE CCeXDib::GetBits() const
+LPBYTE CDibEx::GetData() const
 {
     if (!m_pDib) {
         return nullptr;
     }
     return (GetPaletteBits() + GetPaletteSize(m_nColors));
-} // End of GetBits
+} // End of GetData
 
-LONG CCeXDib::GetWidth() const
+LONG CDibEx::GetWidth() const
 {
     return m_pDib ? GetInfoHdr()->biWidth : 0;
 } // End of GetWidth
 
-LONG CCeXDib::GetHeight() const
+LONG CDibEx::GetHeight() const
 {
     return m_pDib ? GetInfoHdr()->biHeight : 0;
 } // End of GetHeight
 
-DWORD CCeXDib::GetStride() const
+DWORD CDibEx::GetStride() const
 {
     return m_nStride;
 } // End of GetStride
 
-WORD CCeXDib::GetBitCount() const
+WORD CDibEx::GetBitCount() const
 {
     return GetInfoHdr()->biBitCount;
 } // End of GetBitCount
 
-LONG CCeXDib::GetNumColors() const
+LONG CDibEx::GetNumColors() const
 {
     return m_nColors;
 } // End of GetNumColors
 
-CCeXDib::LPDIB CCeXDib::Create(LONG nWidth, LONG nHeight, LONG nBitCount)
+CDibEx::LPDIB CDibEx::Create(LONG nWidth, LONG nHeight, LONG nBitCount)
 {
     BITMAPINFOHEADER biHdr{0};
     DWORD       dwMemBytes{0};
@@ -160,22 +148,20 @@ CCeXDib::LPDIB CCeXDib::Create(LONG nWidth, LONG nHeight, LONG nBitCount)
     return m_pDib.get(); // Return handle to the DIB
 } // End of Create
 
-void CCeXDib::Swap(CCeXDib& rhs) noexcept
+void CDibEx::Clear(int byVal) const
 {
-    std::swap(m_pDib,    rhs.m_pDib);
-    std::swap(m_nStride, rhs.m_nStride);
-    std::swap(m_nColors, rhs.m_nColors);
-    std::swap(m_hMemDC,  rhs.m_hMemDC);
-    std::swap(m_hBitmap, rhs.m_hBitmap);
-    std::swap(m_lpBits,  rhs.m_lpBits);
-}
+    if (!m_pDib) {
+        return ;
+    }
+    memset(GetData(), byVal, GetInfoHdr()->biSizeImage);
+} // End of Clear
 
-bool CCeXDib::Clone(CCeXDib const& src)
+bool CDibEx::Clone(CDibEx const& src)
 {
-    if (!src.GetBits()) {
+    if (!src.GetData()) {
         return false;
     }
-    CCeXDib temp{};
+    CDibEx temp{};
     if (!temp.Create(src.GetWidth(), src.GetHeight(), src.GetBitCount())) {
         return false;
     }
@@ -184,7 +170,21 @@ bool CCeXDib::Clone(CCeXDib const& src)
     return true;
 } // End of Clone
 
-void CCeXDib::BlendPalette(COLORREF crColor, DWORD dwPerc) const
+void CDibEx::Swap(CDibEx& rhs) noexcept
+{
+    std::swap(m_pDib,    rhs.m_pDib);
+    std::swap(m_nStride, rhs.m_nStride);
+    std::swap(m_nColors, rhs.m_nColors);
+}
+
+void CDibDC::Swap(CDibDC& rhs) noexcept
+{
+    CDibEx::Swap(rhs);
+    std::swap(m_DC.m_hDC,  rhs.m_DC.m_hDC);
+    std::swap(m_Bitmap.m_hBitmap, rhs.m_Bitmap.m_hBitmap);
+}
+
+void CDibEx::BlendPalette(COLORREF crColor, DWORD dwPerc) const
 {
     if (!m_pDib || !m_nColors) {
         return;
@@ -204,15 +204,7 @@ void CCeXDib::BlendPalette(COLORREF crColor, DWORD dwPerc) const
     } // for
 } // End of BlendPalette
 
-void CCeXDib::Clear(int byVal) const
-{
-    if (!m_pDib) {
-        return ;
-    }
-    memset(GetBits(), byVal, GetInfoHdr()->biSizeImage);
-} // End of Clear
-
-void CCeXDib::SetPixelIndex(LONG dwX, LONG dwY, BYTE byI) const
+void CDibEx::SetPixelIndex(LONG dwX, LONG dwY, BYTE byI) const
 {
     if (!m_pDib || !m_nColors ||
         (dwX < 0) || (dwY < 0) ||
@@ -221,11 +213,11 @@ void CCeXDib::SetPixelIndex(LONG dwX, LONG dwY, BYTE byI) const
         return;
     }
 
-    const LPBYTE iDst = GetBits();
+    const LPBYTE iDst = GetData();
     iDst[(GetInfoHdr()->biHeight - dwY - 1) * m_nStride + dwX] = byI;
 } // End of SetPixelIndex
 
-void CCeXDib::SetPaletteIndex(DWORD byIdx, BYTE byR, BYTE byG, BYTE byB) const
+void CDibEx::SetPaletteIndex(DWORD byIdx, BYTE byR, BYTE byG, BYTE byB) const
 {
     if (!m_pDib || !m_nColors || (static_cast<LONG>(byIdx) > m_nColors - 1)) {
         return ;
@@ -238,56 +230,7 @@ void CCeXDib::SetPaletteIndex(DWORD byIdx, BYTE byR, BYTE byG, BYTE byB) const
     iDst[lOffset] = 0;
 } // End of SetPaletteIndex
 
-void CCeXDib::Draw(HDC hDC, int dwX, int dwY)
-{
-    HBITMAP    hBitmap{nullptr};
-    HBITMAP hOldBitmap{nullptr};
-    HDC         hMemDC{nullptr};
-
-    if (!m_hBitmap) {
-        m_hBitmap = CreateDIBSection(hDC, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &m_lpBits, nullptr, 0);
-        if (!m_hBitmap) {
-            return;
-        }
-        if (!m_lpBits) {
-            DeleteObject(m_hBitmap);
-            m_hBitmap = nullptr;
-            return;
-        } // if
-    } // if
-    if (!m_hMemDC) {
-        m_hMemDC = CreateCompatibleDC(hDC);
-        if (m_hMemDC == nullptr) {
-            return;
-        }
-    } // if
-
-    memcpy(m_lpBits, GetBits(), GetInfoHdr()->biSizeImage);
-    hOldBitmap = static_cast<HBITMAP>(SelectObject(m_hMemDC, m_hBitmap));
-    BitBlt(hDC, dwX, dwY, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, m_hMemDC, 0, 0, SRCCOPY);
-    SelectObject(m_hMemDC, hOldBitmap);
-} // End of Draw
-
-void CCeXDib::Copy(HDC hDC, int dwX, int dwY)
-{
-    if (!m_hBitmap) {
-        m_hBitmap = CreateDIBSection(hDC, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &m_lpBits, nullptr, 0);
-        if (!m_hBitmap) {
-            return;
-        }
-        if (m_lpBits == nullptr) {
-            DeleteObject(m_hBitmap);
-            m_hBitmap = nullptr;
-            return;
-        } // if
-    } // if
-    const HDC  hMemDC{CreateCompatibleDC(hDC)};
-    const HBITMAP hOB{static_cast<HBITMAP>(SelectObject(hMemDC, m_hBitmap))};
-    BitBlt(hMemDC, 0, 0, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, hDC, dwX, dwY, SRCCOPY);
-    SelectObject(hMemDC, hOB);
-} // End of Copy
-
-void CCeXDib::SetGrayPalette() const
+void CDibEx::SetGrayPalette() const
 {
     if (!m_pDib || !m_nColors) {
         return;
@@ -303,7 +246,7 @@ void CCeXDib::SetGrayPalette() const
     memcpy(iDst, ppal, GetPaletteSize(m_nColors));
 } // End of SetGrayPalette
 
-BOOL CCeXDib::WriteBMP(LPCTSTR bmpFileName) const
+BOOL CDibEx::WriteBMP(LPCTSTR bmpFileName) const
 {
     static constexpr WORD BITMAP_HDR = 0x4d42; // 'BM'
 
@@ -350,3 +293,47 @@ BOOL CCeXDib::WriteBMP(LPCTSTR bmpFileName) const
     CloseHandle(hFile);             // release file handle
     return TRUE;
 } // End of WriteBMP
+
+void CDibDC::Draw(HDC hDC, int dwX, int dwY)
+{
+    if (!m_Bitmap) {
+        LPVOID    lpBits{nullptr};
+        WTL::CBitmap bmp{};
+        bmp.CreateDIBSection(hDC, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &lpBits, nullptr, 0);
+        if (!bmp.m_hBitmap || !lpBits) {
+            return;
+        }
+        m_lpBits = lpBits;
+        m_Bitmap.Attach(bmp.Detach());
+    }
+    if (!m_DC) {
+        WTL::CDC dc{};
+        dc.CreateCompatibleDC(hDC);
+        if (!dc.m_hDC) {
+            return;
+        }
+        m_DC.Attach(dc.Detach());
+    }
+    memcpy(m_lpBits, GetData(), GetInfoHdr()->biSizeImage);
+    auto const hOldBitmap = m_DC.SelectBitmap(m_Bitmap);
+    BitBlt(hDC, dwX, dwY, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, m_DC, 0, 0, SRCCOPY);
+    m_DC.SelectBitmap(hOldBitmap);
+} // End of Draw
+
+void CDibDC::Copy(HDC hDC, int dwX, int dwY)
+{
+    if (!m_Bitmap) {
+        LPVOID    lpBits{nullptr};
+        WTL::CBitmap bmp{};
+        bmp.CreateDIBSection(hDC, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &lpBits, nullptr, 0);
+        if (!bmp.m_hBitmap || !lpBits) {
+            return;
+        }
+        m_lpBits = lpBits;
+        m_Bitmap.Attach(bmp.Detach());
+    }
+    WTL::CDC     memDC{CreateCompatibleDC(hDC)};
+    auto const prevBmp{m_DC.SelectBitmap(m_Bitmap)};
+    BitBlt(memDC, 0, 0, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, hDC, dwX, dwY, SRCCOPY);
+    memDC.SelectBitmap(prevBmp);
+} // End of Copy

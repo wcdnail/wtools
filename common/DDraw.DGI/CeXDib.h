@@ -1,5 +1,5 @@
 //
-//  Class:      CCeXDib
+//  Class:      CDibEx
 //
 //  Compiler:   Visual C++
 //              eMbedded Visual C++
@@ -34,6 +34,7 @@
 
 #pragma once
 
+#include <wcdafx.api.h>
 #include <cstdint>
 #include <memory>
 
@@ -54,48 +55,62 @@ static constexpr RGBQUAD RGB2RGBQUAD(COLORREF cr)
 } // End of RGB2RGBQUAD
 
 
-struct CCeXDib
+struct CDibEx
 {
     using LPDIB = uint8_t*;
 
-    virtual ~CCeXDib();
-    CCeXDib();
+    DELETE_COPY_MOVE_OF(CDibEx);
+
+    virtual ~CDibEx();
+    CDibEx();
+
+    LPBYTE GetData() const;
+    LONG GetWidth() const;
+    LONG GetHeight() const;
+    DWORD GetStride() const;
+    WORD GetBitCount() const;
+    LONG GetNumColors() const;
 
     LPDIB Create(LONG nWidth, LONG nHeight, LONG nBitCount);
-    void Swap(CCeXDib& rhs) noexcept;
-    bool Clone(CCeXDib const& src);
-    void Draw(HDC hDC, int dwX, int dwY);
-    void Copy(HDC hDC, int dwX, int dwY);
-    LPBYTE GetBits() const;
     void Clear(int byVal = 0) const;
+    void Swap(CDibEx& rhs) noexcept;
+    bool Clone(CDibEx const& src);
 
     void SetGrayPalette() const;
     void SetPaletteIndex(DWORD byIdx, BYTE byR, BYTE byG, BYTE byB) const;
     void SetPixelIndex(LONG dwX, LONG dwY, BYTE byI) const;
     void BlendPalette(COLORREF crColor, DWORD dwPerc) const;
 
-    WORD GetBitCount() const;
-    DWORD GetStride() const;
-    LONG GetWidth() const;
-    LONG GetHeight() const;
-    LONG GetNumColors() const;
-
     BOOL WriteBMP(LPCTSTR bmpFileName) const;
 
-private:
+protected:
     using DIBPtr = std::unique_ptr<uint8_t[]>;
 
-    void FreeResources();
     LPBITMAPINFOHEADER GetInfoHdr() const;
     LPBYTE GetPaletteBits() const;
 
     static DWORD GetPaletteSize(LONG wColors);
     static DWORD GetSize(BITMAPINFOHEADER const& biHdr, LONG wColors);
 
-    DIBPtr         m_pDib;
-    LONG        m_nStride;
-    LONG        m_nColors;
-    HDC          m_hMemDC;  // Handle to memory DC
-    HBITMAP     m_hBitmap;  // Handle to bitmap
-    LPVOID       m_lpBits;  // Pointer to actual bitmap bits
+    DIBPtr  m_pDib;
+    LONG m_nStride;
+    LONG m_nColors;
+};
+
+struct CDibDC: CDibEx
+{
+    DELETE_COPY_MOVE_OF(CDibDC);
+
+    ~CDibDC() override;
+    CDibDC();
+
+    void Swap(CDibDC& rhs) noexcept;
+
+    void Draw(HDC hDC, int dwX, int dwY);
+    void Copy(HDC hDC, int dwX, int dwY);
+
+private:
+    WTL::CDC         m_DC;
+    WTL::CBitmap m_Bitmap;
+    LPVOID       m_lpBits;
 };
