@@ -43,6 +43,17 @@ static constexpr auto BytesInBPP(T bits) -> T
     return (((bits) + 31) / 32 * 4);
 }
 
+static constexpr RGBQUAD RGB2RGBQUAD(COLORREF cr)
+{
+    RGBQUAD c;
+    c.rgbRed = GetRValue(cr);   /* get R, G, and B out of DWORD */
+    c.rgbGreen = GetGValue(cr);
+    c.rgbBlue = GetBValue(cr);
+    c.rgbReserved=0;
+    return c;
+} // End of RGB2RGBQUAD
+
+
 struct CCeXDib
 {
     using LPDIB = uint8_t*;
@@ -53,12 +64,12 @@ struct CCeXDib
     LPDIB Create(LONG nWidth, LONG nHeight, LONG nBitCount);
     void Swap(CCeXDib& rhs) noexcept;
     bool Clone(CCeXDib const& src);
-    void Draw(HDC hDC, DWORD dwX, DWORD dwY);
-    void Copy(HDC hDC, DWORD dwX, DWORD dwY);
+    void Draw(HDC hDC, int dwX, int dwY);
+    void Copy(HDC hDC, int dwX, int dwY);
     LPBYTE GetBits() const;
     void Clear(int byVal = 0) const;
 
-    void SetGrayPalette();
+    void SetGrayPalette() const;
     void SetPaletteIndex(DWORD byIdx, BYTE byR, BYTE byG, BYTE byB) const;
     void SetPixelIndex(LONG dwX, LONG dwY, BYTE byI) const;
     void BlendPalette(COLORREF crColor, DWORD dwPerc) const;
@@ -67,9 +78,9 @@ struct CCeXDib
     DWORD GetStride() const;
     LONG GetWidth() const;
     LONG GetHeight() const;
-    WORD GetNumColors();
+    LONG GetNumColors() const;
 
-    BOOL WriteBMP(LPCTSTR bmpFileName);
+    BOOL WriteBMP(LPCTSTR bmpFileName) const;
 
 private:
     using DIBPtr = std::unique_ptr<uint8_t[]>;
@@ -80,8 +91,6 @@ private:
 
     static DWORD GetPaletteSize(LONG wColors);
     static DWORD GetSize(BITMAPINFOHEADER const& biHdr, LONG wColors);
-
-    RGBQUAD RGB2RGBQUAD(COLORREF cr);
 
     DIBPtr         m_pDib;
     LONG        m_nStride;

@@ -81,6 +81,11 @@ WORD CCeXDib::GetBitCount() const
     return GetInfoHdr()->biBitCount;
 } // End of GetBitCount
 
+LONG CCeXDib::GetNumColors() const
+{
+    return m_nColors;
+} // End of GetNumColors
+
 CCeXDib::LPDIB CCeXDib::Create(LONG nWidth, LONG nHeight, LONG nBitCount)
 {
     BITMAPINFOHEADER biHdr{0};
@@ -222,28 +227,52 @@ void CCeXDib::SetPixelIndex(LONG dwX, LONG dwY, BYTE byI) const
 
 void CCeXDib::SetPaletteIndex(DWORD byIdx, BYTE byR, BYTE byG, BYTE byB) const
 {
-    if (!m_pDib || !m_nColors) {
+    if (!m_pDib || !m_nColors || (static_cast<LONG>(byIdx) > m_nColors - 1)) {
         return ;
     }
-    const LPBYTE iDst = GetPaletteBits();
-    if ((byIdx >= 0) && (byIdx < m_nColors)) {
-        DWORD lOffset = byIdx * sizeof(RGBQUAD);
-        iDst[lOffset++] = byB;
-        iDst[lOffset++] = byG;
-        iDst[lOffset++] = byR;
-        iDst[lOffset] = 0;
-    } // if
+    const LPBYTE iDst{GetPaletteBits()};
+    DWORD     lOffset{byIdx * static_cast<DWORD>(sizeof(RGBQUAD))};
+    iDst[lOffset++] = byB;
+    iDst[lOffset++] = byG;
+    iDst[lOffset++] = byR;
+    iDst[lOffset] = 0;
 } // End of SetPaletteIndex
 
-void CCeXDib::Draw(HDC hDC, DWORD dwX, DWORD dwY)
+void CCeXDib::Draw(HDC hDC, int dwX, int dwY)
 {
     HBITMAP    hBitmap{nullptr};
     HBITMAP hOldBitmap{nullptr};
     HDC         hMemDC{nullptr};
 
-    if (m_hBitmap == nullptr) {
+    if (!m_hBitmap) {
         m_hBitmap = CreateDIBSection(hDC, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &m_lpBits, nullptr, 0);
-        if (m_hBitmap == nullptr) {
+        if (!m_hBitmap) {
+            return;
+        }
+        if (!m_lpBits) {
+            DeleteObject(m_hBitmap);
+            m_hBitmap = nullptr;
+            return;
+        } // if
+    } // if
+    if (!m_hMemDC) {
+        m_hMemDC = CreateCompatibleDC(hDC);
+        if (m_hMemDC == nullptr) {
+            return;
+        }
+    } // if
+
+    memcpy(m_lpBits, GetBits(), GetInfoHdr()->biSizeImage);
+    hOldBitmap = static_cast<HBITMAP>(SelectObject(m_hMemDC, m_hBitmap));
+    BitBlt(hDC, dwX, dwY, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, m_hMemDC, 0, 0, SRCCOPY);
+    SelectObject(m_hMemDC, hOldBitmap);
+} // End of Draw
+
+void CCeXDib::Copy(HDC hDC, int dwX, int dwY)
+{
+    if (!m_hBitmap) {
+        m_hBitmap = CreateDIBSection(hDC, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &m_lpBits, nullptr, 0);
+        if (!m_hBitmap) {
             return;
         }
         if (m_lpBits == nullptr) {
@@ -252,129 +281,72 @@ void CCeXDib::Draw(HDC hDC, DWORD dwX, DWORD dwY)
             return;
         } // if
     } // if
-
-    memcpy(m_lpBits, GetBits(), GetInfoHdr()->biSizeImage);
-
-    if (m_hMemDC == nullptr)
-    {
-        m_hMemDC = CreateCompatibleDC(hDC);
-        if (m_hMemDC == nullptr)   return;
-    } // if
-
-    hOldBitmap = (HBITMAP)SelectObject(m_hMemDC, m_hBitmap);
-
-    BitBlt(hDC, dwX, dwY, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, m_hMemDC, 0, 0, SRCCOPY);
-
-    SelectObject(m_hMemDC, hOldBitmap);
-} // End of Draw
-
-void CCeXDib::Copy(HDC hDC, DWORD dwX, DWORD dwY)
-{
-    if (m_hBitmap == nullptr)
-    {
-        m_hBitmap = CreateDIBSection(hDC, (BITMAPINFO*)m_pDib.get(), DIB_RGB_COLORS, &m_lpBits, nullptr, 0);
-        if (m_hBitmap == nullptr)
-            return;
-        if (m_lpBits == nullptr)
-        {
-            ::DeleteObject(m_hBitmap);
-            m_hBitmap = nullptr;
-            return;
-        } // if
-    } // if
-    
-    HDC hMemDC = ::CreateCompatibleDC(hDC);
-    HBITMAP hOldBitmap = (HBITMAP)::SelectObject(hMemDC, m_hBitmap);
-    ::BitBlt(hMemDC, 0, 0, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, hDC, dwX, dwY, SRCCOPY);
-    ::SelectObject(hMemDC, hOldBitmap);
+    const HDC  hMemDC{CreateCompatibleDC(hDC)};
+    const HBITMAP hOB{static_cast<HBITMAP>(SelectObject(hMemDC, m_hBitmap))};
+    BitBlt(hMemDC, 0, 0, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, hDC, dwX, dwY, SRCCOPY);
+    SelectObject(hMemDC, hOB);
 } // End of Copy
 
-void CCeXDib::SetGrayPalette()
+void CCeXDib::SetGrayPalette() const
 {
-    RGBQUAD     pal[256];
-    RGBQUAD*    ppal;
-    LPBYTE      iDst;
-    int         ni;
-
-    if (m_pDib == nullptr || m_nColors == 0) return;
-
-    ppal = (RGBQUAD*)&pal[0];
-    iDst = (LPBYTE)(m_pDib.get()) + sizeof(BITMAPINFOHEADER);
-    for (ni = 0; ni < m_nColors; ni++)
-    {
+    if (!m_pDib || !m_nColors) {
+        return;
+    }
+    RGBQUAD    pal[256]{0};
+    RGBQUAD const* ppal{pal};
+    for (int ni = 0; ni < m_nColors; ni++) {
         pal[ni] = RGB2RGBQUAD(RGB(ni,ni,ni));
     } // for
-
     pal[0] = RGB2RGBQUAD(RGB(0,0,0));
     pal[m_nColors-1] = RGB2RGBQUAD(RGB(255,255,255));
-
+    const LPBYTE iDst{GetPaletteBits()};
     memcpy(iDst, ppal, GetPaletteSize(m_nColors));
 } // End of SetGrayPalette
 
-RGBQUAD CCeXDib::RGB2RGBQUAD(COLORREF cr)
-{
-    RGBQUAD c;
-    c.rgbRed = GetRValue(cr);   /* get R, G, and B out of DWORD */
-    c.rgbGreen = GetGValue(cr);
-    c.rgbBlue = GetBValue(cr);
-    c.rgbReserved=0;
-    return c;
-} // End of RGB2RGBQUAD
-
-WORD CCeXDib::GetNumColors()
-{
-    return m_nColors;
-} // End of GetNumColors
-
-BOOL CCeXDib::WriteBMP(LPCTSTR bmpFileName)
+BOOL CCeXDib::WriteBMP(LPCTSTR bmpFileName) const
 {
     static constexpr WORD BITMAP_HDR = 0x4d42; // 'BM'
-
-    BITMAPFILEHEADER    hdr;
-    HANDLE  hFile;
-    DWORD   nByteWrite;
 
     if (*bmpFileName == _T('\0') || !m_pDib) {
         return 0;
     }
-    DWORD dwMySize{GetSize(*GetInfoHdr(), m_nColors)};
-
-    hFile=CreateFile(           // open if exist ini file
-        bmpFileName,            // pointer to name of the file 
-        GENERIC_WRITE,          // access mode 
-        0,                      // share mode 
-        nullptr,                   // pointer to security descriptor 
-        CREATE_ALWAYS,          // how to create 
-        FILE_ATTRIBUTE_NORMAL,  // file attributes 
-        nullptr                    // handle to file with attributes to copy  
-        );
-    if (hFile == INVALID_HANDLE_VALUE) return FALSE;
+    const DWORD dwMySize{GetSize(*GetInfoHdr(), m_nColors)};
+    const HANDLE   hFile{CreateFile(    // open if exist ini file
+        bmpFileName,                    // pointer to name of the file 
+        GENERIC_WRITE,                  // access mode 
+        0,                              // share mode 
+        nullptr,                        // pointer to security descriptor 
+        CREATE_ALWAYS,                  // how to create 
+        FILE_ATTRIBUTE_NORMAL,          // file attributes 
+        nullptr)};                      // handle to file with attributes to copy  
+    if (INVALID_HANDLE_VALUE == hFile) {
+        return FALSE;
+    }
 
     // Fill in the fields of the file header
+    BITMAPFILEHEADER hdr{0};
     hdr.bfType = BITMAP_HDR;
     hdr.bfSize = dwMySize + sizeof(BITMAPFILEHEADER);
     hdr.bfReserved1 = hdr.bfReserved2 = 0;
     hdr.bfOffBits = sizeof(BITMAPFILEHEADER) + GetInfoHdr()->biSize + GetPaletteSize(m_nColors);
 
     // Write the file header
+    DWORD nByteWrite{0};
     WriteFile(                      // write ini (sync mode <-> no overlapped)
         hFile,                      // handle of file to write 
-        (LPSTR) &hdr,               // address of buffer that contains data  
+        (LPCVOID)&hdr,              // address of buffer that contains data  
         sizeof(BITMAPFILEHEADER),   // number of bytes to write 
         &nByteWrite,                // address of number of bytes written 
-        nullptr                     // address of structure for data 
-        );
+        nullptr);                   // address of structure for data 
 
     // Write the DIB header and the bits
     WriteFile(                      // write ini (sync mode <-> no overlapped)
         hFile,                      // handle of file to write 
-        (LPSTR)m_pDib.get(),        // address of buffer that contains data  
+        (LPCVOID)m_pDib.get(),      // address of buffer that contains data  
         dwMySize,                   // number of bytes to write 
         &nByteWrite,                // address of number of bytes written 
-        nullptr                     // address of structure for data 
-        );
+        nullptr);                   // address of structure for data 
 
-    CloseHandle(hFile);             // free file handle
-
+    CloseHandle(hFile);             // release file handle
     return TRUE;
 } // End of WriteBMP
