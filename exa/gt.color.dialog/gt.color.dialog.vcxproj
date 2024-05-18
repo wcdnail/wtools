@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CustomDrawSliderCtrl.cpp" />
     <ClCompile Include="FOHyperLink.cpp" />
     <ClCompile Include="GTColorDialog.cpp" />
     <ClCompile Include="GTColorDialogDlg.cpp" />
@@ -34,6 +35,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CustomDrawSliderCtrl.h" />
     <ClInclude Include="FOHyperLink.h" />
     <ClInclude Include="GTColorDialog.h" />
     <ClInclude Include="GTColorDialogDlg.h" />

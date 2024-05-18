@@ -94,6 +94,9 @@
     <ClInclude Include="WTL\CCustomCtrl.h">
       <Filter>WTL</Filter>
     </ClInclude>
+    <ClInclude Include="WTL\CSliderCtrl.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

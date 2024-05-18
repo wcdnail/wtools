@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "CColorPicker.h"
 #include "CSpectrumImage.h"
+#include "CSliderCtrl.h"
 #include <atlctrls.h>
 #include <atlcrack.h>
 #include <atldlgs.h>
@@ -55,8 +56,9 @@ private:
     };
 
     CSpectrumImage m_imSpectrum;
-    
+    WTL::CSliderCtrl   m_Slider;
     int         m_nSpectrumKind;
+    int                m_nSlide;
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,               ID/ClassName,    Style,             X,             Y,          Width,        Height, Style...
         CONTROL_GROUPBOX(   _T("Spectrum Color"),           CID_GRP_SPECTRUM,                       4,             4,         HDlgCX,       DlgCY-8, 0, 0)
@@ -77,6 +79,8 @@ private:
     END_DIALOG()
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
+        DDX_CONTROL_HANDLE(CID_SPECTRUM_SLD, m_Slider);
+        DDX_INDEX(WTL::CSliderCtrl, CID_SPECTRUM_SLD, m_nSlide);
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
         if (!bSaveAndValidate) {
             OnDDXChanges(nCtlID);

@@ -79,6 +79,7 @@
     <ClInclude Include="WTL\CColorButton.h" />
     <ClInclude Include="WTL\CColorPicker.h" />
     <ClInclude Include="WTL\CCustomCtrl.h" />
+    <ClInclude Include="WTL\CSliderCtrl.h" />
     <ClInclude Include="WTL\CSpectrumImage.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

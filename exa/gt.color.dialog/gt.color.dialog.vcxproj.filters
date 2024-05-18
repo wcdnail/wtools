@@ -2,12 +2,14 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="StdAfx.cpp" />
+    <ClCompile Include="CustomDrawSliderCtrl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="resource.h">
       <Filter>rez</Filter>
     </ClInclude>
+    <ClInclude Include="CustomDrawSliderCtrl.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="rez">
