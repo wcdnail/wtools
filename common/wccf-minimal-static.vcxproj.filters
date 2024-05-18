@@ -34,6 +34,9 @@
     <ClCompile Include="DDraw.DGI\DDGDIStuff.cpp">
       <Filter>DDraw.DGI</Filter>
     </ClCompile>
+    <ClCompile Include="WTL\CSpectrumSlider.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -95,6 +98,9 @@
       <Filter>WTL</Filter>
     </ClInclude>
     <ClInclude Include="WTL\CSliderCtrl.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
+    <ClInclude Include="WTL\CSpectrumSlider.h">
       <Filter>WTL</Filter>
     </ClInclude>
   </ItemGroup>

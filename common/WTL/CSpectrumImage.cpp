@@ -21,6 +21,12 @@ void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
     InvalidateRect(nullptr, FALSE);
 }
 
+ATOM& CSpectrumImage::GetWndClassAtomRef()
+{
+    static ATOM gs_CSpectrumImage_Atom{0};
+    return gs_CSpectrumImage_Atom;
+}
+
 BOOL CSpectrumImage::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
     BOOL const bSave{m_bMsgHandled};
@@ -54,6 +60,7 @@ int CSpectrumImage::OnCreate(LPCREATESTRUCT pCS)
     }
     m_dHue     = 0.0;
     m_dPrevHue = -1.0;
+    ATLTRACE(ATL::atlTraceControls, 0, _T("WM_CREATE OK for %p\n"), this);
     return 0;
 }
 

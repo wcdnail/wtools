@@ -21,6 +21,8 @@ private:
     std::unique_ptr<Impl> m_pImpl;
     BOOL            m_bMsgHandled;
 
+    static ATOM& GetWndClassAtomRef();
+
     BOOL IsMsgHandled() const { return m_bMsgHandled; }
     void SetMsgHandled(BOOL bHandled) { m_bMsgHandled = bHandled; }
 

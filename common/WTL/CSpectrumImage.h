@@ -3,6 +3,8 @@
 #include "CCustomCtrl.h"
 #include <DDraw.DGI/CeXDib.h>
 
+#define CSPECIMG_CLASS _T("WCCF::CSpectrumImage")
+
 enum SpectrumKind: int
 {
     SPEC_Begin = 0,
@@ -19,7 +21,7 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
 {
     using Super = CCustomControl<CSpectrumImage>;
 
-    DECLARE_WND_CLASS(_T("WCCF::CSpectrumImage"))
+    DECLARE_WND_CLASS(CSPECIMG_CLASS)
 
     ~CSpectrumImage() override;
     CSpectrumImage();
@@ -28,12 +30,14 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
 
 private:
     friend Super;
-   
+
     CDIBitmap               m_Dib;
     SpectrumKind   m_SpectrumKind;
     double                 m_dHue;
     double             m_dPrevHue;
     BOOL            m_bMsgHandled;
+
+    static ATOM& GetWndClassAtomRef();
 
     BOOL IsMsgHandled() const { return m_bMsgHandled; }
     void SetMsgHandled(BOOL bHandled) { m_bMsgHandled = bHandled; }

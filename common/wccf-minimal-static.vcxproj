@@ -48,6 +48,7 @@
     <ClCompile Include="WTL\CColorButton.cpp" />
     <ClCompile Include="WTL\CColorPicker.cpp" />
     <ClCompile Include="WTL\CSpectrumImage.cpp" />
+    <ClCompile Include="WTL\CSpectrumSlider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DDraw.DGI\CeXDib.h" />
@@ -81,6 +82,7 @@
     <ClInclude Include="WTL\CCustomCtrl.h" />
     <ClInclude Include="WTL\CSliderCtrl.h" />
     <ClInclude Include="WTL\CSpectrumImage.h" />
+    <ClInclude Include="WTL\CSpectrumSlider.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>wccf-minimal-static</ProjectName>

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "CColorPicker.h"
 #include "CSpectrumImage.h"
+#include "CSpectrumSlider.h"
 #include "CSliderCtrl.h"
 #include <atlctrls.h>
 #include <atlcrack.h>
@@ -36,7 +37,7 @@ private:
 
     enum Styles: DWORD
     {
-        TB_VERT = TBS_VERT | TBS_NOTICKS | TBS_DOWNISLEFT | WS_TABSTOP,
+        TB_VERT = TBS_VERT | TBS_NOTICKS | TBS_DOWNISLEFT | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
         CC_CHILD = WS_CHILD | WS_VISIBLE,
     };
 
@@ -56,21 +57,21 @@ private:
     };
 
     CSpectrumImage m_imSpectrum;
-    WTL::CSliderCtrl   m_Slider;
+    CSpectrumSlider  m_imSlider;
     int         m_nSpectrumKind;
     int                m_nSlide;
 
-    BEGIN_CONTROLS_MAP()  //             Text/ID,               ID/ClassName,    Style,             X,             Y,          Width,        Height, Style...
-        CONTROL_GROUPBOX(   _T("Spectrum Color"),           CID_GRP_SPECTRUM,                       4,             4,         HDlgCX,       DlgCY-8, 0, 0)
-        CONTROL_COMBOBOX(                                     CID_SPEC_COMBO,                      16,            18,         HHCX-8,       DlgCY-8, CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP, 0)
-        CONTROL_RTEXT(              _T("Color:"),         CID_SPEC_COLOR_CAP,    HDlgCX-HHCY-HHCX/2-8,            18,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-        CONTROL_CTEXT(               _T("COLOR"),         CID_SPEC_COLOR_SEL,           HDlgCX-HHCY-8,            18,         HHCY+2,          HHCY, SS_SUNKEN | SS_CENTERIMAGE | SS_BITMAP, 0)
-        CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC, _T("WCCF::CSpectrumImage"), CC_CHILD,            16,       24+HLCY, HDlgCX-HHCY-32, DlgCY-HLCY-36, 0)
-        CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,             TRACKBAR_CLASS,  TB_VERT, HDlgCX-HHCY-8,       24+HHCY,      HHCX/2-12, DlgCY-HHCY-36, 0)
-        CONTROL_GROUPBOX(        _T("RGB Color"),                CID_GRP_RGB,              8+HDlgCX+4,             4,         HDlgCX,       HDlg3CY, 0, 0)
-        CONTROL_GROUPBOX(        _T("HSL Color"),                CID_GRP_HSL,              8+HDlgCX+4,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
-        CONTROL_GROUPBOX(        _T("HSV Color"),                CID_GRP_HSV,     8+HDlgCX+HDlgCX/2+8,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
-        CONTROL_GROUPBOX(     _T("Color Picker"),             CID_GRP_PICKER,              8+HDlgCX+4, 4+HDlg3CY*2+8,         HDlgCX,     HDlg3CY+8, 0, 0)
+    BEGIN_CONTROLS_MAP()  //             Text/ID,       ID/ClassName,    Style,             X,             Y,          Width,        Height, Style...
+        CONTROL_GROUPBOX(   _T("Spectrum Color"),   CID_GRP_SPECTRUM,                       4,             4,         HDlgCX,       DlgCY-8, 0, 0)
+        CONTROL_COMBOBOX(                             CID_SPEC_COMBO,                      16,            18,         HHCX-8,       DlgCY-8, CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP, 0)
+        CONTROL_RTEXT(              _T("Color:"), CID_SPEC_COLOR_CAP,    HDlgCX-HHCY-HHCX/2-8,            18,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
+        CONTROL_CTEXT(               _T("COLOR"), CID_SPEC_COLOR_SEL,           HDlgCX-HHCY-8,            18,         HHCY+2,          HHCY, SS_SUNKEN | SS_CENTERIMAGE | SS_BITMAP, 0)
+        CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,     CSPECIMG_CLASS, CC_CHILD,            16,       24+HLCY, HDlgCX-HHCY-32, DlgCY-HLCY-36, 0)
+        CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,     CSPECSLD_CLASS,  TB_VERT, HDlgCX-HHCY-8,       24+HHCY,      HHCX/2-12, DlgCY-HHCY-36, 0)
+        CONTROL_GROUPBOX(        _T("RGB Color"),        CID_GRP_RGB,              8+HDlgCX+4,             4,         HDlgCX,       HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(        _T("HSL Color"),        CID_GRP_HSL,              8+HDlgCX+4,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(        _T("HSV Color"),        CID_GRP_HSV,     8+HDlgCX+HDlgCX/2+8,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
+        CONTROL_GROUPBOX(     _T("Color Picker"),     CID_GRP_PICKER,              8+HDlgCX+4, 4+HDlg3CY*2+8,         HDlgCX,     HDlg3CY+8, 0, 0)
     END_CONTROLS_MAP()
 
     BEGIN_DIALOG(0, 0, DlgCX, DlgCY)
@@ -79,9 +80,8 @@ private:
     END_DIALOG()
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
-        DDX_CONTROL_HANDLE(CID_SPECTRUM_SLD, m_Slider);
-        DDX_INDEX(WTL::CSliderCtrl, CID_SPECTRUM_SLD, m_nSlide);
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
+      //DDX_INDEX(WTL::CSliderCtrl, CID_SPECTRUM_SLD, m_nSlide);
         if (!bSaveAndValidate) {
             OnDDXChanges(nCtlID);
         }
@@ -93,7 +93,7 @@ private:
         DLGRESIZE_CONTROL(CID_SPEC_COLOR_CAP, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_SPEC_COLOR_SEL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_SPECTRUM_PIC, DLSZ_SIZE_Y | DLSZ_SIZE_X)
-        DLGRESIZE_CONTROL(CID_SPECTRUM_SLD, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+      //DLGRESIZE_CONTROL(CID_SPECTRUM_SLD, DLSZ_SIZE_Y | DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_RGB, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSV, DLSZ_MOVE_X)
@@ -117,14 +117,21 @@ CColorPicker::Impl::~Impl() = default;
 
 CColorPicker::Impl::Impl()
     :    m_imSpectrum{}
+    ,      m_imSlider{}
     , m_nSpectrumKind{SPEC_HSV_Hue}
+    ,        m_nSlide{0}
     ,   m_bMsgHandled{FALSE}
 {
 }
 
 HRESULT CColorPicker::Impl::PreCreateWindow()
 {
-    auto const code{m_imSpectrum.PreCreateWindow()};
+    HRESULT code{S_OK};
+    code = m_imSpectrum.PreCreateWindow();
+    if (ERROR_SUCCESS != code) {
+        return code;
+    }
+    code = m_imSlider.PreCreateWindow();
     if (ERROR_SUCCESS != code) {
         return code;
     }
@@ -150,6 +157,9 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
     UNREFERENCED_PARAMETER(wndFocus);
     UNREFERENCED_PARAMETER(lInitParam);
+
+    ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
+    ATLASSUME(m_imSlider.m_hWnd != nullptr);
 
     WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
     cbSpectrum.AddString(L"RGB/红");
@@ -187,6 +197,12 @@ HRESULT CColorPicker::PreCreateWindow()
         return code;
     }
     return Super::PreCreateWindow();
+}
+
+ATOM& CColorPicker::GetWndClassAtomRef()
+{
+    static ATOM gs_CColorPicker_Atom{0};
+    return gs_CColorPicker_Atom;
 }
 
 #if 0
@@ -256,6 +272,7 @@ int CColorPicker::OnCreate(LPCREATESTRUCT lpCreateStruct)
     if (!m_pImpl->Create(m_hWnd)) {
         return -1;
     }
+    ATLTRACE(ATL::atlTraceControls, 0, _T("WM_CREATE OK for %p\n"), this);
     return 0;
 }
 
