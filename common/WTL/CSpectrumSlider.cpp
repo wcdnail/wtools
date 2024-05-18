@@ -94,6 +94,7 @@ void CSpectrumSlider::SetPrimaryColor(COLORREF crPrimary)
     m_focusBrush.Attach(CreateBrushIndirect(&logBrush));
 }
 
+#if 0
 LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR) const
 {
     // for additional info, read beginning MSDN "Customizing a Control's Appearance Using Custom Draw" at
@@ -101,7 +102,7 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR) const
     // slider controls (which are actually called "trackbar" controls) are specifically discussed at
     // http://msdn.microsoft.com/library/default.asp?url=/library/en-us/shellcc/platform/commctls/trackbar/notifications/nm_customdraw_trackbar.asp
     
-    NMCUSTOMDRAW const& nmcd{*reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR)};
+    NMCUSTOMDRAW&       nmcd{*reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR)};
     UINT const     drawStage{nmcd.dwDrawStage};
     DWORD_PTR const itemSpec{nmcd.dwItemSpec};
     switch (drawStage) {
@@ -148,7 +149,6 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR) const
         //CRect const   rcThumb{GetThumbRect()};
         //CRect        rcClient{nmcd.rc};
         //CRect           rcBar{};
-
         //GetClientRect(&rcClient);
         //// TBS_RIGHT, TBS_BOTTOM and TBS_HORZ are all defined as 0x0000, so avoid testing on them
         //if (dwStyle & TBS_VERT) {
@@ -158,12 +158,11 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR) const
         //    // TODO: investigate it 
         //    rcBar.SetRect(rcClient.left+4, rcChannel.left+rcThumb.Height()/2, rcClient.right-8, rcChannel.right-rcThumb.Height()/2);
         //}
-
         //dc.FillSolidRect(rcBar, m_crPrimary);
         //dc.RestoreDC(iSave);
         return CDRF_NOTIFYITEMDRAW | CDRF_SKIPDEFAULT;// | CDRF_NOTIFYPOSTPAINT;
     }
-        
+
     case CDDS_PREERASE:         // Before the erase cycle begins
     case CDDS_POSTERASE:        // After the erase cycle is complete
     case CDDS_ITEMPREERASE:     // Before an item is erased
@@ -176,6 +175,21 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR) const
         // this is where we perform our item-specific custom drawing
         switch (itemSpec) {
         case TBCD_CHANNEL: {
+            const DWORD dwStyle{GetStyle()};
+            CRect&    rcChannel{static_cast<CRect&>(nmcd.rc)};
+            CRect            rc{};
+            GetClientRect(rc);
+            if (dwStyle & TBS_VERT) {
+                rcChannel.left = rc.left;
+                rcChannel.right = rc.right;
+                rcChannel.DeflateRect(6, 4);
+            }
+            else {
+                rc.left = nmcd.rc.left+1;
+                rc.right = nmcd.rc.right-1;
+                rc.DeflateRect(4, 6);
+            }
+            return CDRF_DODEFAULT;
             // channel that the trackbar control's thumb marker slides along
             // For the pre-item-paint of the channel, we simply tell the control to draw the default
             // and then tell us when it's done drawing the channel (i.e., item-post-paint) using
@@ -185,24 +199,24 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR) const
             // Frankly, when I returned CDRF_SKIPDEFAULT, in an attempt to skip drawing here
             // and draw everything in post-paint, the control seems to ignore the CDRF_SKIPDEFAULT flag,
             // and it seems to draw the channel even if we returned CDRF_SKIPDEFAULT
-            WTL::CDCHandle   dc{nmcd.hdc};
-            const DWORD dwStyle{GetStyle()};
-            CRect            rc{};
-            GetClientRect(rc);
-            if (dwStyle & TBS_VERT) {
-                rc.top = nmcd.rc.top+1;
-                rc.bottom = nmcd.rc.bottom-1;
-                rc.DeflateRect(6, 4);
-            }
-            else {
-                rc.left = nmcd.rc.left+1;
-                rc.right = nmcd.rc.right-1;
-                rc.DeflateRect(4, 6);
-            }
-            dc.Draw3dRect(rc, m_crMidShadow, m_crHilite);
-            rc.DeflateRect(2, 2);
-            dc.FillSolidRect(rc, m_crPrimary);
-            return CDRF_SKIPDEFAULT; //CDRF_DODEFAULT | CDRF_NOTIFYPOSTPAINT;
+            //WTL::CDCHandle   dc{nmcd.hdc};
+            //const DWORD dwStyle{GetStyle()};
+            //CRect            rc{};
+            //GetClientRect(rc);
+            //if (dwStyle & TBS_VERT) {
+            //    rc.top = nmcd.rc.top+1;
+            //    rc.bottom = nmcd.rc.bottom-1;
+            //    rc.DeflateRect(6, 4);
+            //}
+            //else {
+            //    rc.left = nmcd.rc.left+1;
+            //    rc.right = nmcd.rc.right-1;
+            //    rc.DeflateRect(4, 6);
+            //}
+            //dc.Draw3dRect(rc, m_crMidShadow, m_crHilite);
+            //rc.DeflateRect(2, 2);
+            //dc.FillSolidRect(rc, m_crPrimary);
+            //return CDRF_SKIPDEFAULT; //CDRF_DODEFAULT | CDRF_NOTIFYPOSTPAINT;
         }
 
         case TBCD_TICS:     // the increment tick marks that appear along the edge of the trackbar control
@@ -210,6 +224,17 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR) const
             return CDRF_DODEFAULT;
             
         case TBCD_THUMB: {
+            const DWORD dwStyle{GetStyle()};
+            CRect&      rcThumb{static_cast<CRect&>(nmcd.rc)};
+            CRect            rc{};
+            GetClientRect(rc);
+            if (dwStyle & TBS_VERT) {
+                rcThumb.left = rc.left + 2;
+                rcThumb.right = rc.right - 2;
+            }
+            else {
+            }
+            return CDRF_DODEFAULT;
             // trackbar control's thumb marker. This is the portion of the control that the user moves
             // For the pre-item-paint of the thumb, we draw everything completely here, during item 
             // pre-paint, and then tell the control to skip default painting and NOT to notify 
@@ -220,35 +245,32 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR) const
             // I return another CDRF_SKIPDEFAULT.  I don't understand why.  
             // Anyway, it works fine if I draw everthing here, return CDRF_SKIPDEFAULT, and do not ask for
             // a post-paint item notification
-            WTL::CDCHandle           dc{nmcd.hdc};
-            const int           iSaveDC{dc.SaveDC()};
-            WTL::CBrushHandle brCurrent{WTL::AtlGetStockBrush(BLACK_BRUSH)};
-          //const WTL::CPen         pen{CreatePen(PS_SOLID, 2, m_crShadow)};
-            CRect               rcThumb{nmcd.rc};
-            const DWORD         dwStyle{GetStyle()};
-            CRect                    rc{};
-            GetClientRect(rc);
-            if (dwStyle & TBS_VERT) {
-                rcThumb.left = rc.left+4;
-                rcThumb.right = rc.right-4;
-            }
-            else {
-                rcThumb.left = nmcd.rc.left+1;
-                rcThumb.right = nmcd.rc.right-1;
-            }
-
-            // if thumb is selected/focussed, switch brushes
-            if (nmcd.uItemState && CDIS_FOCUS) {
-                brCurrent = m_focusBrush;
-                //dcThumb.SetBrushOrg(nmcd.rc.right % 8, nmcd.rc.top % 8);
-                //dcThumb.SetBkColor(m_crPrimary);
-                //dcThumb.SetTextColor(m_crHilite);                
-            }
-            //dc.SelectBrush(brCurrent);
-            //dc.SelectPen(pen);
-            dc.FrameRect(rcThumb, brCurrent);
-            dc.RestoreDC(iSaveDC);
-            return CDRF_SKIPDEFAULT;    // don't let control draw itself, or it will un-do our work
+            //WTL::CDCHandle           dc{nmcd.hdc};
+            //const int           iSaveDC{dc.SaveDC()};
+            //WTL::CBrushHandle brCurrent{WTL::AtlGetStockBrush(BLACK_BRUSH)};
+            //CRect               rcThumb{nmcd.rc};
+            //const DWORD         dwStyle{GetStyle()};
+            //CRect                    rc{};
+            //GetClientRect(rc);
+            //if (dwStyle & TBS_VERT) {
+            //    rcThumb.left = rc.left+4;
+            //    rcThumb.right = rc.right-4;
+            //}
+            //else {
+            //    rcThumb.left = nmcd.rc.left+1;
+            //    rcThumb.right = nmcd.rc.right-1;
+            //}
+            //
+            //// if thumb is selected/focussed, switch brushes
+            //if (nmcd.uItemState && CDIS_FOCUS) {
+            //    brCurrent = m_focusBrush;
+            //    //dcThumb.SetBrushOrg(nmcd.rc.right % 8, nmcd.rc.top % 8);
+            //    //dcThumb.SetBkColor(m_crPrimary);
+            //    //dcThumb.SetTextColor(m_crHilite);                
+            //}
+            //dc.FrameRect(rcThumb, brCurrent);
+            //dc.RestoreDC(iSaveDC);
+            //return CDRF_SKIPDEFAULT;    // don't let control draw itself, or it will un-do our work
         }
         default:
             ATLASSERT(FALSE);           // all of a slider's items have been listed, so we shouldn't get here
@@ -290,5 +312,73 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR) const
     default:
         ATLASSERT(FALSE);   // all drawing stages are listed, so we shouldn't get here
     };
+    return CDRF_DODEFAULT;
+}
+#endif
+
+LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
+{
+    SetMsgHandled(TRUE);
+    NMCUSTOMDRAW& nmcd{*reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR)};
+    LRESULT       lRes{CDRF_DODEFAULT};
+    switch(nmcd.dwDrawStage) {
+    case CDDS_PREPAINT:                         lRes = OnPrePaint(nmcd); break;
+    case CDDS_POSTPAINT:                        lRes = OnPostPaint(nmcd); break;
+    case CDDS_PREERASE:                         lRes = OnPreErase(nmcd); break;
+    case CDDS_POSTERASE:                        lRes = OnPostErase(nmcd); break;
+    case CDDS_ITEMPREPAINT:                     lRes = OnItemPrePaint(nmcd); break;
+    case CDDS_ITEMPOSTPAINT:                    lRes = OnItemPostPaint(nmcd); break;
+    case CDDS_ITEMPREERASE:                     lRes = OnItemPreErase(nmcd); break;
+    case CDDS_ITEMPOSTERASE:                    lRes = OnItemPostErase(nmcd); break;
+    case (CDDS_ITEMPREPAINT | CDDS_SUBITEM):    lRes = OnSubItemPrePaint(nmcd); break;
+    default:
+        SetMsgHandled(FALSE);
+        break;
+    }
+    return lRes;
+}
+
+LRESULT CSpectrumSlider::OnPrePaint(NMCUSTOMDRAW& nmcd) const
+{
+    return CDRF_DODEFAULT;
+}
+
+LRESULT CSpectrumSlider::OnPostPaint(NMCUSTOMDRAW& nmcd) const
+{
+    return CDRF_DODEFAULT;
+}
+
+LRESULT CSpectrumSlider::OnPreErase(NMCUSTOMDRAW& nmcd) const
+{
+    return CDRF_DODEFAULT;
+}
+
+LRESULT CSpectrumSlider::OnPostErase(NMCUSTOMDRAW& nmcd) const
+{
+    return CDRF_DODEFAULT;
+}
+
+LRESULT CSpectrumSlider::OnItemPrePaint(NMCUSTOMDRAW& nmcd) const
+{
+    return CDRF_DODEFAULT;
+}
+
+LRESULT CSpectrumSlider::OnItemPostPaint(NMCUSTOMDRAW& nmcd) const
+{
+    return CDRF_DODEFAULT;
+}
+
+LRESULT CSpectrumSlider::OnItemPreErase(NMCUSTOMDRAW& nmcd) const
+{
+    return CDRF_DODEFAULT;
+}
+
+LRESULT CSpectrumSlider::OnItemPostErase(NMCUSTOMDRAW& nmcd) const
+{
+    return CDRF_DODEFAULT;
+}
+
+LRESULT CSpectrumSlider::OnSubItemPrePaint(NMCUSTOMDRAW& nmcd) const
+{
     return CDRF_DODEFAULT;
 }
