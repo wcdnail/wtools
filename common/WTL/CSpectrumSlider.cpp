@@ -1,7 +1,6 @@
 //
 // https://www.codeproject.com/articles/8985/customizing-the-appearance-of-csliderctrl-using-cu
-// Customizing the Appearance of CSliderCtrl Using Custom Draw
-// Mike O'Neill
+// Mike O'Neill's Customizing the Appearance of CSliderCtrl Using Custom Draw
 // adopted to WTL
 //
 #include "stdafx.h"
@@ -316,28 +315,78 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR) const
 }
 #endif
 
+CRect& CSpectrumSlider::SetChannelRect(NMCUSTOMDRAW& nmcd, CRect const& rcClient) const
+{
+    const DWORD dwStyle{GetStyle()};
+    CRect&    rcChannel{static_cast<CRect&>(nmcd.rc)};
+    if (dwStyle & TBS_VERT) {
+        rcChannel.left = rcClient.left;
+        rcChannel.right = rcClient.right;
+        rcChannel.DeflateRect(6, 4);
+    }
+    else {
+        rcChannel.top = rcClient.top;
+        rcChannel.bottom = rcClient.bottom;
+        rcChannel.DeflateRect(4, 6);
+    }
+    return rcChannel;
+}
+
+CRect& CSpectrumSlider::SetThumbRect(NMCUSTOMDRAW& nmcd, CRect const& rcClient) const
+{
+    const DWORD dwStyle{GetStyle()};
+    CRect&      rcThumb{static_cast<CRect&>(nmcd.rc)};
+    if (dwStyle & TBS_VERT) {
+        rcThumb.left = rcClient.left + 2;
+        rcThumb.right = rcClient.right - 2;
+    }
+    else {
+        rcThumb.top = rcClient.top + 2;
+        rcThumb.bottom = rcClient.bottom - 2;
+    }
+    return rcThumb;
+}
+
 LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
 {
-    SetMsgHandled(TRUE);
     NMCUSTOMDRAW& nmcd{*reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR)};
+    int const   itemId{static_cast<int>(nmcd.dwItemSpec)};
     LRESULT       lRes{CDRF_DODEFAULT};
     switch(nmcd.dwDrawStage) {
-    case CDDS_PREPAINT:                         lRes = OnPrePaint(nmcd); break;
-    case CDDS_POSTPAINT:                        lRes = OnPostPaint(nmcd); break;
-    case CDDS_PREERASE:                         lRes = OnPreErase(nmcd); break;
-    case CDDS_POSTERASE:                        lRes = OnPostErase(nmcd); break;
-    case CDDS_ITEMPREPAINT:                     lRes = OnItemPrePaint(nmcd); break;
-    case CDDS_ITEMPOSTPAINT:                    lRes = OnItemPostPaint(nmcd); break;
-    case CDDS_ITEMPREERASE:                     lRes = OnItemPreErase(nmcd); break;
-    case CDDS_ITEMPOSTERASE:                    lRes = OnItemPostErase(nmcd); break;
-    case (CDDS_ITEMPREPAINT | CDDS_SUBITEM):    lRes = OnSubItemPrePaint(nmcd); break;
+    case CDDS_PREPAINT: {
+        return CDRF_NOTIFYITEMDRAW | CDRF_SKIPDEFAULT;
+    }
+    case CDDS_ITEMPREPAINT: {
+        switch (itemId) {
+        case TBCD_CHANNEL: {
+            CRect rcClient{};
+            GetClientRect(rcClient);
+            CRect rcChannel{SetChannelRect(nmcd, rcClient)};
+            break;
+        }
+        case TBCD_THUMB: {
+            CRect rcClient{};
+            GetClientRect(rcClient);
+            CRect rcThumb{SetThumbRect(nmcd, rcClient)};
+            break;
+        }
+        }
+        break;
+    }
+    case CDDS_POSTERASE:
+    case CDDS_POSTPAINT:
+    case CDDS_ITEMPOSTPAINT:
+    case CDDS_ITEMPOSTERASE:
+    case (CDDS_ITEMPREPAINT | CDDS_SUBITEM):
     default:
-        SetMsgHandled(FALSE);
+        lRes = CDRF_SKIPDEFAULT;
+        SetMsgHandled(TRUE);
         break;
     }
     return lRes;
 }
 
+/*
 LRESULT CSpectrumSlider::OnPrePaint(NMCUSTOMDRAW& nmcd) const
 {
     return CDRF_DODEFAULT;
@@ -382,3 +431,4 @@ LRESULT CSpectrumSlider::OnSubItemPrePaint(NMCUSTOMDRAW& nmcd) const
 {
     return CDRF_DODEFAULT;
 }
+*/
