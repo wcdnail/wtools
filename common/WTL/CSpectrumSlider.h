@@ -41,5 +41,5 @@ private:
     BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 
     int OnCreate(LPCREATESTRUCT pCS);
-    LRESULT OnCustomDraw(LPNMHDR pNMHDR);
+    LRESULT OnCustomDraw(LPNMHDR pNMHDR) const;
 };
