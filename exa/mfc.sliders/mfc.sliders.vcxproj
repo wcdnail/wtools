@@ -19,13 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FOHyperLink.cpp" />
-    <ClCompile Include="GTColorDialog.cpp" />
-    <ClCompile Include="GTColorDialogDlg.cpp" />
-    <ClCompile Include="GTColorSelectorWnd.cpp" />
-    <ClCompile Include="GTColorSliderWnd.cpp" />
-    <ClCompile Include="GTColorWellWnd.cpp" />
-    <ClCompile Include="GTDrawHelper.cpp" />
+    <ClCompile Include="BuddiedSliderCtrl.cpp" />
+    <ClCompile Include="ColorSelector.cpp" />
+    <ClCompile Include="ColorSelectorDlg.cpp" />
+    <ClCompile Include="CustomDrawSliderCtrl.cpp" />
+    <ClCompile Include="SpectrumWnd.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Create</PrecompiledHeader>
@@ -34,27 +32,25 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FOHyperLink.h" />
-    <ClInclude Include="GTColorDialog.h" />
-    <ClInclude Include="GTColorDialogDlg.h" />
-    <ClInclude Include="GTColorSelectorWnd.h" />
-    <ClInclude Include="GTColorSliderWnd.h" />
-    <ClInclude Include="GTColorWellWnd.h" />
-    <ClInclude Include="GTDrawHelper.h" />
+    <ClInclude Include="BuddiedSliderCtrl.h" />
+    <ClInclude Include="ColorSelector.h" />
+    <ClInclude Include="ColorSelectorDlg.h" />
+    <ClInclude Include="CustomDrawSliderCtrl.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SpectrumWnd.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="GTColorDialog.rc" />
+    <ResourceCompile Include="ColorSelector.rc" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>gt.color.dialog</ProjectName>
+    <ProjectName>mfc.sliders</ProjectName>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectGuid>{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}</ProjectGuid>
+    <ProjectGuid>{E0768B49-E3C8-478A-BB51-105D7ECCBDB9}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='product|Win32'" Label="Configuration">

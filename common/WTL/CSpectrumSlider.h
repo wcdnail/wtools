@@ -2,7 +2,7 @@
 
 #include "CCustomCtrl.h"
 #include "CSliderCtrl.h"
-#include <DDraw.DGI/CeXDib.h>
+//#include <DDraw.DGI/CeXDib.h>
 #include <wcdafx.api.h>
 
 #define CSPECSLD_CLASS _T("WCCF::CSpectrumSlider")
@@ -17,11 +17,20 @@ struct CSpectrumSlider: CCustomControl<CSpectrumSlider, WTL::CSliderCtrl>
     ~CSpectrumSlider() override;
     CSpectrumSlider();
 
+    void SetPrimaryColor(COLORREF crPrimary);
+
 private:
     friend Super;
 
-    CDIBitmap     m_Dib;
-    BOOL  m_bMsgHandled;
+  //CDIBitmap     m_Dib;
+    BOOL        m_bMsgHandled;
+    COLORREF      m_crPrimary;
+    COLORREF       m_crShadow;
+    COLORREF       m_crHilite;
+    COLORREF    m_crMidShadow;
+    COLORREF m_crDarkerShadow;
+    WTL::CBrush m_normalBrush;
+    WTL::CBrush  m_focusBrush;
 
     static ATOM& GetWndClassAtomRef();
 
@@ -32,5 +41,5 @@ private:
     BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 
     int OnCreate(LPCREATESTRUCT pCS);
-    void OnPaint(WTL::CDCHandle dc);
+    LRESULT OnCustomDraw(LPNMHDR pNMHDR);
 };

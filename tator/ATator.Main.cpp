@@ -41,16 +41,23 @@ static int Run(LPTSTR lpstrCmdLine, int nCmdShow)
     WTL::CMessageLoop theLoop;
     _Module.AddMessageLoop(&theLoop);
 
-    if constexpr (false) {
-        CDefaultWin32Dlg dlg;
-        nRet = static_cast<int>(dlg.DoModal());
-        if (-1 == nRet) {
-            code = static_cast<HRESULT>(GetLastError());
+    if constexpr (true) {
+      //CDefaultWin32Dlg dlg;
+        CTatorMainDlg dlg;
+        if (ERROR_SUCCESS != (code = dlg.Initialize())) {
             bError = true;
+        }
+        else {
+            nRet = static_cast<int>(dlg.DoModal());
+            if (-1 == nRet) {
+                code = static_cast<HRESULT>(GetLastError());
+                bError = true;
+            }
         }
     }
     else {
-        CTatorMainDlg dlg;
+      //CTatorMainDlg dlg;
+        CDefaultWin32Dlg dlg;
         if (ERROR_SUCCESS != (code = dlg.Initialize())) {
             bError = true;
         }

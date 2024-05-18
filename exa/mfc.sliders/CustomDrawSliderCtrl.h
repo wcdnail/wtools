@@ -1,4 +1,11 @@
+#if !defined(AFX_CUSTOMDRAWSLIDERCTRL_H__A5580780_B870_40D7_AC86_ED4F9CDEDC4A__INCLUDED_)
+#define AFX_CUSTOMDRAWSLIDERCTRL_H__A5580780_B870_40D7_AC86_ED4F9CDEDC4A__INCLUDED_
+
+#if _MSC_VER > 1000
 #pragma once
+#endif // _MSC_VER > 1000
+// CustomDrawSliderCtrl.h : header file
+//
 
 /////////////////////////////////////////////////////////////////////////////
 // CCustomDrawSliderCtrl window
@@ -52,3 +59,7 @@ protected:
 
 /////////////////////////////////////////////////////////////////////////////
 
+//{{AFX_INSERT_LOCATION}}
+// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+
+#endif // !defined(AFX_CUSTOMDRAWSLIDERCTRL_H__A5580780_B870_40D7_AC86_ED4F9CDEDC4A__INCLUDED_)

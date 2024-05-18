@@ -30,21 +30,12 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
 
     CColorPicker m_ccColorPicker;
 
-    BOOL PreTranslateMessage(MSG* pMsg) override
-    {
-        if (IsDialogMessageW(pMsg)) {
-            return TRUE;
-        }
-        return FALSE;
-    }
+    BOOL PreTranslateMessage(MSG* pMsg) override;
 
-    HRESULT Initialize()
-    {
-        return m_ccColorPicker.PreCreateWindow();
-    }
+    HRESULT Initialize();
 
     BEGIN_DDX_MAP(CTatorMainDlg)
-    END_DDX_MAP()
+        END_DDX_MAP()
 
     BEGIN_DIALOG(0, 0, DIALOG_CX, DIALOG_CY)
         DIALOG_CAPTION(_T("TATOR [XYZ]"))
@@ -70,36 +61,51 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
         MSG_WM_INITDIALOG(OnInitDialog)
         COMMAND_ID_HANDLER(IDOK, OnCloseCmd)
         COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
+        REFLECT_NOTIFICATIONS()
         CHAIN_MSG_MAP(CDialogResize<CTatorMainDlg>)
     END_MSG_MAP()
 
-    BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
-    {
-        UNREFERENCED_PARAMETER(wndFocus);
-        UNREFERENCED_PARAMETER(lInitParam);
+    BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
+    LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+};
 
-#if 1
-        MoveToMonitor{}.Move(m_hWnd, 2, PutAt::YCenter | PutAt::Right);
-#endif
-
-        WTL::CIcon const icon(LoadIconW(WTL::ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
-        SetIcon(icon, TRUE);
-        SetIcon(icon, FALSE);
-
-        DlgResize_Init(true, true, 0);
-        //CenterWindow(GetParent());
+inline BOOL CTatorMainDlg::PreTranslateMessage(MSG* pMsg)
+{
+    if (IsDialogMessageW(pMsg)) {
         return TRUE;
     }
+    return FALSE;
+}
 
-    LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-    {
-        if (m_bModal) {
-            EndDialog(wID);
-        }
-        else {
-            DestroyWindow();
-            PostQuitMessage(wID);
-        }
-        return 0;
+inline HRESULT CTatorMainDlg::Initialize()
+{
+    return m_ccColorPicker.PreCreateWindow();
+}
+
+inline BOOL CTatorMainDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
+{
+    UNREFERENCED_PARAMETER(wndFocus);
+    UNREFERENCED_PARAMETER(lInitParam);
+#if 1
+    MoveToMonitor{}.Move(m_hWnd, 2, PutAt::YCenter | PutAt::Right);
+#endif
+    WTL::CIcon const icon(LoadIconW(WTL::ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
+    SetIcon(icon, TRUE);
+    SetIcon(icon, FALSE);
+
+    DlgResize_Init(true, true, 0);
+    //CenterWindow(GetParent());
+    return TRUE;
+}
+
+inline LRESULT CTatorMainDlg::OnCloseCmd(WORD, WORD wID, HWND, BOOL&)
+{
+    if (m_bModal) {
+        EndDialog(wID);
     }
-};
+    else {
+        DestroyWindow();
+        PostQuitMessage(wID);
+    }
+    return 0;
+}

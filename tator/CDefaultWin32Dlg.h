@@ -19,6 +19,11 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         return IsDialogMessageW(pMsg);
     }
 
+    HRESULT Initialize()
+    {
+        return S_OK;
+    }
+
     BEGIN_MSG_MAP_EX(CDefaultWin32Dlg)
         MSG_WM_INITDIALOG(OnInitDialog)
         COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)

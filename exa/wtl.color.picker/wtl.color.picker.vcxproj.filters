@@ -28,50 +28,53 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\ab.png">
-      <Filter>rez</Filter>
+      <Filter>rez\pixmaps</Filter>
     </Image>
     <Image Include="res\close.png">
-      <Filter>rez</Filter>
-    </Image>
-    <Image Include="res\ddd.bmp">
-      <Filter>rez</Filter>
-    </Image>
-    <Image Include="res\droplist.png">
-      <Filter>rez</Filter>
-    </Image>
-    <Image Include="..\..\Color16 - 副本\Color\res\dropper.ico">
-      <Filter>rez</Filter>
-    </Image>
-    <Image Include="res\dropper.ico">
-      <Filter>rez</Filter>
-    </Image>
-    <Image Include="res\dropper.png">
-      <Filter>rez</Filter>
-    </Image>
-    <Image Include="res\menu.png">
-      <Filter>rez</Filter>
-    </Image>
-    <Image Include="res\min.png">
-      <Filter>rez</Filter>
+      <Filter>rez\pixmaps</Filter>
     </Image>
     <Image Include="res\Color.ico">
-      <Filter>rez</Filter>
+      <Filter>rez\pixmaps</Filter>
+    </Image>
+    <Image Include="res\ddd.bmp">
+      <Filter>rez\pixmaps</Filter>
+    </Image>
+    <Image Include="res\droplist.png">
+      <Filter>rez\pixmaps</Filter>
+    </Image>
+    <Image Include="..\..\Color16 - 副本\Color\res\dropper.ico">
+      <Filter>rez\pixmaps</Filter>
+    </Image>
+    <Image Include="res\dropper.ico">
+      <Filter>rez\pixmaps</Filter>
+    </Image>
+    <Image Include="res\dropper.png">
+      <Filter>rez\pixmaps</Filter>
+    </Image>
+    <Image Include="res\menu.png">
+      <Filter>rez\pixmaps</Filter>
+    </Image>
+    <Image Include="res\min.png">
+      <Filter>rez\pixmaps</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\arrow blue.cur">
-      <Filter>rez</Filter>
-    </None>
-    <None Include="res\ibeam blue.cur">
-      <Filter>rez</Filter>
+      <Filter>rez\pixmaps</Filter>
     </None>
     <None Include="res\dropcur.cur">
-      <Filter>rez</Filter>
+      <Filter>rez\pixmaps</Filter>
+    </None>
+    <None Include="res\ibeam blue.cur">
+      <Filter>rez\pixmaps</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="rez">
       <UniqueIdentifier>{b77156f0-550f-4836-a832-fe91345eabce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rez\pixmaps">
+      <UniqueIdentifier>{65145144-6344-4650-bc44-46b3eea55ad9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
