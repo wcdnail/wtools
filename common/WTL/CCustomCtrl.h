@@ -3,8 +3,8 @@
 #include <atlwin.h>
 #include <atlapp.h>
 
-template <typename T, typename TBase = ATL::CWindow>
-struct CCustomControl: ATL::CWindowImpl<T, TBase>
+template <typename T, typename TBase = ATL::CWindow, typename TWinTraits = ATL::CControlWinTraits>
+struct CCustomControl: ATL::CWindowImpl<T, TBase, TWinTraits>
 {
     ~CCustomControl() override = default;
 
@@ -14,8 +14,8 @@ protected:
     CCustomControl() = default;
 };
 
-template <typename T, typename TBase>
-inline HRESULT CCustomControl<T, TBase>::PreCreateWindow()
+template <typename T, typename TBase, typename TWinTraits>
+inline HRESULT CCustomControl<T, TBase, TWinTraits>::PreCreateWindow()
 {
     WTL::CStaticDataInitCriticalSectionLock lock;
     HRESULT code = lock.Lock();
@@ -24,12 +24,12 @@ inline HRESULT CCustomControl<T, TBase>::PreCreateWindow()
     }
     ATOM& rAtom = T::GetWndClassAtomRef();
     if (!rAtom) {
-        const ATOM atom = ATL::AtlModuleRegisterClassExW(nullptr, &T::GetWndClassInfo().m_wc);
+        const ATOM atom = ATL::AtlModuleRegisterClassEx(nullptr, &T::GetWndClassInfo().m_wc);
         if (!atom) {
+            lock.Unlock();
             code = static_cast<HRESULT>(GetLastError());
             return code;
         }
-        // ##TODO: gs_Atom is not ThreadSafe!
         rAtom = atom;
     }
     lock.Unlock();

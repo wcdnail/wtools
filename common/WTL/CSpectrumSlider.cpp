@@ -28,7 +28,7 @@ BOOL CSpectrumSlider::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam,
     switch(dwMsgMapID) { 
     case 0:
         MSG_WM_CREATE(OnCreate)
-        //MSG_WM_PAINT(OnPaint)
+        MSG_WM_PAINT(OnPaint)
         break;
     default:
         ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
@@ -42,4 +42,14 @@ int CSpectrumSlider::OnCreate(LPCREATESTRUCT pCS)
 {
     ATLTRACE(ATL::atlTraceControls, 0, _T("WM_CREATE OK for %p\n"), this);
     return 0;
+}
+
+void CSpectrumSlider::OnPaint(WTL::CDCHandle dc)
+{
+    UNREFERENCED_PARAMETER(dc);
+
+    WTL::CPaintDC dcPaint{m_hWnd};
+    CRect          rcDest{dcPaint.m_ps.rcPaint};
+
+    dcPaint.DrawTextW(L"SLIDER!!!", -1, rcDest, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 }

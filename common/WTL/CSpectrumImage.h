@@ -21,7 +21,7 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
 {
     using Super = CCustomControl<CSpectrumImage>;
 
-    DECLARE_WND_CLASS(CSPECIMG_CLASS)
+    DECLARE_WND_SUPERCLASS2(CSPECIMG_CLASS, CSpectrumImage, nullptr)
 
     ~CSpectrumImage() override;
     CSpectrumImage();

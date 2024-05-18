@@ -4,6 +4,7 @@
 #include "CSpectrumSlider.h"
 #include "CSliderCtrl.h"
 #include <atlctrls.h>
+#include <atlctrlx.h>
 #include <atlcrack.h>
 #include <atldlgs.h>
 #include <atlddx.h>
@@ -81,7 +82,7 @@ private:
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
-      //DDX_INDEX(WTL::CSliderCtrl, CID_SPECTRUM_SLD, m_nSlide);
+        DDX_INDEX(WTL::CSliderCtrl, CID_SPECTRUM_SLD, m_nSlide);
         if (!bSaveAndValidate) {
             OnDDXChanges(nCtlID);
         }
@@ -93,7 +94,7 @@ private:
         DLGRESIZE_CONTROL(CID_SPEC_COLOR_CAP, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_SPEC_COLOR_SEL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_SPECTRUM_PIC, DLSZ_SIZE_Y | DLSZ_SIZE_X)
-      //DLGRESIZE_CONTROL(CID_SPECTRUM_SLD, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_SPECTRUM_SLD, DLSZ_SIZE_Y | DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_RGB, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSV, DLSZ_MOVE_X)
@@ -127,11 +128,11 @@ CColorPicker::Impl::Impl()
 HRESULT CColorPicker::Impl::PreCreateWindow()
 {
     HRESULT code{S_OK};
-    code = m_imSpectrum.PreCreateWindow();
+    code = m_imSlider.PreCreateWindow();
     if (ERROR_SUCCESS != code) {
         return code;
     }
-    code = m_imSlider.PreCreateWindow();
+    code = m_imSpectrum.PreCreateWindow();
     if (ERROR_SUCCESS != code) {
         return code;
     }

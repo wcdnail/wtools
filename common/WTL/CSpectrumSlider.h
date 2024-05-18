@@ -12,8 +12,7 @@ struct CSpectrumSlider: CCustomControl<CSpectrumSlider, WTL::CSliderCtrl>
     using Super = CCustomControl<CSpectrumSlider, WTL::CSliderCtrl>;
 
     DELETE_COPY_MOVE_OF(CSpectrumSlider);
-
-    DECLARE_WND_SUPERCLASS(CSPECSLD_CLASS, WTL::CSliderCtrl::GetWndClassName())
+    DECLARE_WND_SUPERCLASS2(CSPECSLD_CLASS, CSpectrumSlider, WTL::CSliderCtrl::GetWndClassName())
 
     ~CSpectrumSlider() override;
     CSpectrumSlider();
