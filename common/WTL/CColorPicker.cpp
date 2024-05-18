@@ -4,7 +4,6 @@
 #include "CSpectrumSlider.h"
 #include "CSliderCtrl.h"
 #include <atlctrls.h>
-#include <atlctrlx.h>
 #include <atlcrack.h>
 #include <atldlgs.h>
 #include <atlddx.h>
@@ -38,7 +37,7 @@ private:
 
     enum Styles: DWORD
     {
-        TB_VERT = TBS_RIGHT | TBS_VERT | TBS_NOTICKS | TBS_DOWNISLEFT | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
+        TB_VERT = TBS_BOTH | TBS_VERT | TBS_NOTICKS | TBS_DOWNISLEFT | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
         CC_CHILD = WS_CHILD | WS_VISIBLE,
     };
 
