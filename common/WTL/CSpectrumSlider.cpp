@@ -5,9 +5,8 @@
 //
 #include "stdafx.h"
 #include "CSpectrumSlider.h"
-
-#include <atlmisc.h>
 #include <DDraw.DGI/DDGDIStuff.h>
+#include <atlmisc.h>
 
 CSpectrumSlider::~CSpectrumSlider() = default;
 
@@ -43,6 +42,8 @@ BOOL CSpectrumSlider::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam,
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) { 
     case 0:
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_ERASEBKGND(OnEraseBkgnd)
         REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
         NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
     ALT_MSG_MAP(1)
@@ -60,6 +61,12 @@ int CSpectrumSlider::OnCreate(LPCREATESTRUCT pCS)
 {
     ATLTRACE(ATL::atlTraceControls, 0, _T("WM_CREATE OK for %p\n"), this);
     return 0;
+}
+
+HBRUSH CSpectrumSlider::OnEraseBkgnd(WTL::CDCHandle dc)
+{
+    UNREFERENCED_PARAMETER(dc);
+    return m_normalBrush;
 }
 
 void CSpectrumSlider::SetPrimaryColor(COLORREF crPrimary)
@@ -320,13 +327,13 @@ CRect& CSpectrumSlider::SetChannelRect(NMCUSTOMDRAW& nmcd, CRect const& rcClient
     const DWORD dwStyle{GetStyle()};
     CRect&    rcChannel{static_cast<CRect&>(nmcd.rc)};
     if (dwStyle & TBS_VERT) {
-        rcChannel.left = rcClient.left;
-        rcChannel.right = rcClient.right;
+        rcChannel.left = rcClient.left + 8;
+        rcChannel.right = rcClient.right - 8;
         rcChannel.DeflateRect(6, 4);
     }
     else {
-        rcChannel.top = rcClient.top;
-        rcChannel.bottom = rcClient.bottom;
+        rcChannel.top = rcClient.top + 8;
+        rcChannel.bottom = rcClient.bottom - 8;
         rcChannel.DeflateRect(4, 6);
     }
     return rcChannel;
@@ -337,12 +344,12 @@ CRect& CSpectrumSlider::SetThumbRect(NMCUSTOMDRAW& nmcd, CRect const& rcClient) 
     const DWORD dwStyle{GetStyle()};
     CRect&      rcThumb{static_cast<CRect&>(nmcd.rc)};
     if (dwStyle & TBS_VERT) {
-        rcThumb.left = rcClient.left + 2;
-        rcThumb.right = rcClient.right - 2;
+        rcThumb.left = rcClient.left + 12;
+        rcThumb.right = rcClient.right - 12;
     }
     else {
-        rcThumb.top = rcClient.top + 2;
-        rcThumb.bottom = rcClient.bottom - 2;
+        rcThumb.top = rcClient.top + 8;
+        rcThumb.bottom = rcClient.bottom - 8;
     }
     return rcThumb;
 }
@@ -354,7 +361,7 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
     LRESULT       lRes{CDRF_DODEFAULT};
     switch(nmcd.dwDrawStage) {
     case CDDS_PREPAINT: {
-        return CDRF_NOTIFYITEMDRAW | CDRF_SKIPDEFAULT;
+        return CDRF_NOTIFYITEMDRAW;
     }
     case CDDS_ITEMPREPAINT: {
         switch (itemId) {
@@ -365,70 +372,20 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
             break;
         }
         case TBCD_THUMB: {
-            CRect rcClient{};
+            CRect    rcClient{};
             GetClientRect(rcClient);
-            CRect rcThumb{SetThumbRect(nmcd, rcClient)};
-            break;
+            CRect     rcThumb{SetThumbRect(nmcd, rcClient)};
+            WTL::CDCHandle dc{nmcd.hdc};
+            const int iSaveDC{dc.SaveDC()};
+            WTL::CBrushHandle brCurrent{WTL::AtlGetStockBrush(BLACK_BRUSH)};
+            dc.FrameRect(rcThumb, brCurrent);
+            dc.RestoreDC(iSaveDC);
+            Invalidate(FALSE);
+            return CDRF_SKIPDEFAULT;
         }
         }
         break;
     }
-    case CDDS_POSTERASE:
-    case CDDS_POSTPAINT:
-    case CDDS_ITEMPOSTPAINT:
-    case CDDS_ITEMPOSTERASE:
-    case (CDDS_ITEMPREPAINT | CDDS_SUBITEM):
-    default:
-        lRes = CDRF_SKIPDEFAULT;
-        SetMsgHandled(TRUE);
-        break;
     }
     return lRes;
 }
-
-/*
-LRESULT CSpectrumSlider::OnPrePaint(NMCUSTOMDRAW& nmcd) const
-{
-    return CDRF_DODEFAULT;
-}
-
-LRESULT CSpectrumSlider::OnPostPaint(NMCUSTOMDRAW& nmcd) const
-{
-    return CDRF_DODEFAULT;
-}
-
-LRESULT CSpectrumSlider::OnPreErase(NMCUSTOMDRAW& nmcd) const
-{
-    return CDRF_DODEFAULT;
-}
-
-LRESULT CSpectrumSlider::OnPostErase(NMCUSTOMDRAW& nmcd) const
-{
-    return CDRF_DODEFAULT;
-}
-
-LRESULT CSpectrumSlider::OnItemPrePaint(NMCUSTOMDRAW& nmcd) const
-{
-    return CDRF_DODEFAULT;
-}
-
-LRESULT CSpectrumSlider::OnItemPostPaint(NMCUSTOMDRAW& nmcd) const
-{
-    return CDRF_DODEFAULT;
-}
-
-LRESULT CSpectrumSlider::OnItemPreErase(NMCUSTOMDRAW& nmcd) const
-{
-    return CDRF_DODEFAULT;
-}
-
-LRESULT CSpectrumSlider::OnItemPostErase(NMCUSTOMDRAW& nmcd) const
-{
-    return CDRF_DODEFAULT;
-}
-
-LRESULT CSpectrumSlider::OnSubItemPrePaint(NMCUSTOMDRAW& nmcd) const
-{
-    return CDRF_DODEFAULT;
-}
-*/

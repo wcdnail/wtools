@@ -3,6 +3,9 @@
 #include "CSpectrumImage.h"
 #include "CSpectrumSlider.h"
 #include "CSliderCtrl.h"
+#include <dev.assistance/dev.assist.h>
+#include <dh.tracing.defs.h>
+#include <dh.tracing.h>
 #include <atlctrls.h>
 #include <atlcrack.h>
 #include <atldlgs.h>
@@ -102,12 +105,14 @@ private:
 
     BEGIN_MSG_MAP_EX(CSpectrumColorPicker)
         MSG_WM_INITDIALOG(OnInitDialog)
+        MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
         CHAIN_MSG_MAP(ImplResizer)
         REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
 
-    void OnDDXChanges(int nCtlID);
+    void OnDDXChanges(int nID);
+    LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnSpecComboChanged();
@@ -138,11 +143,27 @@ HRESULT CColorPicker::Impl::PreCreateWindow()
     return S_OK;
 }
 
-void CColorPicker::Impl::OnDDXChanges(int nCtlID)
+void CColorPicker::Impl::OnDDXChanges(int nID)
 {
-    switch (nCtlID) {
+    switch (nID) {
     case CID_SPEC_COMBO: OnSpecComboChanged(); break;
     }
+}
+
+LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
+{
+    UNREFERENCED_PARAMETER(nID);
+    UNREFERENCED_PARAMETER(pnmh);
+    if (NM_CUSTOMDRAW == pnmh->code) {
+        SetMsgHandled(FALSE);
+        return 0;
+        LPNMCUSTOMDRAW nmcd{reinterpret_cast<LPNMCUSTOMDRAW>(pnmh)};
+        DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s >> %05x\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code), nmcd->dwDrawStage);
+        return 0;
+    }
+    DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+    SetMsgHandled(FALSE);
+    return 0;
 }
 
 void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl)
@@ -150,6 +171,7 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl)
     UNREFERENCED_PARAMETER(uNotifyCode);
     UNREFERENCED_PARAMETER(nID);
     UNREFERENCED_PARAMETER(wndCtl);
+    DBGTPrint(LTH_WM_COMMAND L" id:%-4d nc:%-4d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
     SetMsgHandled(FALSE);
 }
 
