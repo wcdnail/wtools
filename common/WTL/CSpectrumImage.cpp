@@ -2,8 +2,24 @@
 #include "CSpectrumImage.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 
+enum : int
+{
+    SPECTRUM_CX = 32,
+    SPECTRUM_CY = 32,
+};
+
 CSpectrumImage::~CSpectrumImage() = default;
 CSpectrumImage::CSpectrumImage() = default;
+
+void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
+{
+    if (kind < SPEC_Begin || kind > SPEC_End) {
+        return ;
+    }
+    m_SpectrumKind = kind;
+    m_dPrevHue = -1.0;
+    InvalidateRect(nullptr, FALSE);
+}
 
 BOOL CSpectrumImage::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
@@ -33,7 +49,7 @@ BOOL CSpectrumImage::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 int CSpectrumImage::OnCreate(LPCREATESTRUCT pCS)
 {
     UNREFERENCED_PARAMETER(pCS);
-    if (!m_Dib.Create(256, 256, 32)) { // pCS->cx, pCS->cy
+    if (!m_Dib.Create(SPECTRUM_CX, SPECTRUM_CY, 32)) { // pCS->cx, pCS->cy
         return -1;
     }
     m_dHue     = 0.0;
@@ -44,8 +60,25 @@ int CSpectrumImage::OnCreate(LPCREATESTRUCT pCS)
 void CSpectrumImage::OnPaint(WTL::CDCHandle dc)
 {
     UNREFERENCED_PARAMETER(dc);
+
     if (m_dHue != m_dPrevHue) {
-        DDraw_HSV_Hue(m_Dib, m_dHue);
+        switch (m_SpectrumKind) {
+        case SPEC_RGB_Red:
+            break;
+        case SPEC_RGB_Green:
+            break;
+        case SPEC_RGB_Blue:
+            break;
+        case SPEC_HSV_Hue:
+            DDraw_HSV_Hue(m_Dib, m_dHue);
+            break;
+        case SPEC_HSV_Saturation:
+            break;
+        case SPEC_HSV_Brightness:
+            break;
+        default: 
+            break;
+        }
         m_dPrevHue = m_dHue;
     }
 

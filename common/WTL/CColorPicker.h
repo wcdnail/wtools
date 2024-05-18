@@ -18,7 +18,6 @@ private:
     friend Super;
     struct Impl;
 
-    static ATOM           gs_Atom;
     std::unique_ptr<Impl> m_pImpl;
     BOOL            m_bMsgHandled;
 

@@ -3,14 +3,16 @@
 #include "CCustomCtrl.h"
 #include <DDraw.DGI/CeXDib.h>
 
-enum SpectrumIndex: int
+enum SpectrumKind: int
 {
-    SPEC_RGB_Red = 0,
+    SPEC_Begin = 0,
+    SPEC_RGB_Red = SPEC_Begin,
     SPEC_RGB_Green,
     SPEC_RGB_Blue,
     SPEC_HSV_Hue,
     SPEC_HSV_Saturation,
     SPEC_HSV_Brightness,
+    SPEC_End = SPEC_HSV_Brightness
 };
 
 struct CSpectrumImage: CCustomControl<CSpectrumImage>
@@ -22,10 +24,13 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
     ~CSpectrumImage() override;
     CSpectrumImage();
 
+    void SetSpectrumKind(SpectrumKind kind);
+
 private:
     friend Super;
    
     CDIBitmap               m_Dib;
+    SpectrumKind   m_SpectrumKind;
     double                 m_dHue;
     double             m_dPrevHue;
     BOOL            m_bMsgHandled;

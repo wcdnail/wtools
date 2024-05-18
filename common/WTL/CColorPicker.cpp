@@ -6,8 +6,6 @@
 #include <atldlgs.h>
 #include <atlddx.h>
 
-ATOM CColorPicker::gs_Atom{0};
-
 struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
                            WTL::CDialogResize<Impl>,
                            WTL::CWinDataExchange<Impl>
@@ -15,17 +13,10 @@ struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
     using   ImplSuper = WTL::CIndirectDialogImpl<Impl>;
     using ImplResizer = WTL::CDialogResize<Impl>;
 
-    ~Impl() override = default;
-    Impl() = default;
+    ~Impl() override;
+    Impl();
 
-    HRESULT PreCreateWindow()
-    {
-        auto const code{m_imSpectrum.PreCreateWindow()};
-        if (ERROR_SUCCESS != code) {
-            return code;
-        }
-        return S_OK;
-    }
+    HRESULT PreCreateWindow();
 
 private:
     friend ImplSuper;
@@ -63,8 +54,9 @@ private:
         CID_GRP_PICKER,
     };
 
-    CSpectrumImage m_imSpectrum{};
-    int         m_nSpectrumKind{SPEC_HSV_Hue};
+    CSpectrumImage m_imSpectrum;
+    
+    int         m_nSpectrumKind;
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,               ID/ClassName,    Style,             X,             Y,          Width,        Height, Style...
         CONTROL_GROUPBOX(   _T("Spectrum Color"),           CID_GRP_SPECTRUM,                       4,             4,         HDlgCX,       DlgCY-8, 0, 0)
@@ -86,6 +78,9 @@ private:
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
+        if (!bSaveAndValidate) {
+            OnDDXChanges(nCtlID);
+        }
     END_DDX_MAP()
 
     BEGIN_DLGRESIZE_MAP(CTatorMainDlg)
@@ -103,27 +98,74 @@ private:
 
     BEGIN_MSG_MAP_EX(CSpectrumColorPicker)
         MSG_WM_INITDIALOG(OnInitDialog)
+        MSG_WM_COMMAND(OnCommand)
         CHAIN_MSG_MAP(ImplResizer)
+        DEFAULT_REFLECTION_HANDLER()
     END_MSG_MAP()
 
-    BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
-    {
-        UNREFERENCED_PARAMETER(wndFocus);
-        UNREFERENCED_PARAMETER(lInitParam);
-
-        WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
-        cbSpectrum.AddString(L"RGB/红");
-        cbSpectrum.AddString(L"RGB/绿");
-        cbSpectrum.AddString(L"RGB/蓝");
-        cbSpectrum.AddString(L"HSV/色调");
-        cbSpectrum.AddString(L"HSV/饱和度");
-        cbSpectrum.AddString(L"HSV/明度");
-
-        DoDataExchange(FALSE);
-        DlgResize_Init(false, true, 0);
-        return TRUE;
-    }
+    void OnDDXChanges(int nCtlID);
+    void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
+    BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
+    void OnSpecComboChanged();
 };
+
+CColorPicker::Impl::~Impl() = default;
+
+CColorPicker::Impl::Impl()
+    :    m_imSpectrum{}
+    , m_nSpectrumKind{SPEC_HSV_Hue}
+    ,   m_bMsgHandled{FALSE}
+{
+}
+
+HRESULT CColorPicker::Impl::PreCreateWindow()
+{
+    auto const code{m_imSpectrum.PreCreateWindow()};
+    if (ERROR_SUCCESS != code) {
+        return code;
+    }
+    return S_OK;
+}
+
+void CColorPicker::Impl::OnDDXChanges(int nCtlID)
+{
+    switch (nCtlID) {
+    case CID_SPEC_COMBO: OnSpecComboChanged(); break;
+    }
+}
+
+void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl)
+{
+    UNREFERENCED_PARAMETER(uNotifyCode);
+    UNREFERENCED_PARAMETER(nID);
+    UNREFERENCED_PARAMETER(wndCtl);
+    SetMsgHandled(FALSE);
+}
+
+BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
+{
+    UNREFERENCED_PARAMETER(wndFocus);
+    UNREFERENCED_PARAMETER(lInitParam);
+
+    WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
+    cbSpectrum.AddString(L"RGB/红");
+    cbSpectrum.AddString(L"RGB/绿");
+    cbSpectrum.AddString(L"RGB/蓝");
+    cbSpectrum.AddString(L"HSV/色调");
+    cbSpectrum.AddString(L"HSV/饱和度");
+    cbSpectrum.AddString(L"HSV/明度");
+
+    DoDataExchange(FALSE);
+    DlgResize_Init(false, true, 0);
+
+    OnSpecComboChanged();
+    return TRUE;
+}
+
+void CColorPicker::Impl::OnSpecComboChanged()
+{
+    m_imSpectrum.SetSpectrumKind(static_cast<SpectrumKind>(m_nSpectrumKind));
+}
 
 CColorPicker::~CColorPicker() = default;
 
