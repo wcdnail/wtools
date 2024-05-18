@@ -166,49 +166,49 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
             return CDRF_DODEFAULT;
             
         case TBCD_THUMB: {
-                // trackbar control's thumb marker. This is the portion of the control that the user moves
-                // For the pre-item-paint of the thumb, we draw everything completely here, during item 
-                // pre-paint, and then tell the control to skip default painting and NOT to notify 
-                // us during post-paint.
-                // If I asked for a post-paint notification, then for some reason, when the control gets to 
-                // post-paint, it completely over-writes everthing that I do here, and draws the default thumb
-                // (which is partially obscured by the thumb drawn here).  This happens even if in post-paint
-                // I return another CDRF_SKIPDEFAULT.  I don't understand why.  
-                // Anyway, it works fine if I draw everthing here, return CDRF_SKIPDEFAULT, and do not ask for
-                // a post-paint item notification
+            // trackbar control's thumb marker. This is the portion of the control that the user moves
+            // For the pre-item-paint of the thumb, we draw everything completely here, during item 
+            // pre-paint, and then tell the control to skip default painting and NOT to notify 
+            // us during post-paint.
+            // If I asked for a post-paint notification, then for some reason, when the control gets to 
+            // post-paint, it completely over-writes everthing that I do here, and draws the default thumb
+            // (which is partially obscured by the thumb drawn here).  This happens even if in post-paint
+            // I return another CDRF_SKIPDEFAULT.  I don't understand why.  
+            // Anyway, it works fine if I draw everthing here, return CDRF_SKIPDEFAULT, and do not ask for
+            // a post-paint item notification
 
-                WTL::CDCHandle dcThumb{nmcd.hdc};
-                const int      iSaveDC{dcThumb.SaveDC()};
-                const WTL::CBrush* pBr{&m_normalBrush};
-                const WTL::CPen    pen{CreatePen(PS_SOLID, 1, m_crShadow)};
+            WTL::CDCHandle dcThumb{nmcd.hdc};
+            const int      iSaveDC{dcThumb.SaveDC()};
+            const WTL::CBrush* pBr{&m_normalBrush};
+            const WTL::CPen    pen{CreatePen(PS_SOLID, 1, m_crShadow)};
 
-                // if thumb is selected/focussed, switch brushes
-                if (nmcd.uItemState && CDIS_FOCUS) {
-                    pBr = &m_focusBrush;
-                    dcThumb.SetBrushOrg(nmcd.rc.right % 8, nmcd.rc.top % 8);
-                    dcThumb.SetBkColor(m_crPrimary);
-                    dcThumb.SetTextColor(m_crHilite);                
-                }
-                dcThumb.SelectBrush(*pBr);
-                dcThumb.SelectPen(pen);
+            // if thumb is selected/focussed, switch brushes
+            if (nmcd.uItemState && CDIS_FOCUS) {
+                pBr = &m_focusBrush;
+                dcThumb.SetBrushOrg(nmcd.rc.right % 8, nmcd.rc.top % 8);
+                dcThumb.SetBkColor(m_crPrimary);
+                dcThumb.SetTextColor(m_crHilite);                
+            }
+            dcThumb.SelectBrush(*pBr);
+            dcThumb.SelectPen(pen);
 
 #if 0   // draw an ellipse
-                dc.Ellipse(&(nmcd.rc));
+            dc.Ellipse(&(nmcd.rc));
 #else   // draw a diamond
-                int const xx{nmcd.rc.left};
-                int const yy{nmcd.rc.top};
-                int const dx{2};
-                int const dy{2};
-                int const cx{nmcd.rc.right - xx - 1};
-                int const cy{nmcd.rc.bottom - yy - 1};
-                const POINT pts[8]{ {xx+dx,       yy}, {xx,       yy+dy}, {xx, yy+cy-dy}, {xx+dx, yy+cy},
-                                    {xx+cx-dx, yy+cy}, {xx+cx, yy+cy-dy}, {xx+cx, yy+dy}, {xx+cx-dx, yy},
-                                  };
-                dcThumb.Polygon(pts, 8);
+            int const xx{nmcd.rc.left};
+            int const yy{nmcd.rc.top};
+            int const dx{2};
+            int const dy{2};
+            int const cx{nmcd.rc.right - xx - 1};
+            int const cy{nmcd.rc.bottom - yy - 1};
+            const POINT pts[8]{ {xx+dx,       yy}, {xx,       yy+dy}, {xx, yy+cy-dy}, {xx+dx, yy+cy},
+                                {xx+cx-dx, yy+cy}, {xx+cx, yy+cy-dy}, {xx+cx, yy+dy}, {xx+cx-dx, yy},
+                                };
+            dcThumb.Polygon(pts, 8);
 #endif  // which shape to draw
-                dcThumb.RestoreDC(iSaveDC);
-            }
+            dcThumb.RestoreDC(iSaveDC);
             return CDRF_SKIPDEFAULT;    // don't let control draw itself, or it will un-do our work
+        }
         default:
             ATLASSERT(FALSE);           // all of a slider's items have been listed, so we shouldn't get here
         };
@@ -216,83 +216,58 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
 
     case CDDS_ITEMPOSTPAINT:    // After an item has been drawn
         switch (itemSpec) {
-        case TBCD_CHANNEL:  // channel that the trackbar control's thumb marker slides along
+        case TBCD_CHANNEL: {
+            // channel that the trackbar control's thumb marker slides along
             // For the item-post-paint of the channel, we basically like what the control has drawn, 
             // which is a four-line high rectangle whose colors (in order) are white, mid-gray, black, 
             // and dark-gray.
             // However, to emphasize the control's color, we will replace the middle two lines
             // (i.e., the mid-gray and black lines) with hilite and shadow colors of the control
             // using CDC::Draw3DRect.
-            {
-                WTL::CDCHandle dcChannel{nmcd.hdc};
-                const RECT rrc = {nmcd.rc.left+1, nmcd.rc.top+1, nmcd.rc.right-1, nmcd.rc.bottom-1};
-                dcChannel.Draw3dRect(&rrc, m_crMidShadow, m_crHilite);
-            }
+            WTL::CDCHandle dcChannel{nmcd.hdc};
+            CRect const       rcRect{nmcd.rc.left+1, nmcd.rc.top+1, nmcd.rc.right-1, nmcd.rc.bottom-1};
+            dcChannel.Draw3dRect(rcRect, m_crMidShadow, m_crHilite);
             return CDRF_SKIPDEFAULT;
-            break;
-
+        }
         case TBCD_TICS:     // the increment tick marks that appear along the edge of the trackbar control
                             // currently, there is no special post-item-paint drawing of the tics
             return CDRF_DODEFAULT;
         case TBCD_THUMB:    // trackbar control's thumb marker. This is the portion of the control that the user moves
                             // currently, there is no special post-item-paint drawing for the thumb
             return CDRF_DODEFAULT;  // don't let control draw itself, or it will un-do our work
-            
         default:
             ATLASSERT(FALSE); // all of a slider's items have been listed, so we shouldn't get here
         };
         break;
 
     case CDDS_POSTPAINT: {
-            // After the paint cycle is complete
-            // this is the post-paint for the entire control, and it's possible to add to whatever is 
-            // now visible on the control
-            // To emphasize the directivity of the control, we simply draw in two colored dots at the 
-            // extreme edges of the control
-            WTL::CDCHandle   dc{nmcd.hdc};
-            WTL::CBrush  bWhite{CreateSolidBrush(RGB(255, 255, 255))};  // white brush
-            WTL::CBrush   bDark{CreateSolidBrush(m_crDarkerShadow)};    // dark but still colored brush
-            WTL::CPen       pen{CreatePen(PS_SOLID, 1, m_crPrimary)};
-            CRect       rClient{};
-            const DWORD dwStyle{GetStyle()};
-            const int        cx{8};
-            CRect      rrcFirst{1, 1, cx, cx};
-            CRect       rrcLast{};
-            const int     iSave{dc.SaveDC()};
+        // After the paint cycle is complete
+        // this is the post-paint for the entire control, and it's possible to add to whatever is 
+        // now visible on the control
+        // To emphasize the directivity of the control, we simply draw in two colored dots at the 
+        // extreme edges of the control
+        WTL::CDCHandle     dc{nmcd.hdc};
+        const int       iSave{dc.SaveDC()};
+        const DWORD   dwStyle{GetStyle()};
+        CRect const rcChannel{GetChannelRect()};
+        CRect const   rcThumb{GetThumbRect()};
+        CRect        rcClient{nmcd.rc};
+        CRect           rcBar{};
 
-            GetClientRect(&rClient);
-           
-            // TBS_RIGHT, TBS_BOTTOM and TBS_HORZ are all defined as 0x0000, so avoid testing on them
-            if (dwStyle & TBS_VERT) {
-                if (dwStyle & TBS_LEFT) {
-                    rrcFirst = CRect(rClient.right-cx, 1, rClient.right-1, cx); 
-                    rrcLast = CRect(rClient.right-cx, rClient.bottom-cx, rClient.right-1, rClient.bottom-1);
-                }
-                else {
-                    rrcFirst = CRect(1, 1, cx, cx); 
-                    rrcLast = CRect(1, rClient.bottom-cx, cx, rClient.bottom-1);
-                }
-            }
-            else {
-                if (dwStyle & TBS_TOP) {
-                    rrcFirst = CRect(1, rClient.bottom-cx, cx, rClient.bottom-1); 
-                    rrcLast = CRect(rClient.right-cx, rClient.bottom-cx, rClient.right-1, rClient.bottom-1);
-                }
-                else {
-                    rrcFirst = CRect(1, 1, cx, cx); 
-                    rrcLast = CRect(rClient.right-cx, 1, rClient.right-1, cx);
-                }
-            }
-            
-            dc.SelectBrush(bWhite);
-            dc.SelectPen(pen);
-            dc.Ellipse(rrcFirst);
-            dc.SelectBrush(bDark);
-            dc.Ellipse(rrcLast);
-            dc.RestoreDC(iSave);
+        GetClientRect(&rcClient);
+        // TBS_RIGHT, TBS_BOTTOM and TBS_HORZ are all defined as 0x0000, so avoid testing on them
+        if (dwStyle & TBS_VERT) {
+            rcBar.SetRect(rcThumb.right+4, rcChannel.left+rcThumb.Height()/2, rcClient.right-8, rcChannel.right-rcThumb.Height()/2);
         }
-        return CDRF_SKIPDEFAULT;
+        else {
+            // TODO: investigate it 
+            rcBar.SetRect(rcClient.left+4, rcChannel.left+rcThumb.Height()/2, rcClient.right-8, rcChannel.right-rcThumb.Height()/2);
+        }
 
+        dc.FillSolidRect(rcBar, m_crPrimary);
+        dc.RestoreDC(iSave);
+        return CDRF_SKIPDEFAULT;
+    }
     default:
         ATLASSERT(FALSE);   // all drawing stages are listed, so we shouldn't get here
     };
