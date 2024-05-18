@@ -2,7 +2,13 @@
 #include "CeXDib.h"
 
 CDibEx::~CDibEx() = default;
-CDIBitmap::~CDIBitmap() = default;
+
+CDIBitmap::~CDIBitmap()
+{
+    if (m_DC && m_hOldBm) {
+        m_DC.SelectBitmap(m_hOldBm);
+    }
+}
 
 CDibEx::CDibEx()
     :    m_pDib{nullptr}
@@ -14,6 +20,7 @@ CDibEx::CDibEx()
 CDIBitmap::CDIBitmap()
     :     m_DC{}
     , m_Bitmap{}
+    , m_hOldBm{nullptr}
 {
 }
 
@@ -293,14 +300,14 @@ BOOL CDibEx::WriteBMP(LPCTSTR bmpFileName) const
     return TRUE;
 } // End of WriteBMP
 
-void CDIBitmap::Draw(WTL::CDCHandle dc, CRect const& rc)
+WTL::CDCHandle CDIBitmap::GetDC(WTL::CDCHandle dc)
 {
     if (!m_Bitmap) {
         LPVOID    lpBits{nullptr};
         WTL::CBitmap bmp{};
         bmp.CreateDIBSection(dc, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &lpBits, nullptr, 0);
         if (!bmp.m_hBitmap || !lpBits) {
-            return ;
+            return {};
         }
         m_Bitmap.Attach(bmp.Detach());
         memcpy(lpBits, GetData(), GetInfoHdr()->biSizeImage);
@@ -308,28 +315,31 @@ void CDIBitmap::Draw(WTL::CDCHandle dc, CRect const& rc)
     if (!m_DC) {
         WTL::CDC dcTemp{CreateCompatibleDC(dc)};
         if (!dcTemp) {
-            return ;
+            return {};
         }
         m_DC.Attach(dcTemp.Detach());
+        m_hOldBm = m_DC.SelectBitmap(m_Bitmap);
     }
-    auto const hOldBitmap = m_DC.SelectBitmap(m_Bitmap);
-    dc.BitBlt(rc.left, rc.top, rc.Width(), rc.Height(), m_DC, 0, 0, SRCCOPY);
-    m_DC.SelectBitmap(hOldBitmap);
+    return m_DC.m_hDC;
+}
+
+void CDIBitmap::Draw(WTL::CDCHandle dc, CRect const& rc)
+{
+    WTL::CDCHandle dcSource{GetDC(dc)};
+    if (!dcSource) {
+        return;
+    }
+    dc.BitBlt(rc.left, rc.top, rc.Width(), rc.Height(), dcSource, 0, 0, SRCCOPY);
 } // End of Draw
 
 void CDIBitmap::Borrow(WTL::CDCHandle dc, int dwX, int dwY)
 {
-    if (!m_Bitmap) {
-        LPVOID    lpBits{nullptr};
-        WTL::CBitmap bmp{};
-        bmp.CreateDIBSection(dc, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &lpBits, nullptr, 0);
-        if (!bmp.m_hBitmap || !lpBits) {
-            return;
-        }
-        m_Bitmap.Attach(bmp.Detach());
+    const WTL::CDCHandle dcSource{GetDC(dc)};
+    if (!dcSource) {
+        return;
     }
-    WTL::CDC     memDC{CreateCompatibleDC(dc)};
-    auto const prevBmp{memDC.SelectBitmap(m_Bitmap)};
+    WTL::CDC memDC{CreateCompatibleDC(dc)};
+    auto const hBm{memDC.SelectBitmap(m_Bitmap)};
     memDC.BitBlt(0, 0, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, dc, dwX, dwY, SRCCOPY);
-    memDC.SelectBitmap(prevBmp);
+    memDC.SelectBitmap(hBm);
 } // End of Borrow

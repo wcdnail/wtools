@@ -1,18 +1,18 @@
 #pragma once
 
-#include <atlwin.h>
+#include "CCustomCtrl.h"
 #include <memory>
 
-struct CColorPicker: ATL::CWindowImpl<CColorPicker>
+struct CColorPicker: CCustomControl<CColorPicker>
 {
-    using Super = ATL::CWindowImpl<CColorPicker>;
+    using Super = CCustomControl<CColorPicker>;
 
     DECLARE_WND_CLASS(_T("WCCF::CColorPicker"))
 
     ~CColorPicker() override;
     CColorPicker();
 
-    HRESULT PreCreateWindow();
+    HRESULT PreCreateWindow() override;
 
 private:
     friend Super;

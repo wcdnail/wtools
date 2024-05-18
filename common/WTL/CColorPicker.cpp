@@ -128,36 +128,19 @@ private:
 CColorPicker::~CColorPicker() = default;
 
 CColorPicker::CColorPicker()
-    : Super{}
-    , m_pImpl{std::make_unique<Impl>()}
+    :         Super{}
+    ,       m_pImpl{std::make_unique<Impl>()}
     , m_bMsgHandled{FALSE}
 {
 }
 
 HRESULT CColorPicker::PreCreateWindow()
 {
-    HRESULT code{m_pImpl->PreCreateWindow()};
+    auto const code = m_pImpl->PreCreateWindow();
     if (ERROR_SUCCESS != code) {
         return code;
     }
-    // ##TODO: gs_Atom is not ThreadSafe!
-    // look at CStaticDataInitCriticalSectionLock lock;
-    if (!gs_Atom) {
-        const ATOM atom = ATL::AtlModuleRegisterClassExW(nullptr, &GetWndClassInfo().m_wc);
-        if (!atom) {
-            code = static_cast<HRESULT>(GetLastError());
-            return code;
-        }
-        // ##TODO: gs_Atom is not ThreadSafe!
-        gs_Atom = atom;
-    }
-    if (!m_thunk.Init(nullptr, nullptr)) {
-        code = static_cast<HRESULT>(ERROR_OUTOFMEMORY);
-        SetLastError(static_cast<DWORD>(code));
-        return code;
-    }
-    WTL::ModuleHelper::AddCreateWndData(&m_thunk.cd, this);
-    return S_OK;
+    return Super::PreCreateWindow();
 }
 
 #if 0
@@ -224,7 +207,9 @@ void CColorPicker::OnNcPaint(WTL::CRgnHandle rgn)
 int CColorPicker::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     UNREFERENCED_PARAMETER(lpCreateStruct);
-    m_pImpl->Create(m_hWnd);
+    if (!m_pImpl->Create(m_hWnd)) {
+        return -1;
+    }
     return 0;
 }
 

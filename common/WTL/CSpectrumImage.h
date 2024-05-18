@@ -1,7 +1,7 @@
 #pragma once
 
+#include "CCustomCtrl.h"
 #include <DDraw.DGI/CeXDib.h>
-#include <atlwin.h>
 
 enum SpectrumIndex: int
 {
@@ -13,21 +13,18 @@ enum SpectrumIndex: int
     SPEC_HSV_Brightness,
 };
 
-struct CSpectrumImage: ATL::CWindowImpl<CSpectrumImage>
+struct CSpectrumImage: CCustomControl<CSpectrumImage>
 {
-    using Super = ATL::CWindowImpl<CSpectrumImage>;
+    using Super = CCustomControl<CSpectrumImage>;
 
     DECLARE_WND_CLASS(_T("WCCF::CSpectrumImage"))
 
     ~CSpectrumImage() override;
     CSpectrumImage();
 
-    HRESULT PreCreateWindow();
-
 private:
     friend Super;
-
-    static ATOM           gs_Atom;
+   
     CDIBitmap               m_Dib;
     double                 m_dHue;
     double             m_dPrevHue;

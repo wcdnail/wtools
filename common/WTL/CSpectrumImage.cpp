@@ -2,33 +2,8 @@
 #include "CSpectrumImage.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 
-ATOM CSpectrumImage::gs_Atom{0};
-
 CSpectrumImage::~CSpectrumImage() = default;
 CSpectrumImage::CSpectrumImage() = default;
-
-HRESULT CSpectrumImage::PreCreateWindow()
-{
-    HRESULT code = S_OK;
-    // ##TODO: gs_Atom is not ThreadSafe!
-    // look at CStaticDataInitCriticalSectionLock lock;
-    if (!gs_Atom) {
-        const ATOM atom = ATL::AtlModuleRegisterClassExW(nullptr, &GetWndClassInfo().m_wc);
-        if (!atom) {
-            code = static_cast<HRESULT>(GetLastError());
-            return code;
-        }
-        // ##TODO: gs_Atom is not ThreadSafe!
-        gs_Atom = atom;
-    }
-    if (!m_thunk.Init(nullptr, nullptr)) {
-        code = static_cast<HRESULT>(ERROR_OUTOFMEMORY);
-        SetLastError(static_cast<DWORD>(code));
-        return code;
-    }
-    WTL::ModuleHelper::AddCreateWndData(&m_thunk.cd, this);
-    return S_OK;
-}
 
 BOOL CSpectrumImage::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
@@ -74,6 +49,10 @@ void CSpectrumImage::OnPaint(WTL::CDCHandle dc)
         m_dPrevHue = m_dHue;
     }
 
-    WTL::CPaintDC dcPaint{m_hWnd};
-    m_Dib.Draw(dcPaint.m_hDC, dcPaint.m_ps.rcPaint);
+    WTL::CPaintDC         dcPaint{m_hWnd};
+    const WTL::CDCHandle dcSource{m_Dib.GetDC(dc)};
+    CRect const&           rcDest{dcPaint.m_ps.rcPaint};
+
+    dcPaint.StretchBlt(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), 
+        dcSource, 0, 0, m_Dib.GetWidth(), m_Dib.GetHeight(), SRCCOPY);
 }

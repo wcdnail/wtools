@@ -91,6 +91,9 @@
     <ClInclude Include="DDraw.DGI\DDGDIStuff.h">
       <Filter>DDraw.DGI</Filter>
     </ClInclude>
+    <ClInclude Include="WTL\CCustomCtrl.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">
