@@ -1,5 +1,6 @@
 #pragma once
 
+#include <DDraw.DGI/CeXDib.h>
 #include <atlwin.h>
 
 enum SpectrumIndex: int
@@ -27,6 +28,9 @@ private:
     friend Super;
 
     static ATOM           gs_Atom;
+    CDIBitmap               m_Dib;
+    double                 m_dHue;
+    double             m_dPrevHue;
     BOOL            m_bMsgHandled;
 
     BOOL IsMsgHandled() const { return m_bMsgHandled; }
@@ -34,4 +38,7 @@ private:
 
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
     BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
+
+    int OnCreate(LPCREATESTRUCT pCS);
+    void OnPaint(WTL::CDCHandle dc);
 };

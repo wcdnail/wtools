@@ -3,6 +3,7 @@
 #include "WTL/CColorButton.h"
 #include "WTL/CColorPicker.h"
 #include "resource.h"
+#include <UT/debug.assistance.h>
 #include <atlframe.h>
 #include <atlcrack.h>
 #include <atldlgs.h>
@@ -15,7 +16,7 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
 {
     enum Sizes: short
     {
-        DIALOG_CX = 500,
+        DIALOG_CX = 540,
         DIALOG_CY = 280,
     };
 
@@ -77,12 +78,16 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
         UNREFERENCED_PARAMETER(wndFocus);
         UNREFERENCED_PARAMETER(lInitParam);
 
+#if 1
+        MoveToMonitor{}.Move(m_hWnd, 2, PutAt::YCenter | PutAt::Right);
+#endif
+
         WTL::CIcon const icon(LoadIconW(WTL::ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
         SetIcon(icon, TRUE);
         SetIcon(icon, FALSE);
 
         DlgResize_Init(true, true, 0);
-        CenterWindow(GetParent());
+        //CenterWindow(GetParent());
         return TRUE;
     }
 

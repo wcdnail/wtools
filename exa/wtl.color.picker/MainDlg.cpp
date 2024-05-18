@@ -957,16 +957,16 @@ void CMainDlg::DoDrawRGB()
     int     blend_width = width;
     int     blend_height = height;
 
-    // left side components, extended with int_extend bits
+    // left side components, extended with IntMult bits
     int     left_red, left_green, left_blue;
-    // left side component advance, extended with int_extend bits
+    // left side component advance, extended with IntMult bits
     int     left_red_adv, left_green_adv, left_blue_adv;
     int     right_red, right_green, right_blue;
     int     right_red_adv, right_green_adv, right_blue_adv;
 
-    // current components, extended with int_extend bits
+    // current components, extended with IntMult bits
     int     red, green, blue;
-    // advance, extended with int_extend bits
+    // advance, extended with IntMult bits
     int     red_adv, green_adv, blue_adv;
 
     COLORREF    lefttop, righttop, leftbottom, rightbottom;
@@ -1007,9 +1007,9 @@ void CMainDlg::DoDrawRGB()
         {
             // in DIB bitmap values are 0BGR
             *p++ = RGB(
-                blue >> int_extend,
-                green >> int_extend,
-                red >> int_extend);
+                blue >> IntMult,
+                green >> IntMult,
+                red >> IntMult);
 
             // advance to the next pixel
             red += red_adv; green += green_adv; blue += blue_adv;

@@ -2,7 +2,7 @@
 #include "CeXDib.h"
 
 CDibEx::~CDibEx() = default;
-CDibDC::~CDibDC() = default;
+CDIBitmap::~CDIBitmap() = default;
 
 CDibEx::CDibEx()
     :    m_pDib{nullptr}
@@ -11,10 +11,9 @@ CDibEx::CDibEx()
 {
 }
 
-CDibDC::CDibDC()
-    :  m_DC{}
+CDIBitmap::CDIBitmap()
+    :     m_DC{}
     , m_Bitmap{}
-    ,  m_lpBits{nullptr}
 {
 }
 
@@ -177,7 +176,7 @@ void CDibEx::Swap(CDibEx& rhs) noexcept
     std::swap(m_nColors, rhs.m_nColors);
 }
 
-void CDibDC::Swap(CDibDC& rhs) noexcept
+void CDIBitmap::Swap(CDIBitmap& rhs) noexcept
 {
     CDibEx::Swap(rhs);
     std::swap(m_DC.m_hDC,  rhs.m_DC.m_hDC);
@@ -294,46 +293,43 @@ BOOL CDibEx::WriteBMP(LPCTSTR bmpFileName) const
     return TRUE;
 } // End of WriteBMP
 
-void CDibDC::Draw(HDC hDC, int dwX, int dwY)
+void CDIBitmap::Draw(WTL::CDCHandle dc, CRect const& rc)
 {
     if (!m_Bitmap) {
         LPVOID    lpBits{nullptr};
         WTL::CBitmap bmp{};
-        bmp.CreateDIBSection(hDC, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &lpBits, nullptr, 0);
+        bmp.CreateDIBSection(dc, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &lpBits, nullptr, 0);
         if (!bmp.m_hBitmap || !lpBits) {
-            return;
+            return ;
         }
-        m_lpBits = lpBits;
         m_Bitmap.Attach(bmp.Detach());
+        memcpy(lpBits, GetData(), GetInfoHdr()->biSizeImage);
     }
     if (!m_DC) {
-        WTL::CDC dc{};
-        dc.CreateCompatibleDC(hDC);
-        if (!dc.m_hDC) {
-            return;
+        WTL::CDC dcTemp{CreateCompatibleDC(dc)};
+        if (!dcTemp) {
+            return ;
         }
-        m_DC.Attach(dc.Detach());
+        m_DC.Attach(dcTemp.Detach());
     }
-    memcpy(m_lpBits, GetData(), GetInfoHdr()->biSizeImage);
     auto const hOldBitmap = m_DC.SelectBitmap(m_Bitmap);
-    BitBlt(hDC, dwX, dwY, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, m_DC, 0, 0, SRCCOPY);
+    dc.BitBlt(rc.left, rc.top, rc.Width(), rc.Height(), m_DC, 0, 0, SRCCOPY);
     m_DC.SelectBitmap(hOldBitmap);
 } // End of Draw
 
-void CDibDC::Copy(HDC hDC, int dwX, int dwY)
+void CDIBitmap::Borrow(WTL::CDCHandle dc, int dwX, int dwY)
 {
     if (!m_Bitmap) {
         LPVOID    lpBits{nullptr};
         WTL::CBitmap bmp{};
-        bmp.CreateDIBSection(hDC, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &lpBits, nullptr, 0);
+        bmp.CreateDIBSection(dc, reinterpret_cast<BITMAPINFO*>(m_pDib.get()), DIB_RGB_COLORS, &lpBits, nullptr, 0);
         if (!bmp.m_hBitmap || !lpBits) {
             return;
         }
-        m_lpBits = lpBits;
         m_Bitmap.Attach(bmp.Detach());
     }
-    WTL::CDC     memDC{CreateCompatibleDC(hDC)};
-    auto const prevBmp{m_DC.SelectBitmap(m_Bitmap)};
-    BitBlt(memDC, 0, 0, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, hDC, dwX, dwY, SRCCOPY);
+    WTL::CDC     memDC{CreateCompatibleDC(dc)};
+    auto const prevBmp{memDC.SelectBitmap(m_Bitmap)};
+    memDC.BitBlt(0, 0, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, dc, dwX, dwY, SRCCOPY);
     memDC.SelectBitmap(prevBmp);
-} // End of Copy
+} // End of Borrow

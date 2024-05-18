@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CSpectrumImage.h"
+#include <DDraw.DGI/DDGDIStuff.h>
 
 ATOM CSpectrumImage::gs_Atom{0};
 
@@ -43,6 +44,8 @@ BOOL CSpectrumImage::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) { 
     case 0:
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_PAINT(OnPaint)
         break;
     default:
         ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
@@ -50,4 +53,27 @@ BOOL CSpectrumImage::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
         break;
     }
     return FALSE;
+}
+
+int CSpectrumImage::OnCreate(LPCREATESTRUCT pCS)
+{
+    UNREFERENCED_PARAMETER(pCS);
+    if (!m_Dib.Create(256, 256, 32)) { // pCS->cx, pCS->cy
+        return -1;
+    }
+    m_dHue     = 0.0;
+    m_dPrevHue = -1.0;
+    return 0;
+}
+
+void CSpectrumImage::OnPaint(WTL::CDCHandle dc)
+{
+    UNREFERENCED_PARAMETER(dc);
+    if (m_dHue != m_dPrevHue) {
+        DDraw_HSV_Hue(m_Dib, m_dHue);
+        m_dPrevHue = m_dHue;
+    }
+
+    WTL::CPaintDC dcPaint{m_hWnd};
+    m_Dib.Draw(dcPaint.m_hDC, dcPaint.m_ps.rcPaint);
 }

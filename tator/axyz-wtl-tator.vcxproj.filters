@@ -3,6 +3,9 @@
   <ItemGroup>
     <ClCompile Include="ATator.Main.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="..\UT\debug.assistance.cpp">
+      <Filter>UT</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ATator.MemDlg.h" />
@@ -12,10 +15,16 @@
     <ClInclude Include="resource.h">
       <Filter>rez</Filter>
     </ClInclude>
+    <ClInclude Include="..\UT\debug.assistance.h">
+      <Filter>UT</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="rez">
       <UniqueIdentifier>{fbd2a61b-b751-4765-971b-a305796c7940}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UT">
+      <UniqueIdentifier>{2f602439-9870-4a97-8d6d-549f26dfe01b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

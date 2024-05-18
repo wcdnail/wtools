@@ -19,99 +19,73 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DDraw.DGI\CeXDib.cpp" />
-    <ClCompile Include="DDraw.DGI\DDGDIStuff.cpp" />
-    <ClCompile Include="dev.assistance\dev.assist.cpp" />
-    <ClCompile Include="dh.timer.cpp" />
-    <ClCompile Include="dh.tracing.cpp" />
-    <ClCompile Include="icons.dll.cpp" />
-    <ClCompile Include="icons.save.m1.cpp" />
-    <ClCompile Include="info\runtime.information.cpp" />
-    <ClCompile Include="rect.alloc.cpp" />
-    <ClCompile Include="rectz.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="settings.cpp" />
-    <ClCompile Include="shell.imagelist.cpp" />
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="FOHyperLink.cpp" />
+    <ClCompile Include="GTColorDialog.cpp" />
+    <ClCompile Include="GTColorDialogDlg.cpp" />
+    <ClCompile Include="GTColorSelectorWnd.cpp" />
+    <ClCompile Include="GTColorSliderWnd.cpp" />
+    <ClCompile Include="GTColorWellWnd.cpp" />
+    <ClCompile Include="GTDrawHelper.cpp" />
+    <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="string.utils.format.cpp" />
-    <ClCompile Include="windows.uses.gdi+.cpp" />
-    <ClCompile Include="windows.wtl.buffered.paint.cpp" />
-    <ClCompile Include="WTL\CColorButton.cpp" />
-    <ClCompile Include="WTL\CColorPicker.cpp" />
-    <ClCompile Include="WTL\CSpectrumImage.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DDraw.DGI\CeXDib.h" />
-    <ClInclude Include="DDraw.DGI\DDGDIStuff.h" />
-    <ClInclude Include="debug.dump.msg.h" />
-    <ClInclude Include="dev.assistance\dev.assist.h" />
-    <ClInclude Include="dev.assistance\list.view.exstyles.h" />
-    <ClInclude Include="dev.assistance\list.view.styles.h" />
-    <ClInclude Include="dev.assistance\notify.codes.h" />
-    <ClInclude Include="dev.assistance\virtual.keys.consts.h" />
-    <ClInclude Include="dev.assistance\window.messages.consts.h" />
-    <ClInclude Include="dh.timer.h" />
-    <ClInclude Include="dh.tracing.h" />
-    <ClInclude Include="icons.dll.h" />
-    <ClInclude Include="info\runtime.information.h" />
-    <ClInclude Include="rect.alloc.h" />
-    <ClInclude Include="rect.aspect.ratio.h" />
-    <ClInclude Include="rect.gdi+.h" />
-    <ClInclude Include="rect.putinto.h" />
-    <ClInclude Include="rect.screen.h" />
-    <ClInclude Include="rectz.h" />
-    <ClInclude Include="settings.h" />
-    <ClInclude Include="shell.imagelist.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="string.utils.format.h" />
-    <ClInclude Include="windows.uses.gdi+.h" />
-    <ClInclude Include="windows.wtl.buffered.paint.h" />
-    <ClInclude Include="WTL\CButtonMenu.h" />
-    <ClInclude Include="WTL\CColorButton.h" />
-    <ClInclude Include="WTL\CColorPicker.h" />
-    <ClInclude Include="WTL\CSpectrumImage.h" />
+    <ClInclude Include="FOHyperLink.h" />
+    <ClInclude Include="GTColorDialog.h" />
+    <ClInclude Include="GTColorDialogDlg.h" />
+    <ClInclude Include="GTColorSelectorWnd.h" />
+    <ClInclude Include="GTColorSliderWnd.h" />
+    <ClInclude Include="GTColorWellWnd.h" />
+    <ClInclude Include="GTDrawHelper.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="StdAfx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GTColorDialog.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>wccf-minimal-static</ProjectName>
+    <ProjectName>gt.color.dialog</ProjectName>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectGuid>{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}</ProjectGuid>
+    <ProjectGuid>{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='product|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='product|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -174,7 +148,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_STATIC_LIB;_UNICODE;UNICODE;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;_ATL_NO_AUTOMATIC_NAMESPACE;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_WTL_NO_AUTOMATIC_NAMESPACE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WCDAFX_DLL;_UNICODE;UNICODE;_DLL;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -184,9 +158,9 @@
       <ExceptionHandling>Async</ExceptionHandling>
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -211,7 +185,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_STATIC_LIB;_UNICODE;UNICODE;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;_ATL_NO_AUTOMATIC_NAMESPACE;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_WTL_NO_AUTOMATIC_NAMESPACE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WCDAFX_DLL;_UNICODE;UNICODE;_DLL;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -220,9 +194,9 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <ExceptionHandling>Async</ExceptionHandling>
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -247,7 +221,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_STATIC_LIB;_UNICODE;UNICODE;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;_ATL_NO_AUTOMATIC_NAMESPACE;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_WTL_NO_AUTOMATIC_NAMESPACE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WCDAFX_DLL;_UNICODE;UNICODE;_DLL;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -257,9 +231,9 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <ExceptionHandling>Async</ExceptionHandling>
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -286,7 +260,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);$(SolutionDir)common;$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_STATIC_LIB;_UNICODE;UNICODE;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;_ATL_NO_AUTOMATIC_NAMESPACE;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;_WTL_NO_AUTOMATIC_NAMESPACE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WCDAFX_DLL;_UNICODE;UNICODE;_DLL;WIN32;_WINDOWS;_ATL_NO_DEFAULT_LIBS;BOOST_SYSTEM_NO_DEPRECATED;BOOST_ALL_NO_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -295,9 +269,9 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <ExceptionHandling>Async</ExceptionHandling>
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

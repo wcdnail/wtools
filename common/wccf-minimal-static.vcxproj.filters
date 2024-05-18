@@ -31,6 +31,9 @@
     <ClCompile Include="DDraw.DGI\CeXDib.cpp">
       <Filter>DDraw.DGI</Filter>
     </ClCompile>
+    <ClCompile Include="DDraw.DGI\DDGDIStuff.cpp">
+      <Filter>DDraw.DGI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -83,6 +86,9 @@
       <Filter>WTL</Filter>
     </ClInclude>
     <ClInclude Include="DDraw.DGI\CeXDib.h">
+      <Filter>DDraw.DGI</Filter>
+    </ClInclude>
+    <ClInclude Include="DDraw.DGI\DDGDIStuff.h">
       <Filter>DDraw.DGI</Filter>
     </ClInclude>
   </ItemGroup>

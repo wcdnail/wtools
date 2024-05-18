@@ -97,20 +97,19 @@ protected:
     LONG m_nColors;
 };
 
-struct CDibDC: CDibEx
+struct CDIBitmap: CDibEx
 {
-    DELETE_COPY_MOVE_OF(CDibDC);
+    DELETE_COPY_MOVE_OF(CDIBitmap);
 
-    ~CDibDC() override;
-    CDibDC();
+    ~CDIBitmap() override;
+    CDIBitmap();
 
-    void Swap(CDibDC& rhs) noexcept;
+    void Swap(CDIBitmap& rhs) noexcept;
 
-    void Draw(HDC hDC, int dwX, int dwY);
-    void Copy(HDC hDC, int dwX, int dwY);
+    void Draw(WTL::CDCHandle dc, CRect const& rc);
+    void Borrow(WTL::CDCHandle dc, int dwX, int dwY);
 
 private:
     WTL::CDC         m_DC;
     WTL::CBitmap m_Bitmap;
-    LPVOID       m_lpBits;
 };

@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "axyz-wtl-tator", "tator\axy
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wtl.color.picker", "exa\wtl.color.picker\wtl.color.picker.vcxproj", "{5117D2CB-0CCA-4744-9C67-83F4E496EB32}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "your.project.name", "exa\gt.color.dialog\gt.color.dialog.vcxproj", "{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|x64 = debug|x64
@@ -71,6 +73,18 @@ Global
 		{5117D2CB-0CCA-4744-9C67-83F4E496EB32}.Release|x64.Build.0 = Release|x64
 		{5117D2CB-0CCA-4744-9C67-83F4E496EB32}.Release|x86.ActiveCfg = Release|Win32
 		{5117D2CB-0CCA-4744-9C67-83F4E496EB32}.Release|x86.Build.0 = Release|Win32
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.debug|x64.ActiveCfg = debug|x64
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.debug|x64.Build.0 = debug|x64
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.debug|x86.ActiveCfg = debug|Win32
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.debug|x86.Build.0 = debug|Win32
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.product|x64.ActiveCfg = product|x64
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.product|x64.Build.0 = product|x64
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.product|x86.ActiveCfg = product|Win32
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.product|x86.Build.0 = product|Win32
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.Release|x64.ActiveCfg = product|x64
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.Release|x64.Build.0 = product|x64
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.Release|x86.ActiveCfg = debug|Win32
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2}.Release|x86.Build.0 = debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,6 +93,7 @@ Global
 		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3} = {6C18C091-5EE3-4C58-81F7-F15D14E22200}
 		{60F03168-F9D7-4927-9C1B-35708354D401} = {6C18C091-5EE3-4C58-81F7-F15D14E22200}
 		{5117D2CB-0CCA-4744-9C67-83F4E496EB32} = {6C18C091-5EE3-4C58-81F7-F15D14E22200}
+		{D3C23AE3-98BE-4D7D-9F31-D94014F491C2} = {6C18C091-5EE3-4C58-81F7-F15D14E22200}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0ED0A07E-4AAB-4BDF-B82A-45023E5250ED}
