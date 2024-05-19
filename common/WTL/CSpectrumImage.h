@@ -18,6 +18,7 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
     void SetSpectrumKind(SpectrumKind kind);
     SpectrumKind GetSpectrumKind() const;
     void OnSliderChanged(long nPos);
+    void OnColorChanged(long xPos, long yPos);
 
 private:
     friend Super;
@@ -25,6 +26,8 @@ private:
     BOOL            m_bMsgHandled;
     CDIBitmap               m_Dib;
     CColorUnion           m_Color;
+    CPoint                m_ptSel;
+    bool               m_bCapture;
     SpectrumKind   m_SpectrumKind;
     CSpectrumSlider*  m_pimSlider;
 
@@ -40,6 +43,11 @@ private:
 
     int OnCreate(LPCREATESTRUCT pCS);
     void OnPaint(WTL::CDCHandle dc);
+    void OnLButtonDown(UINT nFlags, CPoint point);
+    void OnLButtonUp(UINT nFlags, CPoint point);
+    void OnMouseMove(UINT nFlags, CPoint point);
+
+    void DrawMarker(WTL::CDCHandle dc);
 };
 
 inline SpectrumKind CSpectrumImage::GetSpectrumKind() const

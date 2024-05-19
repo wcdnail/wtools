@@ -219,7 +219,6 @@ void CSpectrumSlider::OnMouseMove(UINT, CPoint point)
     long const     nMax{GetRangeMax()};
     long const   nRange{nMax-nMin};
     LONG           nPos{0};
-
     if (dwStyle & TBS_VERT) {
         float const nScale{static_cast<float>(m_rcRaster.Height()) / static_cast<float>(nRange)};
         nPos = static_cast<LONG>(static_cast<float>(point.y - m_rcRaster.top) / nScale);

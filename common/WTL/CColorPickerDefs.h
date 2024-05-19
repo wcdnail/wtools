@@ -26,6 +26,8 @@ enum CCPMiscConsts: int
     SPECTRUM_SLIDER_MAX = 255,
     SPECTRUM_CHANNEL_CX = 24,
     SPECTRUM_CHANNEL_CY = 32,
+
+    NM_SPECTRUM_CLR_SEL = 1917,
 };
 
 struct CSpectrumImage;
@@ -65,6 +67,7 @@ struct CColorUnion
     void UpdateHSV();
 
     void SetHue(double dHue);
+    void SetHSV(double dH, double dS, double dV);
 };
 
 inline bool CColorUnion::IsUpdated() const
@@ -81,6 +84,20 @@ inline void CColorUnion::SetRGB(int R, int G, int B)
 {
     m_Comp.Color = RGB(R, G, B);
     SetUpdated(true);
+}
+
+inline void CColorUnion::SetHue(double dHue)
+{
+    m_dH = std::min<double>(dHue, 359.);
+    UpdateRGB();
+}
+
+inline void CColorUnion::SetHSV(double dH, double dS, double dV)
+{
+    m_dH = std::min<double>(dH, 359.);
+    m_dS = std::min<double>(dS, 100.);
+    m_dV = std::min<double>(dV, 100.);
+    UpdateRGB();
 }
 
 static_assert(SPECTRUM_BPP == 32, "SPECTRUM_BPP must always be 32!");

@@ -62,6 +62,7 @@ private:
 
     CSpectrumImage m_imSpectrum;
     CSpectrumSlider  m_imSlider;
+    WTL::CStatic      m_stColor;
     int         m_nSpectrumKind;
     int                m_nSlide;
 
@@ -126,6 +127,7 @@ CColorPicker::Impl::~Impl() = default;
 CColorPicker::Impl::Impl()
     :    m_imSpectrum{}
     ,      m_imSlider{}
+    ,       m_stColor{}
     , m_nSpectrumKind{SPEC_HSV_Hue}
     ,        m_nSlide{0}
     ,   m_bMsgHandled{FALSE}
@@ -159,8 +161,8 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
     UNREFERENCED_PARAMETER(pnmh);
     switch (pnmh->code) {
     case NM_CUSTOMDRAW:
-        //LPNMCUSTOMDRAW nmcd{reinterpret_cast<LPNMCUSTOMDRAW>(pnmh)};
-        //DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s >> %05x\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code), nmcd->dwDrawStage);
+      //LPNMCUSTOMDRAW nmcd{reinterpret_cast<LPNMCUSTOMDRAW>(pnmh)};
+      //DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s >> %05x\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code), nmcd->dwDrawStage);
         SetMsgHandled(FALSE);
         return 0;
     case TRBN_THUMBPOSCHANGING:
@@ -171,8 +173,15 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
                 return 0;
             }
             m_imSpectrum.OnSliderChanged(ptPosCh->dwPos);
-            DBGTPrint(LTH_WM_NOTIFY L" >> %d\n", ptPosCh->dwPos);
-            //GetDlgItem(CID_SPEC_COLOR_SEL).InvalidateRect(nullptr, FALSE);
+            m_stColor.InvalidateRect(nullptr, FALSE);
+            return 0;
+        }
+        }
+        break;
+    case NM_SPECTRUM_CLR_SEL:
+        switch (nID) {
+        case CID_SPECTRUM_PIC: {
+            m_stColor.InvalidateRect(nullptr, FALSE);
             return 0;
         }
         }
@@ -196,6 +205,8 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
     UNREFERENCED_PARAMETER(wndFocus);
     UNREFERENCED_PARAMETER(lInitParam);
+
+    m_stColor.Attach(GetDlgItem(CID_SPEC_COLOR_SEL));
 
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     m_imSlider.SubclassWindow(GetDlgItem(CID_SPECTRUM_SLD));

@@ -112,9 +112,3 @@ void CColorUnion::UpdateHSV()
     }
     SetUpdated(true);
 }
-
-void CColorUnion::SetHue(double dHue)
-{
-    m_dH = std::min<double>(dHue, 359.);
-    UpdateRGB();
-}
