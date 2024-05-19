@@ -46,7 +46,8 @@ private:
     BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 
     int OnCreate(LPCREATESTRUCT pCS);
-    CRect& SetChannelRect(NMCUSTOMDRAW& nmcd, CRect const& rcClient) const;
-    CRect& SetThumbRect(NMCUSTOMDRAW& nmcd, CRect const& rcClient) const;
+    CRect GetRatserRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const;
+    CRect& SetThumbRect(NMCUSTOMDRAW const& nmcd, CRect const& rcClient) const;
+    void DrawRasterChannel(NMCUSTOMDRAW const& nmcd);
     LRESULT OnCustomDraw(LPNMHDR pNMHDR);
 };

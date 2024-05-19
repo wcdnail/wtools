@@ -306,33 +306,57 @@ void GTDrawHelper::HSV_HUE(DWORD *buffer,int samples,double sat,double val_fp)
     // hue in [0, 60)
     pos += pos_adv;
     j = (int) pos;
-    HSV_SAT_INIT_0 ();
-    while (j--) *buffer++ = HSV_0 (), HSV_SAT_ADV_0 ();
+    coef3 = coef1;
+    coef3_adv = (int) ((val - coef3) / ((j) - 1));
+    while (j--) {
+        *buffer++ = RGB ((BYTE) (coef1 >> IntMult),(BYTE) (coef3 >> IntMult),(BYTE) (val >> IntMult));
+        coef3 += coef3_adv;
+    }
 
     pos += pos_adv;
     j = (int) pos - (int) (1 * pos_adv);
-    HSV_SAT_INIT_1 ();
-    while (j--) *buffer++ = HSV_1 (), HSV_SAT_ADV_1 ();
+    coef2 = val;
+    coef2_adv = (int) ((val * (1.0 - sat) - coef2) / ((j) - 1));
+    while (j--) {
+        *buffer++ = RGB ((BYTE) (coef1 >> IntMult),(BYTE) (val >> IntMult),(BYTE) (coef2 >> IntMult));
+        coef2 += coef2_adv;
+    }
 
     pos += pos_adv;
     j = (int) pos - (int) (2 * pos_adv);
-    HSV_SAT_INIT_2 ();
-    while (j--) *buffer++ = HSV_2 (), HSV_SAT_ADV_2 ();
+    coef3 = coef1;
+    coef3_adv = (int) ((val - coef3) / HSV_LOOP_STEPS (j));
+    while (j--) {
+        *buffer++ = RGB ((BYTE) (coef3 >> IntMult),(BYTE) (val >> IntMult),(BYTE) (coef1 >> IntMult));
+        coef3 += coef3_adv;
+    }
 
     pos += pos_adv;
     j = (int) pos - (int) (3 * pos_adv);
-    HSV_SAT_INIT_3 ();
-    while (j--) *buffer++ = HSV_3 (), HSV_SAT_ADV_3 ();
+    coef2 = val;
+    coef2_adv = (int) ((val * (1.0 - sat) - coef2) / HSV_LOOP_STEPS (j));
+    while (j--) {
+        *buffer++ = RGB ((BYTE) (val >> IntMult),(BYTE) (coef2 >> IntMult),(BYTE) (coef1 >> IntMult));
+        coef2 += coef2_adv;
+    }
 
     pos += pos_adv;
     j = (int) pos - (int) (4 * pos_adv);
-    HSV_SAT_INIT_4 ();
-    while (j--) *buffer++ = HSV_4 (), HSV_SAT_ADV_4 ();
+    coef3 = coef1;
+    coef3_adv = (int) ((val - coef3) / HSV_LOOP_STEPS (j));
+    while (j--) {
+        *buffer++ = RGB ((BYTE) (val >> IntMult),(BYTE) (coef1 >> IntMult),(BYTE) (coef3 >> IntMult));
+        coef3 += coef3_adv;
+    }
 
     pos += (pos_adv + 0.1); // + 0.1 because of floating-point math's rounding errors
     j = (int) pos - (int) (5 * pos_adv);
-    HSV_SAT_INIT_5 ();
-    while (j--) *buffer++ = HSV_5 (), HSV_SAT_ADV_5 ();
+    coef2 = val;
+    coef2_adv = (int) ((val * (1.0 - sat) - coef2) / HSV_LOOP_STEPS (j));
+    while (j--) {
+        *buffer++ = RGB ( (BYTE) (coef2 >> IntMult),(BYTE) (coef1 >> IntMult),(BYTE) (val >> IntMult));
+        coef2 += coef2_adv;
+    }
 }
 
 

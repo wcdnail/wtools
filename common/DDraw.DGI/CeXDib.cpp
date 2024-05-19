@@ -29,6 +29,14 @@ DWORD CDibEx::GetSize(BITMAPINFOHEADER const& biHdr, LONG wColors)
     return biHdr.biSize + biHdr.biSizeImage + GetPaletteSize(wColors);
 } // End of GetSize
 
+DWORD CDibEx::GetImageSize() const
+{
+    if (!m_pDib) {
+        return 0;
+    }
+    return GetSize(*GetInfoHdr(), m_nColors);
+}
+
 DWORD CDibEx::GetPaletteSize(LONG wColors)
 {
     return (wColors * sizeof(RGBQUAD));

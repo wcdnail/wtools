@@ -83,10 +83,12 @@ struct CDibEx
 
     BOOL WriteBMP(LPCTSTR bmpFileName) const;
 
+    LPBITMAPINFOHEADER GetInfoHdr() const;
+    DWORD GetImageSize() const;
+
 protected:
     using DIBPtr = std::unique_ptr<uint8_t[]>;
 
-    LPBITMAPINFOHEADER GetInfoHdr() const;
     LPBYTE GetPaletteBits() const;
 
     static DWORD GetPaletteSize(LONG wColors);

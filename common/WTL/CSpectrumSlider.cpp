@@ -11,8 +11,8 @@
 
 enum : int
 {
-    SPECTRUM_SLIDER_CX = 2,
-    SPECTRUM_SLIDER_CY = 32,
+    SPECTRUM_SLIDER_CX = 32,
+    SPECTRUM_SLIDER_CY = 1,
 };
 
 CSpectrumSlider::~CSpectrumSlider() = default;
@@ -40,22 +40,16 @@ bool CSpectrumSlider::Initialize()
 
 void CSpectrumSlider::UpdateRaster(SpectrumKind spKind, double dHue)
 {
+    UNREFERENCED_PARAMETER(dHue);
+
     switch (spKind) {
-    case SPEC_RGB_Red:
-        break;
-    case SPEC_RGB_Green:
-        break;
-    case SPEC_RGB_Blue:
-        break;
-    case SPEC_HSV_Hue:
-        DDraw_HSV_Hue(m_Dib, dHue);
-        break;
-    case SPEC_HSV_Saturation:
-        break;
-    case SPEC_HSV_Brightness:
-        break;
-    default: 
-        break;
+    case SPEC_RGB_Red:        break;
+    case SPEC_RGB_Green:      break;
+    case SPEC_RGB_Blue:       break;
+    case SPEC_HSV_Hue:        DDraw_HSV_HUE(m_Dib, 1, 1); break;
+    case SPEC_HSV_Saturation: break;
+    case SPEC_HSV_Brightness: break;
+    default: break;
     }
 }
 
@@ -130,24 +124,27 @@ void CSpectrumSlider::SetPrimaryColor(COLORREF crPrimary)
     m_focusBrush.Attach(CreateBrushIndirect(&logBrush));
 }
 
-CRect& CSpectrumSlider::SetChannelRect(NMCUSTOMDRAW& nmcd, CRect const& rcClient) const
+CRect CSpectrumSlider::GetRatserRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const
 {
-    const DWORD dwStyle{GetStyle()};
-    CRect&    rcChannel{static_cast<CRect&>(nmcd.rc)};
+    CRect        rcRast{nmcd.rc};
+    if (rcClient.IsRectEmpty()) {
+        GetClientRect(rcClient);
+    }
     if (dwStyle & TBS_VERT) {
-        rcChannel.left = rcClient.left + 14;
-        rcChannel.right = rcClient.right - 8;
-        rcChannel.DeflateRect(6, 4);
+        rcRast.left = rcClient.left + 14;
+        rcRast.right = rcClient.right - 8;
+        rcRast.DeflateRect(8, 5);
     }
     else {
-        rcChannel.top = rcClient.top + 8;
-        rcChannel.bottom = rcClient.bottom - 8;
-        rcChannel.DeflateRect(4, 6);
+        rcRast.top = rcClient.top + 8;
+        rcRast.bottom = rcClient.bottom - 8;
+        rcRast.DeflateRect(5, 8);
     }
-    return rcChannel;
+    return rcRast;
 }
 
-CRect& CSpectrumSlider::SetThumbRect(NMCUSTOMDRAW& nmcd, CRect const& rcClient) const
+#if 0
+CRect& CSpectrumSlider::SetThumbRect(NMCUSTOMDRAW const& nmcd, CRect const& rcClient) const
 {
     const DWORD dwStyle{GetStyle()};
     CRect&      rcThumb{static_cast<CRect&>(nmcd.rc)};
@@ -161,12 +158,53 @@ CRect& CSpectrumSlider::SetThumbRect(NMCUSTOMDRAW& nmcd, CRect const& rcClient) 
     }
     return rcThumb;
 }
+#endif
+
+void CSpectrumSlider::DrawRasterChannel(NMCUSTOMDRAW const& nmcd)
+{
+    CRect                rcClient{};
+    const DWORD           dwStyle{GetStyle()};
+    CRect                  rcDest{GetRatserRect(dwStyle, nmcd, rcClient)};
+    WTL::CDCHandle             dc{nmcd.hdc};
+    const int             iSaveDC{dc.SaveDC()};
+    WTL::CBrushHandle const brBlk{WTL::AtlGetStockBrush(BLACK_BRUSH)};
+
+    if (dwStyle & TBS_VERT) {
+        BITMAPINFO const bmpInfo{
+            {
+            /* biSize;          */ sizeof(bmpInfo.bmiHeader),
+            /* biWidth;         */ m_Dib.GetHeight(),
+            /* biHeight;        */ m_Dib.GetWidth(),
+            /* biPlanes;        */ 1,
+            /* biBitCount;      */ m_Dib.GetBitCount(),
+            /* biCompression;   */ 0,
+            /* biSizeImage;     */ m_Dib.GetImageSize(),
+            /* biXPelsPerMeter; */ 0,
+            /* biYPelsPerMeter; */ 0,
+            /* biClrUsed;       */ 0,
+            /* biClrImportant;  */ 0
+            },
+            {0}
+        };
+        dc.StretchDIBits(rcDest.left, rcDest.top,
+                         rcDest.Width(), rcDest.Height(),
+                         0, 0, m_Dib.GetHeight(), m_Dib.GetWidth(),
+                         m_Dib.GetData(), &bmpInfo, 
+                         DIB_RGB_COLORS, SRCCOPY);
+    }
+    else {
+        WTL::CDCHandle const dcSource{m_Dib.GetDC(dc)};
+        dc.StretchBlt(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(),
+            dcSource, 0, 0, m_Dib.GetWidth(), m_Dib.GetHeight(), SRCCOPY);
+    }
+    dc.FrameRect(rcDest, brBlk);
+    dc.RestoreDC(iSaveDC);
+ }
 
 LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
 {
-    NMCUSTOMDRAW& nmcd{*reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR)};
-    int const   itemId{static_cast<int>(nmcd.dwItemSpec)};
-    LRESULT       lRes{CDRF_DODEFAULT};
+    NMCUSTOMDRAW const& nmcd{*reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR)};
+    int const         itemId{static_cast<int>(nmcd.dwItemSpec)};
     switch(nmcd.dwDrawStage) {
     case CDDS_PREPAINT: {
         return CDRF_NOTIFYITEMDRAW;
@@ -174,16 +212,8 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
     case CDDS_ITEMPREPAINT: {
         switch (itemId) {
         case TBCD_CHANNEL: {
-            CRect    rcClient{};
-            GetClientRect(rcClient);
-            CRect   rcChannel{SetChannelRect(nmcd, rcClient)};
-            WTL::CDCHandle dc{nmcd.hdc};
-            const int iSaveDC{dc.SaveDC()};
-            dc.FrameRect(rcChannel, m_normalBrush);
-            rcChannel.DeflateRect(2, 2);
-            dc.FillSolidRect(rcChannel, m_crPrimary);
-            dc.RestoreDC(iSaveDC);
-            return CDRF_SKIPDEFAULT;
+            DrawRasterChannel(nmcd);
+            return CDRF_DODEFAULT;
         }
         case TBCD_THUMB: {
             if constexpr (false) {
@@ -204,5 +234,5 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
         break;
     }
     }
-    return lRes;
+    return CDRF_DODEFAULT;
 }
