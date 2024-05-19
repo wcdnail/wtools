@@ -372,16 +372,19 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
             break;
         }
         case TBCD_THUMB: {
-            CRect    rcClient{};
-            GetClientRect(rcClient);
-            CRect     rcThumb{SetThumbRect(nmcd, rcClient)};
-            WTL::CDCHandle dc{nmcd.hdc};
-            const int iSaveDC{dc.SaveDC()};
-            WTL::CBrushHandle brCurrent{WTL::AtlGetStockBrush(BLACK_BRUSH)};
-            dc.FrameRect(rcThumb, brCurrent);
-            dc.RestoreDC(iSaveDC);
-            Invalidate(FALSE);
-            return CDRF_SKIPDEFAULT;
+            if constexpr (false) {
+                CRect    rcClient{};
+                GetClientRect(rcClient);
+                CRect     rcThumb{SetThumbRect(nmcd, rcClient)};
+                WTL::CDCHandle dc{nmcd.hdc};
+                const int iSaveDC{dc.SaveDC()};
+                WTL::CBrushHandle brCurrent{WTL::AtlGetStockBrush(BLACK_BRUSH)};
+                dc.FrameRect(rcThumb, brCurrent);
+                dc.RestoreDC(iSaveDC);
+                Invalidate(FALSE);
+                return CDRF_SKIPDEFAULT;
+            }
+            break;
         }
         }
         break;

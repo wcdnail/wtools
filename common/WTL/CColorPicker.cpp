@@ -40,7 +40,7 @@ private:
 
     enum Styles: DWORD
     {
-        TB_VERT = TBS_BOTH | TBS_VERT | TBS_NOTICKS | TBS_DOWNISLEFT | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
+        TB_VERT = TBS_RIGHT | TBS_VERT | TBS_NOTICKS | TBS_DOWNISLEFT | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
         CC_CHILD = WS_CHILD | WS_VISIBLE,
     };
 
@@ -191,8 +191,6 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     cbSpectrum.AddString(L"HSV/色调");
     cbSpectrum.AddString(L"HSV/饱和度");
     cbSpectrum.AddString(L"HSV/明度");
-
-    m_imSlider.SetPrimaryColor(0xffffff);
 
     DoDataExchange(FALSE);
     DlgResize_Init(false, true, 0);

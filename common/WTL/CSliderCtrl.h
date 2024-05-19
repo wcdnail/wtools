@@ -33,65 +33,65 @@ struct CSliderCtrlT: TBase
         return _T("msctls_trackbar32");
     }
 
-    int GetPos() const
+    long GetPos() const
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_GETPOS, 0, 0);
+        return (long)::SendMessage(this->m_hWnd, TBM_GETPOS, 0, 0);
     }
 
-    int GetCurSel() const // DDX compat
+    long GetCurSel() const // DDX compat
     {
         return GetPos();
     }
 
-    int GetRangeMin() const
+    long GetRangeMin() const
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_GETRANGEMIN, 0, 0);
+        return (long)::SendMessage(this->m_hWnd, TBM_GETRANGEMIN, 0, 0);
     }
 
-    int GetRangeMax() const
+    long GetRangeMax() const
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_GETRANGEMAX, 0, 0);
+        return (long)::SendMessage(this->m_hWnd, TBM_GETRANGEMAX, 0, 0);
     }
 
-    int GetTick(int nTick) const
+    long GetTick(long nTick) const
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_GETTIC, static_cast<WPARAM>(nTick), 0);
+        return (long)::SendMessage(this->m_hWnd, TBM_GETTIC, static_cast<WPARAM>(nTick), 0);
     }
 
-    BOOL SetTick(int nTick)
+    BOOL SetTick(long nTick)
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
         return (BOOL)::SendMessage(this->m_hWnd, TBM_SETTIC, 0, static_cast<LPARAM>(nTick));
     }
 
-    void SetPos(int nPos, BOOL bRedraw)
+    void SetPos(long nPos, BOOL bRedraw)
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
         ::SendMessage(this->m_hWnd, TBM_SETPOS, static_cast<WPARAM>(bRedraw), static_cast<LPARAM>(nPos));
     }
 
-    void SetCurSel(int nPos) // DDX compat
+    void SetCurSel(long nPos) // DDX compat
     {
         SetPos(nPos, TRUE);
     }
 
-    void SetRange(int nMin, int nMax, BOOL bRedraw)
+    void SetRange(long nMin, long nMax, BOOL bRedraw)
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
         ::SendMessage(this->m_hWnd, TBM_SETRANGE, static_cast<WPARAM>(bRedraw), MAKELONG(nMin, nMax));
     }
 
-    void SetRangeMin(int nMin, BOOL bRedraw)
+    void SetRangeMin(long nMin, BOOL bRedraw)
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
         ::SendMessage(this->m_hWnd, TBM_SETRANGEMIN, static_cast<WPARAM>(bRedraw), static_cast<LPARAM>(nMin));
     }
 
-    void SetRangeMax(int nMax, BOOL bRedraw)
+    void SetRangeMax(long nMax, BOOL bRedraw)
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
         ::SendMessage(this->m_hWnd, TBM_SETRANGEMAX, static_cast<WPARAM>(bRedraw), static_cast<LPARAM>(nMax));
@@ -103,19 +103,19 @@ struct CSliderCtrlT: TBase
         ::SendMessage(this->m_hWnd, TBM_CLEARTICS, static_cast<WPARAM>(bRedraw), 0);
     }
 
-    void SetSel(int nStart, int nStop, BOOL bRedraw)
+    void SetSel(long nStart, long nStop, BOOL bRedraw)
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
         ::SendMessage(this->m_hWnd, TBM_SETSEL, static_cast<WPARAM>(bRedraw), MAKELONG(nStart, nStop));
     }
 
-    void SetSelStart(int nMin, BOOL bRedraw)
+    void SetSelStart(long nMin, BOOL bRedraw)
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
         ::SendMessage(this->m_hWnd, TBM_SETSELSTART, static_cast<WPARAM>(bRedraw), static_cast<LPARAM>(nMin));
     }
 
-    void SetSelEnd(int nMax, BOOL bRedraw)
+    void SetSelEnd(long nMax, BOOL bRedraw)
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
         ::SendMessage(this->m_hWnd, TBM_SETSELEND, static_cast<WPARAM>(bRedraw), static_cast<LPARAM>(nMax));
@@ -127,28 +127,28 @@ struct CSliderCtrlT: TBase
         return static_cast<DWORD const*>(::SendMessage(this->m_hWnd, TBM_GETPTICS, 0, 0));
     }
 
-    int GetTicPos(int nTick) const
+    long GetTicPos(long nTick) const
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_GETTICPOS, static_cast<WPARAM>(nTick), 0);
+        return (long)::SendMessage(this->m_hWnd, TBM_GETTICPOS, static_cast<WPARAM>(nTick), 0);
     }
 
-    int GetNumTics() const
+    long GetNumTics() const
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_GETNUMTICS, 0, 0);
+        return (long)::SendMessage(this->m_hWnd, TBM_GETNUMTICS, 0, 0);
     }
 
-    int GetSelStart() const
+    long GetSelStart() const
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_GETSELSTART, 0, 0);
+        return (long)::SendMessage(this->m_hWnd, TBM_GETSELSTART, 0, 0);
     }
 
-    int GetSelEnd() const
+    long GetSelEnd() const
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_GETSELEND, 0, 0);
+        return (long)::SendMessage(this->m_hWnd, TBM_GETSELEND, 0, 0);
     }
 
     void CearSel(BOOL bRedraw)
@@ -163,28 +163,28 @@ struct CSliderCtrlT: TBase
         ::SendMessage(this->m_hWnd, TBM_SETTICFREQ, static_cast<WPARAM>(nFreq), 0);
     }
 
-    int SetPageSize(int nNewPageSize)
+    long SetPageSize(long nNewPageSize)
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_SETPAGESIZE, 0, static_cast<LPARAM>(nNewPageSize));
+        return (long)::SendMessage(this->m_hWnd, TBM_SETPAGESIZE, 0, static_cast<LPARAM>(nNewPageSize));
     }
 
-    int GetPageSize() const
+    long GetPageSize() const
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_GETPAGESIZE, 0, 0);
+        return (long)::SendMessage(this->m_hWnd, TBM_GETPAGESIZE, 0, 0);
     }
 
-    int SetLineSize(int nNewLineSize)
+    long SetLineSize(long nNewLineSize)
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_SETLINESIZE, 0, static_cast<LPARAM>(nNewLineSize));
+        return (long)::SendMessage(this->m_hWnd, TBM_SETLINESIZE, 0, static_cast<LPARAM>(nNewLineSize));
     }
 
-    int GetLineSize() const
+    long GetLineSize() const
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
-        return (int)::SendMessage(this->m_hWnd, TBM_GETLINESIZE, 0, 0);
+        return (long)::SendMessage(this->m_hWnd, TBM_GETLINESIZE, 0, 0);
     }
 
     CRect GetThumbRect() const
@@ -233,6 +233,55 @@ struct CSliderCtrlT: TBase
     {
         ATLASSERT(::IsWindow(this->m_hWnd));
         return (int)::SendMessage(this->m_hWnd, TBM_SETTIPSIDE, static_cast<WPARAM>(nSide), 0);
+    }
+
+    //
+    // uFlags
+    // TRUE     The buddy will appear to the left of the trackbar if the trackbar control uses the TBS_HORZ style.
+    //          If the trackbar uses the TBS_VERT style, the buddy appears above the trackbar control.
+    // FALSE    The buddy will appear to the right of the trackbar if the trackbar control uses the TBS_HORZ style.
+    //          If the trackbar uses the TBS_VERT style, the buddy appears below the trackbar control.
+    //
+    HWND SetBuddy(UINT uFlags, HWND hWndBuddy)
+    {
+        ATLASSERT(::IsWindow(this->m_hWnd));
+        return reinterpret_cast<HWND>(::SendMessage(this->m_hWnd, TBM_SETBUDDY,
+            static_cast<WPARAM>(uFlags), reinterpret_cast<LPARAM>(hWndBuddy)));
+    }
+
+    //
+    // uFlags
+    // TRUE     Retrieves the handle to the buddy to the left of the trackbar.
+    //          If the trackbar control uses the TBS_VERT style, the message will retrieve the buddy above the trackbar.
+    // FALSE    Retrieves the handle to the buddy to the right of the trackbar.
+    //          If the trackbar control uses the TBS_VERT style, the message will retrieve the buddy below the trackbar.
+    //
+    HWND GetBuddy(UINT uFlags) const
+    {
+        ATLASSERT(::IsWindow(this->m_hWnd));
+        return reinterpret_cast<HWND>(::SendMessage(this->m_hWnd, TBM_GETBUDDY, static_cast<WPARAM>(uFlags), 0));
+    }
+
+    //
+    // Calling TBM_SETPOSNOTIFY will set the trackbar slider location like TBM_SETPOS would,
+    // but it will also cause the trackbar to notify its parent of a move via a WM_HSCROLL or WM_VSCROLL message.
+    //
+    void SetPosNotify(long nPos)
+    {
+        ATLASSERT(::IsWindow(this->m_hWnd));
+        ::SendMessage(this->m_hWnd, TBM_SETPOSNOTIFY, 0, static_cast<LPARAM>(nPos));
+    }
+
+    UINT SetUnicodeFormat(UINT uFlags)
+    {
+        ATLASSERT(::IsWindow(this->m_hWnd));
+        return (UINT)::SendMessage(this->m_hWnd, TBM_SETUNICODEFORMAT, static_cast<WPARAM>(uFlags), 0);
+    }
+
+    UINT GetUnicodeFormat() const
+    {
+        ATLASSERT(::IsWindow(this->m_hWnd));
+        return (UINT)::SendMessage(this->m_hWnd, TBM_GETUNICODEFORMAT, 0, 0);
     }
 };
 
