@@ -7,6 +7,8 @@
 
 #define CSPECSLD_CLASS _T("WCCF::CSpectrumSlider")
 
+enum SpectrumKind: int;
+
 struct CSpectrumSlider: CCustomControl<CSpectrumSlider, WTL::CSliderCtrl>
 {
     using Super = CCustomControl<CSpectrumSlider, WTL::CSliderCtrl>;
@@ -17,22 +19,25 @@ struct CSpectrumSlider: CCustomControl<CSpectrumSlider, WTL::CSliderCtrl>
     ~CSpectrumSlider() override;
     CSpectrumSlider();
 
-    void SetPrimaryColor(COLORREF crPrimary);
+    bool Initialize();
+    void UpdateRaster(SpectrumKind spKind, double dHue);
 
 private:
     friend Super;
 
-    BOOL        m_bMsgHandled;
-    COLORREF      m_crPrimary;
-    COLORREF       m_crShadow;
-    COLORREF       m_crHilite;
-    COLORREF    m_crMidShadow;
-    COLORREF m_crDarkerShadow;
-    WTL::CBrush m_normalBrush;
-    WTL::CBrush  m_focusBrush;
-    CDIBitmap           m_Dib;
+    BOOL            m_bMsgHandled;
+    COLORREF          m_crPrimary;
+    COLORREF           m_crShadow;
+    COLORREF           m_crHilite;
+    COLORREF        m_crMidShadow;
+    COLORREF     m_crDarkerShadow;
+    WTL::CBrush     m_normalBrush;
+    WTL::CBrush      m_focusBrush;
+    CDIBitmap               m_Dib;
 
     static ATOM& GetWndClassAtomRef();
+
+    void SetPrimaryColor(COLORREF crPrimary);
 
     BOOL IsMsgHandled() const { return m_bMsgHandled; }
     void SetMsgHandled(BOOL bHandled) { m_bMsgHandled = bHandled; }
@@ -41,7 +46,6 @@ private:
     BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 
     int OnCreate(LPCREATESTRUCT pCS);
-    HBRUSH OnEraseBkgnd(WTL::CDCHandle dc);
     CRect& SetChannelRect(NMCUSTOMDRAW& nmcd, CRect const& rcClient) const;
     CRect& SetThumbRect(NMCUSTOMDRAW& nmcd, CRect const& rcClient) const;
     LRESULT OnCustomDraw(LPNMHDR pNMHDR);

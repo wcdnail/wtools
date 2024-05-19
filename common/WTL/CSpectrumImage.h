@@ -17,6 +17,8 @@ enum SpectrumKind: int
     SPEC_End = SPEC_HSV_Brightness
 };
 
+struct CSpectrumSlider;
+
 struct CSpectrumImage: CCustomControl<CSpectrumImage>
 {
     using Super = CCustomControl<CSpectrumImage>;
@@ -26,7 +28,8 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
     ~CSpectrumImage() override;
     CSpectrumImage();
 
-    void SetSpectrumKind(SpectrumKind kind);
+    void OnDataChanged(SpectrumKind kind, CSpectrumSlider& imSlider);
+    SpectrumKind GetSpectrumKind() const;
 
 private:
     friend Super;
@@ -35,6 +38,7 @@ private:
     SpectrumKind   m_SpectrumKind;
     double                 m_dHue;
     double             m_dPrevHue;
+    CSpectrumSlider*  m_pimSlider;
     BOOL            m_bMsgHandled;
 
     static ATOM& GetWndClassAtomRef();
@@ -45,6 +49,13 @@ private:
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
     BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 
+    void UpdateRaster() const;
+
     int OnCreate(LPCREATESTRUCT pCS);
     void OnPaint(WTL::CDCHandle dc);
 };
+
+inline SpectrumKind CSpectrumImage::GetSpectrumKind() const
+{
+    return m_SpectrumKind;
+}

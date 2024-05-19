@@ -3,6 +3,8 @@
 #include "CeXDib.h"
 #include <cmath>
 
+#include "exa/gt.color.dialog/GTDrawHelper.h"
+
 //
 // This code is refactored from: GTDrawHelper.cpp
 // David Swigger's (dwswigger@yahoo.com) Photoshop's-like color pickers
@@ -90,4 +92,89 @@ bool DDraw_HSV_Hue(CDibEx const& dibDest, double dHue)
         dibDest.GetHeight(),
         dibDest.GetStride() / sizeof(DWORD),
         dHue);
+}
+
+void DDraw_HSV_HUE_Line(DWORD *buffer, int samples, double sat, double val_fp)
+{
+    // value, but as integer in [0, 255 << IntMult]
+    int     val;
+
+    // loop counter
+    int     j;
+
+    // coefficients and advances
+    int     coef1, coef2, coef3;
+    int     coef2_adv, coef3_adv;
+
+    // current position and advance to the next one
+    double  pos, pos_adv;
+
+    //
+    // hue increments in [0, 360); indirectly
+    //  intp changes - 0, 1, 2, 3, 4, 5; indirectly (separate loops)
+    //  frac increments in [0, 1) six times; indirectly (coefficients)
+    // sat - const, in [0, 1]
+    // val - const, in [0, (255 << IntMult)]
+    //
+    // coef1 => val * (1 - sat)              => const, = val * (1 - sat)
+    // coef2 => val * (1 - sat * frac)       => changes from val to val * (1 - sat)
+    // coef3 => val * (1 - sat * (1 - frac)) => changes from val * (1 - sat) to val
+    //
+
+    // constants
+    val = (int) (val_fp * 255) << IntMult;
+    coef1 = (int) (val * (1 - sat));
+
+    // prepare
+    pos = 0;
+    pos_adv = (double) samples / 6.0;
+
+    // hue in [0, 60)
+    pos += pos_adv;
+    j = (int) pos;
+    coef3 = coef1, coef3_adv = (int) ((val - coef3) / ((j) - 1));
+    while (j--) {
+        *buffer++ = RGB((BYTE) (coef1 >> int_extend),(BYTE) (coef3 >> int_extend),(BYTE) (val >> int_extend));
+        coef3 += coef3_adv;
+    }
+
+    pos += pos_adv;
+    j = (int) pos - (int) (1 * pos_adv);
+    coef2 = val, coef2_adv = (int) ((val * (1.0 - sat) - coef2) / ((j) - 1));
+    while (j--) {
+        *buffer++ = RGB ((BYTE) (coef1 >> int_extend),(BYTE) (val >> int_extend),(BYTE) (coef2 >> int_extend));
+        coef2 += coef2_adv;
+    }
+
+    pos += pos_adv;
+    j = (int) pos - (int) (2 * pos_adv);
+    coef3 = coef1, coef3_adv = (int) ((val - coef3) / ((j) - 1));
+    while (j--) {
+        *buffer++ = RGB ((BYTE) (coef3 >> int_extend),(BYTE) (val >> int_extend),(BYTE) (coef1 >> int_extend));
+        coef3 += coef3_adv;
+    }
+
+    pos += pos_adv;
+    j = (int) pos - (int) (3 * pos_adv);
+    coef2 = val, coef2_adv = (int) ((val * (1.0 - sat) - coef2) / ((j) - 1));
+    while (j--) {
+        *buffer++ = RGB((BYTE) (val >> int_extend),(BYTE) (coef2 >> int_extend),(BYTE) (coef1 >> int_extend));
+        coef2 += coef2_adv;
+    }
+
+    pos += pos_adv;
+    j = (int) pos - (int) (4 * pos_adv);
+    coef3 = coef1, coef3_adv = (int) ((val - coef3) / ((j) - 1));
+    while (j--) {
+        *buffer++ = RGB ((BYTE) (val >> int_extend),(BYTE) (coef1 >> int_extend),(BYTE) (coef3 >> int_extend));
+        coef3 += coef3_adv;
+    }
+
+    pos += (pos_adv + 0.1); // + 0.1 because of floating-point math's rounding errors
+    j = (int) pos - (int) (5 * pos_adv);
+    coef2 = val, coef2_adv = (int) ((val * (1.0 - sat) - coef2) / HSV_LOOP_STEPS (j));
+    while (j--) {
+        *buffer++ = RGB ( (BYTE) (coef2 >> int_extend),(BYTE) (coef1 >> int_extend),(BYTE) (val >> int_extend));
+        coef2 += coef2_adv;
+    }
 }

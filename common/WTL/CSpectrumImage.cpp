@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CSpectrumImage.h"
+#include "CSpectrumSlider.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 
 enum : int
@@ -9,15 +10,25 @@ enum : int
 };
 
 CSpectrumImage::~CSpectrumImage() = default;
-CSpectrumImage::CSpectrumImage() = default;
 
-void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
+CSpectrumImage::CSpectrumImage()
+    :          m_Dib{}
+    , m_SpectrumKind{SPEC_HSV_Hue}
+    ,         m_dHue{.0}
+    ,     m_dPrevHue{-1.}
+    ,    m_pimSlider{nullptr}
+    ,  m_bMsgHandled{FALSE}
+{
+}
+
+void CSpectrumImage::OnDataChanged(SpectrumKind kind, CSpectrumSlider& imSlider)
 {
     if (kind < SPEC_Begin || kind > SPEC_End) {
         return ;
     }
     m_SpectrumKind = kind;
     m_dPrevHue = -1.0;
+    m_pimSlider = &imSlider;
     InvalidateRect(nullptr, FALSE);
 }
 
@@ -64,28 +75,36 @@ int CSpectrumImage::OnCreate(LPCREATESTRUCT pCS)
     return 0;
 }
 
+void CSpectrumImage::UpdateRaster() const
+{
+    switch (m_SpectrumKind) {
+    case SPEC_RGB_Red:
+        break;
+    case SPEC_RGB_Green:
+        break;
+    case SPEC_RGB_Blue:
+        break;
+    case SPEC_HSV_Hue:
+        DDraw_HSV_Hue(m_Dib, m_dHue);
+        break;
+    case SPEC_HSV_Saturation:
+        break;
+    case SPEC_HSV_Brightness:
+        break;
+    default: 
+        break;
+    }
+    if (m_pimSlider) {
+        m_pimSlider->UpdateRaster(m_SpectrumKind, m_dHue);
+    }
+}
+
 void CSpectrumImage::OnPaint(WTL::CDCHandle dc)
 {
     UNREFERENCED_PARAMETER(dc);
 
     if (m_dHue != m_dPrevHue) {
-        switch (m_SpectrumKind) {
-        case SPEC_RGB_Red:
-            break;
-        case SPEC_RGB_Green:
-            break;
-        case SPEC_RGB_Blue:
-            break;
-        case SPEC_HSV_Hue:
-            DDraw_HSV_Hue(m_Dib, m_dHue);
-            break;
-        case SPEC_HSV_Saturation:
-            break;
-        case SPEC_HSV_Brightness:
-            break;
-        default: 
-            break;
-        }
+        UpdateRaster();
         m_dPrevHue = m_dHue;
     }
 

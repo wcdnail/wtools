@@ -183,6 +183,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     m_imSlider.SubclassWindow(GetDlgItem(CID_SPECTRUM_SLD));
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
+    m_imSlider.Initialize();
 
     WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
     cbSpectrum.AddString(L"RGB/红");
@@ -201,7 +202,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 
 void CColorPicker::Impl::OnSpecComboChanged()
 {
-    m_imSpectrum.SetSpectrumKind(static_cast<SpectrumKind>(m_nSpectrumKind));
+    m_imSpectrum.OnDataChanged(static_cast<SpectrumKind>(m_nSpectrumKind), m_imSlider);
 }
 
 CColorPicker::~CColorPicker() = default;
