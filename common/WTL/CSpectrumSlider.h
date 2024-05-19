@@ -18,25 +18,19 @@ struct CSpectrumSlider: CCustomControl<CSpectrumSlider, WTL::CSliderCtrl>
     ~CSpectrumSlider() override;
     CSpectrumSlider();
 
-    bool Initialize();
-    void UpdateRaster(SpectrumKind spKind, double dHue);
+    bool Initialize(CSpectrumImage& imSpectrum);
+    void UpdateRaster(SpectrumKind spKind);
 
 private:
     friend Super;
 
     BOOL            m_bMsgHandled;
-    COLORREF          m_crPrimary;
-    COLORREF           m_crShadow;
-    COLORREF           m_crHilite;
-    COLORREF        m_crMidShadow;
-    COLORREF     m_crDarkerShadow;
-    WTL::CBrush     m_normalBrush;
-    WTL::CBrush      m_focusBrush;
     CDIBitmap               m_Dib;
+    CSpectrumImage* m_pimSpectrum;
+    CRect              m_rcRaster;
+    bool               m_bCapture;
 
     static ATOM& GetWndClassAtomRef();
-
-    void SetPrimaryColor(COLORREF crPrimary);
 
     BOOL IsMsgHandled() const { return m_bMsgHandled; }
     void SetMsgHandled(BOOL bHandled) { m_bMsgHandled = bHandled; }
@@ -49,4 +43,7 @@ private:
     CRect GetThumbRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const;
     void DrawRasterChannel(NMCUSTOMDRAW const& nmcd);
     LRESULT OnCustomDraw(LPNMHDR pNMHDR);
+    void OnLButtonDown(UINT nFlags, CPoint point);
+    void OnLButtonUp(UINT nFlags, CPoint point);
+    void OnMouseMove(UINT nFlags, CPoint point);
 };

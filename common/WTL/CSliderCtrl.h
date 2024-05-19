@@ -264,7 +264,7 @@ struct CSliderCtrlT: TBase
 
     //
     // Calling TBM_SETPOSNOTIFY will set the trackbar slider location like TBM_SETPOS would,
-    // but it will also cause the trackbar to notify its parent of a move via a WM_HSCROLL or WM_VSCROLL message.
+    // but it will also cause the trackbar to notify its parent of a move via a WM_HSCROLL or WM_VSCROLL message
     //
     void SetPosNotify(long nPos)
     {

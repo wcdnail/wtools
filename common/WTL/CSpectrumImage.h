@@ -13,18 +13,20 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
     ~CSpectrumImage() override;
     CSpectrumImage();
 
-    void OnDataChanged(SpectrumKind kind, CSpectrumSlider& imSlider);
+    bool Initialize(CSpectrumSlider& imSlider, long cx = SPECTRUM_CX, long cy = SPECTRUM_CY);
+    COLORREF GetColorRef() const;
+    void SetSpectrumKind(SpectrumKind kind);
     SpectrumKind GetSpectrumKind() const;
+    void OnSliderChanged(long nPos);
 
 private:
     friend Super;
 
-    CDIBitmap               m_Dib;
-    SpectrumKind   m_SpectrumKind;
-    double                 m_dHue;
-    double             m_dPrevHue;
-    CSpectrumSlider*  m_pimSlider;
     BOOL            m_bMsgHandled;
+    CDIBitmap               m_Dib;
+    CColorUnion           m_Color;
+    SpectrumKind   m_SpectrumKind;
+    CSpectrumSlider*  m_pimSlider;
 
     static ATOM& GetWndClassAtomRef();
 
@@ -43,4 +45,9 @@ private:
 inline SpectrumKind CSpectrumImage::GetSpectrumKind() const
 {
     return m_SpectrumKind;
+}
+
+inline COLORREF CSpectrumImage::GetColorRef() const
+{
+    return m_Color.m_Comp.Color;
 }

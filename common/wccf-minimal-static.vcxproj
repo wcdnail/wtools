@@ -48,6 +48,7 @@
     <ClCompile Include="windows.wtl.buffered.paint.cpp" />
     <ClCompile Include="WTL\CColorButton.cpp" />
     <ClCompile Include="WTL\CColorPicker.cpp" />
+    <ClCompile Include="WTL\CColorPickerDefs.cpp" />
     <ClCompile Include="WTL\CSpectrumImage.cpp" />
     <ClCompile Include="WTL\CSpectrumSlider.cpp" />
   </ItemGroup>

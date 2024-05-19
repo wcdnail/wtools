@@ -60,7 +60,6 @@ private:
         CID_GRP_PICKER,
     };
 
-    CColorUnion         m_Color;
     CSpectrumImage m_imSpectrum;
     CSpectrumSlider  m_imSlider;
     int         m_nSpectrumKind;
@@ -125,8 +124,7 @@ private:
 CColorPicker::Impl::~Impl() = default;
 
 CColorPicker::Impl::Impl()
-    :         m_Color{RGB(0xaa, 0xbb, 0xcc)}
-    ,    m_imSpectrum{}
+    :    m_imSpectrum{}
     ,      m_imSlider{}
     , m_nSpectrumKind{SPEC_HSV_Hue}
     ,        m_nSlide{0}
@@ -159,12 +157,25 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
 {
     UNREFERENCED_PARAMETER(nID);
     UNREFERENCED_PARAMETER(pnmh);
-    if (NM_CUSTOMDRAW == pnmh->code) {
+    switch (pnmh->code) {
+    case NM_CUSTOMDRAW:
+        //LPNMCUSTOMDRAW nmcd{reinterpret_cast<LPNMCUSTOMDRAW>(pnmh)};
+        //DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s >> %05x\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code), nmcd->dwDrawStage);
         SetMsgHandled(FALSE);
         return 0;
-        LPNMCUSTOMDRAW nmcd{reinterpret_cast<LPNMCUSTOMDRAW>(pnmh)};
-        DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s >> %05x\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code), nmcd->dwDrawStage);
-        return 0;
+    case TRBN_THUMBPOSCHANGING:
+        switch (nID) {
+        case CID_SPECTRUM_SLD: {
+            auto const* ptPosCh = reinterpret_cast<NMTRBTHUMBPOSCHANGING const*>(pnmh);
+            if (!ptPosCh) {
+                return 0;
+            }
+            m_imSpectrum.OnSliderChanged(ptPosCh->dwPos);
+            //GetDlgItem(CID_SPEC_COLOR_SEL).InvalidateRect(nullptr, FALSE);
+            return 0;
+        }
+        }
+        break;
     }
     DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
     SetMsgHandled(FALSE);
@@ -188,7 +199,9 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     m_imSlider.SubclassWindow(GetDlgItem(CID_SPECTRUM_SLD));
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
-    m_imSlider.Initialize();
+
+    m_imSlider.Initialize(m_imSpectrum);
+    m_imSpectrum.Initialize(m_imSlider);
 
     WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
     cbSpectrum.AddString(L"RGB/红");
@@ -210,8 +223,8 @@ void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
     switch (nID) {
     case CID_SPEC_COLOR_SEL:{
         WTL::CDCHandle dc{pDI->hDC};
-        CRect          rc{pDI->rcItem};
-        dc.FillSolidRect(rc, m_Color.m_Comp.Color);
+        CRect const    rc{pDI->rcItem};
+        dc.FillSolidRect(rc, m_imSpectrum.GetColorRef());
         return;
     }
     }
@@ -221,7 +234,7 @@ void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
 
 void CColorPicker::Impl::OnSpecComboChanged()
 {
-    m_imSpectrum.OnDataChanged(static_cast<SpectrumKind>(m_nSpectrumKind), m_imSlider);
+    m_imSpectrum.SetSpectrumKind(static_cast<SpectrumKind>(m_nSpectrumKind));
 }
 
 CColorPicker::~CColorPicker() = default;

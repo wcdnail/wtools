@@ -86,15 +86,19 @@ inline BOOL CTatorMainDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
     UNREFERENCED_PARAMETER(wndFocus);
     UNREFERENCED_PARAMETER(lInitParam);
-#if 1
-    MoveToMonitor{}.Move(m_hWnd, 2, PutAt::YCenter | PutAt::Right);
-#endif
+
+    if constexpr (false) {
+        MoveToMonitor{}.Move(m_hWnd, 2, PutAt::YCenter | PutAt::Right);
+    }
+    else {
+        CenterWindow(GetParent());
+    }
+
     WTL::CIcon const icon(LoadIconW(WTL::ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
     SetIcon(icon, TRUE);
     SetIcon(icon, FALSE);
 
     DlgResize_Init(true, true, 0);
-    //CenterWindow(GetParent());
     return TRUE;
 }
 

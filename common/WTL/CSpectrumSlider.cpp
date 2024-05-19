@@ -1,7 +1,7 @@
 //
 // https://www.codeproject.com/articles/8985/customizing-the-appearance-of-csliderctrl-using-cu
 // Mike O'Neill's Customizing the Appearance of CSliderCtrl Using Custom Draw
-// adopted to WTL
+// adopted to WTL from MFC
 //
 #include "stdafx.h"
 #include "CSpectrumSlider.h"
@@ -12,28 +12,25 @@ CSpectrumSlider::~CSpectrumSlider() = default;
 
 CSpectrumSlider::CSpectrumSlider()
     :    m_bMsgHandled{FALSE}
-    ,      m_crPrimary{0x00000000}
-    ,       m_crShadow{0x00000000}
-    ,       m_crHilite{0x00000000}
-    ,    m_crMidShadow{0x00000000}
-    , m_crDarkerShadow{0x00000000}
-    ,    m_normalBrush{}
-    ,     m_focusBrush{}
     ,            m_Dib{}
+    ,    m_pimSpectrum{nullptr}
+    ,       m_rcRaster{}
+    ,       m_bCapture{false}
 {
 }
 
-bool CSpectrumSlider::Initialize()
+bool CSpectrumSlider::Initialize(CSpectrumImage& imSpectrum)
 {
     if (!m_Dib.Create(SPECTRUM_SLIDER_CX, 1, 32)) {
         return false;
     }
+    m_pimSpectrum = &imSpectrum;
+    SetRange(SPECTRUM_SLIDER_MIN, SPECTRUM_SLIDER_MAX, FALSE);
     return true;
 }
 
-void CSpectrumSlider::UpdateRaster(SpectrumKind spKind, double dHue)
+void CSpectrumSlider::UpdateRaster(SpectrumKind spKind)
 {
-    UNREFERENCED_PARAMETER(dHue);
     switch (spKind) {
     case SPEC_RGB_Red:        break;
     case SPEC_RGB_Green:      break;
@@ -66,6 +63,9 @@ BOOL CSpectrumSlider::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam,
     switch(dwMsgMapID) { 
     case 0:
         MSG_WM_CREATE(OnCreate)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
         REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
         NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
     ALT_MSG_MAP(1)
@@ -85,26 +85,6 @@ int CSpectrumSlider::OnCreate(LPCREATESTRUCT pCS)
     return 0;
 }
 
-void CSpectrumSlider::SetPrimaryColor(COLORREF crPrimary)
-{
-    m_crPrimary = crPrimary;
-
-    m_crHilite       = ColorAdjustLuma(crPrimary,  500, TRUE); // increase by 50%
-    m_crMidShadow    = ColorAdjustLuma(crPrimary, -210, TRUE); // decrease by 21.0%
-    m_crShadow       = ColorAdjustLuma(crPrimary, -445, TRUE); // decrease by 44.5%
-    m_crDarkerShadow = ColorAdjustLuma(crPrimary, -500, TRUE); // decrease by 50.0%
-
-    m_normalBrush.Attach(CreateSolidBrush(crPrimary));
-
-    static const WORD bitsBrush1[8] = { 0x0055, 0x00aa, 0x0055, 0x00aa, 0x0055, 0x00aa, 0x0055, 0x00aa };
-    WTL::CBitmap bm{};
-    bm.CreateBitmap(8, 8, 1, 1, bitsBrush1);
-    LOGBRUSH logBrush{0};
-    logBrush.lbStyle = BS_PATTERN;
-    logBrush.lbHatch = reinterpret_cast<ULONG_PTR>(bm.m_hBitmap);
-    m_focusBrush.Attach(CreateBrushIndirect(&logBrush));
-}
-
 CRect CSpectrumSlider::GetRatserRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const
 {
     CRect        rcRast{nmcd.rc};
@@ -112,33 +92,16 @@ CRect CSpectrumSlider::GetRatserRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CR
         GetClientRect(rcClient);
     }
     if (dwStyle & TBS_VERT) {
-        rcRast.left = rcClient.left + 14;
         rcRast.right = rcClient.right - 8;
-        rcRast.DeflateRect(8, 5);
+        rcRast.left = rcRast.right - SPECTRUM_CHANNEL_CX;
+        rcRast.DeflateRect(0, 5);
     }
     else {
-        rcRast.top = rcClient.top + 8;
         rcRast.bottom = rcClient.bottom - 8;
-        rcRast.DeflateRect(5, 8);
+        rcRast.top = rcRast.bottom - SPECTRUM_CHANNEL_CY;
+        rcRast.DeflateRect(5, 0);
     }
     return rcRast;
-}
-
-CRect CSpectrumSlider::GetThumbRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const
-{
-    if (rcClient.IsRectEmpty()) {
-        GetClientRect(rcClient);
-    }
-    CRect rcThumb{nmcd.rc};
-    if (dwStyle & TBS_VERT) {
-        rcThumb.left = rcClient.left + 12;
-        rcThumb.right = rcClient.right - 12;
-    }
-    else {
-        rcThumb.top = rcClient.top + 8;
-        rcThumb.bottom = rcClient.bottom - 8;
-    }
-    return rcThumb;
 }
 
 void CSpectrumSlider::DrawRasterChannel(NMCUSTOMDRAW const& nmcd)
@@ -180,7 +143,25 @@ void CSpectrumSlider::DrawRasterChannel(NMCUSTOMDRAW const& nmcd)
     }
     dc.FrameRect(rcDest, brBlk);
     dc.RestoreDC(iSaveDC);
+    m_rcRaster = rcDest;
  }
+
+CRect CSpectrumSlider::GetThumbRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const
+{
+    if (rcClient.IsRectEmpty()) {
+        GetClientRect(rcClient);
+    }
+    CRect rcThumb{nmcd.rc};
+    if (dwStyle & TBS_VERT) {
+        rcThumb.left = rcClient.left + 12;
+        rcThumb.right = rcClient.right - 12;
+    }
+    else {
+        rcThumb.top = rcClient.top + 8;
+        rcThumb.bottom = rcClient.bottom - 8;
+    }
+    return rcThumb;
+}
 
 LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
 {
@@ -214,4 +195,56 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
     }
     }
     return CDRF_DODEFAULT;
+}
+
+void CSpectrumSlider::OnLButtonUp(UINT, CPoint)
+{
+    if (!m_bCapture) {
+        SetMsgHandled(FALSE);
+        return ;
+    }
+    ReleaseCapture();
+    m_bCapture = false;
+}
+
+void CSpectrumSlider::OnMouseMove(UINT, CPoint point)
+{
+    if (!m_bCapture) {
+        SetMsgHandled(FALSE);
+        return;
+    }
+    DWORD const dwStyle{GetStyle()};
+    long const     nMin{GetRangeMin()};
+    long const     nMax{GetRangeMax()};
+    long const   nRange{nMax-nMin};
+    LONG           nPos{0};
+
+    if (dwStyle & TBS_VERT) {
+        float const nScale{static_cast<float>(m_rcRaster.Height()) / static_cast<float>(nRange)};
+        nPos = static_cast<LONG>(static_cast<float>(point.y - m_rcRaster.top) / nScale);
+    }
+    else {
+        float const nScale{static_cast<float>(m_rcRaster.Width()) / static_cast<float>(nRange)};
+        nPos = static_cast<LONG>(static_cast<float>(point.x - m_rcRaster.left) / nScale);
+    }
+    SetPos(nPos, TRUE);
+
+    NMTRBTHUMBPOSCHANGING tPosCh;
+    tPosCh.dwPos = nPos;
+    tPosCh.nReason = TB_THUMBPOSITION;
+    tPosCh.hdr.code = TRBN_THUMBPOSCHANGING;
+    tPosCh.hdr.idFrom = GetDlgCtrlID();
+    tPosCh.hdr.hwndFrom = m_hWnd;
+    ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)tPosCh.hdr.idFrom, reinterpret_cast<LPARAM>(&tPosCh));
+}
+
+void CSpectrumSlider::OnLButtonDown(UINT, CPoint point)
+{
+    if (m_rcRaster.IsRectEmpty() || !m_rcRaster.PtInRect(point)) {
+        SetMsgHandled(FALSE);
+        return;
+    }
+    SetFocus();
+    SetCapture();
+    m_bCapture = true;
 }

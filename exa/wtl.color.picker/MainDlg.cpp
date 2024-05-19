@@ -1972,45 +1972,36 @@ void CMainDlg::ColorFromPos()
         }
 
         // RGB G
-        if (m_combo.GetCurSel() == 1)
-        {
-            SetRGB((unsigned short)GetDlgItemInt(IDC_RED),
-                (unsigned short)(255 - y),
-                (unsigned short)GetDlgItemInt(IDC_BLUE));
+        if (m_combo.GetCurSel() == 1) {
+            SetRGB(static_cast<unsigned short>(GetDlgItemInt(IDC_RED)),
+                   static_cast<unsigned short>(255 - y),
+                   static_cast<unsigned short>(GetDlgItemInt(IDC_BLUE)));
             SetHSL(0, 0, 0);
 
             UpdateValues(GetCurrentColour());
         }
-
         // RGB B
-        if (m_combo.GetCurSel() == 2)
-        {
-            SetRGB((unsigned short)GetDlgItemInt(IDC_RED),
-                (unsigned short)GetDlgItemInt(IDC_GREEN),
-                (unsigned short)(255 - y));
+        if (m_combo.GetCurSel() == 2) {
+            SetRGB(static_cast<unsigned short>(GetDlgItemInt(IDC_RED)),
+                   static_cast<unsigned short>(GetDlgItemInt(IDC_GREEN)),
+                   static_cast<unsigned short>(255 - y));
             SetHSL(0, 0, 0);
-
             UpdateValues(GetCurrentColour());
         }
-
         // HSV H
-        if (m_combo.GetCurSel() == 3)
-        {
-            SetHSV((unsigned short)((255 - y) / 255.0*359.0),
-                (unsigned short)GetDlgItemInt(IDC_SATURATION),
-                (unsigned short)GetDlgItemInt(IDC_VALUE));
+        if (m_combo.GetCurSel() == 3) {
+            SetHSV(static_cast<unsigned short>((255 - y) / 255.0 * 359.0),
+                   static_cast<unsigned short>(GetDlgItemInt(IDC_SATURATION)),
+                   static_cast<unsigned short>(GetDlgItemInt(IDC_VALUE)));
             SetHSL(0,0,0);
             UpdateValues(GetCurrentColour());
         }
-
         // HSV S
-        if (m_combo.GetCurSel() == 4)
-        {
-            SetHSV((unsigned short)GetDlgItemInt(IDC_HUE),
-                (unsigned short)((255 - y) / 255.0*100.0),
-                (unsigned short)GetDlgItemInt(IDC_VALUE));
+        if (m_combo.GetCurSel() == 4) {
+            SetHSV(static_cast<unsigned short>(GetDlgItemInt(IDC_HUE)),
+                   static_cast<unsigned short>((255 - y) / 255.0 * 100.0),
+                   static_cast<unsigned short>(GetDlgItemInt(IDC_VALUE)));
             SetHSL(0, 0, 0);
-
             UpdateValues(GetCurrentColour());
         }
 

@@ -40,6 +40,9 @@
     <ClCompile Include="..\exa\wtl.color.picker\GTDrawHelper.cpp">
       <Filter>DDraw.DGI</Filter>
     </ClCompile>
+    <ClCompile Include="WTL\CColorPickerDefs.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />

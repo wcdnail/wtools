@@ -6,23 +6,43 @@
 CSpectrumImage::~CSpectrumImage() = default;
 
 CSpectrumImage::CSpectrumImage()
-    :          m_Dib{}
+    :  m_bMsgHandled{FALSE}
+    ,          m_Dib{}
+    ,        m_Color{0., 0., 100.}
     , m_SpectrumKind{SPEC_HSV_Hue}
-    ,         m_dHue{.0}
-    ,     m_dPrevHue{-1.}
     ,    m_pimSlider{nullptr}
-    ,  m_bMsgHandled{FALSE}
 {
 }
 
-void CSpectrumImage::OnDataChanged(SpectrumKind kind, CSpectrumSlider& imSlider)
+bool CSpectrumImage::Initialize(CSpectrumSlider& imSlider, long cx /*= SPECTRUM_CX*/, long cy /*= SPECTRUM_CY*/)
+{
+    if (!m_Dib.Create(cx, cy, SPECTRUM_BPP)) {
+        return false;
+    }
+    m_pimSlider = &imSlider;
+    return true;
+}
+
+void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
 {
     if (kind < SPEC_Begin || kind > SPEC_End) {
         return ;
     }
     m_SpectrumKind = kind;
-    m_dPrevHue = -1.0;
-    m_pimSlider = &imSlider;
+    InvalidateRect(nullptr, FALSE);
+}
+
+void CSpectrumImage::OnSliderChanged(long nPos)
+{
+    switch (m_SpectrumKind) {
+    case SPEC_RGB_Red:          break;
+    case SPEC_RGB_Green:        break;
+    case SPEC_RGB_Blue:         break;
+    case SPEC_HSV_Hue:          m_Color.SetHue((255 - static_cast<double>(nPos)) / 255.0 * 359.0); break;
+    case SPEC_HSV_Saturation:   break;
+    case SPEC_HSV_Brightness:   break;
+    default: break;
+    }
     InvalidateRect(nullptr, FALSE);
 }
 
@@ -60,11 +80,6 @@ BOOL CSpectrumImage::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 int CSpectrumImage::OnCreate(LPCREATESTRUCT pCS)
 {
     UNREFERENCED_PARAMETER(pCS);
-    if (!m_Dib.Create(SPECTRUM_CX, SPECTRUM_CY, 32)) { // pCS->cx, pCS->cy
-        return -1;
-    }
-    m_dHue     = 0.0;
-    m_dPrevHue = -1.0;
     ATLTRACE(ATL::atlTraceControls, 0, _T("WM_CREATE OK for %p\n"), this);
     return 0;
 }
@@ -72,24 +87,16 @@ int CSpectrumImage::OnCreate(LPCREATESTRUCT pCS)
 void CSpectrumImage::UpdateRaster() const
 {
     switch (m_SpectrumKind) {
-    case SPEC_RGB_Red:
-        break;
-    case SPEC_RGB_Green:
-        break;
-    case SPEC_RGB_Blue:
-        break;
-    case SPEC_HSV_Hue:
-        DDraw_HSV_Hue(m_Dib, m_dHue);
-        break;
-    case SPEC_HSV_Saturation:
-        break;
-    case SPEC_HSV_Brightness:
-        break;
-    default: 
-        break;
+    case SPEC_RGB_Red:          break;
+    case SPEC_RGB_Green:        break;
+    case SPEC_RGB_Blue:         break;
+    case SPEC_HSV_Hue:          DDraw_HSV_Hue(m_Dib, m_Color.m_dH); break;
+    case SPEC_HSV_Saturation:   break;
+    case SPEC_HSV_Brightness:   break;
+    default: break;
     }
     if (m_pimSlider) {
-        m_pimSlider->UpdateRaster(m_SpectrumKind, m_dHue);
+        m_pimSlider->UpdateRaster(m_SpectrumKind);
     }
 }
 
@@ -97,9 +104,9 @@ void CSpectrumImage::OnPaint(WTL::CDCHandle dc)
 {
     UNREFERENCED_PARAMETER(dc);
 
-    if (m_dHue != m_dPrevHue) {
+    if (m_Color.IsUpdated()) {
         UpdateRaster();
-        m_dPrevHue = m_dHue;
+        m_Color.SetUpdated();
     }
 
     WTL::CPaintDC         dcPaint{m_hWnd};

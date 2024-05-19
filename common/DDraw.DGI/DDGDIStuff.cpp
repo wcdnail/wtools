@@ -34,6 +34,10 @@ constexpr void RGB_Line1(DWORD*& pDest, int nCount, int bRGB, int iR, int iG, in
 
 bool DDraw_HSV_SAT_Line(DWORD* pDest, int nWidth, double dHue, double dValue)
 {
+    //GTDrawHelper dh;
+    //dh.HSV_SAT(pDest, nWidth, dHue, dValue);
+    //return true;
+
     if (nWidth <= 0) {
         // TODO: report nWidth - INVAL
         return false;
