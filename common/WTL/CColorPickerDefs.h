@@ -47,18 +47,18 @@ union CUNRGB
 
 struct CColorUnion
 {
-    COLORREF m_crPrev;
     double       m_dH;
     double       m_dS;
     double       m_dV;
     CUNRGB     m_Comp;
+    bool   m_bUpdated;
 
     ~CColorUnion();
-    CColorUnion(COLORREF crInitial);
     CColorUnion(double dH, double dS, double dV);
+    CColorUnion(COLORREF crInitial);
 
     bool IsUpdated() const;
-    void SetUpdated();
+    void SetUpdated(bool bUpdated);
 
     void SetRGB(int R, int G, int B);
     void UpdateRGB();
@@ -69,17 +69,18 @@ struct CColorUnion
 
 inline bool CColorUnion::IsUpdated() const
 {
-    return m_crPrev != m_Comp.Color;
+    return m_bUpdated;
 }
 
-inline void CColorUnion::SetUpdated()
+inline void CColorUnion::SetUpdated(bool bUpdated)
 {
-    m_crPrev = m_Comp.Color;
+    m_bUpdated = bUpdated;
 }
 
 inline void CColorUnion::SetRGB(int R, int G, int B)
 {
     m_Comp.Color = RGB(R, G, B);
+    SetUpdated(true);
 }
 
 static_assert(SPECTRUM_BPP == 32, "SPECTRUM_BPP must always be 32!");

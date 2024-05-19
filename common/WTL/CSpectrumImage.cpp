@@ -84,7 +84,7 @@ int CSpectrumImage::OnCreate(LPCREATESTRUCT pCS)
     return 0;
 }
 
-void CSpectrumImage::UpdateRaster() const
+void CSpectrumImage::UpdateRaster()
 {
     switch (m_SpectrumKind) {
     case SPEC_RGB_Red:          break;
@@ -98,6 +98,7 @@ void CSpectrumImage::UpdateRaster() const
     if (m_pimSlider) {
         m_pimSlider->UpdateRaster(m_SpectrumKind);
     }
+    m_Dib.FreeResources();
 }
 
 void CSpectrumImage::OnPaint(WTL::CDCHandle dc)
@@ -106,7 +107,7 @@ void CSpectrumImage::OnPaint(WTL::CDCHandle dc)
 
     if (m_Color.IsUpdated()) {
         UpdateRaster();
-        m_Color.SetUpdated();
+        m_Color.SetUpdated(false);
     }
 
     WTL::CPaintDC         dcPaint{m_hWnd};

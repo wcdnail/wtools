@@ -171,6 +171,7 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
                 return 0;
             }
             m_imSpectrum.OnSliderChanged(ptPosCh->dwPos);
+            DBGTPrint(LTH_WM_NOTIFY L" >> %d\n", ptPosCh->dwPos);
             //GetDlgItem(CID_SPEC_COLOR_SEL).InvalidateRect(nullptr, FALSE);
             return 0;
         }

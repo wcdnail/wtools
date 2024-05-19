@@ -1074,25 +1074,15 @@ void CMainDlg::DoDrawHSV_Hue(void)
     int     height = 255;       // rect.Height();
     int     blend_width = width;  // rect.Width();
     int     blend_height = height; // rect.Height();
-
-    double  hue;
-    double  val, val_adv;
-
-
     p = bmp_data;
-
     // constant
-    hue = GetDlgItemInt(IDC_HUE);
-
+    double const hue = GetDlgItemInt(IDC_HUE);
     // outer loop - rows
     i = blend_height;
-
     // initial and change
-    val = 0.0;
-    val_adv = 1.0 / i;
-
-    while (i--)
-    {
+    double  val = 0.0;
+    double  val_adv = 1.0 / i;
+    while (i--) {
         GTDrawHelper m_Panel;
         m_Panel.HSV_SAT(p, blend_width, hue, val);
         val += val_adv;

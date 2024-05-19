@@ -351,3 +351,12 @@ void CDIBitmap::Borrow(WTL::CDCHandle dc, int dwX, int dwY)
     memDC.BitBlt(0, 0, GetInfoHdr()->biWidth, GetInfoHdr()->biHeight, dc, dwX, dwY, SRCCOPY);
     memDC.SelectBitmap(hBm);
 } // End of Borrow
+
+void CDIBitmap::FreeResources()
+{
+    m_Bitmap.Attach(nullptr);
+    if (m_hOldBm) {
+        m_DC.SelectBitmap(m_hOldBm);
+    }
+    m_DC.Attach(nullptr);
+}

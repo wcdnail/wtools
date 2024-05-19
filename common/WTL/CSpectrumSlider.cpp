@@ -40,6 +40,7 @@ void CSpectrumSlider::UpdateRaster(SpectrumKind spKind)
     case SPEC_HSV_Brightness: break;
     default: break;
     }
+    m_Dib.FreeResources();
 }
 
 ATOM& CSpectrumSlider::GetWndClassAtomRef()
@@ -226,6 +227,12 @@ void CSpectrumSlider::OnMouseMove(UINT, CPoint point)
     else {
         float const nScale{static_cast<float>(m_rcRaster.Width()) / static_cast<float>(nRange)};
         nPos = static_cast<LONG>(static_cast<float>(point.x - m_rcRaster.left) / nScale);
+    }
+    if (nPos < nMin) {
+        nPos = nMin;
+    }
+    else if (nPos > nMax) {
+        nPos = nMax;
     }
     SetPos(nPos, TRUE);
 

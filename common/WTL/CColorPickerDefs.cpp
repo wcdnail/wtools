@@ -3,23 +3,20 @@
 
 CColorUnion::~CColorUnion() = default;
 
+CColorUnion::CColorUnion(double dH, double dS, double dV)
+    :       m_dH{dH}
+    ,       m_dS{dS}
+    ,       m_dV{dV}
+    , m_bUpdated{false}
+{
+    UpdateRGB();
+}
+
 CColorUnion::CColorUnion(COLORREF crInitial)
-    : m_crPrev{CLR_INVALID}
-    ,     m_dH{0.0}
-    ,     m_dS{0.0}
-    ,     m_dV{0.0}
+    : CColorUnion{0., 0., 100.}
 {
     m_Comp.Color = crInitial;
     UpdateHSV();
-}
-
-CColorUnion::CColorUnion(double dH, double dS, double dV)
-    : m_crPrev{CLR_INVALID}
-    ,     m_dH{dH}
-    ,     m_dS{dS}
-    ,     m_dV{dV}
-{
-    UpdateRGB();
 }
 
 template <typename T>
@@ -113,11 +110,11 @@ void CColorUnion::UpdateHSV()
     else {
         m_dH = temp;
     }
+    SetUpdated(true);
 }
 
 void CColorUnion::SetHue(double dHue)
 {
-    m_crPrev = m_Comp.Color;
     m_dH = std::min<double>(dHue, 359.);
     UpdateRGB();
 }
