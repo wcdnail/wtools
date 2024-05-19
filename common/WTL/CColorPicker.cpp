@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "CColorPicker.h"
+#include "CColorPickerDefs.h"
 #include "CSpectrumImage.h"
 #include "CSpectrumSlider.h"
 #include "CSliderCtrl.h"
@@ -59,6 +60,7 @@ private:
         CID_GRP_PICKER,
     };
 
+    CColorUnion         m_Color;
     CSpectrumImage m_imSpectrum;
     CSpectrumSlider  m_imSlider;
     int         m_nSpectrumKind;
@@ -68,7 +70,7 @@ private:
         CONTROL_GROUPBOX(   _T("Spectrum Color"),        CID_GRP_SPECTRUM,                       4,             4,         HDlgCX,       DlgCY-8, 0, 0)
         CONTROL_COMBOBOX(                                  CID_SPEC_COMBO,                      16,            18,         HHCX-8,       DlgCY-8, CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP, 0)
         CONTROL_RTEXT(              _T("Color:"),      CID_SPEC_COLOR_CAP,    HDlgCX-HHCY-HHCX/2-8,            18,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-        CONTROL_CTEXT(               _T("COLOR"),      CID_SPEC_COLOR_SEL,           HDlgCX-HHCY-8,            18,         HHCY+2,        HHCY-2, SS_SUNKEN | SS_CENTERIMAGE | SS_BITMAP, 0)
+        CONTROL_CTEXT(               _T("COLOR"),      CID_SPEC_COLOR_SEL,           HDlgCX-HHCY-8,            18,         HHCY+2,        HHCY-2, SS_SUNKEN | SS_CENTERIMAGE | SS_OWNERDRAW, WS_EX_STATICEDGE)
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS, CC_CHILD,            16,       24+HLCY, HDlgCX-HHCY-32, DlgCY-HLCY-36, 0)
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD, _T("msctls_trackbar32"),  TB_VERT, HDlgCX-HHCY-8,       18+HHCY,      HHCX/2-12, DlgCY-HHCY-30, 0)
         CONTROL_GROUPBOX(        _T("RGB Color"),             CID_GRP_RGB,              8+HDlgCX+4,             4,         HDlgCX,       HDlg3CY, 0, 0)
@@ -107,6 +109,7 @@ private:
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
+        MSG_WM_DRAWITEM(OnDrawItem)
         CHAIN_MSG_MAP(ImplResizer)
         REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
@@ -115,13 +118,15 @@ private:
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
+    void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
     void OnSpecComboChanged();
 };
 
 CColorPicker::Impl::~Impl() = default;
 
 CColorPicker::Impl::Impl()
-    :    m_imSpectrum{}
+    :         m_Color{RGB(0xaa, 0xbb, 0xcc)}
+    ,    m_imSpectrum{}
     ,      m_imSlider{}
     , m_nSpectrumKind{SPEC_HSV_Hue}
     ,        m_nSlide{0}
@@ -198,6 +203,20 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 
     OnSpecComboChanged();
     return TRUE;
+}
+
+void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
+{
+    switch (nID) {
+    case CID_SPEC_COLOR_SEL:{
+        WTL::CDCHandle dc{pDI->hDC};
+        CRect          rc{pDI->rcItem};
+        dc.FillSolidRect(rc, m_Color.m_Comp.Color);
+        return;
+    }
+    }
+    SetMsgHandled(FALSE);
+    DBGTPrint(LTH_WM_DRAWITEM L" id:%-4d ct:%-4d\n", nID, pDI->CtlType);
 }
 
 void CColorPicker::Impl::OnSpecComboChanged()

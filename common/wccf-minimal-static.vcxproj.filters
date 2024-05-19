@@ -109,6 +109,9 @@
     <ClInclude Include="..\exa\wtl.color.picker\GTDrawHelper.h">
       <Filter>DDraw.DGI</Filter>
     </ClInclude>
+    <ClInclude Include="WTL\CColorPickerDefs.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

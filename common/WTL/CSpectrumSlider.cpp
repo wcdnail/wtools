@@ -5,15 +5,8 @@
 //
 #include "stdafx.h"
 #include "CSpectrumSlider.h"
-#include "CSpectrumImage.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 #include <atlmisc.h>
-
-enum : int
-{
-    SPECTRUM_SLIDER_CX = 48,
-    SPECTRUM_SLIDER_CY = 1,
-};
 
 CSpectrumSlider::~CSpectrumSlider() = default;
 
@@ -32,7 +25,7 @@ CSpectrumSlider::CSpectrumSlider()
 
 bool CSpectrumSlider::Initialize()
 {
-    if (!m_Dib.Create(SPECTRUM_SLIDER_CX, SPECTRUM_SLIDER_CY, 32)) {
+    if (!m_Dib.Create(SPECTRUM_SLIDER_CX, 1, 32)) {
         return false;
     }
     return true;
@@ -41,7 +34,6 @@ bool CSpectrumSlider::Initialize()
 void CSpectrumSlider::UpdateRaster(SpectrumKind spKind, double dHue)
 {
     UNREFERENCED_PARAMETER(dHue);
-
     switch (spKind) {
     case SPEC_RGB_Red:        break;
     case SPEC_RGB_Green:      break;
@@ -95,32 +87,21 @@ int CSpectrumSlider::OnCreate(LPCREATESTRUCT pCS)
 
 void CSpectrumSlider::SetPrimaryColor(COLORREF crPrimary)
 {
-    // sets primary color of control, and derives shadow and hilite colors
-    // also initializes brushes that are used in custom draw functions
     m_crPrimary = crPrimary;
 
-    // get hilite and shadow colors
-    // uses the very-nice shell function of ColorAdjustLuma, described at
-    // http://msdn.microsoft.com/library/default.asp?url=/library/en-us/shellcc/platform/shell/reference/shlwapi/gdi/coloradjustluma.asp
-    // for which we need at least IE version 5.0 and above, and a link to shlwapi.lib
     m_crHilite       = ColorAdjustLuma(crPrimary,  500, TRUE); // increase by 50%
     m_crMidShadow    = ColorAdjustLuma(crPrimary, -210, TRUE); // decrease by 21.0%
     m_crShadow       = ColorAdjustLuma(crPrimary, -445, TRUE); // decrease by 44.5%
     m_crDarkerShadow = ColorAdjustLuma(crPrimary, -500, TRUE); // decrease by 50.0%
 
-    // create normal (solid) brush 
     m_normalBrush.Attach(CreateSolidBrush(crPrimary));
 
-    // create a hatch-patterned pixel pattern for patterned brush (used when thumb has focus/is selected)
-    // see http://www.codeproject.com/gdi/custom_pattern_brush.asp
-    // or look for BrushTool.exe for the code that generates these bits
     static const WORD bitsBrush1[8] = { 0x0055, 0x00aa, 0x0055, 0x00aa, 0x0055, 0x00aa, 0x0055, 0x00aa };
     WTL::CBitmap bm{};
     bm.CreateBitmap(8, 8, 1, 1, bitsBrush1);
-    LOGBRUSH logBrush;
+    LOGBRUSH logBrush{0};
     logBrush.lbStyle = BS_PATTERN;
     logBrush.lbHatch = reinterpret_cast<ULONG_PTR>(bm.m_hBitmap);
-    logBrush.lbColor = 0; // ignored anyway; must set DC background and text colors
     m_focusBrush.Attach(CreateBrushIndirect(&logBrush));
 }
 
@@ -143,11 +124,12 @@ CRect CSpectrumSlider::GetRatserRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CR
     return rcRast;
 }
 
-#if 0
-CRect& CSpectrumSlider::SetThumbRect(NMCUSTOMDRAW const& nmcd, CRect const& rcClient) const
+CRect CSpectrumSlider::GetThumbRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const
 {
-    const DWORD dwStyle{GetStyle()};
-    CRect&      rcThumb{static_cast<CRect&>(nmcd.rc)};
+    if (rcClient.IsRectEmpty()) {
+        GetClientRect(rcClient);
+    }
+    CRect rcThumb{nmcd.rc};
     if (dwStyle & TBS_VERT) {
         rcThumb.left = rcClient.left + 12;
         rcThumb.right = rcClient.right - 12;
@@ -158,7 +140,6 @@ CRect& CSpectrumSlider::SetThumbRect(NMCUSTOMDRAW const& nmcd, CRect const& rcCl
     }
     return rcThumb;
 }
-#endif
 
 void CSpectrumSlider::DrawRasterChannel(NMCUSTOMDRAW const& nmcd)
 {
@@ -217,15 +198,13 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
         }
         case TBCD_THUMB: {
             if constexpr (false) {
-                CRect    rcClient{};
-                GetClientRect(rcClient);
-                CRect     rcThumb{SetThumbRect(nmcd, rcClient)};
-                WTL::CDCHandle dc{nmcd.hdc};
-                const int iSaveDC{dc.SaveDC()};
-                WTL::CBrushHandle brCurrent{WTL::AtlGetStockBrush(BLACK_BRUSH)};
-                dc.FrameRect(rcThumb, brCurrent);
+                CRect      rcClient{};
+                DWORD const dwStyle{GetStyle()};
+                CRect       rcThumb{GetThumbRect(dwStyle, nmcd, rcClient)};
+                WTL::CDCHandle   dc{nmcd.hdc};
+                const int   iSaveDC{dc.SaveDC()};
+                dc.FrameRect(rcThumb, WTL::AtlGetStockBrush(BLACK_BRUSH));
                 dc.RestoreDC(iSaveDC);
-                Invalidate(FALSE);
                 return CDRF_SKIPDEFAULT;
             }
             break;

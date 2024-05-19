@@ -3,12 +3,6 @@
 #include "CSpectrumSlider.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 
-enum : int
-{
-    SPECTRUM_CX = 32,
-    SPECTRUM_CY = 32,
-};
-
 CSpectrumImage::~CSpectrumImage() = default;
 
 CSpectrumImage::CSpectrumImage()

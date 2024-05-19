@@ -1,11 +1,10 @@
 #pragma once
 
+#include "CColorPickerDefs.h"
 #include "CCustomCtrl.h"
 #include "CSliderCtrl.h"
 #include <DDraw.DGI/CeXDib.h>
 #include <wcdafx.api.h>
-
-#define CSPECSLD_CLASS _T("WCCF::CSpectrumSlider")
 
 enum SpectrumKind: int;
 
@@ -47,7 +46,7 @@ private:
 
     int OnCreate(LPCREATESTRUCT pCS);
     CRect GetRatserRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const;
-    CRect& SetThumbRect(NMCUSTOMDRAW const& nmcd, CRect const& rcClient) const;
+    CRect GetThumbRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const;
     void DrawRasterChannel(NMCUSTOMDRAW const& nmcd);
     LRESULT OnCustomDraw(LPNMHDR pNMHDR);
 };

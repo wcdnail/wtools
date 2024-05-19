@@ -3,7 +3,7 @@
 #include "CeXDib.h"
 #include <cmath>
 
-#include "exa/wtl.color.picker/GTDrawHelper.h"
+//#include "exa/wtl.color.picker/GTDrawHelper.h"
 
 //
 // This code is refactored from: GTDrawHelper.cpp
@@ -166,15 +166,6 @@ constexpr void HSV_HUE_Violet_To_Crimson(DWORD*& pDest, int nRange, int nVal, in
 
 void DDraw_HSV_HUE_Line(DWORD* pDest, int nWidth, double dSaturation, double dVal)
 {
-    //
-    //  dFrac increments in [0, 1) six times; indirectly (coefficients)
-    // dSaturation - const, in [0, 1]
-    // nVal - const, in [0, (255 << IntMult)]
-    //
-    // coef1 => val * (1 - dSaturation)               => const, = val * (1 - dSaturation)
-    // coef2 => val * (1 - dSaturation * dFrac)       => changes from val to val * (1 - dSaturation)
-    // coef3 => val * (1 - dSaturation * (1 - dFrac)) => changes from val * (1 - dSaturation) to val
-    //
     using PLineRoutine = void(*)(DWORD*&, int, int, int, double);
     static constexpr PLineRoutine gsLineRoutine[]{
         HSV_HUE_Red_To_Yellow,
@@ -192,7 +183,11 @@ void DDraw_HSV_HUE_Line(DWORD* pDest, int nWidth, double dSaturation, double dVa
     double        dPos{0};
     for (int i = 0; i < giIterationCount; i++) {
         dPos += dOffs;
-        auto const nRange{static_cast<int>(dPos) - static_cast<int>(i * dOffs)};
+        auto nRange{static_cast<int>(dPos) - static_cast<int>(i * dOffs)};
+        nWidth -= nRange;
+        if (i >= giIterationCount - 1) {
+            nRange += nWidth;
+        }
         gsLineRoutine[i](pDest, nRange, nVal, nCoef, dSaturation);
     }
 }

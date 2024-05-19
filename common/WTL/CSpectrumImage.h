@@ -1,23 +1,8 @@
 #pragma once
 
+#include "CColorPickerDefs.h"
 #include "CCustomCtrl.h"
 #include <DDraw.DGI/CeXDib.h>
-
-#define CSPECIMG_CLASS _T("WCCF::CSpectrumImage")
-
-enum SpectrumKind: int
-{
-    SPEC_Begin = 0,
-    SPEC_RGB_Red = SPEC_Begin,
-    SPEC_RGB_Green,
-    SPEC_RGB_Blue,
-    SPEC_HSV_Hue,
-    SPEC_HSV_Saturation,
-    SPEC_HSV_Brightness,
-    SPEC_End = SPEC_HSV_Brightness
-};
-
-struct CSpectrumSlider;
 
 struct CSpectrumImage: CCustomControl<CSpectrumImage>
 {
