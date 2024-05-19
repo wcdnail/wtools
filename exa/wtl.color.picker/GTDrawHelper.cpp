@@ -6,9 +6,9 @@
 #include "GTDrawHelper.h"
 
 #ifdef _DEBUG
-#undef THIS_FILE
+#  undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
-#define new DEBUG_NEW
+#  define new DEBUG_NEW
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -257,9 +257,9 @@ void GTDrawHelper::GetRGB (DWORD *buffer,int samples,COLORREF start,COLORREF end
     {
         // set current pixel (in DIB bitmap format is BGR, not RGB!)
         *buffer++ = RGB (
-            (BYTE) (blue >> IntMult),
-            (BYTE) (green >> IntMult),
-            (BYTE) (red >> IntMult));
+            (BYTE) (blue >> g_IntMult),
+            (BYTE) (green >> g_IntMult),
+            (BYTE) (red >> g_IntMult));
         // advance color values to the next pixel
         red += red_adv;
         green += green_adv;
@@ -268,9 +268,12 @@ void GTDrawHelper::GetRGB (DWORD *buffer,int samples,COLORREF start,COLORREF end
 }
 
 
-void GTDrawHelper::HSV_HUE(DWORD *buffer,int samples,double sat,double val_fp)
+void GTDrawHelper::HSV_HUE(DWORD *buffer,int samples,double sat,double val_fp, int count /*= 6*/)
 {
-    // value, but as integer in [0, 255 << IntMult]
+    if (count < 1) {
+        return;
+    }
+    // value, but as integer in [0, 255 << g_IntMult]
     int     val;
 
     // loop counter
@@ -288,7 +291,7 @@ void GTDrawHelper::HSV_HUE(DWORD *buffer,int samples,double sat,double val_fp)
     //  intp changes - 0, 1, 2, 3, 4, 5; indirectly (separate loops)
     //  frac increments in [0, 1) six times; indirectly (coefficients)
     // sat - const, in [0, 1]
-    // val - const, in [0, (255 << IntMult)]
+    // val - const, in [0, (255 << g_IntMult)]
     //
     // coef1 => val * (1 - sat)              => const, = val * (1 - sat)
     // coef2 => val * (1 - sat * frac)       => changes from val to val * (1 - sat)
@@ -296,12 +299,12 @@ void GTDrawHelper::HSV_HUE(DWORD *buffer,int samples,double sat,double val_fp)
     //
 
     // constants
-    val = (int) (val_fp * 255) << IntMult;
+    val = (int) (val_fp * 255) << g_IntMult;
     coef1 = (int) (val * (1 - sat));
 
     // prepare
     pos = 0;
-    pos_adv = (double) samples / 6.0;
+    pos_adv = (double) samples / (double) count;
 
     // hue in [0, 60)
     pos += pos_adv;
@@ -309,52 +312,67 @@ void GTDrawHelper::HSV_HUE(DWORD *buffer,int samples,double sat,double val_fp)
     coef3 = coef1;
     coef3_adv = (int) ((val - coef3) / ((j) - 1));
     while (j--) {
-        *buffer++ = RGB ((BYTE) (coef1 >> IntMult),(BYTE) (coef3 >> IntMult),(BYTE) (val >> IntMult));
+        *buffer++ = RGB ((coef1 >> g_IntMult),(coef3 >> g_IntMult),(val >> g_IntMult));
         coef3 += coef3_adv;
     }
 
+    if (count < 2) {
+        return;
+    }
     pos += pos_adv;
     j = (int) pos - (int) (1 * pos_adv);
     coef2 = val;
     coef2_adv = (int) ((val * (1.0 - sat) - coef2) / ((j) - 1));
     while (j--) {
-        *buffer++ = RGB ((BYTE) (coef1 >> IntMult),(BYTE) (val >> IntMult),(BYTE) (coef2 >> IntMult));
+        *buffer++ = RGB ((coef1 >> g_IntMult),(val >> g_IntMult),(coef2 >> g_IntMult));
         coef2 += coef2_adv;
     }
 
+    if (count < 3) {
+        return;
+    }
     pos += pos_adv;
     j = (int) pos - (int) (2 * pos_adv);
     coef3 = coef1;
-    coef3_adv = (int) ((val - coef3) / HSV_LOOP_STEPS (j));
+    coef3_adv = (int) ((val - coef3) / ((j) - 1));
     while (j--) {
-        *buffer++ = RGB ((BYTE) (coef3 >> IntMult),(BYTE) (val >> IntMult),(BYTE) (coef1 >> IntMult));
+        *buffer++ = RGB ((coef3 >> g_IntMult),(val >> g_IntMult),(coef1 >> g_IntMult));
         coef3 += coef3_adv;
     }
 
+    if (count < 4) {
+        return;
+    }
     pos += pos_adv;
     j = (int) pos - (int) (3 * pos_adv);
     coef2 = val;
     coef2_adv = (int) ((val * (1.0 - sat) - coef2) / HSV_LOOP_STEPS (j));
     while (j--) {
-        *buffer++ = RGB ((BYTE) (val >> IntMult),(BYTE) (coef2 >> IntMult),(BYTE) (coef1 >> IntMult));
+        *buffer++ = RGB ((val >> g_IntMult),(coef2 >> g_IntMult),(coef1 >> g_IntMult));
         coef2 += coef2_adv;
     }
 
+    if (count < 5) {
+        return;
+    }
     pos += pos_adv;
     j = (int) pos - (int) (4 * pos_adv);
     coef3 = coef1;
     coef3_adv = (int) ((val - coef3) / HSV_LOOP_STEPS (j));
     while (j--) {
-        *buffer++ = RGB ((BYTE) (val >> IntMult),(BYTE) (coef1 >> IntMult),(BYTE) (coef3 >> IntMult));
+        *buffer++ = RGB ((val >> g_IntMult),(coef1 >> g_IntMult),(coef3 >> g_IntMult));
         coef3 += coef3_adv;
     }
 
+    if (count < 6) {
+        return;
+    }
     pos += (pos_adv + 0.1); // + 0.1 because of floating-point math's rounding errors
     j = (int) pos - (int) (5 * pos_adv);
     coef2 = val;
     coef2_adv = (int) ((val * (1.0 - sat) - coef2) / HSV_LOOP_STEPS (j));
     while (j--) {
-        *buffer++ = RGB ( (BYTE) (coef2 >> IntMult),(BYTE) (coef1 >> IntMult),(BYTE) (val >> IntMult));
+        *buffer++ = RGB ( (coef2 >> g_IntMult),(coef1 >> g_IntMult),(val >> g_IntMult));
         coef2 += coef2_adv;
     }
 }
@@ -362,7 +380,7 @@ void GTDrawHelper::HSV_HUE(DWORD *buffer,int samples,double sat,double val_fp)
 
 void GTDrawHelper::HSV_SAT(DWORD *buffer,int samples,double hue,double val_fp)
 {
-    // value, but as integer in [0, 255 << IntMult]
+    // value, but as integer in [0, 255 << g_IntMult]
     int     val;
 
     // loop counter
@@ -379,7 +397,7 @@ void GTDrawHelper::HSV_SAT(DWORD *buffer,int samples,double hue,double val_fp)
     //  intp - const in 0, 1, 2, 3, 4, 5
     //  frac - const in [0, 1)
     // sat - increments, in [0, 1]; indirectly (coefficients)
-    // val - const, in [0, (255 << IntMult)]
+    // val - const, in [0, (255 << g_IntMult)]
     //
     // coef1 => val * (1 - sat)              => changes from val to 0
     // coef2 => val * (1 - sat * frac)       => changes from val to val * (1 - frac)
@@ -387,7 +405,7 @@ void GTDrawHelper::HSV_SAT(DWORD *buffer,int samples,double hue,double val_fp)
     //
 
     // constants
-    val = (int) (val_fp * 255) << IntMult;
+    val = (int) (val_fp * 255) << g_IntMult;
     frac = modf (hue / 60.0, &intp);
 
     // prepare
@@ -442,7 +460,7 @@ void GTDrawHelper::HSV_VAL(DWORD *buffer,int samples,double hue,double sat)
     //  intp - const in 0, 1, 2, 3, 4, 5
     //  frac - const in [0, 1)
     // sat - const, in [0, 1]
-    // val - increments, in [0, (255 << IntMult)]; indirectly (coefficients)
+    // val - increments, in [0, (255 << g_IntMult)]; indirectly (coefficients)
     //
     // coef1 => val * (1 - sat)              => changes from 0 to val * (1 - sat)
     // coef2 => val * (1 - sat * frac)       => changes from 0 to val * (1 - sat * frac)
@@ -451,7 +469,7 @@ void GTDrawHelper::HSV_VAL(DWORD *buffer,int samples,double hue,double sat)
 
     // constants
     frac = modf (hue / 60.0, &intp);
-    val_max = 255 << IntMult;
+    val_max = 255 << g_IntMult;
 
     // prepare
     j = samples;

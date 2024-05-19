@@ -11,7 +11,7 @@
 
 enum : int
 {
-    SPECTRUM_SLIDER_CX = 32,
+    SPECTRUM_SLIDER_CX = 48,
     SPECTRUM_SLIDER_CY = 1,
 };
 

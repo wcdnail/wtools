@@ -3,6 +3,8 @@
 #include "CeXDib.h"
 #include <cmath>
 
+#include "exa/wtl.color.picker/GTDrawHelper.h"
+
 //
 // This code is refactored from: GTDrawHelper.cpp
 // David Swigger's (dwswigger@yahoo.com) Photoshop's-like color pickers
@@ -12,9 +14,9 @@
 
 constexpr int IntMult = 20;
 
-constexpr void RGB_Line3(DWORD*& pDest, int nWidth, int vR, int vG, int vB, int iR, int iG, int iB)
+constexpr void RGB_Line3(DWORD*& pDest, int nCount, int vR, int vG, int vB, int iR, int iG, int iB)
 {
-    for (int j = 0; j < nWidth; j++) {
+    for (int j = 0; j < nCount; j++) {
         *pDest++ = RGB(vR >> IntMult, vG >> IntMult, vB >> IntMult);
         vR += iR;
         vG += iG;
@@ -22,12 +24,12 @@ constexpr void RGB_Line3(DWORD*& pDest, int nWidth, int vR, int vG, int vB, int 
     }
 }
 
-constexpr void RGB_Line1(DWORD*& pDest, int nWidth, int bRGB, int iR, int iG, int iB)
+constexpr void RGB_Line1(DWORD*& pDest, int nCount, int bRGB, int iR, int iG, int iB)
 {
     const int vR{bRGB};
     const int vG{bRGB};
     const int vB{bRGB};
-    RGB_Line3(pDest, nWidth, vR, vG, vB, iR, iG, iB);
+    RGB_Line3(pDest, nCount, vR, vG, vB, iR, iG, iB);
 }
 
 bool DDraw_HSV_SAT_Line(DWORD* pDest, int nWidth, double dHue, double dValue)
@@ -123,6 +125,45 @@ bool DDraw_HSV_HUE(CDibEx const& dibDest, double dSaturation, double dVal)
     );
 }
 
+constexpr void HSV_HUE_Red_To_Yellow(DWORD*& pDest, int nRange, int nVal, int nCoef, double dSaturation)
+{
+    UNREFERENCED_PARAMETER(dSaturation);
+    int const nStep{(nVal - nCoef) / (nRange - 1)};
+    RGB_Line3(pDest, nRange, nCoef, nCoef, nVal, 0, nStep, 0);
+}
+
+constexpr void HSV_HUE_Yellow_To_Green(DWORD*& pDest, int nRange, int nVal, int nCoef, double dSaturation)
+{
+    int const nStep{static_cast<int>((nVal * (1.0 - dSaturation) - nVal) / (nRange - 1))};
+    RGB_Line3(pDest, nRange, nCoef, nVal, nVal, 0, 0, nStep);
+}
+
+constexpr void HSV_HUE_Green_To_Cyan(DWORD*& pDest, int nRange, int nVal, int nCoef, double dSaturation)
+{
+    UNREFERENCED_PARAMETER(dSaturation);
+    int const nStep{(nVal - nCoef) / (nRange - 1)};
+    RGB_Line3(pDest, nRange, nCoef, nVal, nCoef, nStep, 0, 0);
+}
+
+constexpr void HSV_HUE_Cyan_To_Blue(DWORD*& pDest, int nRange, int nVal, int nCoef, double dSaturation)
+{
+    int const nStep{static_cast<int>((nVal * (1.0 - dSaturation) - nVal) / (nRange - 1))};
+    RGB_Line3(pDest, nRange, nVal, nVal, nCoef, 0, nStep, 0);
+}
+
+constexpr void HSV_HUE_Blue_To_Violet(DWORD*& pDest, int nRange, int nVal, int nCoef, double dSaturation)
+{
+    UNREFERENCED_PARAMETER(dSaturation);
+    int const nStep{(nVal - nCoef) / (nRange - 1)};
+    RGB_Line3(pDest, nRange, nVal, nCoef, nCoef, 0, 0, nStep);
+}
+
+constexpr void HSV_HUE_Violet_To_Crimson(DWORD*& pDest, int nRange, int nVal, int nCoef, double dSaturation)
+{
+    int const nStep{static_cast<int>((nVal * (1.0 - dSaturation) - nVal) / (nRange - 1))};
+    RGB_Line3(pDest, nRange, nVal, nCoef, nVal, nStep, 0, 0);
+}
+
 void DDraw_HSV_HUE_Line(DWORD* pDest, int nWidth, double dSaturation, double dVal)
 {
     //
@@ -132,51 +173,26 @@ void DDraw_HSV_HUE_Line(DWORD* pDest, int nWidth, double dSaturation, double dVa
     //
     // coef1 => val * (1 - dSaturation)               => const, = val * (1 - dSaturation)
     // coef2 => val * (1 - dSaturation * dFrac)       => changes from val to val * (1 - dSaturation)
-    // nCoef3 => val * (1 - dSaturation * (1 - dFrac)) => changes from val * (1 - dSaturation) to val
+    // coef3 => val * (1 - dSaturation * (1 - dFrac)) => changes from val * (1 - dSaturation) to val
     //
+    using PLineRoutine = void(*)(DWORD*&, int, int, int, double);
+    static constexpr PLineRoutine gsLineRoutine[]{
+        HSV_HUE_Red_To_Yellow,
+        HSV_HUE_Yellow_To_Green,
+        HSV_HUE_Green_To_Cyan,
+        HSV_HUE_Cyan_To_Blue,
+        HSV_HUE_Blue_To_Violet,
+        HSV_HUE_Violet_To_Crimson,
+    };
+    static constexpr int giIterationCount{_countof(gsLineRoutine)};
 
-    // current position and advance to the next one
-    double           dFrac{0};
-    double const dFracStep{static_cast<double>(nWidth) / 6.0};
-    // value, but as integer in [0, 255 << IntMult]
-    int               nVal{static_cast<int>(dVal * 255.) << IntMult};
-    int             nCoef1{static_cast<int>(nVal * (1. - dSaturation))};
-    int             nCoef2{nCoef1};
-    int             nCoef3{nCoef1};
-    int             nRange{0};
-    int              nStep{0};
-
-    dFrac += dFracStep;
-    nRange = static_cast<int>(dFrac);
-    nStep  = (nVal - nCoef3) / (nRange - 1);
-    RGB_Line3(pDest, nRange, nCoef1, nCoef3, nVal, 0, nStep, 0);
-
-    dFrac += dFracStep;
-    nRange = static_cast<int>(dFrac - (1 * dFracStep));
-    nStep  = static_cast<int>((nVal * (1.0 - dSaturation) - nCoef2) / (nRange - 1));
-    RGB_Line3(pDest, nRange, nCoef1, nVal, nCoef2, 0, 0, nStep);
-
-    dFrac += dFracStep;
-    nRange = static_cast<int>(dFrac - (2 * dFracStep));
-    nCoef3 = nCoef1;
-    nStep  = (nVal - nCoef3) / (nRange - 1);
-    RGB_Line3(pDest, nRange, nCoef3, nVal, nCoef1, nStep, 0, 0);
-
-    dFrac += dFracStep;
-    nRange = static_cast<int>(dFrac - (3 * dFracStep));
-    nCoef2 = nVal;
-    nStep  = static_cast<int>((nVal * (1.0 - dSaturation) - nCoef2) / ((nRange) - 1));
-    RGB_Line3(pDest, nRange, nVal, nCoef2, nCoef1, 0, nStep, 0);
-
-    dFrac += dFracStep;
-    nRange = static_cast<int>(dFrac - (4 * dFracStep));
-    nCoef3 = nCoef1;
-    nStep = (nVal - nCoef3) / ((nRange) - 1);
-    RGB_Line3(pDest, nRange, nVal, nCoef1, nCoef3, 0, 0, nStep);
-
-    dFrac += (dFracStep + 0.1); // + 0.1 because of floating-point math's rounding errors
-    nRange = static_cast<int>(dFrac - (5 * dFracStep));
-    nCoef2 = nVal;
-    nStep  = static_cast<int>((nVal * (1.0 - dSaturation) - nCoef2) / ((nRange) - 1));
-    RGB_Line3(pDest, nRange, nCoef2, nCoef1, nVal, nStep, 0, 0);
+    int const     nVal{static_cast<int>(dVal * 255.) << IntMult};
+    int const    nCoef{static_cast<int>(nVal * (1 - dSaturation))};
+    double const dOffs{static_cast<double>(nWidth) / static_cast<double>(giIterationCount)};
+    double        dPos{0};
+    for (int i = 0; i < giIterationCount; i++) {
+        dPos += dOffs;
+        auto const nRange{static_cast<int>(dPos) - static_cast<int>(i * dOffs)};
+        gsLineRoutine[i](pDest, nRange, nVal, nCoef, dSaturation);
+    }
 }

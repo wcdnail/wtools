@@ -23,28 +23,28 @@
 
 #define HSV_LOOP_STEPS(w)   ((w) - 1)
 
-#define HSV_0() RGB ((BYTE) (coef1 >> IntMult),(BYTE) (coef3 >> IntMult),(BYTE) (val >> IntMult))
+#define HSV_0() RGB ((BYTE) (coef1 >> g_IntMult),(BYTE) (coef3 >> g_IntMult),(BYTE) (val >> g_IntMult))
 
 #define HSV_HUE_ADV_0() coef1 += coef1_adv,coef3 += coef3_adv
 
-#define HSV_1() RGB ((BYTE) (coef1 >> IntMult),(BYTE) (val >> IntMult),(BYTE) (coef2 >> IntMult))
+#define HSV_1() RGB ((BYTE) (coef1 >> g_IntMult),(BYTE) (val >> g_IntMult),(BYTE) (coef2 >> g_IntMult))
 
 #define HSV_HUE_ADV_1() coef1 += coef1_adv, coef2 += coef2_adv
 
 
-#define HSV_2() RGB ((BYTE) (coef3 >> IntMult),(BYTE) (val >> IntMult),(BYTE) (coef1 >> IntMult))
+#define HSV_2() RGB ((BYTE) (coef3 >> g_IntMult),(BYTE) (val >> g_IntMult),(BYTE) (coef1 >> g_IntMult))
 
 #define HSV_HUE_ADV_2()     HSV_HUE_ADV_0()
 
-#define HSV_3() RGB ((BYTE) (val >> IntMult),(BYTE) (coef2 >> IntMult),(BYTE) (coef1 >> IntMult))
+#define HSV_3() RGB ((BYTE) (val >> g_IntMult),(BYTE) (coef2 >> g_IntMult),(BYTE) (coef1 >> g_IntMult))
 
 #define HSV_HUE_ADV_3()     HSV_HUE_ADV_1()
 
-#define HSV_4() RGB ((BYTE) (val >> IntMult),(BYTE) (coef1 >> IntMult),(BYTE) (coef3 >> IntMult))
+#define HSV_4() RGB ((BYTE) (val >> g_IntMult),(BYTE) (coef1 >> g_IntMult),(BYTE) (coef3 >> g_IntMult))
 
 #define HSV_HUE_ADV_4()     HSV_HUE_ADV_0()
 
-#define HSV_5()  RGB (  (BYTE) (coef2 >> IntMult),(BYTE) (coef1 >> IntMult),(BYTE) (val >> IntMult))
+#define HSV_5()  RGB (  (BYTE) (coef2 >> g_IntMult),(BYTE) (coef1 >> g_IntMult),(BYTE) (val >> g_IntMult))
 
 #define HSV_HUE_ADV_5()     HSV_HUE_ADV_1()
 
@@ -87,7 +87,7 @@
 #define HSV_VAL_INIT_4()    HSV_SAT_INIT_4()
 #define HSV_VAL_ADV_4()     HSV_SAT_ADV_4()
 
-const int   IntMult = 20;
+const int   g_IntMult = 20;
 
 enum modes_visual
 {
@@ -176,7 +176,7 @@ public:
     void GetRGB(DWORD *buffer,int samples,COLORREF start,COLORREF end);
 
     // hsv from hue.
-    void HSV_HUE(DWORD *buffer,int samples,double sat,double val);
+    void HSV_HUE(DWORD *buffer,int samples,double sat,double val, int count = 6);
 
     // hsv from sat.
     void HSV_SAT(DWORD *buffer,int samples,double hue,double val);
@@ -206,17 +206,17 @@ public:
 
 inline int scaled_red (COLORREF c)
 {
-    return (GetRValue (c) << IntMult);
+    return (GetRValue (c) << g_IntMult);
 }
 
 inline int scaled_green (COLORREF c)
 {
-    return (GetGValue (c) << IntMult);
+    return (GetGValue (c) << g_IntMult);
 }
 
 inline int scaled_blue (COLORREF c)
 {
-    return (GetBValue (c) << IntMult);
+    return (GetBValue (c) << g_IntMult);
 }
 
 template <class T, class T1> void in_range (T& x,T1 start,T1 end)
