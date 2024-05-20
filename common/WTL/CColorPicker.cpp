@@ -126,7 +126,7 @@ CColorPicker::Impl::Impl()
     :    m_imSpectrum{}
     ,      m_imSlider{}
     ,       m_stColor{}
-    , m_nSpectrumKind{SPEC_HSV_Hue}
+    , m_nSpectrumKind{SPEC_RGB_Red}
     ,        m_nSlide{0}
     ,   m_bMsgHandled{FALSE}
 {
@@ -163,7 +163,8 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
         }
         SetMsgHandled(FALSE);
         return 0;
-    case TRBN_THUMBPOSCHANGING:
+#if 0
+      case TRBN_THUMBPOSCHANGING:
         switch (nID) {
         case CID_SPECTRUM_SLD: {
             auto const* ptPosCh = reinterpret_cast<NMTRBTHUMBPOSCHANGING const*>(pnmh);
@@ -184,6 +185,7 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
         }
         }
         break;
+#endif
     }
     DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
     SetMsgHandled(FALSE);
@@ -222,8 +224,8 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     m_imSlider.SubclassWindow(GetDlgItem(CID_SPECTRUM_SLD));
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
 
-    m_imSlider.Initialize(m_imSpectrum);
-    m_imSpectrum.Initialize(m_imSlider);
+    m_imSlider.Initialize(m_imSpectrum, m_stColor);
+    m_imSpectrum.Initialize(m_imSlider, m_stColor);
 
     WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
     cbSpectrum.AddString(L"RGB/红");

@@ -48,7 +48,8 @@ void DDraw_RGBGrad_Line(DWORD* pDest, int nWidth, COLORREF crBegin, COLORREF crE
     int const rInc{(ScaleRed(crEnd) - R) / (nWidth - 1)};
     int const gInc{(ScaleGreen(crEnd) - G) / (nWidth - 1)};
     int const bInc{(ScaleBlue(crEnd) - B) / (nWidth - 1)};
-    RGB_Line3(pDest, nWidth, R, G, B, rInc, gInc, bInc);
+    // set current pixel (in DIB bitmap format is BGR, not RGB!)
+    RGB_Line3(pDest, nWidth, B, G, R, bInc, gInc, rInc);
 }
 
 void DDraw_RGB(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, CRGBSpecRect&& clrRect)

@@ -15,19 +15,21 @@ CSpectrumImage::~CSpectrumImage() = default;
 CSpectrumImage::CSpectrumImage()
     :  m_bMsgHandled{FALSE}
     ,          m_Dib{}
-    ,        m_Color{0., 0., 100.}
+    ,        m_Color{RGB(0xff, 0, 0)}
     ,        m_ptSel{0, 0}
     , m_SpectrumKind{SPEC_HSV_Hue}
     ,    m_pimSlider{nullptr}
+    ,     m_pstColor{nullptr}
 {
 }
 
-bool CSpectrumImage::Initialize(CSpectrumSlider& imSlider, long cx /*= SPECTRUM_CX*/, long cy /*= SPECTRUM_CY*/)
+bool CSpectrumImage::Initialize(CSpectrumSlider& imSlider, WTL::CStatic& stColor, long cx /*= SPECTRUM_CX*/, long cy /*= SPECTRUM_CY*/)
 {
     if (!m_Dib.Create(cx, cy, SPECTRUM_BPP)) {
         return false;
     }
     m_pimSlider = &imSlider;
+    m_pstColor = &stColor;
     return true;
 }
 
@@ -37,6 +39,15 @@ void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
         return ;
     }
     m_SpectrumKind = kind;
+
+    CRect rcClient{};
+    GetMyRect(rcClient);
+    NotifyColorChanged(rcClient);
+
+    if (m_pimSlider) {
+        OnSliderChanged(m_pimSlider->GetPos());
+    }
+
     m_Color.SetUpdated(true);
     InvalidateRect(nullptr, FALSE);
 }
@@ -74,6 +85,9 @@ void CSpectrumImage::OnColorChanged(long xPos, long yPos)
         if (m_pimSlider) {
             m_pimSlider->UpdateRaster(m_SpectrumKind, m_Color);
         }
+    }
+    if (m_pstColor) {
+        m_pstColor->InvalidateRect(nullptr, FALSE);
     }
     InvalidateRect(nullptr, FALSE);
 }
@@ -199,30 +213,41 @@ void CSpectrumImage::OnLButtonUp(UINT, CPoint)
     ReleaseCapture();
 }
 
+void CSpectrumImage::GetMyRect(CRect& rcClient) const
+{
+    GetClientRect(rcClient);
+    rcClient.right -= 1;
+    rcClient.bottom -= 1;
+}
+
+void CSpectrumImage::NotifyColorChanged(CRect const& rcClient)
+{
+    auto const xScale{static_cast<float>(rcClient.Width()) / static_cast<float>(SPECTRUM_CLR_RANGE)};
+    auto const yScale{static_cast<float>(rcClient.Height()) / static_cast<float>(SPECTRUM_CLR_RANGE)};
+    auto const   xVal{static_cast<int>(static_cast<float>(m_ptSel.x - rcClient.left) / xScale)};
+    auto const   yVal{static_cast<int>(static_cast<float>(m_ptSel.y - rcClient.top) / yScale)};
+    OnColorChanged(xVal, yVal);
+}
+
 void CSpectrumImage::OnMouseMove(UINT, CPoint pt)
 {
     if (GetCapture() != m_hWnd) {
         return;
     }
     CRect rcClient;
-    GetClientRect(rcClient);
-    rcClient.right -= 1;
-    rcClient.bottom -= 1;
+    GetMyRect(rcClient);
 
     pt = Rc::BoundingPoint(rcClient, pt);
     m_ptSel = pt;
+    NotifyColorChanged(rcClient);
 
-    auto const xScale{static_cast<float>(rcClient.Width()) / static_cast<float>(SPECTRUM_CLR_RANGE)};
-    auto const yScale{static_cast<float>(rcClient.Height()) / static_cast<float>(SPECTRUM_CLR_RANGE)};
-    auto const   xVal{static_cast<int>(static_cast<float>(pt.x - rcClient.left) / xScale)};
-    auto const   yVal{static_cast<int>(static_cast<float>(pt.y - rcClient.top) / yScale)};
-    OnColorChanged(xVal, yVal);
-
-    NMHDR nmhdr;
-    nmhdr.code = NM_SPECTRUM_CLR_SEL;
-    nmhdr.idFrom = GetDlgCtrlID();
-    nmhdr.hwndFrom = m_hWnd;
-    ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)nmhdr.idFrom, reinterpret_cast<LPARAM>(&nmhdr));
+    if (!m_pstColor) {
+        NMHDR nmhdr;
+        nmhdr.code = NM_SPECTRUM_CLR_SEL;
+        nmhdr.idFrom = GetDlgCtrlID();
+        nmhdr.hwndFrom = m_hWnd;
+        ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)nmhdr.idFrom, reinterpret_cast<LPARAM>(&nmhdr));
+    }
 }
 
 void CSpectrumImage::OnLButtonDown(UINT, CPoint)

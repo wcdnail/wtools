@@ -15,7 +15,7 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
     ~CSpectrumImage() override;
     CSpectrumImage();
 
-    bool Initialize(CSpectrumSlider& imSlider, long cx = SPECTRUM_CX, long cy = SPECTRUM_CY);
+    bool Initialize(CSpectrumSlider& imSlider, WTL::CStatic& stColor, long cx = SPECTRUM_CX, long cy = SPECTRUM_CY);
     COLORREF GetColorRef() const;
     CRGBSpecRect GetRGBSpectrumRect() const;
     void SetSpectrumKind(SpectrumKind kind);
@@ -32,6 +32,7 @@ private:
     CPoint                m_ptSel;
     SpectrumKind   m_SpectrumKind;
     CSpectrumSlider*  m_pimSlider;
+    WTL::CStatic*      m_pstColor;
 
     static ATOM& GetWndClassAtomRef();
 
@@ -48,6 +49,8 @@ private:
     void OnPaint(WTL::CDCHandle dc);
     void OnLButtonDown(UINT nFlags, CPoint point);
     void OnLButtonUp(UINT nFlags, CPoint point);
+    void GetMyRect(CRect& rcClient) const;
+    void NotifyColorChanged(CRect const& rcClient);
     void OnMouseMove(UINT nFlags, CPoint pt);
 };
 

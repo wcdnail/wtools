@@ -5,6 +5,7 @@
 //
 #include "stdafx.h"
 #include "CSpectrumSlider.h"
+#include "CSpectrumImage.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 #include <atlmisc.h>
 
@@ -14,17 +15,19 @@ CSpectrumSlider::CSpectrumSlider()
     :    m_bMsgHandled{FALSE}
     ,       m_bCapture{false}
     ,    m_pimSpectrum{nullptr}
+    ,       m_pstColor{nullptr}
     ,            m_Dib{}
     ,       m_rcRaster{}
 {
 }
 
-bool CSpectrumSlider::Initialize(CSpectrumImage& imSpectrum)
+bool CSpectrumSlider::Initialize(CSpectrumImage& imSpectrum, WTL::CStatic& stColor, long cx /*= SPECTRUM_SLIDER_CX*/)
 {
-    if (!m_Dib.Create(SPECTRUM_SLIDER_CX, 1, 32)) {
+    if (!m_Dib.Create(cx, 1, 32)) {
         return false;
     }
     m_pimSpectrum = &imSpectrum;
+    m_pstColor = &stColor;
     SetRange(SPECTRUM_SLIDER_MIN, SPECTRUM_SLIDER_MAX, TRUE);
     return true;
 }
@@ -219,10 +222,9 @@ void CSpectrumSlider::OnLButtonUp(UINT, CPoint)
     }
     ReleaseCapture();
     m_bCapture = false;
-    ATLTRACE(ATL::atlTraceControls, 0, _T("%p ReleaseCapture\n"), m_hWnd);
 }
 
-void CSpectrumSlider::OnMouseMove(UINT, CPoint point)
+void CSpectrumSlider::OnMouseMove(UINT nFlags, CPoint pt)
 {
     if (!m_bCapture) {
         SetMsgHandled(FALSE);
@@ -235,11 +237,11 @@ void CSpectrumSlider::OnMouseMove(UINT, CPoint point)
     LONG           nPos{0};
     if (dwStyle & TBS_VERT) {
         float const nScale{static_cast<float>(m_rcRaster.Height()) / static_cast<float>(nRange)};
-        nPos = static_cast<LONG>(static_cast<float>(point.y - m_rcRaster.top) / nScale);
+        nPos = static_cast<LONG>(static_cast<float>(pt.y - m_rcRaster.top) / nScale);
     }
     else {
         float const nScale{static_cast<float>(m_rcRaster.Width()) / static_cast<float>(nRange)};
-        nPos = static_cast<LONG>(static_cast<float>(point.x - m_rcRaster.left) / nScale);
+        nPos = static_cast<LONG>(static_cast<float>(pt.x - m_rcRaster.left) / nScale);
     }
     if (nPos < nMin) {
         nPos = nMin;
@@ -248,19 +250,29 @@ void CSpectrumSlider::OnMouseMove(UINT, CPoint point)
         nPos = nMax;
     }
     SetPos(nPos, TRUE);
-
-    NMTRBTHUMBPOSCHANGING tPosCh;
-    tPosCh.dwPos = nPos;
-    tPosCh.nReason = TB_THUMBPOSITION;
-    tPosCh.hdr.code = TRBN_THUMBPOSCHANGING;
-    tPosCh.hdr.idFrom = GetDlgCtrlID();
-    tPosCh.hdr.hwndFrom = m_hWnd;
-    ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)tPosCh.hdr.idFrom, reinterpret_cast<LPARAM>(&tPosCh));
+    if (m_pimSpectrum) {
+        m_pimSpectrum->OnSliderChanged(nPos);
+    }
+    else {
+        NMTRBTHUMBPOSCHANGING tPosCh;
+        tPosCh.dwPos = nPos;
+        tPosCh.nReason = TB_THUMBPOSITION;
+        tPosCh.hdr.code = TRBN_THUMBPOSCHANGING;
+        tPosCh.hdr.idFrom = GetDlgCtrlID();
+        tPosCh.hdr.hwndFrom = m_hWnd;
+        ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)tPosCh.hdr.idFrom, reinterpret_cast<LPARAM>(&tPosCh));
+    }
+    if (m_pstColor) {
+        m_pstColor->InvalidateRect(nullptr, FALSE);
+    }
+    if (!m_rcRaster.IsRectEmpty() && !m_rcRaster.PtInRect(pt)) {
+        OnLButtonUp(nFlags, pt);
+    }
 }
 
-void CSpectrumSlider::OnLButtonDown(UINT, CPoint point)
+void CSpectrumSlider::OnLButtonDown(UINT, CPoint pt)
 {
-    if (m_rcRaster.IsRectEmpty() || !m_rcRaster.PtInRect(point)) {
+    if (m_rcRaster.IsRectEmpty() || !m_rcRaster.PtInRect(pt)) {
         SetMsgHandled(FALSE);
         return;
     }
@@ -268,11 +280,9 @@ void CSpectrumSlider::OnLButtonDown(UINT, CPoint point)
         SetFocus();
         SetCapture();
         m_bCapture = true;
-        ATLTRACE(ATL::atlTraceControls, 0, _T("%p SetCapture\n"), m_hWnd);
     }
     else {
         ReleaseCapture();
-        ATLTRACE(ATL::atlTraceControls, 0, _T("%p ReleaseCapture #2\n"), m_hWnd);
         m_bCapture = false;
     }
 }
