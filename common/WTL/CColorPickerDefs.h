@@ -66,11 +66,9 @@ struct CColorUnion
     void SetUpdated(bool bUpdated);
 
     void SetRGB(int R, int G, int B);
+    void SetHSV(double dH, double dS, double dV);
     void UpdateRGB();
     void UpdateHSV();
-
-    void SetHue(double dHue);
-    void SetHSV(double dH, double dS, double dV);
 
     BYTE GetRed() const;
     BYTE GetGreen() const;
@@ -99,12 +97,6 @@ inline void CColorUnion::SetRGB(int R, int G, int B)
 {
     SetRGBPlain(R, G, B);
     UpdateHSV();
-}
-
-inline void CColorUnion::SetHue(double dHue)
-{
-    m_dH = std::min<double>(dHue, 359.);
-    UpdateRGB();
 }
 
 inline void CColorUnion::SetHSV(double dH, double dS, double dV)

@@ -32,18 +32,19 @@ void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
         return ;
     }
     m_SpectrumKind = kind;
+    m_Color.SetUpdated(true);
     InvalidateRect(nullptr, FALSE);
 }
 
 void CSpectrumImage::OnSliderChanged(long nPos)
 {
     switch (m_SpectrumKind) {
-    case SPEC_RGB_Red:          break;
-    case SPEC_RGB_Green:        break;
-    case SPEC_RGB_Blue:         break;
-    case SPEC_HSV_Hue:          m_Color.SetHue((255 - static_cast<double>(nPos)) / 255.0 * 359.0); break;
-    case SPEC_HSV_Saturation:   break;
-    case SPEC_HSV_Brightness:   break;
+    case SPEC_RGB_Red:          m_Color.SetRGB(255 - nPos, m_Color.GetGreen(), m_Color.GetBlue()); break;
+    case SPEC_RGB_Green:        m_Color.SetRGB(m_Color.GetRed(), 255 - nPos, m_Color.GetBlue()); break;
+    case SPEC_RGB_Blue:         m_Color.SetRGB(m_Color.GetRed(), m_Color.GetGreen(), 255 - nPos); break;
+    case SPEC_HSV_Hue:          m_Color.SetHSV((255 - static_cast<double>(nPos)) / 255.0 * 359.0, m_Color.m_dS, m_Color.m_dV); break;
+    case SPEC_HSV_Saturation:   m_Color.SetHSV(m_Color.m_dH, (255 - static_cast<double>(nPos)) / 255.0 * 100.0, m_Color.m_dV); break;
+    case SPEC_HSV_Brightness:   m_Color.SetHSV(m_Color.m_dH, m_Color.m_dS, (255 - static_cast<double>(nPos)) / 255.0 * 100.0); break;
     default: break;
     }
     InvalidateRect(nullptr, FALSE);
@@ -56,12 +57,46 @@ void CSpectrumImage::OnColorChanged(long xPos, long yPos)
     case SPEC_RGB_Green:        m_Color.SetRGB(xPos, m_Color.GetGreen(), yPos); break;
     case SPEC_RGB_Blue:         m_Color.SetRGB(xPos, yPos, m_Color.GetBlue()); break;
     case SPEC_HSV_Hue:          m_Color.SetHSV(m_Color.m_dH, xPos / 255.0 * 100.0, (255 - yPos) / 255.0 * 100.0); break;
-    case SPEC_HSV_Saturation:   break;
-    case SPEC_HSV_Brightness:   break;
+    case SPEC_HSV_Saturation:   m_Color.SetHSV(xPos / 255.0 * 359.0, m_Color.m_dS, (255 - yPos) / 255.0 * 100.0); break;
+    case SPEC_HSV_Brightness:   m_Color.SetHSV(xPos / 255.0 * 359.0, (255 - yPos) / 255.0 * 100.0, m_Color.m_dV); break;
     default: break;
     }
     InvalidateRect(nullptr, FALSE);
 }
+
+CRGBSpecRect CSpectrumImage::GetRGBSpectrumRect() const
+{
+    // additional_component => edit int
+    auto const R{m_Color.GetRed()};
+    auto const G{m_Color.GetGreen()};
+    auto const B{m_Color.GetBlue()};
+    CRGBSpecRect result{};
+    switch (m_SpectrumKind) {
+    case SPEC_RGB_Red:
+        result.crLT = RGB(R, 0, 0);
+        result.crRT = RGB(R, 255, 0);
+        result.crLB = RGB(R, 0, 255);
+        result.crRB = RGB(R, 255, 255);
+        break;
+    case SPEC_RGB_Green:
+        result.crLT = RGB(0, G, 0);
+        result.crRT = RGB(255, G, 0);
+        result.crLB = RGB(0, G, 255);
+        result.crRB = RGB(255, G, 255);
+        break;
+    case SPEC_RGB_Blue:
+        result.crLT = RGB(0, 0, B);
+        result.crRT = RGB(0, 255, B);
+        result.crLB = RGB(255, 0, B);
+        result.crRB = RGB(255, 255, B);
+        break;
+    default:
+        ATLASSERT(FALSE);
+        break;
+    }
+    return result;
+}
+
 
 ATOM& CSpectrumImage::GetWndClassAtomRef()
 {
@@ -107,10 +142,10 @@ int CSpectrumImage::OnCreate(LPCREATESTRUCT pCS)
 void CSpectrumImage::UpdateRaster()
 {
     switch (m_SpectrumKind) {
-    case SPEC_RGB_Red:          break;
-    case SPEC_RGB_Green:        break;
-    case SPEC_RGB_Blue:         break;
-    case SPEC_HSV_Hue:          DDraw_HSV_Hue(m_Dib, m_Color.m_dH); break;
+    case SPEC_RGB_Red:
+    case SPEC_RGB_Green:
+    case SPEC_RGB_Blue:         DDrawRGBSpectrum(m_Dib, GetRGBSpectrumRect()); break;
+    case SPEC_HSV_Hue:          DDrawHSVHueSpectrum(m_Dib, m_Color.m_dH); break;
     case SPEC_HSV_Saturation:   break;
     case SPEC_HSV_Brightness:   break;
     default: break;

@@ -14,6 +14,10 @@
 
 constexpr int IntMult = 20;
 
+constexpr int   ScaleRed(COLORREF c) { return (GetRValue (c) << IntMult); }
+constexpr int ScaleGreen(COLORREF c) { return (GetGValue (c) << IntMult); }
+constexpr int  ScaleBlue(COLORREF c) { return (GetBValue (c) << IntMult); }
+
 constexpr void RGB_Line3(DWORD*& pDest, int nCount, int vR, int vG, int vB, int iR, int iG, int iB)
 {
     for (int j = 0; j < nCount; j++) {
@@ -32,7 +36,7 @@ constexpr void RGB_Line1(DWORD*& pDest, int nCount, int bRGB, int iR, int iG, in
     RGB_Line3(pDest, nCount, vR, vG, vB, iR, iG, iB);
 }
 
-bool DDraw_HSV_SAT_Line(DWORD* pDest, int nWidth, double dHue, double dValue)
+bool DDrawHSVHueLine(DWORD* pDest, int nWidth, double dHue, double dValue)
 {
     //GTDrawHelper dh;
     //dh.HSV_SAT(pDest, nWidth, dHue, dValue);
@@ -43,9 +47,8 @@ bool DDraw_HSV_SAT_Line(DWORD* pDest, int nWidth, double dHue, double dValue)
     }
     //
     // dHue - const, in [0, 360)
-    //  intp - const in 0, 1, 2, 3, 4, 5
-    //  frac - const in [0, 1)
-    // sat - increments, in [0, 1]; indirectly (coefficients)
+    //  dInt - const in 0, 1, 2, 3, 4, 5
+    //  dFrac - const in [0, 1)
     // val - const, in [0, (255 << IntMult)]
     //
     // inc1 => val * (1 - sat)              => changes from val to 0
@@ -54,7 +57,7 @@ bool DDraw_HSV_SAT_Line(DWORD* pDest, int nWidth, double dHue, double dValue)
     //
     const int   vStart{static_cast<int>(dValue * 255) << IntMult};
     double        dInt{0};
-    const double dFrac{modf(dHue / 60.0, &dInt)};
+    const double dFrac{std::modf(dHue / 60.0, &dInt)};
     auto const    nInt{static_cast<int>(dInt)};
     const int     inc1{-vStart / nWidth};
     const int     inc2{static_cast<int>((1 - dFrac) * vStart - vStart) / nWidth};
@@ -73,17 +76,16 @@ bool DDraw_HSV_SAT_Line(DWORD* pDest, int nWidth, double dHue, double dValue)
     return true;
 }
 
-bool DDraw_HSV_Hue(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dHue)
+bool DDrawHSVHueSpectrum(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dHue)
 {
     if (nHeight <= 0) {
         // TODO: report nHeight - INVAL
         return false;
     }
-    // initial and change
     double     dValue{0.0};
     const double dAdv{1.0 / nHeight};
     for (int i = 0; i<nHeight; i++) {
-        if (!DDraw_HSV_SAT_Line(pDest, nWidth, dHue, dValue)) {
+        if (!DDrawHSVHueLine(pDest, nWidth, dHue, dValue)) {
             return false;
         }
         dValue += dAdv;
@@ -92,23 +94,23 @@ bool DDraw_HSV_Hue(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, doub
     return true;
 }
 
-bool DDraw_HSV_Hue(CDibEx const& dibDest, double dHue)
+bool DDrawHSVHueSpectrum(CDibEx const& dibDest, double dHue)
 {
     ATLASSUME(dibDest.GetBitCount() == 32);
-    return DDraw_HSV_Hue(reinterpret_cast<DWORD*>(dibDest.GetData()),
+    return DDrawHSVHueSpectrum(reinterpret_cast<DWORD*>(dibDest.GetData()),
         dibDest.GetWidth(),
         dibDest.GetHeight(),
         dibDest.GetStride() / sizeof(DWORD),
         dHue);
 }
 
-bool DDraw_HSV_HUE(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dSaturation, double dVal)
+bool DDrawHSVSatGradient(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dSaturation, double dVal)
 {
     if (nHeight <= 0) {
         // TODO: report nHeight - INVAL
         return false;
     }
-    DDraw_HSV_HUE_Line(pDest, nWidth, dSaturation, dVal);
+    DDrawHSVSatLine(pDest, nWidth, dSaturation, dVal);
     for (int i = 1; i<nHeight; i++) {
         memcpy(pDest + nLinePitch, pDest, nWidth * sizeof(DWORD));
         pDest += nLinePitch;
@@ -116,10 +118,10 @@ bool DDraw_HSV_HUE(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, doub
     return true;
 }
 
-bool DDraw_HSV_HUE(CDibEx const& dibDest, double dSaturation, double dVal)
+bool DDrawHSVSatGradient(CDibEx const& dibDest, double dSaturation, double dVal)
 {
     ATLASSUME(dibDest.GetBitCount() == 32);
-    return DDraw_HSV_HUE(reinterpret_cast<DWORD*>(dibDest.GetData()),
+    return DDrawHSVSatGradient(reinterpret_cast<DWORD*>(dibDest.GetData()),
         dibDest.GetWidth(),
         dibDest.GetHeight(),
         dibDest.GetStride() / sizeof(DWORD),
@@ -167,7 +169,7 @@ constexpr void HSV_HUE_Violet_To_Crimson(DWORD*& pDest, int nRange, int nVal, in
     RGB_Line3(pDest, nRange, nVal, nCoef, nVal, nStep, 0, 0);
 }
 
-void DDraw_HSV_HUE_Line(DWORD* pDest, int nWidth, double dSaturation, double dVal)
+void DDrawHSVSatLine(DWORD* pDest, int nWidth, double dSaturation, double dVal)
 {
     using PLineRoutine = void(*)(DWORD*&, int, int, int, double);
     static constexpr PLineRoutine gsLineRoutine[]{
@@ -192,5 +194,57 @@ void DDraw_HSV_HUE_Line(DWORD* pDest, int nWidth, double dSaturation, double dVa
             nRange += nWidth;
         }
         gsLineRoutine[i](pDest, nRange, nVal, nCoef, dSaturation);
+    }
+}
+
+void DDrawRGBSpectrum(CDibEx const& dibDest, CRGBSpecRect&& color)
+{
+    ATLASSUME(dibDest.GetBitCount() == 32);
+    return DDrawRGBSpectrum(reinterpret_cast<DWORD*>(dibDest.GetData()),
+        dibDest.GetWidth(),
+        dibDest.GetHeight(),
+        dibDest.GetStride() / sizeof(DWORD),
+        std::move(color)
+    );
+}
+
+void DDrawRGBSpectrum(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, CRGBSpecRect&& clrRect)
+{
+    int              left_red{ScaleRed(clrRect.crLB)};
+    int            left_green{ScaleGreen(clrRect.crLB)};
+    int             left_blue{ScaleBlue(clrRect.crLB)};
+    int const    left_red_adv{(ScaleRed(clrRect.crLT) - left_red) / nHeight};
+    int const  left_green_adv{(ScaleGreen(clrRect.crLT) - left_green) / nHeight};
+    int const   left_blue_adv{(ScaleBlue(clrRect.crLT) - left_blue) / nHeight};
+
+    int             right_red{ScaleRed(clrRect.crRB)};
+    int           right_green{ScaleGreen(clrRect.crRB)};
+    int            right_blue{ScaleBlue(clrRect.crRB)};
+    int const   right_red_adv{(ScaleRed(clrRect.crRT) - right_red) / nHeight};
+    int const right_green_adv{(ScaleGreen(clrRect.crRT) - right_green) / nHeight};
+    int const  right_blue_adv{(ScaleBlue(clrRect.crRT) - right_blue) / nHeight};
+
+    int const         red_adv{(right_red - left_red) / nWidth};
+    int const       green_adv{(right_green - left_green) / nWidth};
+    int const        blue_adv{(right_blue - left_blue) / nWidth};
+    int const           nSkip{static_cast<int>(nLinePitch) - nWidth};
+
+    for (int i = 0; i < nHeight; i++) {
+        int   red{left_red};
+        int green{left_green};
+        int  blue{left_blue};
+        for (int j = 0; j < nWidth; j++) {
+            *pDest++ = RGB(blue >> IntMult, green >> IntMult, red >> IntMult);
+            red += red_adv;
+            green += green_adv;
+            blue += blue_adv;
+        }
+        left_red += left_red_adv;
+        left_green += left_green_adv;
+        left_blue += left_blue_adv;
+        right_red += right_red_adv;
+        right_green += right_green_adv;
+        right_blue += right_blue_adv;
+        pDest += nSkip;
     }
 }

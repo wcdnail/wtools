@@ -4,6 +4,8 @@
 #include "CCustomCtrl.h"
 #include <DDraw.DGI/CeXDib.h>
 
+struct CRGBSpecRect;
+
 struct CSpectrumImage: CCustomControl<CSpectrumImage>
 {
     using Super = CCustomControl<CSpectrumImage>;
@@ -15,6 +17,7 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
 
     bool Initialize(CSpectrumSlider& imSlider, long cx = SPECTRUM_CX, long cy = SPECTRUM_CY);
     COLORREF GetColorRef() const;
+    CRGBSpecRect GetRGBSpectrumRect() const;
     void SetSpectrumKind(SpectrumKind kind);
     SpectrumKind GetSpectrumKind() const;
     void OnSliderChanged(long nPos);

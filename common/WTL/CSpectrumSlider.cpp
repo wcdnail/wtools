@@ -35,7 +35,7 @@ void CSpectrumSlider::UpdateRaster(SpectrumKind spKind)
     case SPEC_RGB_Red:        break;
     case SPEC_RGB_Green:      break;
     case SPEC_RGB_Blue:       break;
-    case SPEC_HSV_Hue:        DDraw_HSV_HUE(m_Dib, 1., 1.); break;
+    case SPEC_HSV_Hue:        DDrawHSVSatGradient(m_Dib, 1., 1.); break;
     case SPEC_HSV_Saturation: break;
     case SPEC_HSV_Brightness: break;
     default: break;
