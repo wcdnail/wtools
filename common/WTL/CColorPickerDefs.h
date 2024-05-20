@@ -36,27 +36,16 @@ static_assert(SPECTRUM_BPP == 32, "SPECTRUM_BPP must always be 32!");
 struct CSpectrumImage;
 struct CSpectrumSlider;
 
-struct CSTRGB
-{
-    BYTE   m_btRed;
-    BYTE m_btGreen;
-    BYTE  m_btBlue;
-    BYTE m_btAlpha;
-};
-
-union CUNRGB
-{
-    COLORREF Color;
-    CSTRGB     RGB;
-};
-
 struct CColorUnion
 {
-    double       m_dH;
-    double       m_dS;
-    double       m_dV;
-    CUNRGB     m_Comp;
-    bool   m_bUpdated;
+    bool m_bUpdated;
+    double     m_dH;
+    double     m_dS;
+    double     m_dV;
+    BYTE      m_Red;
+    BYTE    m_Green;
+    BYTE     m_Blue;
+    BYTE    m_Alpha;
 
     ~CColorUnion();
     CColorUnion(double dH, double dS, double dV);
@@ -87,6 +76,8 @@ struct CColorUnion
     COLORREF GetBlueFirst() const;
     COLORREF GetBlueLast() const;
 
+    COLORREF GetColorRef() const;
+
 private:
     void SetRGBPlain(int R, int G, int B);
 };
@@ -96,7 +87,9 @@ inline void CColorUnion::SetUpdated(bool bUpdated) { m_bUpdated = bUpdated; }
 
 inline void CColorUnion::SetRGBPlain(int R, int G, int B)
 {
-    m_Comp.Color = RGB(R, G, B);
+    GetRed()   = R;
+    GetGreen() = G;
+    GetBlue()  = B;
     SetUpdated(true);
 }
 
@@ -114,14 +107,14 @@ inline void CColorUnion::SetHSV(double dH, double dS, double dV)
     UpdateRGB();
 }
 
-inline BYTE     CColorUnion::GetRed() const { return m_Comp.RGB.m_btRed; }
-inline BYTE   CColorUnion::GetGreen() const { return m_Comp.RGB.m_btGreen; }
-inline BYTE    CColorUnion::GetBlue() const { return m_Comp.RGB.m_btBlue; }
-inline BYTE   CColorUnion::GetAlpha() const { return m_Comp.RGB.m_btAlpha; }
-inline BYTE&    CColorUnion::GetRed() { return m_Comp.RGB.m_btRed; }
-inline BYTE&  CColorUnion::GetGreen() { return m_Comp.RGB.m_btGreen; }
-inline BYTE&   CColorUnion::GetBlue() { return m_Comp.RGB.m_btBlue; }
-inline BYTE&  CColorUnion::GetAlpha() { return m_Comp.RGB.m_btAlpha; }
+inline BYTE     CColorUnion::GetRed() const { return m_Red; }
+inline BYTE   CColorUnion::GetGreen() const { return m_Green; }
+inline BYTE    CColorUnion::GetBlue() const { return m_Blue; }
+inline BYTE   CColorUnion::GetAlpha() const { return m_Alpha; }
+inline BYTE&    CColorUnion::GetRed() { return m_Red; }
+inline BYTE&  CColorUnion::GetGreen() { return m_Green; }
+inline BYTE&   CColorUnion::GetBlue() { return m_Blue; }
+inline BYTE&  CColorUnion::GetAlpha() { return m_Alpha; }
 
 inline COLORREF   CColorUnion::GetRedFirst() const { return RGB(       0, GetGreen(), GetBlue()); }
 inline COLORREF    CColorUnion::GetRedLast() const { return RGB(     255, GetGreen(), GetBlue()); }
@@ -129,3 +122,5 @@ inline COLORREF CColorUnion::GetGreenFirst() const { return RGB(GetRed(),       
 inline COLORREF  CColorUnion::GetGreenLast() const { return RGB(GetRed(),        255, GetBlue()); }
 inline COLORREF  CColorUnion::GetBlueFirst() const { return RGB(GetRed(), GetGreen(),         0); }
 inline COLORREF   CColorUnion::GetBlueLast() const { return RGB(GetRed(), GetGreen(),       255); }
+
+inline COLORREF   CColorUnion::GetColorRef() const { return RGB(GetRed(), GetGreen(), GetBlue()); }

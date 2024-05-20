@@ -14,9 +14,9 @@
 
 constexpr int INTSCALE = 20;
 
-constexpr int   ScaleRed(COLORREF c) { return (GetRValue (c) << INTSCALE); }
-constexpr int ScaleGreen(COLORREF c) { return (GetGValue (c) << INTSCALE); }
-constexpr int  ScaleBlue(COLORREF c) { return (GetBValue (c) << INTSCALE); }
+constexpr int   ScaleRed(COLORREF c) { return (GetRValue(c) << INTSCALE); }
+constexpr int ScaleGreen(COLORREF c) { return (GetGValue(c) << INTSCALE); }
+constexpr int  ScaleBlue(COLORREF c) { return (GetBValue(c) << INTSCALE); }
 
 constexpr void RGB_Line3(DWORD*& pDest, int nCount, int vR, int vG, int vB, int iR, int iG, int iB)
 {

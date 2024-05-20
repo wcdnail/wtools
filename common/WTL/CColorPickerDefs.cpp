@@ -17,18 +17,28 @@ constexpr T Min3(T a, T b, T c)
 CColorUnion::~CColorUnion() = default;
 
 CColorUnion::CColorUnion(double dH, double dS, double dV)
-    :       m_dH{dH}
+    : m_bUpdated{false}
+    ,       m_dH{dH}
     ,       m_dS{dS}
     ,       m_dV{dV}
-    , m_bUpdated{true}
+    ,      m_Red{0}
+    ,    m_Green{0}
+    ,     m_Blue{0}
+    ,    m_Alpha{0}
 {
     UpdateRGB();
 }
 
 CColorUnion::CColorUnion(COLORREF crInitial)
-    : CColorUnion{0., 0., 100.}
+    : m_bUpdated{false}
+    ,       m_dH{0.}
+    ,       m_dS{0.}
+    ,       m_dV{0.}
+    ,      m_Red{GetRValue(crInitial)}
+    ,    m_Green{GetGValue(crInitial)}
+    ,     m_Blue{GetBValue(crInitial)}
+    ,    m_Alpha{0}
 {
-    m_Comp.Color = crInitial;
     UpdateHSV();
 }
 
@@ -88,9 +98,9 @@ void CColorUnion::UpdateRGB()
 
 void CColorUnion::UpdateHSV()
 {
-    int const      R{m_Comp.RGB.m_btRed};
-    int const      G{m_Comp.RGB.m_btGreen};
-    int const      B{m_Comp.RGB.m_btBlue};
+    int const      R{m_Red};
+    int const      G{m_Green};
+    int const      B{m_Blue};
     auto const btMax{Max3(R, G, B)};
     auto const btMin{Min3(R, G, B)};
     auto const delta{static_cast<double>(btMax - btMin)};

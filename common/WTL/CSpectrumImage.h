@@ -30,7 +30,6 @@ private:
     CDIBitmap               m_Dib;
     CColorUnion           m_Color;
     CPoint                m_ptSel;
-    bool               m_bCapture;
     SpectrumKind   m_SpectrumKind;
     CSpectrumSlider*  m_pimSlider;
 
@@ -59,5 +58,5 @@ inline SpectrumKind CSpectrumImage::GetSpectrumKind() const
 
 inline COLORREF CSpectrumImage::GetColorRef() const
 {
-    return m_Color.m_Comp.Color;
+    return m_Color.GetColorRef();
 }

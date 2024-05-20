@@ -17,7 +17,6 @@ CSpectrumImage::CSpectrumImage()
     ,          m_Dib{}
     ,        m_Color{0., 0., 100.}
     ,        m_ptSel{0, 0}
-    ,     m_bCapture{false}
     , m_SpectrumKind{SPEC_HSV_Hue}
     ,    m_pimSlider{nullptr}
 {
@@ -194,16 +193,15 @@ void CSpectrumImage::DrawMarker(WTL::CDCHandle dc) const
 
 void CSpectrumImage::OnLButtonUp(UINT, CPoint)
 {
-    if (!m_bCapture) {
+    if (GetCapture() != m_hWnd) {
         return ;
     }
     ReleaseCapture();
-    m_bCapture = false;
 }
 
 void CSpectrumImage::OnMouseMove(UINT, CPoint pt)
 {
-    if (!m_bCapture) {
+    if (GetCapture() != m_hWnd) {
         return;
     }
     CRect rcClient;
@@ -229,7 +227,8 @@ void CSpectrumImage::OnMouseMove(UINT, CPoint pt)
 
 void CSpectrumImage::OnLButtonDown(UINT, CPoint)
 {
-    SetFocus();
-    SetCapture();
-    m_bCapture = true;
+    if (GetCapture() != m_hWnd) {
+        SetFocus();
+        SetCapture();
+    }
 }

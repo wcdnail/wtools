@@ -25,10 +25,10 @@ private:
     friend Super;
 
     BOOL            m_bMsgHandled;
-    CDIBitmap               m_Dib;
-    CSpectrumImage* m_pimSpectrum;
-    CRect              m_rcRaster;
     bool               m_bCapture;
+    CSpectrumImage* m_pimSpectrum;
+    CDIBitmap               m_Dib;
+    CRect              m_rcRaster;
 
     static ATOM& GetWndClassAtomRef();
 

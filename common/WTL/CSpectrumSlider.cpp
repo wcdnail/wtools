@@ -12,10 +12,10 @@ CSpectrumSlider::~CSpectrumSlider() = default;
 
 CSpectrumSlider::CSpectrumSlider()
     :    m_bMsgHandled{FALSE}
-    ,            m_Dib{}
-    ,    m_pimSpectrum{nullptr}
-    ,       m_rcRaster{}
     ,       m_bCapture{false}
+    ,    m_pimSpectrum{nullptr}
+    ,            m_Dib{}
+    ,       m_rcRaster{}
 {
 }
 
@@ -43,11 +43,7 @@ void CSpectrumSlider::UpdateRaster(SpectrumKind spKind, CColorUnion const& unCol
         break;
     }
     m_Dib.FreeResources();
-
-    // InvalidateRect did not work
-    BOOL const bEnabled = IsWindowEnabled();
-    EnableWindow(!bEnabled);
-    EnableWindow(bEnabled);
+    Invalidate();
 }
 
 ATOM& CSpectrumSlider::GetWndClassAtomRef()
@@ -223,6 +219,7 @@ void CSpectrumSlider::OnLButtonUp(UINT, CPoint)
     }
     ReleaseCapture();
     m_bCapture = false;
+    ATLTRACE(ATL::atlTraceControls, 0, _T("%p ReleaseCapture\n"), m_hWnd);
 }
 
 void CSpectrumSlider::OnMouseMove(UINT, CPoint point)
@@ -267,9 +264,17 @@ void CSpectrumSlider::OnLButtonDown(UINT, CPoint point)
         SetMsgHandled(FALSE);
         return;
     }
-    SetFocus();
-    SetCapture();
-    m_bCapture = true;
+    if (!m_bCapture) {
+        SetFocus();
+        SetCapture();
+        m_bCapture = true;
+        ATLTRACE(ATL::atlTraceControls, 0, _T("%p SetCapture\n"), m_hWnd);
+    }
+    else {
+        ReleaseCapture();
+        ATLTRACE(ATL::atlTraceControls, 0, _T("%p ReleaseCapture #2\n"), m_hWnd);
+        m_bCapture = false;
+    }
 }
 
 void CSpectrumSlider::OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar ctlScrollBar)

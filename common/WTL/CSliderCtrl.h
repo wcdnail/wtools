@@ -283,6 +283,14 @@ struct CSliderCtrlT: TBase
         ATLASSERT(::IsWindow(this->m_hWnd));
         return (UINT)::SendMessage(this->m_hWnd, TBM_GETUNICODEFORMAT, 0, 0);
     }
+
+    // Invalidate/InvalidateRect did not work correctly...
+    void Invalidate()
+    {
+        BOOL const bEnabled = this->IsWindowEnabled();
+        this->EnableWindow(!bEnabled);
+        this->EnableWindow(bEnabled);
+    }
 };
 
 using CSliderCtrl = CSliderCtrlT<ATL::CWindow>;
