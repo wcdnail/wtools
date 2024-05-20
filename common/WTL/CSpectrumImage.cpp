@@ -140,11 +140,11 @@ void CSpectrumImage::OnPaint(WTL::CDCHandle /*dc*/)
 
 void CSpectrumImage::DrawMarker(WTL::CDCHandle dc) const
 {
-    CRect const rc{m_ptSel.x, m_ptSel.y, m_ptSel.x+2, m_ptSel.y+2};
-    dc.InvertRect(CRect(rc.left - 3, rc.top, rc.left, rc.bottom));
-    dc.InvertRect(CRect(rc.left, rc.top - 3, rc.right, rc.top));
-    dc.InvertRect(CRect(rc.right, rc.top, rc.right + 3, rc.bottom));
-    dc.InvertRect(CRect(rc.left, rc.bottom, rc.right, rc.bottom + 3));
+    CRect const rc{m_ptSel.x, m_ptSel.y, m_ptSel.x+1, m_ptSel.y+1};
+    dc.InvertRect(CRect(rc.left - 5, rc.top, rc.left, rc.bottom));
+    dc.InvertRect(CRect(rc.left, rc.top - 5, rc.right, rc.top));
+    dc.InvertRect(CRect(rc.right, rc.top, rc.right + 5, rc.bottom));
+    dc.InvertRect(CRect(rc.left, rc.bottom, rc.right, rc.bottom + 5));
 }
 
 void CSpectrumImage::OnLButtonUp(UINT, CPoint)
