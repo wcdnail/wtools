@@ -51,7 +51,9 @@ void CSpectrumImage::OnSliderChanged(long nPos)
     case SPEC_HSV_Hue:          m_Color.SetHSV((255 - static_cast<double>(nPos)) / 255.0 * 359.0, m_Color.m_dS, m_Color.m_dV); break;
     case SPEC_HSV_Saturation:   m_Color.SetHSV(m_Color.m_dH, (255 - static_cast<double>(nPos)) / 255.0 * 100.0, m_Color.m_dV); break;
     case SPEC_HSV_Brightness:   m_Color.SetHSV(m_Color.m_dH, m_Color.m_dS, (255 - static_cast<double>(nPos)) / 255.0 * 100.0); break;
-    default: break;
+    default:
+        ATLASSERT(FALSE);
+        break;
     }
     InvalidateRect(nullptr, FALSE);
 }
@@ -65,7 +67,9 @@ void CSpectrumImage::OnColorChanged(long xPos, long yPos)
     case SPEC_HSV_Hue:          m_Color.SetHSV(m_Color.m_dH, xPos / 255.0 * 100.0, (255 - yPos) / 255.0 * 100.0); break;
     case SPEC_HSV_Saturation:   m_Color.SetHSV(xPos / 255.0 * 359.0, m_Color.m_dS, (255 - yPos) / 255.0 * 100.0); break;
     case SPEC_HSV_Brightness:   m_Color.SetHSV(xPos / 255.0 * 359.0, (255 - yPos) / 255.0 * 100.0, m_Color.m_dV); break;
-    default: break;
+    default: 
+        ATLASSERT(FALSE);
+        break;
     }
     InvalidateRect(nullptr, FALSE);
 }
@@ -143,14 +147,16 @@ void CSpectrumImage::UpdateRaster()
     switch (m_SpectrumKind) {
     case SPEC_RGB_Red:
     case SPEC_RGB_Green:
-    case SPEC_RGB_Blue:         DDrawRGBSpectrum(m_Dib, GetRGBSpectrumRect()); break;
-    case SPEC_HSV_Hue:          DDrawHSVHueSpectrum(m_Dib, m_Color.m_dH); break;
-    case SPEC_HSV_Saturation:   DDrawHSVSatSpectrum(m_Dib, m_Color.m_dS * 0.01); break;
-    case SPEC_HSV_Brightness:   DDrawHSVSatSpectrum(m_Dib, m_Color.m_dV * 0.01); break;
-    default: break;
+    case SPEC_RGB_Blue:         DDraw_RGB(m_Dib, GetRGBSpectrumRect()); break;
+    case SPEC_HSV_Hue:          DDraw_HSV_Hue(m_Dib, m_Color.m_dH); break;
+    case SPEC_HSV_Saturation:   DDraw_HSV_Sat(m_Dib, m_Color.m_dS * 0.01); break;
+    case SPEC_HSV_Brightness:   DDraw_HSV_Sat(m_Dib, m_Color.m_dV * 0.01); break;
+    default:
+        ATLASSERT(FALSE);
+        break;
     }
     if (m_pimSlider) {
-        m_pimSlider->UpdateRaster(m_SpectrumKind);
+        m_pimSlider->UpdateRaster(m_SpectrumKind, m_Color);
     }
     m_Dib.FreeResources();
 }

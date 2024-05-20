@@ -12,16 +12,27 @@ struct CRGBSpecRect
     COLORREF crRB;
 };
 
-bool DDrawHSVHueLine(DWORD* pDest, int nWidth, double dHue, double dValue);
-bool DDrawHSVHueSpectrum(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dHue);
-bool DDrawHSVHueSpectrum(CDibEx const& dibDest, double dHue);
+void DDraw_RGBGrad_Line(DWORD* pDest, int nWidth, COLORREF crBegin, COLORREF crEnd);
+void DDraw_RGB(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, CRGBSpecRect&& color);
+void DDraw_RGB(CDibEx const& dibDest, CRGBSpecRect&& color);
+void DDraw_RGBGrad(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, COLORREF crBegin, COLORREF crEnd);
+void DDraw_RGBGrad(CDibEx const& dibDest, COLORREF crBegin, COLORREF crEnd);
 
-void DDrawHSVSatLine(DWORD* pDest, int nWidth, double dSaturation, double dVal);
-bool DDrawHSVSatGradient(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dSaturation, double dVal);
-bool DDrawHSVSatGradient(CDibEx const& dibDest, double dSaturation, double dVal);
+void DDraw_HSV_HUE_Line(DWORD* pDest, int nWidth, double dSaturation, double dVal);
+bool DDraw_HSV_SAT_Line(DWORD* pDest, int nWidth, double dHue, double dValue);
+bool DDraw_HSV_VAL_Line(DWORD* pDest, int nWidth, double dHue, double dSaturation);
 
-void DDrawHSVSatSpectrum(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dSaturation);
-void DDrawHSVSatSpectrum(CDibEx const& dibDest, double dSaturation);
+bool DDraw_HSV_Hue(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dHue);
+bool DDraw_HSV_Hue(CDibEx const& dibDest, double dHue);
 
-void DDrawRGBSpectrum(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, CRGBSpecRect&& color);
-void DDrawRGBSpectrum(CDibEx const& dibDest, CRGBSpecRect&& color);
+void DDraw_HSV_Sat(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dSaturation);
+void DDraw_HSV_Sat(CDibEx const& dibDest, double dSaturation);
+
+bool DDraw_HSV_H(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dSaturation, double dVal);
+bool DDraw_HSV_H(CDibEx const& dibDest, double dSaturation, double dVal);
+
+bool DDraw_HSV_S(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dHue, double dVal);
+bool DDraw_HSV_S(CDibEx const& dibDest, double dHue, double dVal);
+
+bool DDraw_HSV_V(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dHue, double dSaturation);
+bool DDraw_HSV_V(CDibEx const& dibDest, double dHue, double dSaturation);

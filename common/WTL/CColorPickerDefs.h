@@ -80,6 +80,13 @@ struct CColorUnion
     BYTE& GetBlue();
     BYTE& GetAlpha();
 
+    COLORREF GetRedFirst() const;
+    COLORREF GetRedLast() const;
+    COLORREF GetGreenFirst() const;
+    COLORREF GetGreenLast() const;
+    COLORREF GetBlueFirst() const;
+    COLORREF GetBlueLast() const;
+
 private:
     void SetRGBPlain(int R, int G, int B);
 };
@@ -115,3 +122,10 @@ inline BYTE&    CColorUnion::GetRed() { return m_Comp.RGB.m_btRed; }
 inline BYTE&  CColorUnion::GetGreen() { return m_Comp.RGB.m_btGreen; }
 inline BYTE&   CColorUnion::GetBlue() { return m_Comp.RGB.m_btBlue; }
 inline BYTE&  CColorUnion::GetAlpha() { return m_Comp.RGB.m_btAlpha; }
+
+inline COLORREF   CColorUnion::GetRedFirst() const { return RGB(       0, GetGreen(), GetBlue()); }
+inline COLORREF    CColorUnion::GetRedLast() const { return RGB(     255, GetGreen(), GetBlue()); }
+inline COLORREF CColorUnion::GetGreenFirst() const { return RGB(GetRed(),          0, GetBlue()); }
+inline COLORREF  CColorUnion::GetGreenLast() const { return RGB(GetRed(),        255, GetBlue()); }
+inline COLORREF  CColorUnion::GetBlueFirst() const { return RGB(GetRed(), GetGreen(),         0); }
+inline COLORREF   CColorUnion::GetBlueLast() const { return RGB(GetRed(), GetGreen(),       255); }

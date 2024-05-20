@@ -19,7 +19,7 @@ struct CSpectrumSlider: CCustomControl<CSpectrumSlider, WTL::CSliderCtrl>
     CSpectrumSlider();
 
     bool Initialize(CSpectrumImage& imSpectrum);
-    void UpdateRaster(SpectrumKind spKind);
+    void UpdateRaster(SpectrumKind spKind, CColorUnion const& unColor);
 
 private:
     friend Super;
