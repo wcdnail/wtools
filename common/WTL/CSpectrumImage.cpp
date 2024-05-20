@@ -51,9 +51,9 @@ void CSpectrumImage::OnSliderChanged(long nPos)
 void CSpectrumImage::OnColorChanged(long xPos, long yPos)
 {
     switch (m_SpectrumKind) {
-    case SPEC_RGB_Red:          break;
-    case SPEC_RGB_Green:        break;
-    case SPEC_RGB_Blue:         break;
+    case SPEC_RGB_Red:          m_Color.SetRGB(m_Color.GetRed(), xPos, yPos); break;
+    case SPEC_RGB_Green:        m_Color.SetRGB(xPos, m_Color.GetGreen(), yPos); break;
+    case SPEC_RGB_Blue:         m_Color.SetRGB(xPos, yPos, m_Color.GetBlue()); break;
     case SPEC_HSV_Hue:          m_Color.SetHSV(m_Color.m_dH, xPos / 255.0 * 100.0, (255 - yPos) / 255.0 * 100.0); break;
     case SPEC_HSV_Saturation:   break;
     case SPEC_HSV_Brightness:   break;
@@ -87,6 +87,8 @@ BOOL CSpectrumImage::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_HSCROLL(OnWMScroll)
+        MSG_WM_VSCROLL(OnWMScroll)
         break;
     default:
         ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
@@ -162,8 +164,8 @@ void CSpectrumImage::OnMouseMove(UINT, CPoint point)
     }
     CRect rcClient;
     GetClientRect(rcClient);
-    auto const xScale{static_cast<float>(rcClient.Width()) / 255.f};
-    auto const yScale{static_cast<float>(rcClient.Height()) / 255.f};
+    auto const xScale{static_cast<float>(rcClient.Width()) / static_cast<float>(SPECTRUM_CLR_RANGE)};
+    auto const yScale{static_cast<float>(rcClient.Height()) / static_cast<float>(SPECTRUM_CLR_RANGE)};
     auto const   xVal{static_cast<int>(static_cast<float>(point.x - rcClient.left) / xScale)};
     auto const   yVal{static_cast<int>(static_cast<float>(point.y - rcClient.top) / yScale)};
     m_ptSel = point;
@@ -181,4 +183,9 @@ void CSpectrumImage::OnLButtonDown(UINT, CPoint point)
     SetFocus();
     SetCapture();
     m_bCapture = true;
+}
+
+void CSpectrumImage::OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar pScrollBar)
+{
+    ATLTRACE(L">>> %d %d %p\n", nSBCode, nPos, pScrollBar.m_hWnd);
 }

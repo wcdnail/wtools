@@ -41,7 +41,7 @@ private:
     int OnCreate(LPCREATESTRUCT pCS);
     CRect GetRatserRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const;
     CRect GetThumbRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const;
-    void DrawRasterChannel(NMCUSTOMDRAW const& nmcd);
+    void DrawRasterChannel(NMCUSTOMDRAW const& nmcd, DWORD dwStyle);
     LRESULT OnCustomDraw(LPNMHDR pNMHDR);
     void OnLButtonDown(UINT nFlags, CPoint point);
     void OnLButtonUp(UINT nFlags, CPoint point);

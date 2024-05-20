@@ -18,17 +18,20 @@ enum SpectrumKind: int
 enum CCPMiscConsts: int
 {
     SPECTRUM_BPP        = 32,
+    SPECTRUM_CLR_RANGE  = 255,
     SPEC_BITMAP_WDTH    = 64,
     SPECTRUM_CX         = SPEC_BITMAP_WDTH,
     SPECTRUM_CY         = SPEC_BITMAP_WDTH,
     SPECTRUM_SLIDER_CX  = SPEC_BITMAP_WDTH,
     SPECTRUM_SLIDER_MIN = 0,
-    SPECTRUM_SLIDER_MAX = 255,
+    SPECTRUM_SLIDER_MAX = SPECTRUM_CLR_RANGE,
     SPECTRUM_CHANNEL_CX = 24,
     SPECTRUM_CHANNEL_CY = 32,
 
     NM_SPECTRUM_CLR_SEL = 1917,
 };
+
+static_assert(SPECTRUM_BPP == 32, "SPECTRUM_BPP must always be 32!");
 
 struct CSpectrumImage;
 struct CSpectrumSlider;
@@ -68,22 +71,33 @@ struct CColorUnion
 
     void SetHue(double dHue);
     void SetHSV(double dH, double dS, double dV);
+
+    BYTE GetRed() const;
+    BYTE GetGreen() const;
+    BYTE GetBlue() const;
+    BYTE GetAlpha() const;
+
+    BYTE& GetRed();
+    BYTE& GetGreen();
+    BYTE& GetBlue();
+    BYTE& GetAlpha();
+
+private:
+    void SetRGBPlain(int R, int G, int B);
 };
 
-inline bool CColorUnion::IsUpdated() const
-{
-    return m_bUpdated;
-}
+inline bool CColorUnion::IsUpdated() const { return m_bUpdated; }
+inline void CColorUnion::SetUpdated(bool bUpdated) { m_bUpdated = bUpdated; }
 
-inline void CColorUnion::SetUpdated(bool bUpdated)
+inline void CColorUnion::SetRGBPlain(int R, int G, int B)
 {
-    m_bUpdated = bUpdated;
+    m_Comp.Color = RGB(R, G, B);
 }
 
 inline void CColorUnion::SetRGB(int R, int G, int B)
 {
-    m_Comp.Color = RGB(R, G, B);
-    SetUpdated(true);
+    SetRGBPlain(R, G, B);
+    UpdateHSV();
 }
 
 inline void CColorUnion::SetHue(double dHue)
@@ -100,4 +114,11 @@ inline void CColorUnion::SetHSV(double dH, double dS, double dV)
     UpdateRGB();
 }
 
-static_assert(SPECTRUM_BPP == 32, "SPECTRUM_BPP must always be 32!");
+inline BYTE     CColorUnion::GetRed() const { return m_Comp.RGB.m_btRed; }
+inline BYTE   CColorUnion::GetGreen() const { return m_Comp.RGB.m_btGreen; }
+inline BYTE    CColorUnion::GetBlue() const { return m_Comp.RGB.m_btBlue; }
+inline BYTE   CColorUnion::GetAlpha() const { return m_Comp.RGB.m_btAlpha; }
+inline BYTE&    CColorUnion::GetRed() { return m_Comp.RGB.m_btRed; }
+inline BYTE&  CColorUnion::GetGreen() { return m_Comp.RGB.m_btGreen; }
+inline BYTE&   CColorUnion::GetBlue() { return m_Comp.RGB.m_btBlue; }
+inline BYTE&  CColorUnion::GetAlpha() { return m_Comp.RGB.m_btAlpha; }

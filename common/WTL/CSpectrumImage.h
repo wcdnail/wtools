@@ -40,14 +40,14 @@ private:
     BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 
     void UpdateRaster();
+    void DrawMarker(WTL::CDCHandle dc);
 
     int OnCreate(LPCREATESTRUCT pCS);
     void OnPaint(WTL::CDCHandle dc);
     void OnLButtonDown(UINT nFlags, CPoint point);
     void OnLButtonUp(UINT nFlags, CPoint point);
     void OnMouseMove(UINT nFlags, CPoint point);
-
-    void DrawMarker(WTL::CDCHandle dc);
+    void OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar pScrollBar);
 };
 
 inline SpectrumKind CSpectrumImage::GetSpectrumKind() const

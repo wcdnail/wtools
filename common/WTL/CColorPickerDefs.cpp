@@ -1,23 +1,6 @@
 #include "stdafx.h"
 #include "CColorPickerDefs.h"
-
-CColorUnion::~CColorUnion() = default;
-
-CColorUnion::CColorUnion(double dH, double dS, double dV)
-    :       m_dH{dH}
-    ,       m_dS{dS}
-    ,       m_dV{dV}
-    , m_bUpdated{false}
-{
-    UpdateRGB();
-}
-
-CColorUnion::CColorUnion(COLORREF crInitial)
-    : CColorUnion{0., 0., 100.}
-{
-    m_Comp.Color = crInitial;
-    UpdateHSV();
-}
+#include <dh.tracing.h>
 
 template <typename T>
 constexpr T Max3(T a, T b, T c)
@@ -31,6 +14,24 @@ constexpr T Min3(T a, T b, T c)
     return a < b ? (a < c ? a : c) : (b < c ? b : c);
 }
 
+CColorUnion::~CColorUnion() = default;
+
+CColorUnion::CColorUnion(double dH, double dS, double dV)
+    :       m_dH{dH}
+    ,       m_dS{dS}
+    ,       m_dV{dV}
+    , m_bUpdated{true}
+{
+    UpdateRGB();
+}
+
+CColorUnion::CColorUnion(COLORREF crInitial)
+    : CColorUnion{0., 0., 100.}
+{
+    m_Comp.Color = crInitial;
+    UpdateHSV();
+}
+
 void CColorUnion::UpdateRGB()
 {
     int             R{0xff};
@@ -40,12 +41,13 @@ void CColorUnion::UpdateRGB()
     double const dVal{m_dV / 100.};
     if (0 == m_dS) {
         R = B = G = static_cast<int>(255. * dVal);
-        SetRGB(R, G, B);
+        SetRGBPlain(R, G, B);
         return;
     }
     auto const base{static_cast<int>(255. * (1.0 - dSat) * dVal)};
+    auto const inth{static_cast<int>(m_dH / 60.)};
     auto const frac{static_cast<int>(m_dH) % 60};
-    switch (static_cast<int>(m_dH / 60.)) {
+    switch (inth) {
     case 0:
         R = static_cast<int>(255.0 * dVal);
         G = static_cast<int>((255.0 * dVal - base) * (m_dH / 60.) + base);
@@ -76,8 +78,13 @@ void CColorUnion::UpdateRGB()
         G = base;
         B = static_cast<int>((255. * dVal - base) * (1. - (frac / 60.)) + base);
         break;
+    default:
+        DH::TPrintf(L"%s: NO valid case for %d\n", __FUNCTIONW__, inth);
+        ATLASSERT(false);
+        return;
     }
-    SetRGB(R, G, B);
+    SetRGBPlain(R, G, B);
+    SetUpdated(true);
 }
 
 void CColorUnion::UpdateHSV()
