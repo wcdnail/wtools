@@ -210,41 +210,41 @@ void DDrawRGBSpectrum(CDibEx const& dibDest, CRGBSpecRect&& color)
 
 void DDrawRGBSpectrum(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, CRGBSpecRect&& clrRect)
 {
-    int              left_red{ScaleRed(clrRect.crLB)};
-    int            left_green{ScaleGreen(clrRect.crLB)};
-    int             left_blue{ScaleBlue(clrRect.crLB)};
-    int const    left_red_adv{(ScaleRed(clrRect.crLT) - left_red) / nHeight};
-    int const  left_green_adv{(ScaleGreen(clrRect.crLT) - left_green) / nHeight};
-    int const   left_blue_adv{(ScaleBlue(clrRect.crLT) - left_blue) / nHeight};
+    int            lbRed{ScaleRed(clrRect.crLB)};
+    int          lbGreen{ScaleGreen(clrRect.crLB)};
+    int           lbBlue{ScaleBlue(clrRect.crLB)};
+    int const   ltRedInc{(ScaleRed(clrRect.crLT) - lbRed) / nHeight};
+    int const ltGreenInc{(ScaleGreen(clrRect.crLT) - lbGreen) / nHeight};
+    int const  ltBlueInc{(ScaleBlue(clrRect.crLT) - lbBlue) / nHeight};
 
-    int             right_red{ScaleRed(clrRect.crRB)};
-    int           right_green{ScaleGreen(clrRect.crRB)};
-    int            right_blue{ScaleBlue(clrRect.crRB)};
-    int const   right_red_adv{(ScaleRed(clrRect.crRT) - right_red) / nHeight};
-    int const right_green_adv{(ScaleGreen(clrRect.crRT) - right_green) / nHeight};
-    int const  right_blue_adv{(ScaleBlue(clrRect.crRT) - right_blue) / nHeight};
+    int            rbRed{ScaleRed(clrRect.crRB)};
+    int          rbGreen{ScaleGreen(clrRect.crRB)};
+    int           rbBlue{ScaleBlue(clrRect.crRB)};
+    int const   rtRedInc{(ScaleRed(clrRect.crRT) - rbRed) / nHeight};
+    int const rtGreenInc{(ScaleGreen(clrRect.crRT) - rbGreen) / nHeight};
+    int const  rtBlueInc{(ScaleBlue(clrRect.crRT) - rbBlue) / nHeight};
 
-    int const         red_adv{(right_red - left_red) / nWidth};
-    int const       green_adv{(right_green - left_green) / nWidth};
-    int const        blue_adv{(right_blue - left_blue) / nWidth};
-    int const           nSkip{static_cast<int>(nLinePitch) - nWidth};
+    int const      nSkip{static_cast<int>(nLinePitch) - nWidth};
 
     for (int i = 0; i < nHeight; i++) {
-        int   red{left_red};
-        int green{left_green};
-        int  blue{left_blue};
+        int                R{lbRed};
+        int                G{lbGreen};
+        int                B{lbBlue};
+        int const    nRedInc{(rbRed - R) / nWidth};
+        int const  nGreenInc{(rbGreen - G) / nWidth};
+        int const   nBlueInc{(rbBlue - B) / nWidth};
         for (int j = 0; j < nWidth; j++) {
-            *pDest++ = RGB(blue >> IntMult, green >> IntMult, red >> IntMult);
-            red += red_adv;
-            green += green_adv;
-            blue += blue_adv;
+            *pDest++ = RGB(B >> IntMult, G >> IntMult, R >> IntMult);
+            R += nRedInc;
+            G += nGreenInc;
+            B += nBlueInc;
         }
-        left_red += left_red_adv;
-        left_green += left_green_adv;
-        left_blue += left_blue_adv;
-        right_red += right_red_adv;
-        right_green += right_green_adv;
-        right_blue += right_blue_adv;
+        lbRed += ltRedInc;
+        lbGreen += ltGreenInc;
+        lbBlue += ltBlueInc;
+        rbRed += rtRedInc;
+        rbGreen += rtGreenInc;
+        rbBlue += rtBlueInc;
         pDest += nSkip;
     }
 }
