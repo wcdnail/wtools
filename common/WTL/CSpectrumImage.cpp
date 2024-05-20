@@ -12,12 +12,12 @@ ATOM& CSpectrumImage::GetWndClassAtomRef()
 
 CSpectrumImage::~CSpectrumImage() = default;
 
-CSpectrumImage::CSpectrumImage()
+CSpectrumImage::CSpectrumImage(COLORREF crInit, SpectrumKind kind)
     :  m_bMsgHandled{FALSE}
     ,          m_Dib{}
-    ,        m_Color{RGB(0xff, 0, 0)}
+    ,        m_Color{crInit}
     ,        m_ptSel{0, 0}
-    , m_SpectrumKind{SPEC_HSV_Hue}
+    , m_SpectrumKind{kind}
     ,    m_pimSlider{nullptr}
     ,     m_pstColor{nullptr}
 {

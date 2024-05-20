@@ -64,7 +64,6 @@ private:
     CSpectrumSlider  m_imSlider;
     WTL::CStatic      m_stColor;
     int         m_nSpectrumKind;
-    int                m_nSlide;
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,             X,             Y,          Width,        Height, Style...
         CONTROL_GROUPBOX(   _T("Spectrum Color"),        CID_GRP_SPECTRUM,                       4,             4,         HDlgCX,       DlgCY-8, 0, 0)
@@ -86,7 +85,6 @@ private:
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
-        DDX_INDEX(WTL::CSliderCtrl, CID_SPECTRUM_SLD, m_nSlide);
         OnDDXChanges(nCtlID);
     END_DDX_MAP()
 
@@ -123,11 +121,10 @@ private:
 CColorPicker::Impl::~Impl() = default;
 
 CColorPicker::Impl::Impl()
-    :    m_imSpectrum{}
+    :    m_imSpectrum{0xffffff, SPEC_HSV_Hue}
     ,      m_imSlider{}
     ,       m_stColor{}
-    , m_nSpectrumKind{SPEC_RGB_Red}
-    ,        m_nSlide{0}
+    , m_nSpectrumKind{SPEC_HSV_Hue}
     ,   m_bMsgHandled{FALSE}
 {
 }

@@ -13,7 +13,7 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
     DECLARE_WND_SUPERCLASS2(CSPECIMG_CLASS, CSpectrumImage, nullptr)
 
     ~CSpectrumImage() override;
-    CSpectrumImage();
+    CSpectrumImage(COLORREF crInit, SpectrumKind kind);
 
     bool Initialize(CSpectrumSlider& imSlider, WTL::CStatic& stColor, long cx = SPECTRUM_CX, long cy = SPECTRUM_CY);
     COLORREF GetColorRef() const;
