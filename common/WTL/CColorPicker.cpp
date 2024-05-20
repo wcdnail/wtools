@@ -55,6 +55,12 @@ private:
         CID_SPECTRUM_PIC,
         CID_SPECTRUM_SLD,
         CID_GRP_RGB,
+        CID_RGB_RED_CAP,
+        CID_RGB_RED_VAL,
+        CID_RGB_GREEN_CAP,
+        CID_RGB_GREEN_VAL,
+        CID_RGB_BLUE_CAP,
+        CID_RGB_BLUE_VAL,
         CID_GRP_HSL,
         CID_GRP_HSV,
         CID_GRP_PICKER,
@@ -73,6 +79,12 @@ private:
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS, CC_CHILD,            16,       24+HLCY, HDlgCX-HHCY-32, DlgCY-HLCY-36, WS_EX_STATICEDGE)
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD, _T("msctls_trackbar32"),  TB_VERT, HDlgCX-HHCY-8,       18+HHCY,      HHCX/2-12, DlgCY-HHCY-30, 0)
         CONTROL_GROUPBOX(        _T("RGB Color"),             CID_GRP_RGB,              8+HDlgCX+4,             4,         HDlgCX,       HDlg3CY, 0, 0)
+            CONTROL_RTEXT(            _T("Red:"),         CID_RGB_RED_CAP,              8+HDlgCX+8,     HLCY*0+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
+            CONTROL_CTEXT(         _T("THE RED"),         CID_RGB_RED_VAL,        HDlgCX+12+HHCX/2,     HLCY*0+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, WS_EX_STATICEDGE)
+            CONTROL_RTEXT(          _T("Green:"),       CID_RGB_GREEN_CAP,              8+HDlgCX+8,     HLCY*1+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
+            CONTROL_CTEXT(       _T("THE GREEN"),       CID_RGB_GREEN_VAL,        HDlgCX+12+HHCX/2,     HLCY*1+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, WS_EX_STATICEDGE)
+            CONTROL_RTEXT(           _T("Blue:"),        CID_RGB_BLUE_CAP,              8+HDlgCX+8,     HLCY*2+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
+            CONTROL_CTEXT(        _T("THE BLUE"),        CID_RGB_BLUE_VAL,        HDlgCX+12+HHCX/2,     HLCY*2+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, WS_EX_STATICEDGE)
         CONTROL_GROUPBOX(        _T("HSL Color"),             CID_GRP_HSL,              8+HDlgCX+4,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
         CONTROL_GROUPBOX(        _T("HSV Color"),             CID_GRP_HSV,     8+HDlgCX+HDlgCX/2+8,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
         CONTROL_GROUPBOX(     _T("Color Picker"),          CID_GRP_PICKER,              8+HDlgCX+4, 4+HDlg3CY*2+8,         HDlgCX,     HDlg3CY+8, 0, 0)
@@ -84,6 +96,9 @@ private:
     END_DIALOG()
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
+        DDX_INT(CID_RGB_RED_VAL, m_imSpectrum.GetColorUnion().GetRed());
+        DDX_INT(CID_RGB_GREEN_VAL, m_imSpectrum.GetColorUnion().GetGreen());
+        DDX_INT(CID_RGB_BLUE_VAL, m_imSpectrum.GetColorUnion().GetBlue());
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
         OnDDXChanges(nCtlID);
     END_DDX_MAP()
@@ -96,6 +111,12 @@ private:
         DLGRESIZE_CONTROL(CID_SPECTRUM_PIC, DLSZ_SIZE_Y | DLSZ_SIZE_X)
         DLGRESIZE_CONTROL(CID_SPECTRUM_SLD, DLSZ_SIZE_Y | DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_RGB, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_RED_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_RED_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_GREEN_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_GREEN_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_BLUE_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_BLUE_VAL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSV, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_PICKER, DLSZ_SIZE_Y | DLSZ_MOVE_X)

@@ -202,7 +202,7 @@ LRESULT CSpectrumSlider::OnCustomDraw(LPNMHDR pNMHDR)
                 CRect       rcThumb{GetThumbRect(dwStyle, nmcd, rcClient)};
                 WTL::CDCHandle   dc{nmcd.hdc};
                 const int   iSaveDC{dc.SaveDC()};
-                //dc.FrameRect(rcThumb, WTL::AtlGetStockBrush(BLACK_BRUSH));
+                dc.FrameRect(rcThumb, WTL::AtlGetStockBrush(BLACK_BRUSH));
                 dc.InvertRect(rcThumb);
                 dc.RestoreDC(iSaveDC);
                 InvalidateRect(nullptr, FALSE);

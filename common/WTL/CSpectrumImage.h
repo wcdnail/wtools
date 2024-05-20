@@ -18,6 +18,7 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
     bool Initialize(CSpectrumSlider& imSlider, WTL::CStatic& stColor, long cx = SPECTRUM_CX, long cy = SPECTRUM_CY);
     COLORREF GetColorRef() const;
     CRGBSpecRect GetRGBSpectrumRect() const;
+    CColorUnion& GetColorUnion();
     void SetSpectrumKind(SpectrumKind kind);
     SpectrumKind GetSpectrumKind() const;
     void OnSliderChanged(long nPos);
@@ -62,4 +63,9 @@ inline SpectrumKind CSpectrumImage::GetSpectrumKind() const
 inline COLORREF CSpectrumImage::GetColorRef() const
 {
     return m_Color.GetColorRef();
+}
+
+inline CColorUnion& CSpectrumImage::GetColorUnion()
+{
+    return m_Color;
 }
