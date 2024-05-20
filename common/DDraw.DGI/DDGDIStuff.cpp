@@ -171,6 +171,10 @@ constexpr void HSV_HUE_Violet_To_Crimson(DWORD*& pDest, int nRange, int nVal, in
 
 void DDrawHSVSatLine(DWORD* pDest, int nWidth, double dSaturation, double dVal)
 {
+    if (nWidth <= 0) {
+        // TODO: report nWidth - INVAL
+        return ;
+    }
     using PLineRoutine = void(*)(DWORD*&, int, int, int, double);
     static constexpr PLineRoutine gsLineRoutine[]{
         HSV_HUE_Red_To_Yellow,
@@ -195,6 +199,31 @@ void DDrawHSVSatLine(DWORD* pDest, int nWidth, double dSaturation, double dVal)
         }
         gsLineRoutine[i](pDest, nRange, nVal, nCoef, dSaturation);
     }
+}
+
+void DDrawHSVSatSpectrum(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dSaturation)
+{
+    if (nHeight <= 0) {
+        // TODO: report nHeight - INVAL
+        return ;
+    }
+    double     dValue{0.0};
+    const double dAdv{1.0 / nHeight};
+    for (int i = 0; i<nHeight; i++) {
+        DDrawHSVSatLine(pDest, nWidth, dSaturation, dValue);
+        dValue += dAdv;
+        pDest += nLinePitch;
+    }
+}
+
+void DDrawHSVSatSpectrum(CDibEx const& dibDest, double dSaturation)
+{
+    ATLASSUME(dibDest.GetBitCount() == 32);
+    DDrawHSVSatSpectrum(reinterpret_cast<DWORD*>(dibDest.GetData()),
+        dibDest.GetWidth(),
+        dibDest.GetHeight(),
+        dibDest.GetStride() / sizeof(DWORD),
+        dSaturation);
 }
 
 void DDrawRGBSpectrum(CDibEx const& dibDest, CRGBSpecRect&& color)

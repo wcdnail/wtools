@@ -4,6 +4,12 @@
 #include <DDraw.DGI/DDGDIStuff.h>
 #include <rect.putinto.h>
 
+ATOM& CSpectrumImage::GetWndClassAtomRef()
+{
+    static ATOM gs_CSpectrumImage_Atom{0};
+    return gs_CSpectrumImage_Atom;
+}
+
 CSpectrumImage::~CSpectrumImage() = default;
 
 CSpectrumImage::CSpectrumImage()
@@ -97,13 +103,6 @@ CRGBSpecRect CSpectrumImage::GetRGBSpectrumRect() const
     return result;
 }
 
-
-ATOM& CSpectrumImage::GetWndClassAtomRef()
-{
-    static ATOM gs_CSpectrumImage_Atom{0};
-    return gs_CSpectrumImage_Atom;
-}
-
 BOOL CSpectrumImage::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
     BOOL const bSave{m_bMsgHandled};
@@ -116,7 +115,7 @@ BOOL CSpectrumImage::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 {
     BOOL bHandled{TRUE};
     UNREFERENCED_PARAMETER(hWnd);
-    switch(dwMsgMapID) { 
+    switch(dwMsgMapID) {
     case 0:
         MSG_WM_CREATE(OnCreate)
         MSG_WM_PAINT(OnPaint)
@@ -146,8 +145,8 @@ void CSpectrumImage::UpdateRaster()
     case SPEC_RGB_Green:
     case SPEC_RGB_Blue:         DDrawRGBSpectrum(m_Dib, GetRGBSpectrumRect()); break;
     case SPEC_HSV_Hue:          DDrawHSVHueSpectrum(m_Dib, m_Color.m_dH); break;
-    case SPEC_HSV_Saturation:   break;
-    case SPEC_HSV_Brightness:   break;
+    case SPEC_HSV_Saturation:   DDrawHSVSatSpectrum(m_Dib, m_Color.m_dS * 0.01); break;
+    case SPEC_HSV_Brightness:   DDrawHSVSatSpectrum(m_Dib, m_Color.m_dV * 0.01); break;
     default: break;
     }
     if (m_pimSlider) {

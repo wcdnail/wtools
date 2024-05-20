@@ -71,7 +71,7 @@ private:
         CONTROL_COMBOBOX(                                  CID_SPEC_COMBO,                      16,            18,         HHCX-8,       DlgCY-8, CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP, 0)
         CONTROL_RTEXT(              _T("Color:"),      CID_SPEC_COLOR_CAP,    HDlgCX-HHCY-HHCX/2-8,            18,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
         CONTROL_CTEXT(               _T("COLOR"),      CID_SPEC_COLOR_SEL,           HDlgCX-HHCY-8,            18,         HHCY+2,        HHCY-2, SS_SUNKEN | SS_CENTERIMAGE | SS_OWNERDRAW, WS_EX_STATICEDGE)
-        CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS, CC_CHILD,            16,       24+HLCY, HDlgCX-HHCY-32, DlgCY-HLCY-36, 0)
+        CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS, CC_CHILD,            16,       24+HLCY, HDlgCX-HHCY-32, DlgCY-HLCY-36, WS_EX_STATICEDGE)
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD, _T("msctls_trackbar32"),  TB_VERT, HDlgCX-HHCY-8,       18+HHCY,      HHCX/2-12, DlgCY-HHCY-30, 0)
         CONTROL_GROUPBOX(        _T("RGB Color"),             CID_GRP_RGB,              8+HDlgCX+4,             4,         HDlgCX,       HDlg3CY, 0, 0)
         CONTROL_GROUPBOX(        _T("HSL Color"),             CID_GRP_HSL,              8+HDlgCX+4,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)

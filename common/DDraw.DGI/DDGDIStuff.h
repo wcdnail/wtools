@@ -20,5 +20,8 @@ void DDrawHSVSatLine(DWORD* pDest, int nWidth, double dSaturation, double dVal);
 bool DDrawHSVSatGradient(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dSaturation, double dVal);
 bool DDrawHSVSatGradient(CDibEx const& dibDest, double dSaturation, double dVal);
 
+void DDrawHSVSatSpectrum(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, double dSaturation);
+void DDrawHSVSatSpectrum(CDibEx const& dibDest, double dSaturation);
+
 void DDrawRGBSpectrum(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, CRGBSpecRect&& color);
 void DDrawRGBSpectrum(CDibEx const& dibDest, CRGBSpecRect&& color);
