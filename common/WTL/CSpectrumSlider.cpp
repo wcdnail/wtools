@@ -73,8 +73,6 @@ BOOL CSpectrumSlider::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam,
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
-        MSG_WM_HSCROLL(OnWMScroll)
-        MSG_WM_VSCROLL(OnWMScroll)
         REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
         NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
     ALT_MSG_MAP(1)
@@ -104,7 +102,7 @@ CRect CSpectrumSlider::GetRatserRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CR
         if (dwStyle & TBS_NOTHUMB) {
             rcRast.left = rcClient.left;
             rcRast.right = rcClient.right;
-            rcRast.DeflateRect(5, 1);
+            rcRast.DeflateRect(2, 0);
         }
         else {
             rcRast.right = rcClient.right - 8;
@@ -168,7 +166,12 @@ CRect CSpectrumSlider::GetThumbRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRe
     if (dwStyle & TBS_VERT) {
         rcThumb.left = rcClient.left;
         rcThumb.right = rcClient.right;
-        rcThumb.DeflateRect(6, 1);
+        if (dwStyle & TBS_NOTHUMB) {
+            rcThumb.DeflateRect(3, 1);
+        }
+        else {
+            rcThumb.DeflateRect(6, 1);
+        }
     }
     else {
         rcThumb.top = rcClient.top + 8;
@@ -277,7 +280,6 @@ void CSpectrumSlider::OnLButtonDown(UINT, CPoint pt)
         return;
     }
     if (!m_bCapture) {
-        SetFocus();
         SetCapture();
         m_bCapture = true;
     }
@@ -285,9 +287,4 @@ void CSpectrumSlider::OnLButtonDown(UINT, CPoint pt)
         ReleaseCapture();
         m_bCapture = false;
     }
-}
-
-void CSpectrumSlider::OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar ctlScrollBar)
-{
-    ATLTRACE(L">>> %d %d %p\n", nSBCode, nPos, ctlScrollBar.m_hWnd);
 }

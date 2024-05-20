@@ -47,5 +47,4 @@ private:
     void OnLButtonDown(UINT nFlags, CPoint pt);
     void OnLButtonUp(UINT nFlags, CPoint point);
     void OnMouseMove(UINT nFlags, CPoint pt);
-    void OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar ctlScrollBar);
 };

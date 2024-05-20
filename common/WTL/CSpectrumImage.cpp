@@ -253,7 +253,6 @@ void CSpectrumImage::OnMouseMove(UINT, CPoint pt)
 void CSpectrumImage::OnLButtonDown(UINT, CPoint)
 {
     if (GetCapture() != m_hWnd) {
-        SetFocus();
         SetCapture();
     }
 }

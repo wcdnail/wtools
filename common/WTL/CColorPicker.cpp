@@ -106,6 +106,8 @@ private:
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_DRAWITEM(OnDrawItem)
+        MSG_WM_HSCROLL(OnWMScroll)
+        MSG_WM_VSCROLL(OnWMScroll)
         CHAIN_MSG_MAP(ImplResizer)
         REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
@@ -116,6 +118,7 @@ private:
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
     void OnSpecComboChanged();
+    void OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar ctlScrollBar);
 };
 
 CColorPicker::Impl::~Impl() = default;
@@ -256,7 +259,14 @@ void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
 void CColorPicker::Impl::OnSpecComboChanged()
 {
     m_imSpectrum.SetSpectrumKind(static_cast<SpectrumKind>(m_nSpectrumKind));
-    m_imSpectrum.SetFocus();
+}
+
+void CColorPicker::Impl::OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar ctlScrollBar)
+{
+    if (ctlScrollBar.m_hWnd == m_imSlider.m_hWnd) {
+        m_imSpectrum.OnSliderChanged(nPos);
+        m_stColor.InvalidateRect(nullptr, FALSE);
+    }
 }
 
 CColorPicker::~CColorPicker() = default;
