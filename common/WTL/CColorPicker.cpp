@@ -87,9 +87,7 @@ private:
     BEGIN_DDX_MAP(CSpectrumColorPicker)
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
         DDX_INDEX(WTL::CSliderCtrl, CID_SPECTRUM_SLD, m_nSlide);
-        if (!bSaveAndValidate) {
-            OnDDXChanges(nCtlID);
-        }
+        OnDDXChanges(nCtlID);
     END_DDX_MAP()
 
     BEGIN_DLGRESIZE_MAP(CTatorMainDlg)
@@ -157,12 +155,12 @@ void CColorPicker::Impl::OnDDXChanges(int nID)
 
 LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
 {
-    UNREFERENCED_PARAMETER(nID);
-    UNREFERENCED_PARAMETER(pnmh);
     switch (pnmh->code) {
     case NM_CUSTOMDRAW:
-      //LPNMCUSTOMDRAW nmcd{reinterpret_cast<LPNMCUSTOMDRAW>(pnmh)};
-      //DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s >> %05x\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code), nmcd->dwDrawStage);
+        if constexpr (false) {
+            LPNMCUSTOMDRAW nmcd{reinterpret_cast<LPNMCUSTOMDRAW>(pnmh)};
+            DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s >> %05x\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code), nmcd->dwDrawStage);
+        }
         SetMsgHandled(FALSE);
         return 0;
     case TRBN_THUMBPOSCHANGING:
@@ -192,12 +190,24 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
     return 0;
 }
 
-void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/)
 {
-    UNREFERENCED_PARAMETER(uNotifyCode);
-    UNREFERENCED_PARAMETER(nID);
-    UNREFERENCED_PARAMETER(wndCtl);
-    DBGTPrint(LTH_WM_COMMAND L" id:%-4d nc:%-4d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+    switch (uNotifyCode) {
+    case BN_UNHILITE:
+    case BN_PAINT:
+    case BN_DISABLE:
+    case BN_KILLFOCUS:
+        break;
+    case CBN_SELENDOK:
+        DoDataExchange(TRUE, nID);
+        return ;
+    case CBN_SELENDCANCEL:
+    case CBN_CLOSEUP:
+        return ;
+    default:
+        DBGTPrint(LTH_WM_COMMAND L" id:%-4d nc:%-4d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+        break;
+    }
     SetMsgHandled(FALSE);
 }
 
@@ -247,6 +257,7 @@ void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
 void CColorPicker::Impl::OnSpecComboChanged()
 {
     m_imSpectrum.SetSpectrumKind(static_cast<SpectrumKind>(m_nSpectrumKind));
+    m_imSpectrum.SetFocus();
 }
 
 CColorPicker::~CColorPicker() = default;

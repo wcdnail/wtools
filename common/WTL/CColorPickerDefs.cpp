@@ -84,7 +84,6 @@ void CColorUnion::UpdateRGB()
         return;
     }
     SetRGBPlain(R, G, B);
-    SetUpdated(true);
 }
 
 void CColorUnion::UpdateHSV()

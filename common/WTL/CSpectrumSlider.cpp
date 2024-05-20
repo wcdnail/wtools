@@ -25,7 +25,7 @@ bool CSpectrumSlider::Initialize(CSpectrumImage& imSpectrum)
         return false;
     }
     m_pimSpectrum = &imSpectrum;
-    SetRange(SPECTRUM_SLIDER_MIN, SPECTRUM_SLIDER_MAX, FALSE);
+    SetRange(SPECTRUM_SLIDER_MIN, SPECTRUM_SLIDER_MAX, TRUE);
     return true;
 }
 
@@ -67,6 +67,8 @@ BOOL CSpectrumSlider::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam,
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_HSCROLL(OnWMScroll)
+        MSG_WM_VSCROLL(OnWMScroll)
         REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
         NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
     ALT_MSG_MAP(1)
@@ -261,4 +263,9 @@ void CSpectrumSlider::OnLButtonDown(UINT, CPoint point)
     SetFocus();
     SetCapture();
     m_bCapture = true;
+}
+
+void CSpectrumSlider::OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar ctlScrollBar)
+{
+    ATLTRACE(L">>> %d %d %p\n", nSBCode, nPos, ctlScrollBar.m_hWnd);
 }

@@ -91,4 +91,22 @@ namespace Rc
         rc.top    += yShrink;
         rc.bottom -= yShrink;
     }
+
+    inline CPoint BoundingPoint(CRect const& rc, CPoint const& pt)
+    {
+        CPoint temp{pt};
+        if (temp.x < rc.left) {
+            temp.x = rc.left;
+        }
+        else if (temp.x > rc.right) {
+            temp.x = rc.right;
+        }
+        if (temp.y < rc.top) {
+            temp.y = rc.top;
+        }
+        else if (temp.y > rc.bottom) {
+            temp.y = rc.bottom;
+        }
+        return temp;
+    }
 }

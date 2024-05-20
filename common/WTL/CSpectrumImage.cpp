@@ -2,6 +2,7 @@
 #include "CSpectrumImage.h"
 #include "CSpectrumSlider.h"
 #include <DDraw.DGI/DDGDIStuff.h>
+#include <rect.putinto.h>
 
 CSpectrumImage::~CSpectrumImage() = default;
 
@@ -87,8 +88,6 @@ BOOL CSpectrumImage::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
-        MSG_WM_HSCROLL(OnWMScroll)
-        MSG_WM_VSCROLL(OnWMScroll)
         break;
     default:
         ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
@@ -131,7 +130,7 @@ void CSpectrumImage::OnPaint(WTL::CDCHandle /*dc*/)
     WTL::CPaintDC const   dcPaint{m_hWnd};
     WTL::CDCHandle             dc{dcPaint.m_hDC};
     const WTL::CDCHandle dcSource{m_Dib.GetDC(dc)};
-    CRect const&           rcDest{dcPaint.m_ps.rcPaint};
+    CRect const            rcDest{dcPaint.m_ps.rcPaint};
 
     dc.StretchBlt(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(),
         dcSource, 0, 0, m_Dib.GetWidth(), m_Dib.GetHeight(), SRCCOPY);
@@ -139,13 +138,13 @@ void CSpectrumImage::OnPaint(WTL::CDCHandle /*dc*/)
     DrawMarker(dc);
 }
 
-void CSpectrumImage::DrawMarker(WTL::CDCHandle dc)
+void CSpectrumImage::DrawMarker(WTL::CDCHandle dc) const
 {
-    CRect const rc{m_ptSel.x, m_ptSel.y, m_ptSel.x+1, m_ptSel.y+1};
-    dc.InvertRect(CRect(rc.left - 4, rc.top, rc.left, rc.bottom));
-    dc.InvertRect(CRect(rc.left, rc.top - 4, rc.right, rc.top));
-    dc.InvertRect(CRect(rc.right, rc.top, rc.right + 4, rc.bottom));
-    dc.InvertRect(CRect(rc.left, rc.bottom, rc.right, rc.bottom + 4));
+    CRect const rc{m_ptSel.x, m_ptSel.y, m_ptSel.x+2, m_ptSel.y+2};
+    dc.InvertRect(CRect(rc.left - 3, rc.top, rc.left, rc.bottom));
+    dc.InvertRect(CRect(rc.left, rc.top - 3, rc.right, rc.top));
+    dc.InvertRect(CRect(rc.right, rc.top, rc.right + 3, rc.bottom));
+    dc.InvertRect(CRect(rc.left, rc.bottom, rc.right, rc.bottom + 3));
 }
 
 void CSpectrumImage::OnLButtonUp(UINT, CPoint)
@@ -157,18 +156,23 @@ void CSpectrumImage::OnLButtonUp(UINT, CPoint)
     m_bCapture = false;
 }
 
-void CSpectrumImage::OnMouseMove(UINT, CPoint point)
+void CSpectrumImage::OnMouseMove(UINT, CPoint pt)
 {
     if (!m_bCapture) {
         return;
     }
     CRect rcClient;
     GetClientRect(rcClient);
+    rcClient.right -= 1;
+    rcClient.bottom -= 1;
+
+    pt = Rc::BoundingPoint(rcClient, pt);
+    m_ptSel = pt;
+
     auto const xScale{static_cast<float>(rcClient.Width()) / static_cast<float>(SPECTRUM_CLR_RANGE)};
     auto const yScale{static_cast<float>(rcClient.Height()) / static_cast<float>(SPECTRUM_CLR_RANGE)};
-    auto const   xVal{static_cast<int>(static_cast<float>(point.x - rcClient.left) / xScale)};
-    auto const   yVal{static_cast<int>(static_cast<float>(point.y - rcClient.top) / yScale)};
-    m_ptSel = point;
+    auto const   xVal{static_cast<int>(static_cast<float>(pt.x - rcClient.left) / xScale)};
+    auto const   yVal{static_cast<int>(static_cast<float>(pt.y - rcClient.top) / yScale)};
     OnColorChanged(xVal, yVal);
 
     NMHDR nmhdr;
@@ -178,14 +182,9 @@ void CSpectrumImage::OnMouseMove(UINT, CPoint point)
     ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)nmhdr.idFrom, reinterpret_cast<LPARAM>(&nmhdr));
 }
 
-void CSpectrumImage::OnLButtonDown(UINT, CPoint point)
+void CSpectrumImage::OnLButtonDown(UINT, CPoint)
 {
     SetFocus();
     SetCapture();
     m_bCapture = true;
-}
-
-void CSpectrumImage::OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar pScrollBar)
-{
-    ATLTRACE(L">>> %d %d %p\n", nSBCode, nPos, pScrollBar.m_hWnd);
 }

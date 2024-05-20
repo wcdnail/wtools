@@ -92,6 +92,7 @@ inline void CColorUnion::SetUpdated(bool bUpdated) { m_bUpdated = bUpdated; }
 inline void CColorUnion::SetRGBPlain(int R, int G, int B)
 {
     m_Comp.Color = RGB(R, G, B);
+    SetUpdated(true);
 }
 
 inline void CColorUnion::SetRGB(int R, int G, int B)
