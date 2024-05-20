@@ -15,8 +15,8 @@ struct CRGBSpecRect
 void DDraw_RGBGrad_Line(DWORD* pDest, int nWidth, COLORREF crBegin, COLORREF crEnd);
 void DDraw_RGB(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, CRGBSpecRect&& color);
 void DDraw_RGB(CDibEx const& dibDest, CRGBSpecRect&& color);
-void DDraw_RGBGrad(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, COLORREF crBegin, COLORREF crEnd);
-void DDraw_RGBGrad(CDibEx const& dibDest, COLORREF crBegin, COLORREF crEnd);
+void DDraw_RGB_Grad(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, COLORREF crBegin, COLORREF crEnd);
+void DDraw_RGB_Grad(CDibEx const& dibDest, COLORREF crBegin, COLORREF crEnd);
 
 void DDraw_HSV_HUE_Line(DWORD* pDest, int nWidth, double dSaturation, double dVal);
 bool DDraw_HSV_SAT_Line(DWORD* pDest, int nWidth, double dHue, double dValue);

@@ -258,8 +258,6 @@ void CColorPicker::Impl::OnSpecComboChanged()
 {
     m_imSpectrum.SetSpectrumKind(static_cast<SpectrumKind>(m_nSpectrumKind));
     m_imSpectrum.SetFocus();
-    //m_imSlider.InvalidateRect(nullptr, FALSE);
-    m_imSlider.SetFocus();
 }
 
 CColorPicker::~CColorPicker() = default;

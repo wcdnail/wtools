@@ -3,7 +3,7 @@
 #include "CeXDib.h"
 #include <cmath>
 
-#include "exa/wtl.color.picker/GTDrawHelper.h"
+//#include "exa/wtl.color.picker/GTDrawHelper.h"
 
 //
 // This code is refactored from: GTDrawHelper.cpp
@@ -103,7 +103,7 @@ void DDraw_RGB(CDibEx const& dibDest, CRGBSpecRect&& color)
     );
 }
 
-void DDraw_RGBGrad(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, COLORREF crBegin, COLORREF crEnd)
+void DDraw_RGB_Grad(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, COLORREF crBegin, COLORREF crEnd)
 {
     if (nHeight <= 0) {
         // TODO: report nHeight - INVAL
@@ -116,10 +116,10 @@ void DDraw_RGBGrad(DWORD* pDest, int nWidth, int nHeight, DWORD nLinePitch, COLO
     }
 }
 
-void DDraw_RGBGrad(CDibEx const& dibDest, COLORREF crBegin, COLORREF crEnd)
+void DDraw_RGB_Grad(CDibEx const& dibDest, COLORREF crBegin, COLORREF crEnd)
 {
     ATLASSUME(dibDest.GetBitCount() == 32);
-    DDraw_RGBGrad(reinterpret_cast<DWORD*>(dibDest.GetData()),
+    DDraw_RGB_Grad(reinterpret_cast<DWORD*>(dibDest.GetData()),
         dibDest.GetWidth(),
         dibDest.GetHeight(),
         dibDest.GetStride() / sizeof(DWORD),
@@ -230,7 +230,7 @@ bool DDraw_HSV_SAT_Line(DWORD* pDest, int nWidth, double dHue, double dValue)
 bool DDraw_HSV_VAL_Line(DWORD* pDest, int nWidth, double dHue, double dSaturation)
 {
     //GTDrawHelper dh;
-    //dh.HSV_VAL(pDest, nWidth, dHue, dValue);
+    //dh.HSV_VAL(pDest, nWidth, dHue, dSaturation);
     //return true;
     if (nWidth <= 0) {
         // TODO: report nWidth - INVAL

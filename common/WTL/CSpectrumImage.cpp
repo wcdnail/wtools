@@ -71,6 +71,11 @@ void CSpectrumImage::OnColorChanged(long xPos, long yPos)
         ATLASSERT(FALSE);
         break;
     }
+    if (SPEC_HSV_Hue != m_SpectrumKind) {
+        if (m_pimSlider) {
+            m_pimSlider->UpdateRaster(m_SpectrumKind, m_Color);
+        }
+    }
     InvalidateRect(nullptr, FALSE);
 }
 

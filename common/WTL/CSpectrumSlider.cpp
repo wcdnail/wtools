@@ -32,9 +32,9 @@ bool CSpectrumSlider::Initialize(CSpectrumImage& imSpectrum)
 void CSpectrumSlider::UpdateRaster(SpectrumKind spKind, CColorUnion const& unColor)
 {
     switch (spKind) {
-    case SPEC_RGB_Red:        DDraw_RGBGrad(m_Dib, unColor.GetRedFirst(), unColor.GetRedLast()); break;
-    case SPEC_RGB_Green:      DDraw_RGBGrad(m_Dib, unColor.GetGreenFirst(), unColor.GetGreenLast()); break;
-    case SPEC_RGB_Blue:       DDraw_RGBGrad(m_Dib, unColor.GetBlueFirst(), unColor.GetBlueLast()); break;
+    case SPEC_RGB_Red:        DDraw_RGB_Grad(m_Dib, unColor.GetRedFirst(), unColor.GetRedLast()); break;
+    case SPEC_RGB_Green:      DDraw_RGB_Grad(m_Dib, unColor.GetGreenFirst(), unColor.GetGreenLast()); break;
+    case SPEC_RGB_Blue:       DDraw_RGB_Grad(m_Dib, unColor.GetBlueFirst(), unColor.GetBlueLast()); break;
     case SPEC_HSV_Hue:        DDraw_HSV_H(m_Dib, 1., 1.); break;
     case SPEC_HSV_Saturation: DDraw_HSV_S(m_Dib, unColor.m_dH, unColor.m_dV * 0.01); break;
     case SPEC_HSV_Brightness: DDraw_HSV_V(m_Dib, unColor.m_dH, unColor.m_dS * 0.01); break;
@@ -43,7 +43,11 @@ void CSpectrumSlider::UpdateRaster(SpectrumKind spKind, CColorUnion const& unCol
         break;
     }
     m_Dib.FreeResources();
-    InvalidateRect(nullptr, FALSE);
+
+    // InvalidateRect did not work
+    BOOL const bEnabled = IsWindowEnabled();
+    EnableWindow(!bEnabled);
+    EnableWindow(bEnabled);
 }
 
 ATOM& CSpectrumSlider::GetWndClassAtomRef()
