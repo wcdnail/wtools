@@ -73,7 +73,7 @@ private:
     int         m_nSpectrumKind; // For DDX
     CSpectrumSlider  m_imSlider;
     WTL::CStatic      m_stColor;
-    bool          m_bUpdateData;
+    bool          m_bSaveData;
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,             X,             Y,          Width,        Height, Style...
         CONTROL_GROUPBOX(   _T("Spectrum Color"),        CID_GRP_SPECTRUM,                       4,             4,         HDlgCX,       DlgCY-8, 0, 0)
@@ -99,19 +99,12 @@ private:
         DIALOG_FONT(8, _T("MS Shell Dlg 2"))
     END_DIALOG()
 
-#define DDX_BYTE_RANGE(nID, var)                                             \
-    if ((nCtlID == (UINT)-1) || (nCtlID == nID)) {                            \
-        if (!DDX_Int<BYTE>(nID, var, FALSE, bSaveAndValidate, TRUE, 0, 255)) { \
-            return FALSE;                                                       \
-        }                                                                        \
-    }
-
     BEGIN_DDX_MAP(CSpectrumColorPicker)
-        DDX_BYTE_RANGE(CID_RGB_RED_VAL, m_imSpectrum.GetColorUnion().GetRed());
-        DDX_BYTE_RANGE(CID_RGB_GREEN_VAL, m_imSpectrum.GetColorUnion().GetGreen());
-        DDX_BYTE_RANGE(CID_RGB_BLUE_VAL, m_imSpectrum.GetColorUnion().GetBlue());
+        DDX_UINT_RANGE(CID_RGB_RED_VAL, m_imSpectrum.GetColorUnion().GetRed(), 0, 255);
+        DDX_UINT_RANGE(CID_RGB_GREEN_VAL, m_imSpectrum.GetColorUnion().GetGreen(), 0, 255);
+        DDX_UINT_RANGE(CID_RGB_BLUE_VAL, m_imSpectrum.GetColorUnion().GetBlue(), 0, 255);
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
-        OnDDXChanges(nCtlID);
+        OnDDXChanges(nCtlID, bSaveAndValidate);
     END_DDX_MAP()
 
     BEGIN_DLGRESIZE_MAP(CTatorMainDlg)
@@ -144,13 +137,15 @@ private:
         REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
 
-    void OnDDXChanges(int nID);
+    void SpectruKindChanged();
+    LRESULT SliderChanged(LPNMHDR pnmh);
+    LRESULT ColorChanged(bool bNotify);
+    void OnDDXChanges(UINT nID, BOOL bSaveAndValidate);
+    void OnDataValidateError(UINT nCtrlID, BOOL bSave, _XData& data);
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
-    void ColorChanged(bool bNotify);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
-    void OnSpecComboChanged();
     void OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar ctlScrollBar);
 };
 
@@ -161,7 +156,7 @@ CColorPicker::Impl::Impl()
     , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
     ,      m_imSlider{}
     ,       m_stColor{}
-    ,   m_bUpdateData{false}
+    ,   m_bSaveData{false}
 {
 }
 
@@ -179,46 +174,86 @@ HRESULT CColorPicker::Impl::PreCreateWindow()
     return S_OK;
 }
 
-void CColorPicker::Impl::OnDDXChanges(int nID)
+void CColorPicker::Impl::OnDDXChanges(UINT nID, BOOL bSaveAndValidate)
 {
-    switch (nID) {
-    case CID_SPEC_COMBO: OnSpecComboChanged(); break;
+    if (m_bSaveData || !bSaveAndValidate) {
+        return;
     }
+    switch (nID) {
+    case CID_SPEC_COMBO:    SpectruKindChanged(); break;
+    case CID_RGB_RED_VAL:
+    case CID_RGB_GREEN_VAL:
+    case CID_RGB_BLUE_VAL:  ColorChanged(false); break;
+    }
+}
+
+void CColorPicker::Impl::OnDataValidateError(UINT nCtrlID, BOOL bSave, _XData& data)
+{
+    switch (nCtrlID) {
+    case CID_RGB_RED_VAL:
+    case CID_RGB_GREEN_VAL:
+    case CID_RGB_BLUE_VAL:{
+        if (bSave) {
+            CScopedBoolGuard bGuard{m_bSaveData};
+            SetDlgItemInt(nCtrlID, data.intData.nMax);
+        }
+        break;
+    }
+    }
+}
+
+LRESULT CColorPicker::Impl::SliderChanged(LPNMHDR pnmh)
+{
+    auto const* ptPosCh = reinterpret_cast<NMTRBTHUMBPOSCHANGING const*>(pnmh);
+    if (!ptPosCh) {
+        return 0;
+    }
+    m_imSpectrum.OnSliderChanged(ptPosCh->dwPos);
+    m_stColor.InvalidateRect(nullptr, FALSE);
+    return 0;
+}
+
+LRESULT CColorPicker::Impl::ColorChanged(bool bNotify)
+{
+    if (SPEC_HSV_Hue != m_imSpectrum.GetSpectrumKind()) {
+        m_imSlider.UpdateRaster(m_imSpectrum.GetSpectrumKind(), m_imSpectrum.GetColorUnion());
+    }
+    m_stColor.InvalidateRect(nullptr, FALSE);
+    if (bNotify) {
+        CScopedBoolGuard bGuard{m_bSaveData};
+        DoDataExchange(DDX_LOAD, CID_RGB_RED_VAL);
+        DoDataExchange(DDX_LOAD, CID_RGB_GREEN_VAL);
+        DoDataExchange(DDX_LOAD, CID_RGB_BLUE_VAL);
+    }
+    else {
+        m_imSpectrum.InvalidateRect(nullptr, FALSE);
+    }
+    return 0;
 }
 
 LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
 {
-    switch (pnmh->code) {
-    case NM_CUSTOMDRAW:
+    if (NM_CUSTOMDRAW == pnmh->code) {
         if constexpr (false) {
             LPNMCUSTOMDRAW nmcd{reinterpret_cast<LPNMCUSTOMDRAW>(pnmh)};
-            DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s >> %05x\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code), nmcd->dwDrawStage);
+            DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s >> %05x\n", nID,
+                pnmh->code, DH::WM_NC_C2SW(pnmh->code), nmcd->dwDrawStage);
         }
         SetMsgHandled(FALSE);
         return 0;
+    }
+    if (m_bSaveData) {
+        return 0;
+    }
+    switch (pnmh->code) {
     case TRBN_THUMBPOSCHANGING:
         switch (nID) {
-        case CID_SPECTRUM_SLD: {
-            auto const* ptPosCh = reinterpret_cast<NMTRBTHUMBPOSCHANGING const*>(pnmh);
-            if (!ptPosCh) {
-                return 0;
-            }
-            m_imSpectrum.OnSliderChanged(ptPosCh->dwPos);
-            m_stColor.InvalidateRect(nullptr, FALSE);
-            return 0;
-        }
+        case CID_SPECTRUM_SLD: return SliderChanged(pnmh);
         }
         break;
     case NM_SPECTRUM_CLR_SEL:
         switch (nID) {
-        case CID_SPECTRUM_PIC: {
-            ColorChanged(true);
-            CScopedBoolGuard bGuard{m_bUpdateData};
-            DoDataExchange(DDX_LOAD, CID_RGB_RED_VAL);
-            DoDataExchange(DDX_LOAD, CID_RGB_GREEN_VAL);
-            DoDataExchange(DDX_LOAD, CID_RGB_BLUE_VAL);
-            return 0;
-        }
+        case CID_SPECTRUM_PIC: return ColorChanged(true);
         }
         break;
     }
@@ -227,19 +262,11 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
     return 0;
 }
 
-void CColorPicker::Impl::ColorChanged(bool bNotify)
-{
-    if (SPEC_HSV_Hue != m_imSpectrum.GetSpectrumKind()) {
-        m_imSlider.UpdateRaster(m_imSpectrum.GetSpectrumKind(), m_imSpectrum.GetColorUnion());
-    }
-    m_stColor.InvalidateRect(nullptr, FALSE);
-    if (!bNotify) {
-        m_imSpectrum.InvalidateRect(nullptr, FALSE);
-    }
-}
-
 void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/)
 {
+    if (m_bSaveData) {
+        return ;
+    }
     switch (uNotifyCode) {
     case BN_UNHILITE:
     case BN_PAINT:
@@ -247,12 +274,7 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     case BN_KILLFOCUS:
         break;
     case EN_UPDATE:
-        if (!m_bUpdateData) {
-            if (!DoDataExchange(DDX_SAVE, nID)) {
-                return ;
-            }
-            ColorChanged(false);
-        }
+        DoDataExchange(DDX_SAVE, nID);
         return ;
     case CBN_SELENDOK:
         DoDataExchange(DDX_SAVE, nID);
@@ -293,10 +315,13 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     cbSpectrum.AddString(L"HSV/饱和度");
     cbSpectrum.AddString(L"HSV/明度");
 
-    DoDataExchange(DDX_LOAD);
-    DlgResize_Init(false, true, 0);
+    {
+        CScopedBoolGuard bGuard{m_bSaveData};
+        DoDataExchange(DDX_LOAD);
+        SpectruKindChanged();
+    }
 
-    OnSpecComboChanged();
+    DlgResize_Init(false, true, 0);
     return TRUE;
 }
 
@@ -314,7 +339,7 @@ void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
     DBGTPrint(LTH_WM_DRAWITEM L" id:%-4d ct:%-4d\n", nID, pDI->CtlType);
 }
 
-void CColorPicker::Impl::OnSpecComboChanged()
+void CColorPicker::Impl::SpectruKindChanged()
 {
     m_imSpectrum.SetSpectrumKind(static_cast<SpectrumKind>(m_nSpectrumKind));
     m_imSlider.UpdateRaster(m_imSpectrum.GetSpectrumKind(), m_imSpectrum.GetColorUnion());

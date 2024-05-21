@@ -249,8 +249,10 @@ void CSpectrumSlider::OnMouseMove(UINT nFlags, CPoint pt)
     nmPosChanged.hdr.hwndFrom = m_hWnd;
     ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)nmPosChanged.hdr.idFrom, reinterpret_cast<LPARAM>(&nmPosChanged));
 
-    if (!m_rcRaster.IsRectEmpty() && !m_rcRaster.PtInRect(pt)) {
-        OnLButtonUp(nFlags, pt);
+    if constexpr (false) { // ##TODO: loose capture on rect leave
+        if (!m_rcRaster.IsRectEmpty() && !m_rcRaster.PtInRect(pt)) {
+            OnLButtonUp(nFlags, pt);
+        }
     }
 }
 

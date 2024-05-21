@@ -42,10 +42,10 @@ struct CColorUnion
     double     m_dH;
     double     m_dS;
     double     m_dV;
-    BYTE      m_Red;
-    BYTE    m_Green;
-    BYTE     m_Blue;
-    BYTE    m_Alpha;
+    int       m_Red;
+    int     m_Green;
+    int      m_Blue;
+    int     m_Alpha;
 
     ~CColorUnion();
     CColorUnion(double dH, double dS, double dV);
@@ -59,15 +59,15 @@ struct CColorUnion
     void UpdateRGB();
     void UpdateHSV();
 
-    BYTE GetRed() const;
-    BYTE GetGreen() const;
-    BYTE GetBlue() const;
-    BYTE GetAlpha() const;
+    int GetRed() const;
+    int GetGreen() const;
+    int GetBlue() const;
+    int GetAlpha() const;
 
-    BYTE& GetRed();
-    BYTE& GetGreen();
-    BYTE& GetBlue();
-    BYTE& GetAlpha();
+    int& GetRed();
+    int& GetGreen();
+    int& GetBlue();
+    int& GetAlpha();
 
     COLORREF GetRedFirst() const;
     COLORREF GetRedLast() const;
@@ -107,14 +107,14 @@ inline void CColorUnion::SetHSV(double dH, double dS, double dV)
     UpdateRGB();
 }
 
-inline BYTE     CColorUnion::GetRed() const { return m_Red; }
-inline BYTE   CColorUnion::GetGreen() const { return m_Green; }
-inline BYTE    CColorUnion::GetBlue() const { return m_Blue; }
-inline BYTE   CColorUnion::GetAlpha() const { return m_Alpha; }
-inline BYTE&    CColorUnion::GetRed() { return m_Red; }
-inline BYTE&  CColorUnion::GetGreen() { return m_Green; }
-inline BYTE&   CColorUnion::GetBlue() { return m_Blue; }
-inline BYTE&  CColorUnion::GetAlpha() { return m_Alpha; }
+inline int     CColorUnion::GetRed() const { return m_Red; }
+inline int   CColorUnion::GetGreen() const { return m_Green; }
+inline int    CColorUnion::GetBlue() const { return m_Blue; }
+inline int   CColorUnion::GetAlpha() const { return m_Alpha; }
+inline int&    CColorUnion::GetRed() { return m_Red; }
+inline int&  CColorUnion::GetGreen() { return m_Green; }
+inline int&   CColorUnion::GetBlue() { return m_Blue; }
+inline int&  CColorUnion::GetAlpha() { return m_Alpha; }
 
 inline COLORREF   CColorUnion::GetRedFirst() const { return RGB(       0, GetGreen(), GetBlue()); }
 inline COLORREF    CColorUnion::GetRedLast() const { return RGB(     255, GetGreen(), GetBlue()); }
