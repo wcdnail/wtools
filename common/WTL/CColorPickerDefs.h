@@ -1,7 +1,15 @@
 #pragma once
 
+#include <wcdafx.api.h>
+
 constexpr TCHAR CSPECIMG_CLASS[] = _T("WCCF::CSpectrumImage");
 constexpr TCHAR CSPECSLD_CLASS[] = _T("WCCF::CSpectrumSlider");
+
+constexpr double HSV_HUE_MAX{359.};
+constexpr double HSV_SAT_MAX{100.};
+constexpr double HSV_VAL_MAX{100.};
+constexpr double     RGB_MAX{255.};
+
 
 enum SpectrumKind: int
 {
@@ -18,13 +26,12 @@ enum SpectrumKind: int
 enum CCPMiscConsts: int
 {
     SPECTRUM_BPP        = 32,
-    SPECTRUM_CLR_RANGE  = 255,
     SPEC_BITMAP_WDTH    = 58,
     SPECTRUM_CX         = SPEC_BITMAP_WDTH,
     SPECTRUM_CY         = SPEC_BITMAP_WDTH,
     SPECTRUM_SLIDER_CX  = SPEC_BITMAP_WDTH,
     SPECTRUM_SLIDER_MIN = 0,
-    SPECTRUM_SLIDER_MAX = SPECTRUM_CLR_RANGE,
+    SPECTRUM_SLIDER_MAX = static_cast<int>(RGB_MAX),
     SPECTRUM_CHANNEL_CX = 24,
     SPECTRUM_CHANNEL_CY = 32,
 
@@ -35,9 +42,12 @@ static_assert(SPECTRUM_BPP == 32, "SPECTRUM_BPP must always be 32!");
 
 struct CSpectrumImage;
 struct CSpectrumSlider;
+struct CRGBSpecRect;
 
 struct CColorUnion
 {
+    DELETE_COPY_MOVE_OF(CColorUnion);
+
     bool m_bUpdated;
     double     m_dH;
     double     m_dS;
@@ -77,6 +87,7 @@ struct CColorUnion
     COLORREF GetBlueLast() const;
 
     COLORREF GetColorRef() const;
+    CRGBSpecRect GetRGBSpectrumRect(SpectrumKind nSpectrumKind) const;
 
 private:
     void SetRGBPlain(int R, int G, int B);
@@ -101,9 +112,9 @@ inline void CColorUnion::SetRGB(int R, int G, int B)
 
 inline void CColorUnion::SetHSV(double dH, double dS, double dV)
 {
-    m_dH = std::min<double>(dH, 359.);
-    m_dS = std::min<double>(dS, 100.);
-    m_dV = std::min<double>(dV, 100.);
+    m_dH = std::min<double>(dH, HSV_HUE_MAX); // 359.
+    m_dS = std::min<double>(dS, HSV_SAT_MAX); // 100.
+    m_dV = std::min<double>(dV, HSV_VAL_MAX); // 100.
     UpdateRGB();
 }
 

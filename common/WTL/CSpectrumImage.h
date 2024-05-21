@@ -2,6 +2,7 @@
 
 #include "CColorPickerDefs.h"
 #include "CCustomCtrl.h"
+#include <wcdafx.api.h>
 #include <DDraw.DGI/CeXDib.h>
 #include <atlctrls.h>
 #include <atlgdi.h>
@@ -12,6 +13,7 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
 {
     using Super = CCustomControl<CSpectrumImage>;
 
+    DELETE_COPY_MOVE_OF(CSpectrumImage);
     DECLARE_WND_SUPERCLASS2(CSPECIMG_CLASS, CSpectrumImage, nullptr)
 
     ~CSpectrumImage() override;
@@ -19,12 +21,11 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
 
     bool Initialize(long cx = SPECTRUM_CX, long cy = SPECTRUM_CY);
     COLORREF GetColorRef() const;
-    CRGBSpecRect GetRGBSpectrumRect() const;
     CColorUnion& GetColorUnion();
     void SetSpectrumKind(SpectrumKind kind);
     SpectrumKind GetSpectrumKind() const;
     void OnSliderChanged(long nPos);
-    void OnColorChanged(long xPos, long yPos);
+    void OnColorChanged(double xPos, double yPos);
 
 private:
     friend Super;
@@ -46,7 +47,7 @@ private:
     void OnLButtonDown(UINT nFlags, CPoint point);
     void OnLButtonUp(UINT nFlags, CPoint point) const;
     void NotifySend() const;
-    void NotifyColorChanged(CRect const& rcClient);
+    void NotifyColorChanged(CRect const& rcClient, CPoint pt);
     void OnMouseMove(UINT nFlags, CPoint pt);
 };
 

@@ -198,7 +198,6 @@ LRESULT CMainDlg::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, B
         DoDrawHSV_Hue();
         hcomp.SelectBitmap(bmp_handle);
 
-
         // Draws rect
         double step;
         SColour tempcol;

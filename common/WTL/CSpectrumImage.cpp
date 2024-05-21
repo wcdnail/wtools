@@ -36,7 +36,7 @@ void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
     m_SpectrumKind = kind;
     CRect rcClient{};
     GetClientRect(rcClient);
-    NotifyColorChanged(rcClient);
+    NotifyColorChanged(rcClient, m_ptSel);
     m_Color.SetUpdated(true);
     InvalidateRect(nullptr, FALSE);
 }
@@ -47,9 +47,9 @@ void CSpectrumImage::OnSliderChanged(long nPos)
     case SPEC_RGB_Red:          m_Color.SetRGB(255 - nPos, m_Color.GetGreen(), m_Color.GetBlue()); break;
     case SPEC_RGB_Green:        m_Color.SetRGB(m_Color.GetRed(), 255 - nPos, m_Color.GetBlue()); break;
     case SPEC_RGB_Blue:         m_Color.SetRGB(m_Color.GetRed(), m_Color.GetGreen(), 255 - nPos); break;
-    case SPEC_HSV_Hue:          m_Color.SetHSV((255 - static_cast<double>(nPos)) / 255.0 * 359.0, m_Color.m_dS, m_Color.m_dV); break;
-    case SPEC_HSV_Saturation:   m_Color.SetHSV(m_Color.m_dH, (255 - static_cast<double>(nPos)) / 255.0 * 100.0, m_Color.m_dV); break;
-    case SPEC_HSV_Brightness:   m_Color.SetHSV(m_Color.m_dH, m_Color.m_dS, (255 - static_cast<double>(nPos)) / 255.0 * 100.0); break;
+    case SPEC_HSV_Hue:          m_Color.SetHSV((255 - static_cast<double>(nPos)) / 255.0 * HSV_HUE_MAX, m_Color.m_dS, m_Color.m_dV); break;
+    case SPEC_HSV_Saturation:   m_Color.SetHSV(m_Color.m_dH, (255 - static_cast<double>(nPos)) / 255.0 * HSV_SAT_MAX, m_Color.m_dV); break;
+    case SPEC_HSV_Brightness:   m_Color.SetHSV(m_Color.m_dH, m_Color.m_dS, (255 - static_cast<double>(nPos)) / 255.0 * HSV_VAL_MAX); break;
     default:
         ATLASSERT(FALSE);
         break;
@@ -58,52 +58,20 @@ void CSpectrumImage::OnSliderChanged(long nPos)
     NotifySend();
 }
 
-void CSpectrumImage::OnColorChanged(long xPos, long yPos)
+void CSpectrumImage::OnColorChanged(double xPos, double yPos)
 {
     switch (m_SpectrumKind) {
-    case SPEC_RGB_Red:          m_Color.SetRGB(m_Color.GetRed(), xPos, yPos); break;
-    case SPEC_RGB_Green:        m_Color.SetRGB(xPos, m_Color.GetGreen(), yPos); break;
-    case SPEC_RGB_Blue:         m_Color.SetRGB(xPos, yPos, m_Color.GetBlue()); break;
-    case SPEC_HSV_Hue:          m_Color.SetHSV(m_Color.m_dH, xPos / 255.0 * 100.0, (255 - yPos) / 255.0 * 100.0); break;
-    case SPEC_HSV_Saturation:   m_Color.SetHSV(xPos / 255.0 * 359.0, m_Color.m_dS, (255 - yPos) / 255.0 * 100.0); break;
-    case SPEC_HSV_Brightness:   m_Color.SetHSV(xPos / 255.0 * 359.0, (255 - yPos) / 255.0 * 100.0, m_Color.m_dV); break;
+    case SPEC_RGB_Red:          m_Color.SetRGB(m_Color.GetRed(), static_cast<int>(xPos), static_cast<int>(yPos)); break;
+    case SPEC_RGB_Green:        m_Color.SetRGB(static_cast<int>(xPos), m_Color.GetGreen(), static_cast<int>(yPos)); break;
+    case SPEC_RGB_Blue:         m_Color.SetRGB(static_cast<int>(xPos), static_cast<int>(yPos), m_Color.GetBlue()); break;
+    case SPEC_HSV_Hue:          m_Color.SetHSV(m_Color.m_dH, xPos / RGB_MAX * HSV_SAT_MAX, (RGB_MAX - yPos) / RGB_MAX * HSV_VAL_MAX); break;
+    case SPEC_HSV_Saturation:   m_Color.SetHSV(xPos / RGB_MAX * HSV_HUE_MAX, m_Color.m_dS, (RGB_MAX - yPos) / RGB_MAX * HSV_VAL_MAX); break;
+    case SPEC_HSV_Brightness:   m_Color.SetHSV(xPos / RGB_MAX * HSV_HUE_MAX, (RGB_MAX - yPos) / RGB_MAX * HSV_SAT_MAX, m_Color.m_dV); break;
     default: 
         ATLASSERT(FALSE);
         break;
     }
     InvalidateRect(nullptr, FALSE);
-}
-
-CRGBSpecRect CSpectrumImage::GetRGBSpectrumRect() const
-{
-    auto const    R{m_Color.GetRed()};
-    auto const    G{m_Color.GetGreen()};
-    auto const    B{m_Color.GetBlue()};
-    CRGBSpecRect rv{};
-    switch (m_SpectrumKind) {
-    case SPEC_RGB_Red:
-        rv.crLT = RGB(R, 0, 0);
-        rv.crRT = RGB(R, 255, 0);
-        rv.crLB = RGB(R, 0, 255);
-        rv.crRB = RGB(R, 255, 255);
-        break;
-    case SPEC_RGB_Green:
-        rv.crLT = RGB(0, G, 0);
-        rv.crRT = RGB(255, G, 0);
-        rv.crLB = RGB(0, G, 255);
-        rv.crRB = RGB(255, G, 255);
-        break;
-    case SPEC_RGB_Blue:
-        rv.crLT = RGB(0, 0, B);
-        rv.crRT = RGB(0, 255, B);
-        rv.crLB = RGB(255, 0, B);
-        rv.crRB = RGB(255, 255, B);
-        break;
-    default:
-        ATLASSERT(FALSE);
-        break;
-    }
-    return rv;
 }
 
 BOOL CSpectrumImage::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
@@ -137,7 +105,7 @@ void CSpectrumImage::UpdateRaster()
     switch (m_SpectrumKind) {
     case SPEC_RGB_Red:
     case SPEC_RGB_Green:
-    case SPEC_RGB_Blue:         DDraw_RGB(m_Dib, GetRGBSpectrumRect()); break;
+    case SPEC_RGB_Blue:         DDraw_RGB(m_Dib, m_Color.GetRGBSpectrumRect(m_SpectrumKind)); break;
     case SPEC_HSV_Hue:          DDraw_HSV_Hue(m_Dib, m_Color.m_dH); break;
     case SPEC_HSV_Saturation:   DDraw_HSV_Sat(m_Dib, m_Color.m_dS * 0.01); break;
     case SPEC_HSV_Brightness:   DDraw_HSV_Sat(m_Dib, m_Color.m_dV * 0.01); break;
@@ -154,20 +122,18 @@ void CSpectrumImage::OnPaint(WTL::CDCHandle /*dc*/)
         UpdateRaster();
         m_Color.SetUpdated(false);
     }
-    WTL::CPaintDC const   dcPaint{m_hWnd};
-    WTL::CDCHandle             dc{dcPaint.m_hDC};
-    const WTL::CDCHandle dcSource{m_Dib.GetDC(dc)};
-    CRect const            rcDest{dcPaint.m_ps.rcPaint};
-
+    WTL::CPaintDC const dcPaint{m_hWnd};
+    WTL::CDCHandle           dc{dcPaint.m_hDC};
+    HDC const          dcSource{m_Dib.GetDC(dc)};
+    CRect const          rcDest{dcPaint.m_ps.rcPaint};
     dc.StretchBlt(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(),
                   dcSource, 0, 0, m_Dib.GetWidth(), m_Dib.GetHeight(), SRCCOPY);
-
     DrawMarker(dc);
 }
 
 void CSpectrumImage::DrawMarker(WTL::CDCHandle dc) const
 {
-    CRect const rc{m_ptSel.x, m_ptSel.y, m_ptSel.x+1, m_ptSel.y+1};
+    CRect const rc{m_ptSel.x-1, m_ptSel.y-1, m_ptSel.x+1, m_ptSel.y+1};
     dc.InvertRect(CRect(rc.left - 5, rc.top, rc.left, rc.bottom));
     dc.InvertRect(CRect(rc.left, rc.top - 5, rc.right, rc.top));
     dc.InvertRect(CRect(rc.right, rc.top, rc.right + 5, rc.bottom));
@@ -191,12 +157,24 @@ void CSpectrumImage::NotifySend() const
     ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)nmHeader.idFrom, reinterpret_cast<LPARAM>(&nmHeader));
 }
 
-void CSpectrumImage::NotifyColorChanged(CRect const& rcClient)
+void CSpectrumImage::NotifyColorChanged(CRect const& rcClient, CPoint pt)
 {
-    auto const xScale{static_cast<float>(rcClient.Width()) / static_cast<float>(SPECTRUM_CLR_RANGE)};
-    auto const yScale{static_cast<float>(rcClient.Height()) / static_cast<float>(SPECTRUM_CLR_RANGE)};
-    auto const   xVal{static_cast<int>(static_cast<float>(m_ptSel.x - rcClient.left) / xScale)};
-    auto const   yVal{static_cast<int>(static_cast<float>(m_ptSel.y - rcClient.top) / yScale)};
+    auto const xScale{static_cast<double>(rcClient.Width()) / RGB_MAX};
+    auto const yScale{static_cast<double>(rcClient.Height()) / RGB_MAX};
+    auto         xVal{static_cast<double>(pt.x - rcClient.left) / xScale};
+    auto         yVal{static_cast<double>(pt.y - rcClient.top) / yScale};
+    if (xVal < 0) {
+        xVal = 0;
+    }
+    else if (xVal > RGB_MAX) {
+        xVal = RGB_MAX;
+    }
+    if (yVal < 0) {
+        yVal = 0;
+    }
+    else if (yVal > RGB_MAX) {
+        yVal = RGB_MAX;
+    }
     OnColorChanged(xVal, yVal);
     NotifySend();
 }
@@ -208,15 +186,16 @@ void CSpectrumImage::OnMouseMove(UINT, CPoint pt)
     }
     CRect rcClient;
     GetClientRect(rcClient);
-
-    pt = Rc::BoundingPoint(rcClient, pt);
-    m_ptSel = pt;
-    NotifyColorChanged(rcClient);
+    NotifyColorChanged(rcClient, pt);
+    rcClient.right -= 1;
+    rcClient.bottom -= 1;
+    m_ptSel = Rc::BoundingPoint(rcClient, pt);
 }
 
 void CSpectrumImage::OnLButtonDown(UINT, CPoint)
 {
-    if (GetCapture() != m_hWnd) {
-        SetCapture();
+    if (GetCapture() == m_hWnd) {
+        return ;
     }
+    SetCapture();
 }

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CColorPickerDefs.h"
+#include <DDraw.DGI/DDGDIStuff.h>
 #include <dh.tracing.h>
 
 template <typename T>
@@ -127,4 +128,39 @@ void CColorUnion::UpdateHSV()
         m_dH = temp;
     }
     SetUpdated(true);
+}
+
+CRGBSpecRect CColorUnion::GetRGBSpectrumRect(SpectrumKind nSpectrumKind) const
+{
+    CRGBSpecRect rv{};
+    switch (nSpectrumKind) {
+    case SPEC_RGB_Red: {
+        auto const R{GetRed()};
+        rv.crLT = RGB(R, 0, 0);
+        rv.crRT = RGB(R, 255, 0);
+        rv.crLB = RGB(R, 0, 255);
+        rv.crRB = RGB(R, 255, 255);
+        break;
+    }
+    case SPEC_RGB_Green:{
+        auto const G{GetGreen()};
+        rv.crLT = RGB(0, G, 0);
+        rv.crRT = RGB(255, G, 0);
+        rv.crLB = RGB(0, G, 255);
+        rv.crRB = RGB(255, G, 255);
+        break;
+    }
+    case SPEC_RGB_Blue:{
+        auto const B{GetBlue()};
+        rv.crLT = RGB(0, 0, B);
+        rv.crRT = RGB(0, 255, B);
+        rv.crLB = RGB(255, 0, B);
+        rv.crRB = RGB(255, 255, B);
+        break;
+    }
+    default:
+        ATLASSERT(FALSE);
+        break;
+    }
+    return rv;
 }
