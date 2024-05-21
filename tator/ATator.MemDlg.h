@@ -1,13 +1,16 @@
 #pragma once
 
+#include "resource.h"
 #include "WTL/CColorButton.h"
 #include "WTL/CColorPicker.h"
-#include "resource.h"
 #include <UT/debug.assistance.h>
 #include <atlframe.h>
 #include <atlcrack.h>
 #include <atldlgs.h>
 #include <atlddx.h>
+#include <atlapp.h>
+
+extern WTL::CAppModule _Module;
 
 struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
                       WTL::CDialogResize<CTatorMainDlg>,
@@ -57,8 +60,9 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
         DLGRESIZE_CONTROL(IDC_DLG_ICON, DLSZ_MOVE_Y)
     END_DLGRESIZE_MAP()
 
-    BEGIN_MSG_MAP_EX(CTatorMainDlg)
+    BEGIN_MSG_MAP(CTatorMainDlg)
         MSG_WM_INITDIALOG(OnInitDialog)
+        MSG_WM_DESTROY(OnDestroy)
         COMMAND_ID_HANDLER(IDOK, OnCloseCmd)
         COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
         REFLECT_NOTIFICATIONS()
@@ -66,6 +70,7 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
     END_MSG_MAP()
 
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
+    void OnDestroy();
     LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 };
 
@@ -87,6 +92,10 @@ inline BOOL CTatorMainDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     UNREFERENCED_PARAMETER(wndFocus);
     UNREFERENCED_PARAMETER(lInitParam);
 
+    WTL::CMessageLoop* pLoop = _Module.GetMessageLoop();
+    ATLASSERT(pLoop != NULL);
+    pLoop->AddMessageFilter(this);
+
     if constexpr (false) {
         MoveToMonitor{}.Move(m_hWnd, 2, PutAt::YCenter | PutAt::Right);
     }
@@ -100,6 +109,14 @@ inline BOOL CTatorMainDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 
     DlgResize_Init(true, true, 0);
     return TRUE;
+}
+
+inline void CTatorMainDlg::OnDestroy()
+{
+    SetMsgHandled(FALSE);
+    WTL::CMessageLoop* pLoop = _Module.GetMessageLoop();
+    ATLASSERT(pLoop != NULL);
+    pLoop->RemoveMessageFilter(this);
 }
 
 inline LRESULT CTatorMainDlg::OnCloseCmd(WORD, WORD wID, HWND, BOOL&)

@@ -3,6 +3,7 @@
 #include "CSpectrumSlider.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 #include <rect.putinto.h>
+#include <atlcrack.h>
 
 ATOM& CSpectrumImage::GetWndClassAtomRef()
 {
@@ -13,8 +14,7 @@ ATOM& CSpectrumImage::GetWndClassAtomRef()
 CSpectrumImage::~CSpectrumImage() = default;
 
 CSpectrumImage::CSpectrumImage(COLORREF crInit, SpectrumKind kind)
-    :  m_bMsgHandled{FALSE}
-    ,          m_Dib{}
+    :          m_Dib{}
     ,        m_Color{crInit}
     ,        m_ptSel{0, 0}
     , m_SpectrumKind{kind}
@@ -127,15 +127,6 @@ CRGBSpecRect CSpectrumImage::GetRGBSpectrumRect() const
 
 BOOL CSpectrumImage::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
-    BOOL const bSave{m_bMsgHandled};
-    BOOL const  bRet{_ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)};
-    m_bMsgHandled = bSave;
-    return bRet;
-}
-
-BOOL CSpectrumImage::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
-{
-    BOOL bHandled{TRUE};
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) {
     case 0:

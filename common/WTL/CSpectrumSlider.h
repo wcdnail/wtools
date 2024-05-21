@@ -5,6 +5,7 @@
 #include "CSliderCtrl.h"
 #include <DDraw.DGI/CeXDib.h>
 #include <wcdafx.api.h>
+#include <atlctrls.h>
 
 enum SpectrumKind: int;
 
@@ -24,7 +25,6 @@ struct CSpectrumSlider: CCustomControl<CSpectrumSlider, WTL::CSliderCtrl>
 private:
     friend Super;
 
-    BOOL            m_bMsgHandled;
     bool               m_bCapture;
     CSpectrumImage* m_pimSpectrum;
     WTL::CStatic*      m_pstColor;
@@ -32,12 +32,7 @@ private:
     CRect              m_rcRaster;
 
     static ATOM& GetWndClassAtomRef();
-
-    BOOL IsMsgHandled() const { return m_bMsgHandled; }
-    void SetMsgHandled(BOOL bHandled) { m_bMsgHandled = bHandled; }
-
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
-    BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 
     int OnCreate(LPCREATESTRUCT pCS);
     CRect GetRatserRect(DWORD dwStyle, NMCUSTOMDRAW const& nmcd, CRect& rcClient) const;

@@ -9,6 +9,7 @@
 #include <dh.tracing.h>
 #include <atlctrls.h>
 #include <atlcrack.h>
+#include <atlframe.h>
 #include <atldlgs.h>
 #include <atlddx.h>
 
@@ -67,9 +68,9 @@ private:
     };
 
     CSpectrumImage m_imSpectrum;
+    int         m_nSpectrumKind; // For DDX
     CSpectrumSlider  m_imSlider;
     WTL::CStatic      m_stColor;
-    int         m_nSpectrumKind;
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,             X,             Y,          Width,        Height, Style...
         CONTROL_GROUPBOX(   _T("Spectrum Color"),        CID_GRP_SPECTRUM,                       4,             4,         HDlgCX,       DlgCY-8, 0, 0)
@@ -80,11 +81,11 @@ private:
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD, _T("msctls_trackbar32"),  TB_VERT, HDlgCX-HHCY-8,       18+HHCY,      HHCX/2-12, DlgCY-HHCY-30, 0)
         CONTROL_GROUPBOX(        _T("RGB Color"),             CID_GRP_RGB,              8+HDlgCX+4,             4,         HDlgCX,       HDlg3CY, 0, 0)
             CONTROL_RTEXT(            _T("Red:"),         CID_RGB_RED_CAP,              8+HDlgCX+8,     HLCY*0+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-            CONTROL_CTEXT(         _T("THE RED"),         CID_RGB_RED_VAL,        HDlgCX+12+HHCX/2,     HLCY*0+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, WS_EX_STATICEDGE)
+            CONTROL_EDITTEXT(                             CID_RGB_RED_VAL,        HDlgCX+12+HHCX/2,     HLCY*0+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER, 0)
             CONTROL_RTEXT(          _T("Green:"),       CID_RGB_GREEN_CAP,              8+HDlgCX+8,     HLCY*1+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-            CONTROL_CTEXT(       _T("THE GREEN"),       CID_RGB_GREEN_VAL,        HDlgCX+12+HHCX/2,     HLCY*1+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, WS_EX_STATICEDGE)
+            CONTROL_EDITTEXT(                           CID_RGB_GREEN_VAL,        HDlgCX+12+HHCX/2,     HLCY*1+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER, 0)
             CONTROL_RTEXT(           _T("Blue:"),        CID_RGB_BLUE_CAP,              8+HDlgCX+8,     HLCY*2+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-            CONTROL_CTEXT(        _T("THE BLUE"),        CID_RGB_BLUE_VAL,        HDlgCX+12+HHCX/2,     HLCY*2+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, WS_EX_STATICEDGE)
+            CONTROL_EDITTEXT(                            CID_RGB_BLUE_VAL,        HDlgCX+12+HHCX/2,     HLCY*2+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER, 0)
         CONTROL_GROUPBOX(        _T("HSL Color"),             CID_GRP_HSL,              8+HDlgCX+4,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
         CONTROL_GROUPBOX(        _T("HSV Color"),             CID_GRP_HSV,     8+HDlgCX+HDlgCX/2+8,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
         CONTROL_GROUPBOX(     _T("Color Picker"),          CID_GRP_PICKER,              8+HDlgCX+4, 4+HDlg3CY*2+8,         HDlgCX,     HDlg3CY+8, 0, 0)
@@ -122,7 +123,7 @@ private:
         DLGRESIZE_CONTROL(CID_GRP_PICKER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
     END_DLGRESIZE_MAP()
 
-    BEGIN_MSG_MAP_EX(CSpectrumColorPicker)
+    BEGIN_MSG_MAP(CColorPicker::Impl)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
@@ -146,10 +147,9 @@ CColorPicker::Impl::~Impl() = default;
 
 CColorPicker::Impl::Impl()
     :    m_imSpectrum{0xffffff, SPEC_HSV_Hue}
+    , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
     ,      m_imSlider{}
     ,       m_stColor{}
-    , m_nSpectrumKind{SPEC_HSV_Hue}
-    ,   m_bMsgHandled{FALSE}
 {
 }
 
@@ -293,9 +293,8 @@ void CColorPicker::Impl::OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar ctl
 CColorPicker::~CColorPicker() = default;
 
 CColorPicker::CColorPicker()
-    :         Super{}
-    ,       m_pImpl{std::make_unique<Impl>()}
-    , m_bMsgHandled{FALSE}
+    :   Super{}
+    , m_pImpl{std::make_unique<Impl>()}
 {
 }
 
@@ -306,6 +305,14 @@ HRESULT CColorPicker::PreCreateWindow()
         return code;
     }
     return Super::PreCreateWindow();
+}
+
+BOOL CColorPicker::PreTranslateMessage(MSG* pMsg)
+{
+    if (m_pImpl->IsDialogMessageW(pMsg)) {
+        return TRUE;
+    }
+    return FALSE;
 }
 
 ATOM& CColorPicker::GetWndClassAtomRef()
@@ -335,20 +342,14 @@ struct CDCEx: WTL::CWindowDC
 
 BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
-    BOOL const bSave{m_bMsgHandled};
-    BOOL const  bRet{_ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)};
-    m_bMsgHandled = bSave;
-    return bRet;
-}
-
-BOOL CColorPicker::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
-{
     BOOL bHandled{TRUE};
     UNREFERENCED_PARAMETER(hWnd);
+    UNREFERENCED_PARAMETER(bHandled);
     switch(dwMsgMapID) { 
     case 0:
-        //MSG_WM_NCPAINT(OnNcPaint)
+      //MSG_WM_NCPAINT(OnNcPaint)
         MSG_WM_CREATE(OnCreate)
+        MSG_WM_DESTROY(OnDestroy)
         MSG_WM_SIZE(OnSize)
         REFLECT_NOTIFICATIONS()
         break;
@@ -386,7 +387,12 @@ int CColorPicker::OnCreate(LPCREATESTRUCT lpCreateStruct)
     return 0;
 }
 
-void CColorPicker::OnSize(UINT nType, CSize size)
+void CColorPicker::OnDestroy()
+{
+    SetMsgHandled(FALSE);
+}
+
+void CColorPicker::OnSize(UINT nType, CSize size) const
 {
     CRect rc{0, 0, size.cx, size.cy};
     m_pImpl->MoveWindow(rc);

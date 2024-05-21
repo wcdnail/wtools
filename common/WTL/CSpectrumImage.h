@@ -3,6 +3,8 @@
 #include "CColorPickerDefs.h"
 #include "CCustomCtrl.h"
 #include <DDraw.DGI/CeXDib.h>
+#include <atlctrls.h>
+#include <atlgdi.h>
 
 struct CRGBSpecRect;
 
@@ -27,7 +29,6 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
 private:
     friend Super;
 
-    BOOL            m_bMsgHandled;
     CDIBitmap               m_Dib;
     CColorUnion           m_Color;
     CPoint                m_ptSel;
@@ -37,11 +38,7 @@ private:
 
     static ATOM& GetWndClassAtomRef();
 
-    BOOL IsMsgHandled() const { return m_bMsgHandled; }
-    void SetMsgHandled(BOOL bHandled) { m_bMsgHandled = bHandled; }
-
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
-    BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 
     void UpdateRaster();
     void DrawMarker(WTL::CDCHandle dc) const;

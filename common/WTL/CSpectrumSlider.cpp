@@ -8,12 +8,12 @@
 #include "CSpectrumImage.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 #include <atlmisc.h>
+#include <atlcrack.h>
 
 CSpectrumSlider::~CSpectrumSlider() = default;
 
 CSpectrumSlider::CSpectrumSlider()
-    :    m_bMsgHandled{FALSE}
-    ,       m_bCapture{false}
+    :       m_bCapture{false}
     ,    m_pimSpectrum{nullptr}
     ,       m_pstColor{nullptr}
     ,            m_Dib{}
@@ -56,14 +56,6 @@ ATOM& CSpectrumSlider::GetWndClassAtomRef()
 }
 
 BOOL CSpectrumSlider::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
-{
-    BOOL const bSave{m_bMsgHandled};
-    BOOL const  bRet{_ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID)};
-    m_bMsgHandled = bSave;
-    return bRet;
-}
-
-BOOL CSpectrumSlider::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
     BOOL bHandled{TRUE};
     UNREFERENCED_PARAMETER(hWnd);

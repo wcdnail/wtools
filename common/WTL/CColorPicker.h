@@ -1,9 +1,12 @@
 #pragma once
 
 #include "CCustomCtrl.h"
+#include <atlgdi.h>
+#include <atlapp.h>
 #include <memory>
 
-struct CColorPicker: CCustomControl<CColorPicker>
+struct CColorPicker: CCustomControl<CColorPicker>,
+                     WTL::CMessageFilter
 {
     using Super = CCustomControl<CColorPicker>;
 
@@ -13,23 +16,19 @@ struct CColorPicker: CCustomControl<CColorPicker>
     CColorPicker();
 
     HRESULT PreCreateWindow() override;
+    BOOL PreTranslateMessage(MSG* pMsg) override;
 
 private:
     friend Super;
     struct Impl;
 
     std::unique_ptr<Impl> m_pImpl;
-    BOOL            m_bMsgHandled;
 
     static ATOM& GetWndClassAtomRef();
-
-    BOOL IsMsgHandled() const { return m_bMsgHandled; }
-    void SetMsgHandled(BOOL bHandled) { m_bMsgHandled = bHandled; }
-
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
-    BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 
     void OnNcPaint(WTL::CRgnHandle rgn);
     int OnCreate(LPCREATESTRUCT lpCreateStruct);
-    void OnSize(UINT nType, CSize size);
+    void OnDestroy();
+    void OnSize(UINT nType, CSize size) const;
 };

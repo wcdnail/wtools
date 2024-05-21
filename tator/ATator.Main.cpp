@@ -32,7 +32,7 @@ static HRESULT GetErrorCode(HRESULT code)                   // если диал
     return static_cast<HRESULT>(dwCode);
 }
 
-static int Run(LPTSTR lpstrCmdLine, int nCmdShow)
+static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 {
     HRESULT  code = ERROR_SUCCESS;
     int      nRet = 0;
