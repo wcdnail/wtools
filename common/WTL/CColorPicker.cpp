@@ -274,7 +274,10 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     case BN_KILLFOCUS:
         break;
     case EN_UPDATE:
-        DoDataExchange(DDX_SAVE, nID);
+        if (DoDataExchange(DDX_SAVE, nID)) {
+            m_imSpectrum.GetColorUnion().SetUpdated(true);
+            m_imSpectrum.InvalidateRect(nullptr, FALSE);
+        }
         return ;
     case CBN_SELENDOK:
         DoDataExchange(DDX_SAVE, nID);

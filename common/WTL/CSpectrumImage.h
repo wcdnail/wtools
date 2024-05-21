@@ -30,24 +30,23 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
 private:
     friend Super;
 
-    CDIBitmap               m_Dib;
-    CColorUnion           m_Color;
-    CPoint                m_ptSel;
-    SpectrumKind   m_SpectrumKind;
+    CDIBitmap             m_Dib;
+    CColorUnion         m_Color;
+    SpectrumKind m_SpectrumKind;
 
     static ATOM& GetWndClassAtomRef();
 
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 
     void UpdateRaster();
-    void DrawMarker(WTL::CDCHandle dc) const;
+    void DrawMarker(WTL::CDCHandle dc, CRect const& rc);
 
     int OnCreate(LPCREATESTRUCT pCS);
     void OnPaint(WTL::CDCHandle dc);
     void OnLButtonDown(UINT nFlags, CPoint point);
     void OnLButtonUp(UINT nFlags, CPoint point) const;
     void NotifySend() const;
-    void NotifyColorChanged(CRect const& rcClient, CPoint pt);
+    void NotifyColorChanged(CRect const& rc, CPoint pt);
     void OnMouseMove(UINT nFlags, CPoint pt);
 };
 

@@ -88,6 +88,7 @@ struct CColorUnion
 
     COLORREF GetColorRef() const;
     CRGBSpecRect GetRGBSpectrumRect(SpectrumKind nSpectrumKind) const;
+    CPoint GetColorPoint(SpectrumKind nSpectrumKind, CRect const& rc);
 
 private:
     void SetRGBPlain(int R, int G, int B);

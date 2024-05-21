@@ -164,3 +164,44 @@ CRGBSpecRect CColorUnion::GetRGBSpectrumRect(SpectrumKind nSpectrumKind) const
     }
     return rv;
 }
+
+CPoint CColorUnion::GetColorPoint(SpectrumKind nSpectrumKind, CRect const& rc)
+{
+    double xScale = 1.;
+    double yScale = 1.;
+
+    switch (nSpectrumKind) {
+    case SPEC_RGB_Red:
+    case SPEC_RGB_Green:
+    case SPEC_RGB_Blue:
+        xScale = static_cast<double>(rc.Width()) / RGB_MAX;
+        yScale = static_cast<double>(rc.Height()) / RGB_MAX;
+        break;
+    case SPEC_HSV_Hue:
+        xScale = rc.Width() / HSV_SAT_MAX;
+        yScale = rc.Height() / HSV_VAL_MAX;
+        break;
+    case SPEC_HSV_Saturation:
+        xScale = rc.Width() / HSV_HUE_MAX;
+        yScale = rc.Height() / HSV_VAL_MAX;
+        break;
+    case SPEC_HSV_Brightness:
+        xScale = rc.Width() / HSV_HUE_MAX;
+        yScale = rc.Height() / HSV_SAT_MAX;
+        break;
+    default:
+        break;
+    }
+    CPoint rv{0, 0};
+    switch (nSpectrumKind) {
+    case SPEC_RGB_Red:          rv.SetPoint(static_cast<int>(GetGreen() * xScale), static_cast<int>(GetBlue() * yScale)); break;
+    case SPEC_RGB_Green:        rv.SetPoint(static_cast<int>(GetRed() * xScale), static_cast<int>(GetBlue() * yScale)); break;
+    case SPEC_RGB_Blue:         rv.SetPoint(static_cast<int>(GetGreen() * xScale), static_cast<int>(GetRed() * yScale)); break;
+    case SPEC_HSV_Hue:          rv.SetPoint(static_cast<int>(m_dS * xScale), static_cast<int>(rc.Height() - (m_dV * yScale))); break;
+    case SPEC_HSV_Saturation:   rv.SetPoint(static_cast<int>(m_dH * xScale), static_cast<int>(rc.Height() - (m_dV * yScale))); break;
+    case SPEC_HSV_Brightness:   rv.SetPoint(static_cast<int>(m_dH * xScale), static_cast<int>(rc.Height() - (m_dS * yScale))); break;
+    default:
+        break;
+    }
+    return rv;
+}
