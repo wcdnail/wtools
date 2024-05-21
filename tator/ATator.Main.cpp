@@ -5,7 +5,7 @@
 #include "string.utils.format.h"
 #include "string.utils.error.code.h"
 #include "dh.tracing.h"
-#include "3rd-party/inipp.h"
+#include <WTL/CAppModuleRef.h>
 #include <fstream>
 #include <iostream>
 
@@ -89,6 +89,8 @@ static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int nCmdShow)
 {
+    CScopedAppRegistrator sAppReg{_Module};
+
     HRESULT code = S_OK;
     SetErrorMode(SetErrorMode(0) | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
 

@@ -46,6 +46,7 @@
     <ClCompile Include="string.utils.format.cpp" />
     <ClCompile Include="windows.uses.gdi+.cpp" />
     <ClCompile Include="windows.wtl.buffered.paint.cpp" />
+    <ClCompile Include="WTL\CAppModuleRef.cpp" />
     <ClCompile Include="WTL\CColorButton.cpp" />
     <ClCompile Include="WTL\CColorPicker.cpp" />
     <ClCompile Include="WTL\CColorPickerDefs.cpp" />
@@ -79,6 +80,7 @@
     <ClInclude Include="string.utils.format.h" />
     <ClInclude Include="windows.uses.gdi+.h" />
     <ClInclude Include="windows.wtl.buffered.paint.h" />
+    <ClInclude Include="WTL\CAppModuleRef.h" />
     <ClInclude Include="WTL\CButtonMenu.h" />
     <ClInclude Include="WTL\CColorButton.h" />
     <ClInclude Include="WTL\CColorPicker.h" />

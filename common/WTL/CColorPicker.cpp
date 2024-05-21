@@ -4,6 +4,7 @@
 #include "CSpectrumImage.h"
 #include "CSpectrumSlider.h"
 #include "CSliderCtrl.h"
+#include "CAppModuleRef.h"
 #include <dev.assistance/dev.assist.h>
 #include <dh.tracing.defs.h>
 #include <dh.tracing.h>
@@ -383,6 +384,11 @@ int CColorPicker::OnCreate(LPCREATESTRUCT lpCreateStruct)
     if (!m_pImpl->Create(m_hWnd)) {
         return -1;
     }
+    if (auto const* pAppModule = AppModulePtr()) {
+        WTL::CMessageLoop* pLoop = pAppModule->GetMessageLoop();
+        ATLASSERT(pLoop != NULL);
+        pLoop->AddMessageFilter(this);
+    }
     ATLTRACE(ATL::atlTraceControls, 0, _T("WM_CREATE OK for %p\n"), this);
     return 0;
 }
@@ -390,6 +396,11 @@ int CColorPicker::OnCreate(LPCREATESTRUCT lpCreateStruct)
 void CColorPicker::OnDestroy()
 {
     SetMsgHandled(FALSE);
+    if (auto const* pAppModule = AppModulePtr()) {
+        WTL::CMessageLoop* pLoop = pAppModule->GetMessageLoop();
+        ATLASSERT(pLoop != NULL);
+        pLoop->RemoveMessageFilter(this);
+    }
 }
 
 void CColorPicker::OnSize(UINT nType, CSize size) const

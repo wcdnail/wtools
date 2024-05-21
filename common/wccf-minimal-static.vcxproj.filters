@@ -43,6 +43,9 @@
     <ClCompile Include="WTL\CColorPickerDefs.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
+    <ClCompile Include="WTL\CAppModuleRef.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -113,6 +116,9 @@
       <Filter>DDraw.DGI</Filter>
     </ClInclude>
     <ClInclude Include="WTL\CColorPickerDefs.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
+    <ClInclude Include="WTL\CAppModuleRef.h">
       <Filter>WTL</Filter>
     </ClInclude>
   </ItemGroup>
