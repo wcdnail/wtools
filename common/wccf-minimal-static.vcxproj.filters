@@ -121,6 +121,7 @@
     <ClInclude Include="WTL\CAppModuleRef.h">
       <Filter>WTL</Filter>
     </ClInclude>
+    <ClInclude Include="scoped.bool.guard.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

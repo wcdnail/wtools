@@ -74,6 +74,7 @@
     <ClInclude Include="rect.putinto.h" />
     <ClInclude Include="rect.screen.h" />
     <ClInclude Include="rectz.h" />
+    <ClInclude Include="scoped.bool.guard.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="shell.imagelist.h" />
     <ClInclude Include="stdafx.h" />

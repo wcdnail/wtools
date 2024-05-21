@@ -6,6 +6,7 @@
 #include "CSliderCtrl.h"
 #include "CAppModuleRef.h"
 #include <dev.assistance/dev.assist.h>
+#include <scoped.bool.guard.h>
 #include <dh.tracing.defs.h>
 #include <dh.tracing.h>
 #include <atlctrls.h>
@@ -72,6 +73,7 @@ private:
     int         m_nSpectrumKind; // For DDX
     CSpectrumSlider  m_imSlider;
     WTL::CStatic      m_stColor;
+    bool          m_bUpdateData;
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,             X,             Y,          Width,        Height, Style...
         CONTROL_GROUPBOX(   _T("Spectrum Color"),        CID_GRP_SPECTRUM,                       4,             4,         HDlgCX,       DlgCY-8, 0, 0)
@@ -82,11 +84,11 @@ private:
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD, _T("msctls_trackbar32"),  TB_VERT, HDlgCX-HHCY-8,       18+HHCY,      HHCX/2-12, DlgCY-HHCY-30, 0)
         CONTROL_GROUPBOX(        _T("RGB Color"),             CID_GRP_RGB,              8+HDlgCX+4,             4,         HDlgCX,       HDlg3CY, 0, 0)
             CONTROL_RTEXT(            _T("Red:"),         CID_RGB_RED_CAP,              8+HDlgCX+8,     HLCY*0+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-            CONTROL_EDITTEXT(                             CID_RGB_RED_VAL,        HDlgCX+12+HHCX/2,     HLCY*0+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER, 0)
+            CONTROL_EDITTEXT(                             CID_RGB_RED_VAL,        HDlgCX+12+HHCX/2,     HLCY*0+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
             CONTROL_RTEXT(          _T("Green:"),       CID_RGB_GREEN_CAP,              8+HDlgCX+8,     HLCY*1+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-            CONTROL_EDITTEXT(                           CID_RGB_GREEN_VAL,        HDlgCX+12+HHCX/2,     HLCY*1+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER, 0)
+            CONTROL_EDITTEXT(                           CID_RGB_GREEN_VAL,        HDlgCX+12+HHCX/2,     HLCY*1+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
             CONTROL_RTEXT(           _T("Blue:"),        CID_RGB_BLUE_CAP,              8+HDlgCX+8,     HLCY*2+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-            CONTROL_EDITTEXT(                            CID_RGB_BLUE_VAL,        HDlgCX+12+HHCX/2,     HLCY*2+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER, 0)
+            CONTROL_EDITTEXT(                            CID_RGB_BLUE_VAL,        HDlgCX+12+HHCX/2,     HLCY*2+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
         CONTROL_GROUPBOX(        _T("HSL Color"),             CID_GRP_HSL,              8+HDlgCX+4,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
         CONTROL_GROUPBOX(        _T("HSV Color"),             CID_GRP_HSV,     8+HDlgCX+HDlgCX/2+8,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
         CONTROL_GROUPBOX(     _T("Color Picker"),          CID_GRP_PICKER,              8+HDlgCX+4, 4+HDlg3CY*2+8,         HDlgCX,     HDlg3CY+8, 0, 0)
@@ -97,10 +99,17 @@ private:
         DIALOG_FONT(8, _T("MS Shell Dlg 2"))
     END_DIALOG()
 
+#define DDX_BYTE_RANGE(nID, var)                                             \
+    if ((nCtlID == (UINT)-1) || (nCtlID == nID)) {                            \
+        if (!DDX_Int<BYTE>(nID, var, FALSE, bSaveAndValidate, TRUE, 0, 255)) { \
+            return FALSE;                                                       \
+        }                                                                        \
+    }
+
     BEGIN_DDX_MAP(CSpectrumColorPicker)
-        DDX_INT(CID_RGB_RED_VAL, m_imSpectrum.GetColorUnion().GetRed());
-        DDX_INT(CID_RGB_GREEN_VAL, m_imSpectrum.GetColorUnion().GetGreen());
-        DDX_INT(CID_RGB_BLUE_VAL, m_imSpectrum.GetColorUnion().GetBlue());
+        DDX_BYTE_RANGE(CID_RGB_RED_VAL, m_imSpectrum.GetColorUnion().GetRed());
+        DDX_BYTE_RANGE(CID_RGB_GREEN_VAL, m_imSpectrum.GetColorUnion().GetGreen());
+        DDX_BYTE_RANGE(CID_RGB_BLUE_VAL, m_imSpectrum.GetColorUnion().GetBlue());
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
         OnDDXChanges(nCtlID);
     END_DDX_MAP()
@@ -137,6 +146,7 @@ private:
 
     void OnDDXChanges(int nID);
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
+    void ColorChanged(bool bNotify);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
@@ -151,6 +161,7 @@ CColorPicker::Impl::Impl()
     , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
     ,      m_imSlider{}
     ,       m_stColor{}
+    ,   m_bUpdateData{false}
 {
 }
 
@@ -201,10 +212,11 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
     case NM_SPECTRUM_CLR_SEL:
         switch (nID) {
         case CID_SPECTRUM_PIC: {
-            if (SPEC_HSV_Hue != m_imSpectrum.GetSpectrumKind()) {
-                m_imSlider.UpdateRaster(m_imSpectrum.GetSpectrumKind(), m_imSpectrum.GetColorUnion());
-            }
-            m_stColor.InvalidateRect(nullptr, FALSE);
+            ColorChanged(true);
+            CScopedBoolGuard bGuard{m_bUpdateData};
+            DoDataExchange(DDX_LOAD, CID_RGB_RED_VAL);
+            DoDataExchange(DDX_LOAD, CID_RGB_GREEN_VAL);
+            DoDataExchange(DDX_LOAD, CID_RGB_BLUE_VAL);
             return 0;
         }
         }
@@ -215,6 +227,17 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
     return 0;
 }
 
+void CColorPicker::Impl::ColorChanged(bool bNotify)
+{
+    if (SPEC_HSV_Hue != m_imSpectrum.GetSpectrumKind()) {
+        m_imSlider.UpdateRaster(m_imSpectrum.GetSpectrumKind(), m_imSpectrum.GetColorUnion());
+    }
+    m_stColor.InvalidateRect(nullptr, FALSE);
+    if (!bNotify) {
+        m_imSpectrum.InvalidateRect(nullptr, FALSE);
+    }
+}
+
 void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/)
 {
     switch (uNotifyCode) {
@@ -223,11 +246,23 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     case BN_DISABLE:
     case BN_KILLFOCUS:
         break;
+    case EN_UPDATE:
+        if (!m_bUpdateData) {
+            if (!DoDataExchange(DDX_SAVE, nID)) {
+                return ;
+            }
+            ColorChanged(false);
+        }
+        return ;
     case CBN_SELENDOK:
-        DoDataExchange(TRUE, nID);
+        DoDataExchange(DDX_SAVE, nID);
         return ;
     case CBN_SELENDCANCEL:
     case CBN_CLOSEUP:
+    case EN_CHANGE:
+    case EN_SETFOCUS:
+    case EN_KILLFOCUS:
+    case EN_MAXTEXT:
         return ;
     default:
         DBGTPrint(LTH_WM_COMMAND L" id:%-4d nc:%-4d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
@@ -258,7 +293,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     cbSpectrum.AddString(L"HSV/饱和度");
     cbSpectrum.AddString(L"HSV/明度");
 
-    DoDataExchange(FALSE);
+    DoDataExchange(DDX_LOAD);
     DlgResize_Init(false, true, 0);
 
     OnSpecComboChanged();
