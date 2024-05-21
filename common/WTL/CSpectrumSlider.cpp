@@ -5,29 +5,31 @@
 //
 #include "stdafx.h"
 #include "CSpectrumSlider.h"
-#include "CSpectrumImage.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 #include <atlmisc.h>
 #include <atlcrack.h>
+#include <atlgdi.h>
+
+ATOM& CSpectrumSlider::GetWndClassAtomRef()
+{
+    static ATOM gs_CSpectrumSlider_Atom{0};
+    return gs_CSpectrumSlider_Atom;
+}
 
 CSpectrumSlider::~CSpectrumSlider() = default;
 
 CSpectrumSlider::CSpectrumSlider()
     :       m_bCapture{false}
-    ,    m_pimSpectrum{nullptr}
-    ,       m_pstColor{nullptr}
     ,            m_Dib{}
     ,       m_rcRaster{}
 {
 }
 
-bool CSpectrumSlider::Initialize(CSpectrumImage& imSpectrum, WTL::CStatic& stColor, long cx /*= SPECTRUM_SLIDER_CX*/)
+bool CSpectrumSlider::Initialize(long cx /*= SPECTRUM_SLIDER_CX*/)
 {
     if (!m_Dib.Create(cx, 1, 32)) {
         return false;
     }
-    m_pimSpectrum = &imSpectrum;
-    m_pstColor = &stColor;
     SetRange(SPECTRUM_SLIDER_MIN, SPECTRUM_SLIDER_MAX, TRUE);
     return true;
 }
@@ -49,15 +51,8 @@ void CSpectrumSlider::UpdateRaster(SpectrumKind spKind, CColorUnion const& unCol
     Invalidate();
 }
 
-ATOM& CSpectrumSlider::GetWndClassAtomRef()
-{
-    static ATOM gs_CSpectrumSlider_Atom{0};
-    return gs_CSpectrumSlider_Atom;
-}
-
 BOOL CSpectrumSlider::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
-    BOOL bHandled{TRUE};
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) { 
     case 0:
@@ -245,21 +240,15 @@ void CSpectrumSlider::OnMouseMove(UINT nFlags, CPoint pt)
         nPos = nMax;
     }
     SetPos(nPos, TRUE);
-    if (m_pimSpectrum) {
-        m_pimSpectrum->OnSliderChanged(nPos);
-    }
-    else {
-        NMTRBTHUMBPOSCHANGING tPosCh;
-        tPosCh.dwPos = nPos;
-        tPosCh.nReason = TB_THUMBPOSITION;
-        tPosCh.hdr.code = TRBN_THUMBPOSCHANGING;
-        tPosCh.hdr.idFrom = GetDlgCtrlID();
-        tPosCh.hdr.hwndFrom = m_hWnd;
-        ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)tPosCh.hdr.idFrom, reinterpret_cast<LPARAM>(&tPosCh));
-    }
-    if (m_pstColor) {
-        m_pstColor->InvalidateRect(nullptr, FALSE);
-    }
+
+    NMTRBTHUMBPOSCHANGING nmPosChanged;
+    nmPosChanged.dwPos = nPos;
+    nmPosChanged.nReason = TB_THUMBPOSITION;
+    nmPosChanged.hdr.code = TRBN_THUMBPOSCHANGING;
+    nmPosChanged.hdr.idFrom = GetDlgCtrlID();
+    nmPosChanged.hdr.hwndFrom = m_hWnd;
+    ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)nmPosChanged.hdr.idFrom, reinterpret_cast<LPARAM>(&nmPosChanged));
+
     if (!m_rcRaster.IsRectEmpty() && !m_rcRaster.PtInRect(pt)) {
         OnLButtonUp(nFlags, pt);
     }

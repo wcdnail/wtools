@@ -19,15 +19,13 @@ struct CSpectrumSlider: CCustomControl<CSpectrumSlider, WTL::CSliderCtrl>
     ~CSpectrumSlider() override;
     CSpectrumSlider();
 
-    bool Initialize(CSpectrumImage& imSpectrum, WTL::CStatic& stColor, long cx = SPECTRUM_SLIDER_CX);
+    bool Initialize(long cx = SPECTRUM_SLIDER_CX);
     void UpdateRaster(SpectrumKind spKind, CColorUnion const& unColor);
 
 private:
     friend Super;
 
     bool               m_bCapture;
-    CSpectrumImage* m_pimSpectrum;
-    WTL::CStatic*      m_pstColor;
     CDIBitmap               m_Dib;
     CRect              m_rcRaster;
 
