@@ -24,6 +24,7 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
     CColorUnion& GetColorUnion();
     void SetSpectrumKind(SpectrumKind kind);
     SpectrumKind GetSpectrumKind() const;
+    SpectrumKind const& GetSpectrumKindRef() const;
     void OnSliderChanged(long nPos);
     void OnColorChanged(double xPos, double yPos);
 
@@ -51,6 +52,11 @@ private:
 };
 
 inline SpectrumKind CSpectrumImage::GetSpectrumKind() const
+{
+    return m_SpectrumKind;
+}
+
+inline SpectrumKind const& CSpectrumImage::GetSpectrumKindRef() const
 {
     return m_SpectrumKind;
 }

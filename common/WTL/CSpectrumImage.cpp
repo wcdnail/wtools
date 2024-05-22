@@ -43,6 +43,7 @@ void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
 
 void CSpectrumImage::OnSliderChanged(long nPos)
 {
+    /*
     switch (m_SpectrumKind) {
     case SPEC_RGB_Red:          m_Color.SetRGB(255 - nPos, m_Color.GetGreen(), m_Color.GetBlue()); break;
     case SPEC_RGB_Green:        m_Color.SetRGB(m_Color.GetRed(), 255 - nPos, m_Color.GetBlue()); break;
@@ -56,6 +57,7 @@ void CSpectrumImage::OnSliderChanged(long nPos)
     }
     InvalidateRect(nullptr, FALSE);
     NotifySend();
+    */
 }
 
 void CSpectrumImage::OnColorChanged(double xPos, double yPos)
@@ -192,8 +194,10 @@ void CSpectrumImage::OnMouseMove(UINT, CPoint pt)
 
 void CSpectrumImage::OnLButtonDown(UINT, CPoint)
 {
-    if (GetCapture() == m_hWnd) {
-        return ;
+    if (m_hWnd != GetCapture()) {
+        SetCapture();
     }
-    SetCapture();
+    else {
+        ReleaseCapture();
+    }
 }

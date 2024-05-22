@@ -11,7 +11,7 @@ constexpr double HSV_HUE_AMID{270.};
 constexpr double  HSV_SAT_MAX{100.};
 constexpr double  HSV_VAL_MAX{100.};
 constexpr double      RGB_MAX{255.};
-constexpr int     RGB_MAX_INT{255 };
+constexpr int     RGB_MAX_INT{255};
 
 void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G, int& B);
 
@@ -40,6 +40,7 @@ enum CCPMiscConsts: int
     SPECTRUM_CHANNEL_CY = 32,
 
     NM_SPECTRUM_CLR_SEL = 1917,
+    NM_SLIDER_CLR_SEL,
 };
 
 static_assert(SPECTRUM_BPP == 32, "SPECTRUM_BPP must always be 32!");

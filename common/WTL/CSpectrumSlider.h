@@ -4,7 +4,6 @@
 #include "CCustomCtrl.h"
 #include <DDraw.DGI/CeXDib.h>
 #include <wcdafx.api.h>
-#include <atlctrls.h>
 
 enum SpectrumKind: int;
 
@@ -16,21 +15,25 @@ struct CSpectrumSlider: CCustomControl<CSpectrumSlider>
     DECLARE_WND_SUPERCLASS2(CSPECSLD_CLASS, CSpectrumSlider, nullptr)
 
     ~CSpectrumSlider() override;
-    CSpectrumSlider();
+    CSpectrumSlider(SpectrumKind const& nKind, CColorUnion& unColor);
 
     bool Initialize(long cx = SPECTRUM_SLIDER_CX);
-    void UpdateRaster(SpectrumKind spKind, CColorUnion const& unColor);
+    void UpdateRaster();
 
 private:
     friend Super;
 
-    CDIBitmap  m_Dib;
+    SpectrumKind const& m_nKind;
+    CColorUnion&      m_unColor;
+    CDIBitmap             m_Dib;
 
     static ATOM& GetWndClassAtomRef();
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 
     int OnCreate(LPCREATESTRUCT pCS);
-    CRect GetThumbRect(CRect const& rc) const;
+    double GetValueAndRange(long& nPos) const;
+    void SetValue(long nY) const;
+    void NotifySend() const;
     void DrawRaster(WTL::CDCHandle dc, CRect const& rc) const;
     void DrawPosition(WTL::CDCHandle dc, CRect const& rc) const;
     void OnPaint(WTL::CDCHandle dc) const;
