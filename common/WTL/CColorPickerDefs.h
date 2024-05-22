@@ -29,8 +29,8 @@ enum SpectrumKind: int
 
 enum CCPMiscConsts: int
 {
+    SPEC_BITMAP_WDTH    = 48,
     SPECTRUM_BPP        = 32,
-    SPEC_BITMAP_WDTH    = 32,
     SPECTRUM_CX         = SPEC_BITMAP_WDTH,
     SPECTRUM_CY         = SPEC_BITMAP_WDTH,
     SPECTRUM_SLIDER_CX  = SPEC_BITMAP_WDTH,
