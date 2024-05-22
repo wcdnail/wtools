@@ -96,7 +96,7 @@ private:
         CONTROL_GROUPBOX(   _T("Spectrum Color"),        CID_GRP_SPECTRUM,                         2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
             CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                         8,             14,        HHCX*2-8,       DLG_CY-4,   CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP, 0)
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS, CC_CHILD,               8,        18+HLCY, SPEC_CX-HHCY-20, DLG_CY-HLCY-26,   WS_EX_STATICEDGE)
-        CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD, _T("msctls_trackbar32"),  TB_VERT, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-26,   0)
+        CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD, _T("msctls_trackbar32"),  TB_VERT, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-26,   WS_EX_STATICEDGE)
             CONTROL_RTEXT(          _T("Color:"),      CID_SPEC_COLOR_CAP,    SPEC_CX-HHCY-HHCX/2-10,             14,        HHCX/2-8,           HLCY,   SS_CENTERIMAGE, 0)
             CONTROL_CTEXT(           _T("COLOR"),      CID_SPEC_COLOR_SEL,           SPEC_CX-HHCY-10,             14,          HHCY+2,         HHCY-2,   SS_SUNKEN | SS_CENTERIMAGE | SS_OWNERDRAW, WS_EX_STATICEDGE)
         CONTROL_GROUPBOX(        _T("RGB Color"),             CID_GRP_RGB,                 SPEC_CX+4,              2,        RGB_CX-8,       RGB_CY-4,   0, 0)
@@ -143,7 +143,9 @@ private:
         DDX_TEXT(CID_RGB_HEX_VAL, m_sColorHex);
         DDX_TEXT(CID_RGB_HTM_VAL, m_sColorHtml);
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
-        OnDDXChanges(nCtlID, bSaveAndValidate);
+        if (static_cast<UINT>(-1) != nCtlID) {
+            OnDDXChanges(nCtlID, bSaveAndValidate);
+        }
     END_DDX_MAP()
 
     BEGIN_DLGRESIZE_MAP(CTatorMainDlg)
@@ -194,6 +196,7 @@ private:
 
     void SpectruKindChanged();
     LRESULT SliderChanged(LPNMHDR pnmh);
+    void UpdateDDX();
     LRESULT ColorChanged(bool bNotify);
     void OnDDXChanges(UINT nID, BOOL bSaveAndValidate);
     void OnDataValidateError(UINT nCtrlID, BOOL bSave, _XData& data);
@@ -270,6 +273,15 @@ LRESULT CColorPicker::Impl::SliderChanged(LPNMHDR pnmh)
     return 0;
 }
 
+void CColorPicker::Impl::UpdateDDX()
+{
+    auto const& Color{m_imSpectrum.GetColorUnion()};
+    m_sColorHex.Format(TEXT("0x%02X%02X%02X"), Color.GetBlue(), Color.GetGreen(), Color.GetRed());
+    m_sColorHtml.Format(TEXT("#%02X%02X%02X"), Color.GetRed(), Color.GetGreen(), Color.GetBlue());
+
+    DoDataExchange(DDX_LOAD);
+}
+
 LRESULT CColorPicker::Impl::ColorChanged(bool bNotify)
 {
     if (SPEC_HSV_Hue != m_imSpectrum.GetSpectrumKind()) {
@@ -278,12 +290,7 @@ LRESULT CColorPicker::Impl::ColorChanged(bool bNotify)
     m_stColor.InvalidateRect(nullptr, FALSE);
     if (bNotify) {
         CScopedBoolGuard bGuard{m_bSaveData};
-        DoDataExchange(DDX_LOAD, CID_RGB_RED_VAL);
-        DoDataExchange(DDX_LOAD, CID_RGB_GRN_VAL);
-        DoDataExchange(DDX_LOAD, CID_RGB_BLU_VAL);
-        DoDataExchange(DDX_LOAD, CID_HSV_HUE_VAL);
-        DoDataExchange(DDX_LOAD, CID_HSV_SAT_VAL);
-        DoDataExchange(DDX_LOAD, CID_HSV_VAL_VAL);
+        UpdateDDX();
     }
     else {
         m_imSpectrum.InvalidateRect(nullptr, FALSE);
@@ -380,7 +387,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 
     {
         CScopedBoolGuard bGuard{m_bSaveData};
-        DoDataExchange(DDX_LOAD);
+        UpdateDDX();
         SpectruKindChanged();
     }
 
