@@ -4,7 +4,6 @@
 #include "CCustomCtrl.h"
 #include <wcdafx.api.h>
 #include <DDraw.DGI/CeXDib.h>
-#include <atlctrls.h>
 #include <atlgdi.h>
 
 struct CRGBSpecRect;
@@ -25,7 +24,6 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
     void SetSpectrumKind(SpectrumKind kind);
     SpectrumKind GetSpectrumKind() const;
     SpectrumKind const& GetSpectrumKindRef() const;
-    void OnSliderChanged(long nPos);
     void OnColorChanged(double xPos, double yPos);
 
 private:

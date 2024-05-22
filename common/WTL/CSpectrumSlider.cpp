@@ -61,7 +61,46 @@ double CSpectrumSlider::GetValueAndRange(long& nPos) const
     return RGB_MAX;
 }
 
-void CSpectrumSlider::SetValue(long nY) const
+void CSpectrumSlider::ColorChanged() const
+{
+    switch (m_nKind) {
+    case SPEC_RGB_Red:
+    case SPEC_RGB_Green:
+    case SPEC_RGB_Blue:
+        m_unColor.RGBtoHSV();
+        break;
+    case SPEC_HSV_Hue:
+    case SPEC_HSV_Saturation:
+    case SPEC_HSV_Brightness:
+        m_unColor.HSVtoRGB();
+        break;
+    }
+    m_unColor.SetUpdated(true);
+}
+
+void CSpectrumSlider::SetValue(long nPos, long nMax) const
+{
+    if (nPos < 0) {
+        nPos = 0;
+    }
+    else if (nPos > nMax) {
+        nPos = nMax;
+    }
+    switch (m_nKind) {
+    case SPEC_RGB_Red:        m_unColor.m_Red = nPos; break;
+    case SPEC_RGB_Green:      m_unColor.m_Green = nPos; break;
+    case SPEC_RGB_Blue:       m_unColor.m_Blue = nPos; break;
+    case SPEC_HSV_Hue:        m_unColor.m_dH = static_cast<double>(nPos); break;
+    case SPEC_HSV_Saturation: m_unColor.m_dS = static_cast<double>(nPos); break;
+    case SPEC_HSV_Brightness: m_unColor.m_dV = static_cast<double>(nPos); break;
+    default:
+        ATLASSERT(FALSE);
+        break;
+    }
+    ColorChanged();
+}
+
+void CSpectrumSlider::SetValueByY(long nY) const
 {
     CRect rc{};
     GetClientRect(rc);
@@ -82,7 +121,6 @@ void CSpectrumSlider::SetValue(long nY) const
         case SPEC_RGB_Green: m_unColor.m_Green = static_cast<int>(dPos); break;
         case SPEC_RGB_Blue:  m_unColor.m_Blue = static_cast<int>(dPos); break;
         }
-        m_unColor.RGBtoHSV();
         break;
     }
     case SPEC_HSV_Hue:{
@@ -107,14 +145,7 @@ void CSpectrumSlider::SetValue(long nY) const
         ATLASSERT(FALSE);
         break;
     }
-    switch (m_nKind) {
-    case SPEC_HSV_Hue:
-    case SPEC_HSV_Saturation:
-    case SPEC_HSV_Brightness:
-        m_unColor.HSVtoRGB();
-        break;
-    }
-    m_unColor.SetUpdated(true);
+    ColorChanged();
 }
 
 BOOL CSpectrumSlider::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
@@ -127,6 +158,7 @@ BOOL CSpectrumSlider::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_MOUSEWHEEL(OnMouseWheel)
         break;
     default:
         ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
@@ -214,7 +246,7 @@ void CSpectrumSlider::OnMouseMove(UINT, CPoint pt)
     if (m_hWnd != GetCapture()) {
         return;
     }
-    SetValue(pt.y);
+    SetValueByY(pt.y);
     NotifySend();
     InvalidateRect(nullptr, FALSE);
 }
@@ -227,4 +259,20 @@ void CSpectrumSlider::OnLButtonDown(UINT, CPoint pt)
     else {
         ReleaseCapture();
     }
+}
+
+BOOL CSpectrumSlider::OnMouseWheel(UINT, short zDelta, CPoint)
+{
+    long       nPos{0};
+    long const nMax{static_cast<long>(GetValueAndRange(nPos))};
+    if (zDelta < 0) {
+        nPos -= 4;
+    }
+    else {
+        nPos += 4;
+    }
+    SetValue(nPos, nMax);
+    NotifySend();
+    InvalidateRect(nullptr, FALSE);
+    return TRUE;
 }

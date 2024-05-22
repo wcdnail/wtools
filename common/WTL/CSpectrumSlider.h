@@ -32,7 +32,9 @@ private:
 
     int OnCreate(LPCREATESTRUCT pCS);
     double GetValueAndRange(long& nPos) const;
-    void SetValue(long nY) const;
+    void ColorChanged() const;
+    void SetValue(long nPos, long nMax) const;
+    void SetValueByY(long nY) const;
     void NotifySend() const;
     void DrawRaster(WTL::CDCHandle dc, CRect const& rc) const;
     void DrawPosition(WTL::CDCHandle dc, CRect const& rc) const;
@@ -40,4 +42,5 @@ private:
     void OnLButtonDown(UINT nFlags, CPoint pt);
     void OnLButtonUp(UINT nFlags, CPoint point) const;
     void OnMouseMove(UINT nFlags, CPoint pt);
+    BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 };

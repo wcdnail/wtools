@@ -41,25 +41,6 @@ void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
     InvalidateRect(nullptr, FALSE);
 }
 
-void CSpectrumImage::OnSliderChanged(long nPos)
-{
-    /*
-    switch (m_SpectrumKind) {
-    case SPEC_RGB_Red:          m_Color.SetRGB(255 - nPos, m_Color.GetGreen(), m_Color.GetBlue()); break;
-    case SPEC_RGB_Green:        m_Color.SetRGB(m_Color.GetRed(), 255 - nPos, m_Color.GetBlue()); break;
-    case SPEC_RGB_Blue:         m_Color.SetRGB(m_Color.GetRed(), m_Color.GetGreen(), 255 - nPos); break;
-    case SPEC_HSV_Hue:          m_Color.SetHSV((255 - static_cast<double>(nPos)) / 255.0 * HSV_HUE_MAX, m_Color.m_dS, m_Color.m_dV); break;
-    case SPEC_HSV_Saturation:   m_Color.SetHSV(m_Color.m_dH, (255 - static_cast<double>(nPos)) / 255.0 * HSV_SAT_MAX, m_Color.m_dV); break;
-    case SPEC_HSV_Brightness:   m_Color.SetHSV(m_Color.m_dH, m_Color.m_dS, (255 - static_cast<double>(nPos)) / 255.0 * HSV_VAL_MAX); break;
-    default:
-        ATLASSERT(FALSE);
-        break;
-    }
-    InvalidateRect(nullptr, FALSE);
-    NotifySend();
-    */
-}
-
 void CSpectrumImage::OnColorChanged(double xPos, double yPos)
 {
     switch (m_SpectrumKind) {
