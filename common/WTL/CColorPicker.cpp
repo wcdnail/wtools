@@ -187,14 +187,12 @@ private:
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_DRAWITEM(OnDrawItem)
-        MSG_WM_HSCROLL(OnWMScroll)
-        MSG_WM_VSCROLL(OnWMScroll)
         CHAIN_MSG_MAP(ImplResizer)
         REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
 
     void SpectruKindChanged();
-    LRESULT SliderChanged();
+    LRESULT SliderChanged(bool bNotify);
     void UpdateDDX();
     LRESULT ColorChanged(bool bNotify);
     void OnDDXChanges(UINT nID, BOOL bSaveAndValidate);
@@ -203,7 +201,6 @@ private:
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
-    void OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar ctlScrollBar);
 };
 
 CColorPicker::Impl::~Impl() = default;
@@ -272,13 +269,6 @@ void CColorPicker::Impl::OnDataValidateError(UINT nCtrlID, BOOL bSave, _XData& d
     }
 }
 
-LRESULT CColorPicker::Impl::SliderChanged()
-{
-    m_imSpectrum.InvalidateRect(nullptr, FALSE);
-    m_stColor.InvalidateRect(nullptr, FALSE);
-    return 0;
-}
-
 void CColorPicker::Impl::UpdateDDX()
 {
     auto const& Color{m_imSpectrum.GetColorUnion()};
@@ -304,6 +294,17 @@ LRESULT CColorPicker::Impl::ColorChanged(bool bNotify)
     return 0;
 }
 
+LRESULT CColorPicker::Impl::SliderChanged(bool bNotify)
+{
+    m_imSpectrum.InvalidateRect(nullptr, FALSE);
+    m_stColor.InvalidateRect(nullptr, FALSE);
+    if (bNotify) {
+        CScopedBoolGuard bGuard{m_bSaveData};
+        UpdateDDX();
+    }
+    return 0;
+}
+
 LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
 {
     if (NM_CUSTOMDRAW == pnmh->code) {
@@ -323,7 +324,7 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
     case NM_SPECTRUM_CLR_SEL:
         switch (nID) {
         case CID_SPECTRUM_PIC: return ColorChanged(true);
-        case CID_SPECTRUM_SLD: return SliderChanged();
+        case CID_SPECTRUM_SLD: return SliderChanged(true);
         }
         break;
     }
@@ -414,15 +415,6 @@ void CColorPicker::Impl::SpectruKindChanged()
 {
     m_imSpectrum.SetSpectrumKind(static_cast<SpectrumKind>(m_nSpectrumKind));
     m_imSlider.UpdateRaster();
-    //m_imSpectrum.OnSliderChanged(m_imSlider.GetPos());
-}
-
-void CColorPicker::Impl::OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar ctlScrollBar)
-{
-    if (ctlScrollBar.m_hWnd == m_imSlider.m_hWnd) {
-        m_imSpectrum.OnSliderChanged(nPos);
-        m_stColor.InvalidateRect(nullptr, FALSE);
-    }
 }
 
 CColorPicker::~CColorPicker() = default;

@@ -65,6 +65,12 @@ void CSpectrumSlider::SetValue(long nY) const
 {
     CRect rc{};
     GetClientRect(rc);
+    if (nY > rc.bottom) {
+        nY = rc.bottom;
+    }
+    else if (nY < rc.top) {
+        nY = rc.top;
+    }
     switch (m_nKind) {
     case SPEC_RGB_Red:
     case SPEC_RGB_Green:
@@ -100,6 +106,7 @@ void CSpectrumSlider::SetValue(long nY) const
         ATLASSERT(FALSE);
         break;
     }
+    m_unColor.SetUpdated(true);
 }
 
 BOOL CSpectrumSlider::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
