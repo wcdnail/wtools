@@ -10,6 +10,12 @@ struct CColorPicker: CCustomControl<CColorPicker>,
 {
     using Super = CCustomControl<CColorPicker>;
 
+    enum Sizes: short
+    {
+        DLG_CX  = 360,
+        DLG_CY  = 180,
+    };
+
     DECLARE_WND_CLASS(_T("WCCF::CColorPicker"))
 
     ~CColorPicker() override;

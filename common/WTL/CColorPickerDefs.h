@@ -9,6 +9,7 @@ constexpr double HSV_HUE_MAX{359.};
 constexpr double HSV_SAT_MAX{100.};
 constexpr double HSV_VAL_MAX{100.};
 constexpr double     RGB_MAX{255.};
+constexpr int    RGB_MAX_INT{255 };
 
 
 enum SpectrumKind: int
@@ -31,7 +32,7 @@ enum CCPMiscConsts: int
     SPECTRUM_CY         = SPEC_BITMAP_WDTH,
     SPECTRUM_SLIDER_CX  = SPEC_BITMAP_WDTH,
     SPECTRUM_SLIDER_MIN = 0,
-    SPECTRUM_SLIDER_MAX = static_cast<int>(RGB_MAX),
+    SPECTRUM_SLIDER_MAX = RGB_MAX_INT,
     SPECTRUM_CHANNEL_CX = 24,
     SPECTRUM_CHANNEL_CY = 32,
 

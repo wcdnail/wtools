@@ -18,8 +18,8 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
 {
     enum Sizes: short
     {
-        DIALOG_CX = 540,
-        DIALOG_CY = 280,
+        DIALOG_CX = CColorPicker::DLG_CX + 32,
+        DIALOG_CY = CColorPicker::DLG_CY + 64,
     };
 
     enum ControlIds: int

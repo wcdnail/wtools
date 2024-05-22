@@ -33,13 +33,12 @@ private:
 
     enum Sizes: short
     {
-        DlgCX = 460,
-        DlgCY = 205,
-        HDlgCX = DlgCX/2-6,
-        HDlg3CY = DlgCY/3-8,
-        HHCX = HDlgCX/2-8,
-        HHCY = HDlg3CY/2+8,
-        HLCY = HDlg3CY/4,
+        RGB_CX  = DLG_CX/3,
+        RGB_CY  = DLG_CY/3,
+        SPEC_CX = DLG_CX-RGB_CX,
+        HHCX    = RGB_CX/2,
+        HHCY    = RGB_CY/2,
+        HLCY    = RGB_CY/4-4,
     };
 
     enum Styles: DWORD
@@ -60,12 +59,18 @@ private:
         CID_GRP_RGB,
         CID_RGB_RED_CAP,
         CID_RGB_RED_VAL,
-        CID_RGB_GREEN_CAP,
-        CID_RGB_GREEN_VAL,
-        CID_RGB_BLUE_CAP,
-        CID_RGB_BLUE_VAL,
-        CID_GRP_HSL,
+        CID_RGB_GRN_CAP,
+        CID_RGB_GRN_VAL,
+        CID_RGB_BLU_CAP,
+        CID_RGB_BLU_VAL,
         CID_GRP_HSV,
+        CID_RGB_HUE_CAP,
+        CID_RGB_HUE_VAL,
+        CID_RGB_SAT_CAP,
+        CID_RGB_SAT_VAL,
+        CID_RGB_VAL_CAP,
+        CID_RGB_VAL_VAL,
+        CID_GRP_HSL,
         CID_GRP_PICKER,
     };
 
@@ -73,36 +78,45 @@ private:
     int         m_nSpectrumKind; // For DDX
     CSpectrumSlider  m_imSlider;
     WTL::CStatic      m_stColor;
-    bool          m_bSaveData;
+    bool            m_bSaveData;
 
-    BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,             X,             Y,          Width,        Height, Style...
-        CONTROL_GROUPBOX(   _T("Spectrum Color"),        CID_GRP_SPECTRUM,                       4,             4,         HDlgCX,       DlgCY-8, 0, 0)
-            CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                      16,            18,         HHCX-8,       DlgCY-8, CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP, 0)
-            CONTROL_RTEXT(          _T("Color:"),      CID_SPEC_COLOR_CAP,    HDlgCX-HHCY-HHCX/2-8,            18,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-            CONTROL_CTEXT(           _T("COLOR"),      CID_SPEC_COLOR_SEL,           HDlgCX-HHCY-8,            18,         HHCY+2,        HHCY-2, SS_SUNKEN | SS_CENTERIMAGE | SS_OWNERDRAW, WS_EX_STATICEDGE)
-        CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS, CC_CHILD,            16,       24+HLCY, HDlgCX-HHCY-32, DlgCY-HLCY-36, WS_EX_STATICEDGE)
-        CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD, _T("msctls_trackbar32"),  TB_VERT, HDlgCX-HHCY-8,       18+HHCY,      HHCX/2-12, DlgCY-HHCY-30, 0)
-        CONTROL_GROUPBOX(        _T("RGB Color"),             CID_GRP_RGB,              8+HDlgCX+4,             4,         HDlgCX,       HDlg3CY, 0, 0)
-            CONTROL_RTEXT(            _T("Red:"),         CID_RGB_RED_CAP,              8+HDlgCX+8,     HLCY*0+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-            CONTROL_EDITTEXT(                             CID_RGB_RED_VAL,        HDlgCX+12+HHCX/2,     HLCY*0+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
-            CONTROL_RTEXT(          _T("Green:"),       CID_RGB_GREEN_CAP,              8+HDlgCX+8,     HLCY*1+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-            CONTROL_EDITTEXT(                           CID_RGB_GREEN_VAL,        HDlgCX+12+HHCX/2,     HLCY*1+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
-            CONTROL_RTEXT(           _T("Blue:"),        CID_RGB_BLUE_CAP,              8+HDlgCX+8,     HLCY*2+15,       HHCX/2-8,          HLCY, SS_CENTERIMAGE, 0)
-            CONTROL_EDITTEXT(                            CID_RGB_BLUE_VAL,        HDlgCX+12+HHCX/2,     HLCY*2+15,       HHCX/2-8,          HLCY, ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
-        CONTROL_GROUPBOX(        _T("HSL Color"),             CID_GRP_HSL,              8+HDlgCX+4,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
-        CONTROL_GROUPBOX(        _T("HSV Color"),             CID_GRP_HSV,     8+HDlgCX+HDlgCX/2+8,   4+HDlg3CY+4,     HDlgCX/2-4,       HDlg3CY, 0, 0)
-        CONTROL_GROUPBOX(     _T("Color Picker"),          CID_GRP_PICKER,              8+HDlgCX+4, 4+HDlg3CY*2+8,         HDlgCX,     HDlg3CY+8, 0, 0)
+    BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,               X,              Y,           Width,         Height,   Styles
+        CONTROL_GROUPBOX(   _T("Spectrum Color"),        CID_GRP_SPECTRUM,                         2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
+            CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                         8,             14,        HHCX*2-8,       DLG_CY-4,   CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP, 0)
+        CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS, CC_CHILD,               8,        18+HLCY, SPEC_CX-HHCY-20, DLG_CY-HLCY-26,   WS_EX_STATICEDGE)
+        CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD, _T("msctls_trackbar32"),  TB_VERT, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-26,   0)
+            CONTROL_RTEXT(          _T("Color:"),      CID_SPEC_COLOR_CAP,    SPEC_CX-HHCY-HHCX/2-10,             14,        HHCX/2-8,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_CTEXT(           _T("COLOR"),      CID_SPEC_COLOR_SEL,           SPEC_CX-HHCY-10,             14,          HHCY+2,         HHCY-2,   SS_SUNKEN | SS_CENTERIMAGE | SS_OWNERDRAW, WS_EX_STATICEDGE)
+        CONTROL_GROUPBOX(        _T("RGB Color"),             CID_GRP_RGB,                 SPEC_CX+4,              2,        RGB_CX-8,       RGB_CY-4,   0, 0)
+            CONTROL_RTEXT(               _T("R"),         CID_RGB_RED_CAP,               0+SPEC_CX+6,  (HLCY+3)*0+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_RGB_RED_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*0+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+            CONTROL_RTEXT(               _T("G"),         CID_RGB_GRN_CAP,               0+SPEC_CX+6,  (HLCY+3)*1+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_RGB_GRN_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*1+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+            CONTROL_RTEXT(               _T("B"),         CID_RGB_BLU_CAP,               0+SPEC_CX+6,  (HLCY+3)*2+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_RGB_BLU_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*2+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+        CONTROL_GROUPBOX(        _T("HSV Color"),             CID_GRP_HSL,                 SPEC_CX+4,     0+RGB_CY+2,      RGB_CX/2-6,       RGB_CY-4,   0, 0)
+            CONTROL_RTEXT(               _T("H"),         CID_RGB_HUE_CAP,               0+SPEC_CX+6,  (HLCY+3)*4+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_RGB_HUE_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*4+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+            CONTROL_RTEXT(               _T("S"),         CID_RGB_SAT_CAP,               0+SPEC_CX+6,  (HLCY+3)*5+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_RGB_SAT_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*5+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+            CONTROL_RTEXT(               _T("V"),         CID_RGB_VAL_CAP,               0+SPEC_CX+6,  (HLCY+3)*6+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_RGB_VAL_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*6+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+        CONTROL_GROUPBOX(        _T("HSL Color"),             CID_GRP_HSV,        SPEC_CX+2+RGB_CX/2,     0+RGB_CY+2,      RGB_CX/2-6,       RGB_CY-4,   0, 0)
+        CONTROL_GROUPBOX(     _T("Color Picker"),          CID_GRP_PICKER,               8+SPEC_CX+4,   4+RGB_CY*2+8,         SPEC_CX,       RGB_CY+8,   0, 0)
     END_CONTROLS_MAP()
 
-    BEGIN_DIALOG(0, 0, DlgCX, DlgCY)
+    BEGIN_DIALOG(0, 0, DLG_CX, DLG_CY)
         DIALOG_STYLE(WS_CHILD | WS_VISIBLE)
         DIALOG_FONT(8, _T("MS Shell Dlg 2"))
     END_DIALOG()
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
-        DDX_UINT_RANGE(CID_RGB_RED_VAL, m_imSpectrum.GetColorUnion().GetRed(), 0, 255);
-        DDX_UINT_RANGE(CID_RGB_GREEN_VAL, m_imSpectrum.GetColorUnion().GetGreen(), 0, 255);
-        DDX_UINT_RANGE(CID_RGB_BLUE_VAL, m_imSpectrum.GetColorUnion().GetBlue(), 0, 255);
+        DDX_UINT_RANGE(CID_RGB_RED_VAL, m_imSpectrum.GetColorUnion().GetRed(), 0, RGB_MAX_INT);
+        DDX_UINT_RANGE(CID_RGB_GRN_VAL, m_imSpectrum.GetColorUnion().GetGreen(), 0, RGB_MAX_INT);
+        DDX_UINT_RANGE(CID_RGB_BLU_VAL, m_imSpectrum.GetColorUnion().GetBlue(), 0, RGB_MAX_INT);
+        DDX_FLOAT_RANGE(CID_RGB_HUE_VAL, m_imSpectrum.GetColorUnion().m_dH, 0, HSV_HUE_MAX);
+        DDX_FLOAT_RANGE(CID_RGB_SAT_VAL, m_imSpectrum.GetColorUnion().m_dS, 0, HSV_SAT_MAX);
+        DDX_FLOAT_RANGE(CID_RGB_VAL_VAL, m_imSpectrum.GetColorUnion().m_dV, 0, HSV_VAL_MAX);
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
         OnDDXChanges(nCtlID, bSaveAndValidate);
     END_DDX_MAP()
@@ -117,12 +131,18 @@ private:
         DLGRESIZE_CONTROL(CID_GRP_RGB, DLSZ_MOVE_X)
             DLGRESIZE_CONTROL(CID_RGB_RED_CAP, DLSZ_MOVE_X)
             DLGRESIZE_CONTROL(CID_RGB_RED_VAL, DLSZ_MOVE_X)
-            DLGRESIZE_CONTROL(CID_RGB_GREEN_CAP, DLSZ_MOVE_X)
-            DLGRESIZE_CONTROL(CID_RGB_GREEN_VAL, DLSZ_MOVE_X)
-            DLGRESIZE_CONTROL(CID_RGB_BLUE_CAP, DLSZ_MOVE_X)
-            DLGRESIZE_CONTROL(CID_RGB_BLUE_VAL, DLSZ_MOVE_X)
-        DLGRESIZE_CONTROL(CID_GRP_HSL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_GRN_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_GRN_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_BLU_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_BLU_VAL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSV, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_HUE_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_HUE_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_SAT_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_SAT_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_VAL_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_VAL_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_GRP_HSL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_PICKER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
     END_DLGRESIZE_MAP()
 
@@ -182,8 +202,8 @@ void CColorPicker::Impl::OnDDXChanges(UINT nID, BOOL bSaveAndValidate)
     switch (nID) {
     case CID_SPEC_COMBO:    SpectruKindChanged(); break;
     case CID_RGB_RED_VAL:
-    case CID_RGB_GREEN_VAL:
-    case CID_RGB_BLUE_VAL:  ColorChanged(false); break;
+    case CID_RGB_GRN_VAL:
+    case CID_RGB_BLU_VAL:  ColorChanged(false); break;
     }
 }
 
@@ -191,8 +211,8 @@ void CColorPicker::Impl::OnDataValidateError(UINT nCtrlID, BOOL bSave, _XData& d
 {
     switch (nCtrlID) {
     case CID_RGB_RED_VAL:
-    case CID_RGB_GREEN_VAL:
-    case CID_RGB_BLUE_VAL:{
+    case CID_RGB_GRN_VAL:
+    case CID_RGB_BLU_VAL:{
         if (bSave) {
             CScopedBoolGuard bGuard{m_bSaveData};
             SetDlgItemInt(nCtrlID, data.intData.nMax);
@@ -222,8 +242,11 @@ LRESULT CColorPicker::Impl::ColorChanged(bool bNotify)
     if (bNotify) {
         CScopedBoolGuard bGuard{m_bSaveData};
         DoDataExchange(DDX_LOAD, CID_RGB_RED_VAL);
-        DoDataExchange(DDX_LOAD, CID_RGB_GREEN_VAL);
-        DoDataExchange(DDX_LOAD, CID_RGB_BLUE_VAL);
+        DoDataExchange(DDX_LOAD, CID_RGB_GRN_VAL);
+        DoDataExchange(DDX_LOAD, CID_RGB_BLU_VAL);
+        DoDataExchange(DDX_LOAD, CID_RGB_HUE_VAL);
+        DoDataExchange(DDX_LOAD, CID_RGB_SAT_VAL);
+        DoDataExchange(DDX_LOAD, CID_RGB_VAL_VAL);
     }
     else {
         m_imSpectrum.InvalidateRect(nullptr, FALSE);
@@ -471,6 +494,8 @@ void CColorPicker::OnDestroy()
 
 void CColorPicker::OnSize(UINT nType, CSize size) const
 {
-    CRect rc{0, 0, size.cx, size.cy};
-    m_pImpl->MoveWindow(rc);
+    if constexpr (true) {
+        CRect rc{0, 0, size.cx, size.cy};
+        m_pImpl->MoveWindow(rc);
+    }
 }
