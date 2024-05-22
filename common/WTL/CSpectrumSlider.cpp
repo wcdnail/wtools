@@ -261,15 +261,16 @@ void CSpectrumSlider::OnLButtonDown(UINT, CPoint pt)
     }
 }
 
-BOOL CSpectrumSlider::OnMouseWheel(UINT, short zDelta, CPoint)
+BOOL CSpectrumSlider::OnMouseWheel(UINT nFlags, short zDelta, CPoint)
 {
-    long       nPos{0};
-    long const nMax{static_cast<long>(GetValueAndRange(nPos))};
+    long        nPos{0};
+    long const  nMax{static_cast<long>(GetValueAndRange(nPos))};
+    long const nStep{nFlags & MK_CONTROL ? 15 : nFlags & MK_SHIFT ? 5 : 1};
     if (zDelta < 0) {
-        nPos -= 4;
+        nPos -= nStep;
     }
     else {
-        nPos += 4;
+        nPos += nStep;
     }
     SetValue(nPos, nMax);
     NotifySend();
