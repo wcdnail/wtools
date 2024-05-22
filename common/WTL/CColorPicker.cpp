@@ -296,12 +296,12 @@ LRESULT CColorPicker::Impl::ColorChanged(bool bNotify)
 
 LRESULT CColorPicker::Impl::SliderChanged(bool bNotify)
 {
-    m_imSpectrum.InvalidateRect(nullptr, FALSE);
-    m_stColor.InvalidateRect(nullptr, FALSE);
     if (bNotify) {
         CScopedBoolGuard bGuard{m_bSaveData};
         UpdateDDX();
     }
+    m_imSpectrum.InvalidateRect(nullptr, FALSE);
+    m_stColor.InvalidateRect(nullptr, FALSE);
     return 0;
 }
 

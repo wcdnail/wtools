@@ -82,6 +82,7 @@ void CSpectrumSlider::SetValue(long nY) const
         case SPEC_RGB_Green: m_unColor.m_Green = static_cast<int>(dPos); break;
         case SPEC_RGB_Blue:  m_unColor.m_Blue = static_cast<int>(dPos); break;
         }
+        m_unColor.RGBtoHSV();
         break;
     }
     case SPEC_HSV_Hue:{
@@ -104,6 +105,13 @@ void CSpectrumSlider::SetValue(long nY) const
     }
     default:
         ATLASSERT(FALSE);
+        break;
+    }
+    switch (m_nKind) {
+    case SPEC_HSV_Hue:
+    case SPEC_HSV_Saturation:
+    case SPEC_HSV_Brightness:
+        m_unColor.HSVtoRGB();
         break;
     }
     m_unColor.SetUpdated(true);
