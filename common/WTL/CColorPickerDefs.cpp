@@ -78,7 +78,7 @@ CColorUnion::CColorUnion(double dH, double dS, double dV)
     ,      m_Red{0}
     ,    m_Green{0}
     ,     m_Blue{0}
-    ,    m_Alpha{0}
+    ,    m_Alpha{0xff}
 {
     HSVtoRGB();
 }
@@ -91,12 +91,12 @@ CColorUnion::CColorUnion(COLORREF crInitial)
     ,      m_Red{GetRValue(crInitial)}
     ,    m_Green{GetGValue(crInitial)}
     ,     m_Blue{GetBValue(crInitial)}
-    ,    m_Alpha{0}
+    ,    m_Alpha{0xff}
 {
-    UpdateHSV();
+    RGBtoHSV();
 }
 
-void CColorUnion::UpdateHSV()
+void CColorUnion::RGBtoHSV()
 {
     auto const    R{m_Red / RGB_MAX};
     auto const    G{m_Green / RGB_MAX};

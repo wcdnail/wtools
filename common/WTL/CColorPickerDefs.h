@@ -71,7 +71,7 @@ struct CColorUnion
     void SetRGB(int R, int G, int B);
     void SetHSV(double dH, double dS, double dV);
     void HSVtoRGB();
-    void UpdateHSV();
+    void RGBtoHSV();
 
     int GetRed() const;
     int GetGreen() const;
@@ -112,7 +112,7 @@ inline void CColorUnion::SetRGBPlain(int R, int G, int B)
 inline void CColorUnion::SetRGB(int R, int G, int B)
 {
     SetRGBPlain(R, G, B);
-    UpdateHSV();
+    RGBtoHSV();
 }
 
 inline void CColorUnion::SetHSV(double dH, double dS, double dV)

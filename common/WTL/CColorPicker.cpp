@@ -96,9 +96,9 @@ private:
         CONTROL_GROUPBOX(   _T("Spectrum Color"),        CID_GRP_SPECTRUM,                         2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
             CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                         8,             14,        HHCX*2-8,       DLG_CY-4,   CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP, 0)
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS, CC_CHILD,               8,        18+HLCY, SPEC_CX-HHCY-20, DLG_CY-HLCY-26,   WS_EX_STATICEDGE)
-        CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD, _T("msctls_trackbar32"),  TB_VERT, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-26,   WS_EX_STATICEDGE)
+            CONTROL_CTEXT(_T(""),                        CID_SPECTRUM_SLD,           SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-26,   0, WS_EX_STATICEDGE)
             CONTROL_RTEXT(          _T("Color:"),      CID_SPEC_COLOR_CAP,    SPEC_CX-HHCY-HHCX/2-10,             14,        HHCX/2-8,           HLCY,   SS_CENTERIMAGE, 0)
-            CONTROL_CTEXT(           _T("COLOR"),      CID_SPEC_COLOR_SEL,           SPEC_CX-HHCY-10,             14,          HHCY+2,         HHCY-2,   SS_SUNKEN | SS_CENTERIMAGE | SS_OWNERDRAW, WS_EX_STATICEDGE)
+            CONTROL_CTEXT(           _T("COLOR"),      CID_SPEC_COLOR_SEL,           SPEC_CX-HHCY-10,             14,          HHCY+2,         HHCY-2,   SS_CENTERIMAGE | SS_OWNERDRAW, WS_EX_STATICEDGE)
         CONTROL_GROUPBOX(        _T("RGB Color"),             CID_GRP_RGB,                 SPEC_CX+4,              2,        RGB_CX-8,       RGB_CY-4,   0, 0)
             CONTROL_RTEXT(               _T("R"),         CID_RGB_RED_CAP,               0+SPEC_CX+6,  (HLCY+3)*0+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
             CONTROL_EDITTEXT(                             CID_RGB_RED_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*0+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
@@ -240,8 +240,19 @@ void CColorPicker::Impl::OnDDXChanges(UINT nID, BOOL bSaveAndValidate)
     switch (nID) {
     case CID_RGB_RED_VAL:
     case CID_RGB_GRN_VAL:
-    case CID_RGB_BLU_VAL: ColorChanged(false); break;
-    case CID_SPEC_COMBO:  SpectruKindChanged(); break;
+    case CID_RGB_BLU_VAL:
+        ColorChanged(false);
+        m_imSpectrum.GetColorUnion().RGBtoHSV();
+        break;
+    case CID_HSV_HUE_VAL:
+    case CID_HSV_SAT_VAL:
+    case CID_HSV_VAL_VAL:
+        ColorChanged(false);
+        m_imSpectrum.GetColorUnion().HSVtoRGB();
+        break;
+    case CID_SPEC_COMBO:
+        SpectruKindChanged();
+        break;
     default: 
         break;
     }
@@ -278,7 +289,6 @@ void CColorPicker::Impl::UpdateDDX()
     auto const& Color{m_imSpectrum.GetColorUnion()};
     m_sColorHex.Format(TEXT("0x%02X%02X%02X"), Color.GetBlue(), Color.GetGreen(), Color.GetRed());
     m_sColorHtml.Format(TEXT("#%02X%02X%02X"), Color.GetRed(), Color.GetGreen(), Color.GetBlue());
-
     DoDataExchange(DDX_LOAD);
 }
 
@@ -313,11 +323,13 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
         return 0;
     }
     switch (pnmh->code) {
-    case TRBN_THUMBPOSCHANGING:
+#if 0
+      case TRBN_THUMBPOSCHANGING:
         switch (nID) {
         case CID_SPECTRUM_SLD: return SliderChanged(pnmh);
         }
         break;
+#endif
     case NM_SPECTRUM_CLR_SEL:
         switch (nID) {
         case CID_SPECTRUM_PIC: return ColorChanged(true);
@@ -342,7 +354,6 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
         break;
     case EN_UPDATE:
         if (DoDataExchange(DDX_SAVE, nID)) {
-            m_imSpectrum.GetColorUnion().SetUpdated(true);
             m_imSpectrum.InvalidateRect(nullptr, FALSE);
         }
         return ;
@@ -413,7 +424,7 @@ void CColorPicker::Impl::SpectruKindChanged()
 {
     m_imSpectrum.SetSpectrumKind(static_cast<SpectrumKind>(m_nSpectrumKind));
     m_imSlider.UpdateRaster(m_imSpectrum.GetSpectrumKind(), m_imSpectrum.GetColorUnion());
-    m_imSpectrum.OnSliderChanged(m_imSlider.GetPos());
+    //m_imSpectrum.OnSliderChanged(m_imSlider.GetPos());
 }
 
 void CColorPicker::Impl::OnWMScroll(UINT nSBCode, UINT nPos, WTL::CScrollBar ctlScrollBar)
