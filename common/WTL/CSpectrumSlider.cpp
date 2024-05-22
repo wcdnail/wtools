@@ -19,9 +19,9 @@ ATOM& CSpectrumSlider::GetWndClassAtomRef()
 CSpectrumSlider::~CSpectrumSlider() = default;
 
 CSpectrumSlider::CSpectrumSlider()
-    :       m_bCapture{false}
-    ,            m_Dib{}
-    ,       m_rcRaster{}
+    : m_bCapture{false}
+    ,      m_Dib{}
+    , m_rcRaster{}
 {
 }
 

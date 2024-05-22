@@ -25,9 +25,9 @@ struct CSpectrumSlider: CCustomControl<CSpectrumSlider, WTL::CSliderCtrl>
 private:
     friend Super;
 
-    bool               m_bCapture;
-    CDIBitmap               m_Dib;
-    CRect              m_rcRaster;
+    bool  m_bCapture;
+    CDIBitmap  m_Dib;
+    CRect m_rcRaster;
 
     static ATOM& GetWndClassAtomRef();
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;

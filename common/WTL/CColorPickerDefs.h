@@ -5,12 +5,15 @@
 constexpr TCHAR CSPECIMG_CLASS[] = _T("WCCF::CSpectrumImage");
 constexpr TCHAR CSPECSLD_CLASS[] = _T("WCCF::CSpectrumSlider");
 
-constexpr double HSV_HUE_MAX{359.};
-constexpr double HSV_SAT_MAX{100.};
-constexpr double HSV_VAL_MAX{100.};
-constexpr double     RGB_MAX{255.};
-constexpr int    RGB_MAX_INT{255 };
+constexpr double  HSV_HUE_MAX{360.};
+constexpr double  HSV_HUE_MID{120.};
+constexpr double HSV_HUE_AMID{270.};
+constexpr double  HSV_SAT_MAX{100.};
+constexpr double  HSV_VAL_MAX{100.};
+constexpr double      RGB_MAX{255.};
+constexpr int     RGB_MAX_INT{255 };
 
+void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G, int& B);
 
 enum SpectrumKind: int
 {
@@ -67,7 +70,7 @@ struct CColorUnion
 
     void SetRGB(int R, int G, int B);
     void SetHSV(double dH, double dS, double dV);
-    void UpdateRGB();
+    void HSVtoRGB();
     void UpdateHSV();
 
     int GetRed() const;
@@ -114,10 +117,16 @@ inline void CColorUnion::SetRGB(int R, int G, int B)
 
 inline void CColorUnion::SetHSV(double dH, double dS, double dV)
 {
-    m_dH = std::min<double>(dH, HSV_HUE_MAX); // 359.
-    m_dS = std::min<double>(dS, HSV_SAT_MAX); // 100.
-    m_dV = std::min<double>(dV, HSV_VAL_MAX); // 100.
-    UpdateRGB();
+    m_dH = std::min<double>(dH, HSV_HUE_MAX);
+    m_dS = std::min<double>(dS, HSV_SAT_MAX);
+    m_dV = std::min<double>(dV, HSV_VAL_MAX);
+    HSVtoRGB();
+}
+
+inline void CColorUnion::HSVtoRGB()
+{
+    ::HSVtoRGB(m_dH, m_dS / HSV_SAT_MAX, m_dV / HSV_VAL_MAX, m_Red, m_Green, m_Blue);
+    SetUpdated(true);
 }
 
 inline int     CColorUnion::GetRed() const { return m_Red; }

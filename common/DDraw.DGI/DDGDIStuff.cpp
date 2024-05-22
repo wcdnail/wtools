@@ -215,15 +215,13 @@ bool DDraw_HSV_SAT_Line(DWORD* pDest, int nWidth, double dHue, double dValue)
     const int     inc2{static_cast<int>((1 - dFrac) * vStart - vStart) / nWidth};
     const int     inc3{static_cast<int>(dFrac * vStart - vStart) / nWidth};
     switch (nInt) {
+    default:
     case 0: RGB_Line1(pDest, nWidth, vStart, inc1, inc3, 0); break;
     case 1: RGB_Line1(pDest, nWidth, vStart, inc1, 0, inc2); break;
     case 2: RGB_Line1(pDest, nWidth, vStart, inc3, 0, inc1); break;
     case 3: RGB_Line1(pDest, nWidth, vStart, 0, inc2, inc1); break;
     case 4: RGB_Line1(pDest, nWidth, vStart, 0, inc1, inc3); break;
     case 5: RGB_Line1(pDest, nWidth, vStart, inc2, inc1, 0); break;
-    default:
-        // TODO: report nInt - INVAL
-        return false;
     }
     return true;
 }
@@ -247,15 +245,13 @@ bool DDraw_HSV_VAL_Line(DWORD* pDest, int nWidth, double dHue, double dSaturatio
     const int     inc2{static_cast<int>((vMax * (1. - dSaturation * dFrac)) / nWidth)};
     const int     inc3{static_cast<int>((vMax * (1. - dSaturation * (1 - dFrac))) / nWidth)};
     switch (nInt) {
+    default:
     case 0: RGB_Line1(pDest, nWidth, vStart, inc1, inc3, vStep); break;
     case 1: RGB_Line1(pDest, nWidth, vStart, inc1, vStep, inc2); break;
     case 2: RGB_Line1(pDest, nWidth, vStart, inc3, vStep, inc1); break;
     case 3: RGB_Line1(pDest, nWidth, vStart, vStep, inc2, inc1); break;
     case 4: RGB_Line1(pDest, nWidth, vStart, vStep, inc1, inc3); break;
     case 5: RGB_Line1(pDest, nWidth, vStart, inc2, inc1, vStep); break;
-    default:
-        // TODO: report nInt - INVAL
-        return false;
     }
     return true;
 }

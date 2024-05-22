@@ -3,7 +3,6 @@
 #include "CColorPickerDefs.h"
 #include "CSpectrumImage.h"
 #include "CSpectrumSlider.h"
-#include "CSliderCtrl.h"
 #include "CAppModuleRef.h"
 #include <dev.assistance/dev.assist.h>
 #include <scoped.bool.guard.h>
@@ -31,19 +30,9 @@ private:
     friend ImplSuper;
     friend ImplResizer;
 
-    enum Sizes: short
-    {
-        RGB_CX  = DLG_CX/3,
-        RGB_CY  = DLG_CY/3,
-        SPEC_CX = DLG_CX-RGB_CX,
-        HHCX    = RGB_CX/2,
-        HHCY    = RGB_CY/2,
-        HLCY    = RGB_CY/4-4,
-    };
-
     enum Styles: DWORD
     {
-        TB_VERT = TBS_NOTHUMB | TBS_RIGHT | TBS_VERT | TBS_NOTICKS | TBS_DOWNISLEFT | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
+        TB_VERT = TBS_NOTHUMB | TBS_VERT | TBS_NOTICKS | TBS_FIXEDLENGTH | WS_TABSTOP | WS_CHILD | WS_VISIBLE,
         CC_CHILD = WS_CHILD | WS_VISIBLE,
     };
 
@@ -63,19 +52,42 @@ private:
         CID_RGB_GRN_VAL,
         CID_RGB_BLU_CAP,
         CID_RGB_BLU_VAL,
-        CID_GRP_HSV,
-        CID_RGB_HUE_CAP,
-        CID_RGB_HUE_VAL,
-        CID_RGB_SAT_CAP,
-        CID_RGB_SAT_VAL,
-        CID_RGB_VAL_CAP,
-        CID_RGB_VAL_VAL,
+        CID_RGB_HEX_VAL,
+        CID_RGB_HTM_VAL,
+        CID_RGB_ALP_CAP,
+        CID_RGB_ALP_VAL,
         CID_GRP_HSL,
+        CID_HSL_HUE_CAP,
+        CID_HSL_HUE_VAL,
+        CID_HSL_SAT_CAP,
+        CID_HSL_SAT_VAL,
+        CID_HSL_LTN_CAP,
+        CID_HSL_LTN_VAL,
+        CID_GRP_HSV,
+        CID_HSV_HUE_CAP,
+        CID_HSV_HUE_VAL,
+        CID_HSV_SAT_CAP,
+        CID_HSV_SAT_VAL,
+        CID_HSV_VAL_CAP,
+        CID_HSV_VAL_VAL,
         CID_GRP_PICKER,
+    };
+
+    enum Sizes: short
+    {
+        TRGB_CX = DLG_CX/4,
+        RGB_CX  = TRGB_CX+TRGB_CX/2,
+        RGB_CY  = DLG_CY/3,
+        SPEC_CX = DLG_CX-RGB_CX,
+        HHCX    = RGB_CX/2,
+        HHCY    = RGB_CY/2,
+        HLCY    = RGB_CY/4-4,
     };
 
     CSpectrumImage m_imSpectrum;
     int         m_nSpectrumKind; // For DDX
+    ATL::CString    m_sColorHex;
+    ATL::CString   m_sColorHtml;
     CSpectrumSlider  m_imSlider;
     WTL::CStatic      m_stColor;
     bool            m_bSaveData;
@@ -94,15 +106,25 @@ private:
             CONTROL_EDITTEXT(                             CID_RGB_GRN_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*1+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
             CONTROL_RTEXT(               _T("B"),         CID_RGB_BLU_CAP,               0+SPEC_CX+6,  (HLCY+3)*2+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
             CONTROL_EDITTEXT(                             CID_RGB_BLU_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*2+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
-        CONTROL_GROUPBOX(        _T("HSV Color"),             CID_GRP_HSL,                 SPEC_CX+4,     0+RGB_CY+2,      RGB_CX/2-6,       RGB_CY-4,   0, 0)
-            CONTROL_RTEXT(               _T("H"),         CID_RGB_HUE_CAP,               0+SPEC_CX+6,  (HLCY+3)*4+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
-            CONTROL_EDITTEXT(                             CID_RGB_HUE_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*4+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
-            CONTROL_RTEXT(               _T("S"),         CID_RGB_SAT_CAP,               0+SPEC_CX+6,  (HLCY+3)*5+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
-            CONTROL_EDITTEXT(                             CID_RGB_SAT_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*5+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
-            CONTROL_RTEXT(               _T("V"),         CID_RGB_VAL_CAP,               0+SPEC_CX+6,  (HLCY+3)*6+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
-            CONTROL_EDITTEXT(                             CID_RGB_VAL_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*6+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
-        CONTROL_GROUPBOX(        _T("HSL Color"),             CID_GRP_HSV,        SPEC_CX+2+RGB_CX/2,     0+RGB_CY+2,      RGB_CX/2-6,       RGB_CY-4,   0, 0)
-        CONTROL_GROUPBOX(     _T("Color Picker"),          CID_GRP_PICKER,               8+SPEC_CX+4,   4+RGB_CY*2+8,         SPEC_CX,       RGB_CY+8,   0, 0)
+            CONTROL_EDITTEXT(                             CID_RGB_HEX_VAL,        SPEC_CX-2+RGB_CX/2,  (HLCY+3)*0+13,         HHCX-10,           HLCY,   ES_CENTER | ES_WANTRETURN, 0)
+            CONTROL_EDITTEXT(                             CID_RGB_HTM_VAL,        SPEC_CX-2+RGB_CX/2,  (HLCY+3)*1+13,         HHCX-10,           HLCY,   ES_CENTER | ES_WANTRETURN, 0)
+            CONTROL_RTEXT(               _T("A"),         CID_RGB_ALP_CAP,      0+SPEC_CX+3+RGB_CX/2,  (HLCY+3)*2+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_RGB_ALP_VAL, SPEC_CX-2+HHCX/3+RGB_CX/2,  (HLCY+3)*2+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+        CONTROL_GROUPBOX(        _T("HSL Color"),             CID_GRP_HSL,                 SPEC_CX+4,     0+RGB_CY+2,      RGB_CX/2-6,       RGB_CY-4,   0, 0)
+            CONTROL_RTEXT(               _T("H"),         CID_HSL_HUE_CAP,               0+SPEC_CX+6,  (HLCY+3)*4+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_HSL_HUE_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*4+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+            CONTROL_RTEXT(               _T("S"),         CID_HSL_SAT_CAP,               0+SPEC_CX+6,  (HLCY+3)*5+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_HSL_SAT_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*5+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+            CONTROL_RTEXT(               _T("L"),         CID_HSL_LTN_CAP,               0+SPEC_CX+6,  (HLCY+3)*6+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_HSL_LTN_VAL,          SPEC_CX+0+HHCX/3,  (HLCY+3)*6+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+        CONTROL_GROUPBOX(        _T("HSV Color"),             CID_GRP_HSV,        SPEC_CX+2+RGB_CX/2,     0+RGB_CY+2,      RGB_CX/2-6,       RGB_CY-4,   0, 0)
+            CONTROL_RTEXT(               _T("H"),         CID_HSV_HUE_CAP,      0+SPEC_CX+3+RGB_CX/2,  (HLCY+3)*4+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_HSV_HUE_VAL, SPEC_CX-2+HHCX/3+RGB_CX/2,  (HLCY+3)*4+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+            CONTROL_RTEXT(               _T("S"),         CID_HSV_SAT_CAP,      0+SPEC_CX+3+RGB_CX/2,  (HLCY+3)*5+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_HSV_SAT_VAL, SPEC_CX-2+HHCX/3+RGB_CX/2,  (HLCY+3)*5+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+            CONTROL_RTEXT(               _T("V"),         CID_HSV_VAL_CAP,      0+SPEC_CX+3+RGB_CX/2,  (HLCY+3)*6+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+            CONTROL_EDITTEXT(                             CID_HSV_VAL_VAL, SPEC_CX-2+HHCX/3+RGB_CX/2,  (HLCY+3)*6+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | ES_WANTRETURN, 0)
+        CONTROL_GROUPBOX(     _T("Color Picker"),          CID_GRP_PICKER,               0+SPEC_CX+4,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
     END_CONTROLS_MAP()
 
     BEGIN_DIALOG(0, 0, DLG_CX, DLG_CY)
@@ -114,9 +136,12 @@ private:
         DDX_UINT_RANGE(CID_RGB_RED_VAL, m_imSpectrum.GetColorUnion().GetRed(), 0, RGB_MAX_INT);
         DDX_UINT_RANGE(CID_RGB_GRN_VAL, m_imSpectrum.GetColorUnion().GetGreen(), 0, RGB_MAX_INT);
         DDX_UINT_RANGE(CID_RGB_BLU_VAL, m_imSpectrum.GetColorUnion().GetBlue(), 0, RGB_MAX_INT);
-        DDX_FLOAT_RANGE(CID_RGB_HUE_VAL, m_imSpectrum.GetColorUnion().m_dH, 0, HSV_HUE_MAX);
-        DDX_FLOAT_RANGE(CID_RGB_SAT_VAL, m_imSpectrum.GetColorUnion().m_dS, 0, HSV_SAT_MAX);
-        DDX_FLOAT_RANGE(CID_RGB_VAL_VAL, m_imSpectrum.GetColorUnion().m_dV, 0, HSV_VAL_MAX);
+        DDX_UINT_RANGE(CID_RGB_ALP_VAL, m_imSpectrum.GetColorUnion().GetAlpha(), 0, RGB_MAX_INT);
+        DDX_FLOAT_P_RANGE(CID_HSV_HUE_VAL, m_imSpectrum.GetColorUnion().m_dH, 0, HSV_HUE_MAX, 5);
+        DDX_FLOAT_P_RANGE(CID_HSV_SAT_VAL, m_imSpectrum.GetColorUnion().m_dS, 0, HSV_SAT_MAX, 5);
+        DDX_FLOAT_P_RANGE(CID_HSV_VAL_VAL, m_imSpectrum.GetColorUnion().m_dV, 0, HSV_VAL_MAX, 5);
+        DDX_TEXT(CID_RGB_HEX_VAL, m_sColorHex);
+        DDX_TEXT(CID_RGB_HTM_VAL, m_sColorHtml);
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
         OnDDXChanges(nCtlID, bSaveAndValidate);
     END_DDX_MAP()
@@ -135,14 +160,24 @@ private:
             DLGRESIZE_CONTROL(CID_RGB_GRN_VAL, DLSZ_MOVE_X)
             DLGRESIZE_CONTROL(CID_RGB_BLU_CAP, DLSZ_MOVE_X)
             DLGRESIZE_CONTROL(CID_RGB_BLU_VAL, DLSZ_MOVE_X)
-        DLGRESIZE_CONTROL(CID_GRP_HSV, DLSZ_MOVE_X)
-            DLGRESIZE_CONTROL(CID_RGB_HUE_CAP, DLSZ_MOVE_X)
-            DLGRESIZE_CONTROL(CID_RGB_HUE_VAL, DLSZ_MOVE_X)
-            DLGRESIZE_CONTROL(CID_RGB_SAT_CAP, DLSZ_MOVE_X)
-            DLGRESIZE_CONTROL(CID_RGB_SAT_VAL, DLSZ_MOVE_X)
-            DLGRESIZE_CONTROL(CID_RGB_VAL_CAP, DLSZ_MOVE_X)
-            DLGRESIZE_CONTROL(CID_RGB_VAL_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_HEX_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_HTM_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_ALP_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_RGB_ALP_VAL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_HSL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSL_HUE_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSL_HUE_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSL_SAT_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSL_SAT_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSL_LTN_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSL_LTN_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_GRP_HSV, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSV_HUE_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSV_HUE_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSV_SAT_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSV_SAT_VAL, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSV_VAL_CAP, DLSZ_MOVE_X)
+            DLGRESIZE_CONTROL(CID_HSV_VAL_VAL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_PICKER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
     END_DLGRESIZE_MAP()
 
@@ -200,10 +235,12 @@ void CColorPicker::Impl::OnDDXChanges(UINT nID, BOOL bSaveAndValidate)
         return;
     }
     switch (nID) {
-    case CID_SPEC_COMBO:    SpectruKindChanged(); break;
     case CID_RGB_RED_VAL:
     case CID_RGB_GRN_VAL:
-    case CID_RGB_BLU_VAL:  ColorChanged(false); break;
+    case CID_RGB_BLU_VAL: ColorChanged(false); break;
+    case CID_SPEC_COMBO:  SpectruKindChanged(); break;
+    default: 
+        break;
     }
 }
 
@@ -244,9 +281,9 @@ LRESULT CColorPicker::Impl::ColorChanged(bool bNotify)
         DoDataExchange(DDX_LOAD, CID_RGB_RED_VAL);
         DoDataExchange(DDX_LOAD, CID_RGB_GRN_VAL);
         DoDataExchange(DDX_LOAD, CID_RGB_BLU_VAL);
-        DoDataExchange(DDX_LOAD, CID_RGB_HUE_VAL);
-        DoDataExchange(DDX_LOAD, CID_RGB_SAT_VAL);
-        DoDataExchange(DDX_LOAD, CID_RGB_VAL_VAL);
+        DoDataExchange(DDX_LOAD, CID_HSV_HUE_VAL);
+        DoDataExchange(DDX_LOAD, CID_HSV_SAT_VAL);
+        DoDataExchange(DDX_LOAD, CID_HSV_VAL_VAL);
     }
     else {
         m_imSpectrum.InvalidateRect(nullptr, FALSE);

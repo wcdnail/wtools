@@ -15,6 +15,59 @@ constexpr T Min3(T a, T b, T c)
     return a < b ? (a < c ? a : c) : (b < c ? b : c);
 }
 
+//
+// Refactored from https://github.com/jakebesworth/Simple-Color-Conversions/blob/master/color.c
+// Copyright 2016 Jake Besworth
+// 
+void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G, int& B)
+{
+    double const       dHex{dH / 60.};
+    int const      nPrimary{static_cast<int>(dHex)};
+    double const nSecondary{dHex - nPrimary};
+    double const         dX{(1. - dS) * dV};
+    double const         dY{(1. - (dS * nSecondary)) * dV};
+    double const         dZ{(1. - (dS * (1. - nSecondary))) * dV};
+    double               dR{255.};
+    double               dG{255.};
+    double               dB{255.};
+    switch (nPrimary) {
+    default:
+    case 0:
+        dR = (dV * 255.0) + 0.5;
+        dG = (dZ * 255.0) + 0.5;
+        dB = (dX * 255.0) + 0.5;
+        break;
+    case 1:
+        dR = (dY * 255.0) + 0.5;
+        dG = (dV * 255.0) + 0.5;
+        dB = (dX * 255.0) + 0.5;
+        break;
+    case 2:
+        dR = (dX * 255.0) + 0.5;
+        dG = (dV * 255.0) + 0.5;
+        dB = (dZ * 255.0) + 0.5;
+        break;
+    case 3:
+        dR = (dX * 255.0) + 0.5;
+        dG = (dY * 255.0) + 0.5;
+        dB = (dV * 255.0) + 0.5;
+        break;
+    case 4:
+        dR = (dZ * 255.0) + 0.5;
+        dG = (dX * 255.0) + 0.5;
+        dB = (dV * 255.0) + 0.5;
+        break;
+    case 5:
+        dR = (dV * 255.0) + 0.5;
+        dG = (dX * 255.0) + 0.5;
+        dB = (dY * 255.0) + 0.5;
+        break;
+    }
+    R = static_cast<int>(dR);
+    G = static_cast<int>(dG);
+    B = static_cast<int>(dB);
+}
+
 CColorUnion::~CColorUnion() = default;
 
 CColorUnion::CColorUnion(double dH, double dS, double dV)
@@ -27,7 +80,7 @@ CColorUnion::CColorUnion(double dH, double dS, double dV)
     ,     m_Blue{0}
     ,    m_Alpha{0}
 {
-    UpdateRGB();
+    HSVtoRGB();
 }
 
 CColorUnion::CColorUnion(COLORREF crInitial)
@@ -43,94 +96,39 @@ CColorUnion::CColorUnion(COLORREF crInitial)
     UpdateHSV();
 }
 
-void CColorUnion::UpdateRGB()
-{
-    int             R{0xff};
-    int             G{0xff};
-    int             B{0xff};
-    double const dSat{m_dS / 100.};
-    double const dVal{m_dV / 100.};
-    if (0 == m_dS) {
-        R = B = G = static_cast<int>(255. * dVal);
-        SetRGBPlain(R, G, B);
-        return;
-    }
-    auto const nBase{static_cast<int>(255. * (1.0 - dSat) * dVal)};
-    auto const  nHue{static_cast<int>(m_dH / 60.)};
-    auto const nFrac{static_cast<int>(m_dH) % 60};
-    switch (nHue) {
-    case 0:
-        R = static_cast<int>(255.0 * dVal);
-        G = static_cast<int>((255.0 * dVal - nBase) * (m_dH / 60.) + nBase);
-        B = nBase;
-        break;
-    case 1:
-        R = static_cast<int>((255. * dVal - nBase) * (1. - (nFrac / 60.)) + nBase);
-        G = static_cast<int>(255. * dVal);
-        B = nBase;
-        break;
-    case 2:
-        R = nBase;
-        G = static_cast<int>(255. * dVal);
-        B = static_cast<int>((255. * dVal - nBase) * (nFrac / 60.) + nBase);
-        break;
-    case 3:
-        R = nBase;
-        G = static_cast<int>((255. * dVal - nBase) * (1. - (nFrac / 60.)) + nBase);
-        B = static_cast<int>(255. * dVal);
-        break;
-    case 4:
-        R = static_cast<int>((255. * dVal - nBase) * (nFrac / 60.) + nBase);
-        G = nBase;
-        B = static_cast<int>(255. * dVal);
-        break;
-    case 5:
-        R = static_cast<int>(255. * dVal);
-        G = nBase;
-        B = static_cast<int>((255. * dVal - nBase) * (1. - (nFrac / 60.)) + nBase);
-        break;
-    default:
-        DH::TPrintf(L"%s: NO valid case for %d\n", __FUNCTIONW__, nHue);
-        ATLASSERT(false);
-        return;
-    }
-    SetRGBPlain(R, G, B);
-}
-
 void CColorUnion::UpdateHSV()
 {
-    int const      R{m_Red};
-    int const      G{m_Green};
-    int const      B{m_Blue};
-    auto const btMax{Max3(R, G, B)};
-    if (0 == btMax) {
+    auto const    R{m_Red / RGB_MAX};
+    auto const    G{m_Green / RGB_MAX};
+    auto const    B{m_Blue / RGB_MAX};
+    auto const dMax{Max3(R, G, B)};
+    if (0 == dMax) {
         m_dH = m_dS = m_dV = 0;
         return;
     }
-    auto const btMin{Min3(R, G, B)};
-    auto       delta{static_cast<double>(btMax - btMin)};
-    double      temp{.0};
-    if (delta == 0) {
-        delta = 1.;
-    }
+    auto const   dMin{Min3(R, G, B)};
+    auto const dDelta{dMax - dMin};
 
-    m_dV = btMax / (255.0 * 100.0);
-    m_dS = (delta / static_cast<double>(btMax)) * 100.0;
-    if (btMax == R) {
-        temp = (60 * ((G - B) / delta));
+    if (dDelta == 0.) {
+        m_dH = 0.;
     }
-    else if (btMax == G) {
-        temp = (60 * (2.0 + (B - R) / delta));
+    else if(R == dMax) {
+        m_dH = std::fmod((60. * ((G - B) / dDelta)) + HSV_HUE_MAX, HSV_HUE_MAX);
+    }
+    else if (G == dMax) {
+        m_dH = std::fmod((60. * ((B - R) / dDelta)) + HSV_HUE_MID, HSV_HUE_MAX);
+    }
+    else if (B == dMax) {
+        m_dH = std::fmod((60. * ((R - G) / dDelta)) + HSV_HUE_AMID, HSV_HUE_MAX);
+    }
+    if (dMax == 0.) {
+        m_dS = 0.;
     }
     else {
-        temp = (60 * (4.0 + (R - G) / delta));
+        m_dS = HSV_SAT_MAX * (dDelta / dMax);
     }
-    if (temp < 0) {
-        m_dH = temp + 360;
-    }
-    else {
-        m_dH = temp;
-    }
+    m_dV = dMax * HSV_VAL_MAX;
+
     if (m_dV > HSV_VAL_MAX) {
         m_dV = HSV_VAL_MAX;
     }
