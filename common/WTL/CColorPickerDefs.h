@@ -1,6 +1,7 @@
 #pragma once
 
 #include <wcdafx.api.h>
+#include <utility>
 
 constexpr TCHAR CSPECIMG_CLASS[] = _T("WCCF::CSpectrumImage");
 constexpr TCHAR CSPECSLD_CLASS[] = _T("WCCF::CSpectrumSlider");
@@ -14,6 +15,7 @@ constexpr double      RGB_MAX{255.};
 constexpr int     RGB_MAX_INT{255};
 
 void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G, int& B);
+void RGBtoHSV(int const R, int const G, int const B, double& dH, double& dS, double& dV);
 
 enum SpectrumKind: int
 {
@@ -29,7 +31,7 @@ enum SpectrumKind: int
 
 enum CCPMiscConsts: int
 {
-    SPEC_BITMAP_WDTH    = 48,
+    SPEC_BITMAP_WDTH    = 64,
     SPECTRUM_BPP        = 32,
     SPECTRUM_CX         = SPEC_BITMAP_WDTH,
     SPECTRUM_CY         = SPEC_BITMAP_WDTH,
@@ -104,9 +106,9 @@ inline void CColorUnion::SetUpdated(bool bUpdated) { m_bUpdated = bUpdated; }
 
 inline void CColorUnion::SetRGBPlain(int R, int G, int B)
 {
-    GetRed()   = R;
-    GetGreen() = G;
-    GetBlue()  = B;
+    GetRed()   = std::min<int>(R, RGB_MAX_INT);
+    GetGreen() = std::min<int>(G, RGB_MAX_INT);
+    GetBlue()  = std::min<int>(B, RGB_MAX_INT);
     SetUpdated(true);
 }
 
@@ -127,6 +129,14 @@ inline void CColorUnion::SetHSV(double dH, double dS, double dV)
 inline void CColorUnion::HSVtoRGB()
 {
     ::HSVtoRGB(m_dH, m_dS / HSV_SAT_MAX, m_dV / HSV_VAL_MAX, m_Red, m_Green, m_Blue);
+    SetUpdated(true);
+}
+
+inline void CColorUnion::RGBtoHSV()
+{
+    ::RGBtoHSV(m_Red, m_Green, m_Blue, m_dH, m_dS, m_dV);
+    m_dS *= HSV_SAT_MAX;
+    m_dV *= HSV_VAL_MAX;
     SetUpdated(true);
 }
 

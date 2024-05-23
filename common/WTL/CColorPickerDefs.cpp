@@ -17,7 +17,7 @@ constexpr T Min3(T a, T b, T c)
 
 //
 // Refactored from https://github.com/jakebesworth/Simple-Color-Conversions/blob/master/color.c
-// Copyright 2016 Jake Besworth
+// by Jake Besworth
 // 
 void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G, int& B)
 {
@@ -33,39 +33,93 @@ void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G,
     switch (nPrimary) {
     default:
     case 0:
-        dR = (dV * 255.0) + 0.5;
-        dG = (dZ * 255.0) + 0.5;
-        dB = (dX * 255.0) + 0.5;
+        dR = (dV * 255.) + 0.5;
+        dG = (dZ * 255.) + 0.5;
+        dB = (dX * 255.) + 0.5;
         break;
     case 1:
-        dR = (dY * 255.0) + 0.5;
-        dG = (dV * 255.0) + 0.5;
-        dB = (dX * 255.0) + 0.5;
+        dR = (dY * 255.) + 0.5;
+        dG = (dV * 255.) + 0.5;
+        dB = (dX * 255.) + 0.5;
         break;
     case 2:
-        dR = (dX * 255.0) + 0.5;
-        dG = (dV * 255.0) + 0.5;
-        dB = (dZ * 255.0) + 0.5;
+        dR = (dX * 255.) + 0.5;
+        dG = (dV * 255.) + 0.5;
+        dB = (dZ * 255.) + 0.5;
         break;
     case 3:
-        dR = (dX * 255.0) + 0.5;
-        dG = (dY * 255.0) + 0.5;
-        dB = (dV * 255.0) + 0.5;
+        dR = (dX * 255.) + 0.5;
+        dG = (dY * 255.) + 0.5;
+        dB = (dV * 255.) + 0.5;
         break;
     case 4:
-        dR = (dZ * 255.0) + 0.5;
-        dG = (dX * 255.0) + 0.5;
-        dB = (dV * 255.0) + 0.5;
+        dR = (dZ * 255.) + 0.5;
+        dG = (dX * 255.) + 0.5;
+        dB = (dV * 255.) + 0.5;
         break;
     case 5:
-        dR = (dV * 255.0) + 0.5;
-        dG = (dX * 255.0) + 0.5;
-        dB = (dY * 255.0) + 0.5;
+        dR = (dV * 255.) + 0.5;
+        dG = (dX * 255.) + 0.5;
+        dB = (dY * 255.) + 0.5;
         break;
     }
     R = static_cast<int>(dR);
     G = static_cast<int>(dG);
     B = static_cast<int>(dB);
+}
+
+//
+// Refactored from https://github.com/jakebesworth/Simple-Color-Conversions/blob/master/color.c
+// Copyright 2016 Jake Besworth
+// 
+void RGBtoHSV(int const R, int const G, int const B, double& dH, double& dS, double& dV)
+{
+    int const    nMax{Max3(R, G, B)};
+    int const    nMin{Min3(R, G, B)};
+    double const dMax{nMax / 255.0};
+    double const dMin{nMin / 255.0};
+
+    dS = (dMax < 0.0001) ? 0 : (dMax - dMin) / dMax;
+    dV = dMax;
+
+    /* Saturation is 0 */
+    if(dS < 0.1) {
+        /* Hue is undefined, monochrome */
+        dH = 0;
+        return;
+    }
+    if(R == nMax) {
+        if(G == nMin) {
+            /* H = 5 + B' */
+            dH = 5 + ((dMax - (B / 255.)) / (dMax - dMin));
+        }
+        else {
+            /* H = 1 - G' */
+            dH = 1 - ((dMax - (G / 255.)) / (dMax - dMin));
+        }
+    }
+    else if(G == nMax) {
+        if(B == nMin) {
+            /* H = R' + 1 */
+            dH = ((dMax - (R / 255.)) / (dMax - dMin)) + 1;
+        }
+        else {
+            /* H = 3 - B' */
+            dH = 3 - ((dMax - (B / 255.)) / (dMax - dMin));
+        }
+    }
+    /* This is actually a problem with the original paper, I've fixed it here, should email them... */
+    else if(B == nMax && R == nMin) {
+        /* H = 3 + G' */
+        dH = 3 + ((dMax - (G / 255.)) / (dMax - dMin));
+    }
+    else {
+        /* H = 5 - R' */
+        dH = 5 - ((dMax - (R / 255.)) / (dMax - dMin));
+    }
+
+    /* Hue is then converted to degrees by multiplying by 60 */
+    dH = std::min<double>(dH * 60., HSV_HUE_MAX);
 }
 
 CColorUnion::~CColorUnion() = default;
@@ -96,6 +150,7 @@ CColorUnion::CColorUnion(COLORREF crInitial)
     RGBtoHSV();
 }
 
+#if 0
 void CColorUnion::RGBtoHSV()
 {
     auto const    R{m_Red / RGB_MAX};
@@ -140,6 +195,8 @@ void CColorUnion::RGBtoHSV()
     }
     SetUpdated(true);
 }
+#endif
+
 
 CRGBSpecRect CColorUnion::GetRGBSpectrumRect(SpectrumKind nSpectrumKind) const
 {
