@@ -25,6 +25,7 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
     SpectrumKind GetSpectrumKind() const;
     SpectrumKind const& GetSpectrumKindRef() const;
     void OnColorChanged(double xPos, double yPos);
+    void NotifySend() const;
 
 private:
     friend Super;
@@ -44,7 +45,6 @@ private:
     void OnPaint(WTL::CDCHandle dc);
     void OnLButtonDown(UINT nFlags, CPoint point);
     void OnLButtonUp(UINT nFlags, CPoint point) const;
-    void NotifySend() const;
     void NotifyColorChanged(CRect const& rc, CPoint pt);
     void OnMouseMove(UINT nFlags, CPoint pt);
 };
