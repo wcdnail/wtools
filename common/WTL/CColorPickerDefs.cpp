@@ -181,9 +181,9 @@ CColorUnion::CColorUnion(double dH, double dS, double dV)
     ,    m_G{0}
     ,     m_B{0}
     ,    m_Alpha{0xff}
-    ,      m_dHl{0}
-    ,      m_dSl{0}
-    ,       m_dL{0}
+    ,      m_Hl{0}
+    ,      m_Sl{0}
+    ,       m_L{0}
 {
     HSVtoRGB();
 }
@@ -197,9 +197,9 @@ CColorUnion::CColorUnion(COLORREF crInitial)
     ,    m_G{GetGValue(crInitial)}
     ,     m_B{GetBValue(crInitial)}
     ,    m_Alpha{0xff}
-    ,      m_dHl{0}
-    ,      m_dSl{0}
-    ,       m_dL{0}
+    ,      m_Hl{0}
+    ,      m_Sl{0}
+    ,       m_L{0}
 {
     RGBtoHSV();
 }

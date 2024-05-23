@@ -67,9 +67,9 @@ struct CColorUnion
     int     m_G;
     int      m_B;
     int     m_Alpha;
-    int       m_dHl;
-    int       m_dSl;
-    int        m_dL;
+    int       m_Hl;
+    int       m_Sl;
+    int        m_L;
 
     ~CColorUnion();
     CColorUnion(double dH, double dS, double dV);
@@ -158,9 +158,9 @@ inline void CColorUnion::RGBtoHSL()
 {
     double dH, dS, dL;
     ::RGBtoHSL(m_R, m_G, m_B, dH, dS, dL);
-    m_dHl = static_cast<int>(dH * HSV_HUE_MAX);
-    m_dSl = static_cast<int>(dS * HSV_SAT_MAX);
-    m_dL = static_cast<int>(dL * HSV_VAL_MAX);
+    m_Hl = static_cast<int>(dH * HSV_HUE_MAX);
+    m_Sl = static_cast<int>(dS * HSV_SAT_MAX);
+    m_L = static_cast<int>(dL * HSV_VAL_MAX);
 }
 
 inline int     CColorUnion::GetRed() const { return m_R; }
