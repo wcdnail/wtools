@@ -170,36 +170,38 @@ void RGBtoHSL(int const R, int const G, int const B, double& dHl, double& dSl, d
     dLl = dL;
 }
 
+IMPL_DEFAULT_COPY_MOVE_OF(CColorUnion);
+
 CColorUnion::~CColorUnion() = default;
 
 CColorUnion::CColorUnion(double dH, double dS, double dV)
     : m_bUpdated{false}
-    ,       m_H{static_cast<int>(dH)}
-    ,       m_S{static_cast<int>(dS)}
-    ,       m_V{static_cast<int>(dV)}
-    ,      m_R{0}
-    ,    m_G{0}
-    ,     m_B{0}
-    ,    m_Alpha{0xff}
-    ,      m_Hl{0}
-    ,      m_Sl{0}
-    ,       m_L{0}
+    ,        m_H{static_cast<int>(dH)}
+    ,        m_S{static_cast<int>(dS)}
+    ,        m_V{static_cast<int>(dV)}
+    ,        m_R{0}
+    ,        m_G{0}
+    ,        m_B{0}
+    ,        m_A{0xff}
+    ,       m_Hl{0}
+    ,       m_Sl{0}
+    ,        m_L{0}
 {
     HSVtoRGB();
 }
 
 CColorUnion::CColorUnion(COLORREF crInitial)
     : m_bUpdated{false}
-    ,       m_H{0}
-    ,       m_S{0}
-    ,       m_V{0}
-    ,      m_R{GetRValue(crInitial)}
-    ,    m_G{GetGValue(crInitial)}
-    ,     m_B{GetBValue(crInitial)}
-    ,    m_Alpha{0xff}
-    ,      m_Hl{0}
-    ,      m_Sl{0}
-    ,       m_L{0}
+    ,        m_H{0}
+    ,        m_S{0}
+    ,        m_V{0}
+    ,        m_R{GetRValue(crInitial)}
+    ,        m_G{GetGValue(crInitial)}
+    ,        m_B{GetBValue(crInitial)}
+    ,        m_A{0xff}
+    ,       m_Hl{0}
+    ,       m_Sl{0}
+    ,        m_L{0}
 {
     RGBtoHSV();
 }

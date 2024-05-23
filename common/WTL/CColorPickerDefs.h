@@ -57,19 +57,19 @@ struct CRGBSpecRect;
 
 struct CColorUnion
 {
-    DELETE_COPY_MOVE_OF(CColorUnion);
+    DECL_COPY_MOVE_OF(CColorUnion);
 
     bool m_bUpdated;
-    int        m_H;
-    int        m_S;
-    int        m_V;
-    int       m_R;
-    int     m_G;
-    int      m_B;
-    int     m_Alpha;
-    int       m_Hl;
-    int       m_Sl;
-    int        m_L;
+    int         m_H;
+    int         m_S;
+    int         m_V;
+    int         m_R;
+    int         m_G;
+    int         m_B;
+    int         m_A;
+    int        m_Hl;
+    int        m_Sl;
+    int         m_L;
 
     ~CColorUnion();
     CColorUnion(double dH, double dS, double dV);
@@ -166,11 +166,11 @@ inline void CColorUnion::RGBtoHSL()
 inline int     CColorUnion::GetRed() const { return m_R; }
 inline int   CColorUnion::GetGreen() const { return m_G; }
 inline int    CColorUnion::GetBlue() const { return m_B; }
-inline int   CColorUnion::GetAlpha() const { return m_Alpha; }
+inline int   CColorUnion::GetAlpha() const { return m_A; }
 inline int&    CColorUnion::GetRed() { return m_R; }
 inline int&  CColorUnion::GetGreen() { return m_G; }
 inline int&   CColorUnion::GetBlue() { return m_B; }
-inline int&  CColorUnion::GetAlpha() { return m_Alpha; }
+inline int&  CColorUnion::GetAlpha() { return m_A; }
 
 inline COLORREF   CColorUnion::GetRedFirst() const { return RGB(       0, GetGreen(), GetBlue()); }
 inline COLORREF    CColorUnion::GetRedLast() const { return RGB(     255, GetGreen(), GetBlue()); }

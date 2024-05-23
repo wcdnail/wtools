@@ -85,6 +85,7 @@ private:
     ATL::CString   m_sColorHtml;
     CSpectrumSlider  m_imSlider;
     WTL::CStatic      m_stColor;
+    WTL::CFont       m_fntFixed;
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,                 X,              Y,           Width,         Height,   Styles
         CONTROL_GROUPBOX(         _T("Spectrum"),        CID_GRP_SPECTRUM,                           2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
@@ -138,10 +139,10 @@ private:
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
         DDX_CONTROL_HANDLE(CID_SPEC_COLOR_SEL, m_stColor)
-        DDX_UINT(CID_RGB_RED_VAL, m_imSpectrum.GetColor().GetRed());
-        DDX_UINT(CID_RGB_GRN_VAL, m_imSpectrum.GetColor().GetGreen());
-        DDX_UINT(CID_RGB_BLU_VAL, m_imSpectrum.GetColor().GetBlue());
-        DDX_UINT(CID_RGB_ALP_VAL, m_imSpectrum.GetColor().GetAlpha());
+        DDX_UINT(CID_RGB_RED_VAL, m_imSpectrum.GetColor().m_R);
+        DDX_UINT(CID_RGB_GRN_VAL, m_imSpectrum.GetColor().m_G);
+        DDX_UINT(CID_RGB_BLU_VAL, m_imSpectrum.GetColor().m_B);
+        DDX_UINT(CID_RGB_ALP_VAL, m_imSpectrum.GetColor().m_A);
         DDX_UINT(CID_HSV_HUE_VAL, m_imSpectrum.GetColor().m_H);
         DDX_UINT(CID_HSV_SAT_VAL, m_imSpectrum.GetColor().m_S);
         DDX_UINT(CID_HSV_VAL_VAL, m_imSpectrum.GetColor().m_V);
@@ -219,7 +220,6 @@ private:
     void UpdateDDX();
     LRESULT ColorChanged(bool bNotify);
     void OnDDXChanges(UINT nID, BOOL bSaveAndValidate);
-    void OnDataValidateError(UINT nCtrlID, BOOL bSave, _XData& data);
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
@@ -283,6 +283,7 @@ void CColorPicker::Impl::OnDDXChanges(UINT nID, BOOL bSaveAndValidate)
     }
 }
 
+#if 0
 void CColorPicker::Impl::OnDataValidateError(UINT nCtrlID, BOOL bSave, _XData& data)
 {
     switch (nCtrlID) {
@@ -297,6 +298,8 @@ void CColorPicker::Impl::OnDataValidateError(UINT nCtrlID, BOOL bSave, _XData& d
     }
     }
 }
+#endif
+
 
 void CColorPicker::Impl::UpdateDDX()
 {
@@ -405,12 +408,20 @@ struct UDSpinnerConf
     int nMax;
 };
 
+struct CUFontConf
+{
+    UINT    nID;
+    HFONT hFont;
+};
+
 BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
     UNREFERENCED_PARAMETER(wndFocus);
     UNREFERENCED_PARAMETER(lInitParam);
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
+
+    m_fntFixed = CreateFontW(-13, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, L"Courier");
 
     WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
     cbSpectrum.AddString(L"RGB/红");
@@ -433,8 +444,16 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     };
     for (auto const& spConf: udSpinnerConf) {
         WTL::CUpDownCtrl ctlSpinner{GetDlgItem(spConf.nID)};
-        ATLASSUME(ctlSpinner.m_hWnd != nullptr);
         ctlSpinner.SetRange(spConf.nMin, spConf.nMax);
+    }
+
+    static const CUFontConf cuFontConf[] = {
+        { CID_RGB_HEX_VAL, m_fntFixed },
+        { CID_RGB_HTM_VAL, m_fntFixed },
+    };
+    for (auto const& fntConf: cuFontConf) {
+        ATL::CWindow ctl{GetDlgItem(fntConf.nID)};
+        ctl.SetFont(fntConf.hFont, FALSE);
     }
 
     m_imSlider.Initialize();
