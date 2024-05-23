@@ -73,9 +73,9 @@ void CSpectrumImage::UpdateRaster()
     case SPEC_RGB_Red:
     case SPEC_RGB_Green:
     case SPEC_RGB_Blue:         DDraw_RGB(m_Dib, m_Color.GetRGBSpectrumRect(m_SpectrumKind)); break;
-    case SPEC_HSV_Hue:          DDraw_HSV_Hue(m_Dib, m_Color.m_dH); break;
-    case SPEC_HSV_Saturation:   DDraw_HSV_Sat(m_Dib, m_Color.m_dS / HSV_SAT_MAX); break;
-    case SPEC_HSV_Brightness:   DDraw_HSV_Val(m_Dib, m_Color.m_dV / HSV_VAL_MAX); break;
+    case SPEC_HSV_Hue:          DDraw_HSV_Hue(m_Dib, m_Color.m_H); break;
+    case SPEC_HSV_Saturation:   DDraw_HSV_Sat(m_Dib, m_Color.m_S / HSV_SAT_MAX); break;
+    case SPEC_HSV_Brightness:   DDraw_HSV_Val(m_Dib, m_Color.m_V / HSV_VAL_MAX); break;
     default:
         ATLASSERT(FALSE);
         break;
@@ -89,9 +89,9 @@ void CSpectrumImage::OnColorChanged(double xPos, double yPos)
     case SPEC_RGB_Red:          m_Color.SetRGB(m_Color.GetRed(), static_cast<int>(xPos), static_cast<int>(yPos)); break;
     case SPEC_RGB_Green:        m_Color.SetRGB(static_cast<int>(xPos), m_Color.GetGreen(), static_cast<int>(yPos)); break;
     case SPEC_RGB_Blue:         m_Color.SetRGB(static_cast<int>(yPos), static_cast<int>(xPos), m_Color.GetBlue()); break;
-    case SPEC_HSV_Hue:          m_Color.SetHSV(m_Color.m_dH, xPos / RGB_MAX * HSV_SAT_MAX, (RGB_MAX - yPos) / RGB_MAX * HSV_VAL_MAX); break;
-    case SPEC_HSV_Saturation:   m_Color.SetHSV(xPos / RGB_MAX * HSV_HUE_MAX, m_Color.m_dS, (RGB_MAX - yPos) / RGB_MAX * HSV_VAL_MAX); break;
-    case SPEC_HSV_Brightness:   m_Color.SetHSV(xPos / RGB_MAX * HSV_HUE_MAX, (RGB_MAX - yPos) / RGB_MAX * HSV_SAT_MAX, m_Color.m_dV); break;
+    case SPEC_HSV_Hue:          m_Color.SetHSV(m_Color.m_H, xPos / RGB_MAX * HSV_SAT_MAX, (RGB_MAX - yPos) / RGB_MAX * HSV_VAL_MAX); break;
+    case SPEC_HSV_Saturation:   m_Color.SetHSV(xPos / RGB_MAX * HSV_HUE_MAX, m_Color.m_S, (RGB_MAX - yPos) / RGB_MAX * HSV_VAL_MAX); break;
+    case SPEC_HSV_Brightness:   m_Color.SetHSV(xPos / RGB_MAX * HSV_HUE_MAX, (RGB_MAX - yPos) / RGB_MAX * HSV_SAT_MAX, m_Color.m_V); break;
     default: 
         ATLASSERT(FALSE);
         break;

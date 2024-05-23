@@ -140,16 +140,16 @@ private:
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
         DDX_CONTROL_HANDLE(CID_SPEC_COLOR_SEL, m_stColor)
-        DDX_UINT_RANGE(CID_RGB_RED_VAL, m_imSpectrum.GetColor().GetRed(), 0, RGB_MAX_INT);
+        DDX_UINT_RANGE(CID_RGB_RED_VAL, m_imSpectrum.GetColor().GetRed(),   0, RGB_MAX_INT);
         DDX_UINT_RANGE(CID_RGB_GRN_VAL, m_imSpectrum.GetColor().GetGreen(), 0, RGB_MAX_INT);
-        DDX_UINT_RANGE(CID_RGB_BLU_VAL, m_imSpectrum.GetColor().GetBlue(), 0, RGB_MAX_INT);
+        DDX_UINT_RANGE(CID_RGB_BLU_VAL, m_imSpectrum.GetColor().GetBlue(),  0, RGB_MAX_INT);
         DDX_UINT_RANGE(CID_RGB_ALP_VAL, m_imSpectrum.GetColor().GetAlpha(), 0, RGB_MAX_INT);
-        DDX_FLOAT_P_RANGE(CID_HSV_HUE_VAL, m_imSpectrum.GetColor().m_dH, 0, HSV_HUE_MAX, 5);
-        DDX_FLOAT_P_RANGE(CID_HSV_SAT_VAL, m_imSpectrum.GetColor().m_dS, 0, HSV_SAT_MAX, 5);
-        DDX_FLOAT_P_RANGE(CID_HSV_VAL_VAL, m_imSpectrum.GetColor().m_dV, 0, HSV_VAL_MAX, 5);
-        DDX_FLOAT_P_RANGE(CID_HSL_HUE_VAL, m_imSpectrum.GetColor().m_dHl, 0, HSV_HUE_MAX, 5);
-        DDX_FLOAT_P_RANGE(CID_HSL_SAT_VAL, m_imSpectrum.GetColor().m_dSl, 0, HSV_SAT_MAX, 5);
-        DDX_FLOAT_P_RANGE(CID_HSL_LTN_VAL, m_imSpectrum.GetColor().m_dL, 0, HSV_VAL_MAX, 5);
+        DDX_UINT_RANGE(CID_HSV_HUE_VAL, m_imSpectrum.GetColor().m_H,  0, HSV_HUE_MAX_INT);
+        DDX_UINT_RANGE(CID_HSV_SAT_VAL, m_imSpectrum.GetColor().m_S,  0, HSV_SAT_MAX_INT);
+        DDX_UINT_RANGE(CID_HSV_VAL_VAL, m_imSpectrum.GetColor().m_V,  0, HSV_VAL_MAX_INT);
+        DDX_UINT_RANGE(CID_HSL_HUE_VAL, m_imSpectrum.GetColor().m_dHl, 0, HSV_HUE_MAX_INT);
+        DDX_UINT_RANGE(CID_HSL_SAT_VAL, m_imSpectrum.GetColor().m_dSl, 0, HSV_SAT_MAX_INT);
+        DDX_UINT_RANGE(CID_HSL_LTN_VAL, m_imSpectrum.GetColor().m_dL,  0, HSV_VAL_MAX_INT);
         DDX_TEXT(CID_RGB_HEX_VAL, m_sColorHex);
         DDX_TEXT(CID_RGB_HTM_VAL, m_sColorHtml);
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
