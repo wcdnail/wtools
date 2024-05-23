@@ -3,18 +3,6 @@
 #include <DDraw.DGI/DDGDIStuff.h>
 #include <dh.tracing.h>
 
-template <typename T>
-constexpr T Max3(T a, T b, T c)
-{
-    return a > b ? (a > c ? a : c) : (b > c ? b : c);
-}
-
-template <typename T>
-constexpr T Min3(T a, T b, T c)
-{
-    return a < b ? (a < c ? a : c) : (b < c ? b : c);
-}
-
 //
 // Refactored from https://github.com/jakebesworth/Simple-Color-Conversions/blob/master/color.c
 // by Jake Besworth
@@ -31,7 +19,7 @@ void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G,
     double               dG{255.};
     double               dB{255.};
     switch (nPrimary) {
-    default:
+    default: // HUE MAX == 360, nPrimary may be 6
     case 0:
         dR = (dV * 255.) + 0.5;
         dG = (dZ * 255.) + 0.5;
@@ -70,12 +58,12 @@ void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G,
 
 //
 // Refactored from https://github.com/jakebesworth/Simple-Color-Conversions/blob/master/color.c
-// Copyright 2016 Jake Besworth
+// by Jake Besworth
 // 
 void RGBtoHSV(int const R, int const G, int const B, double& dH, double& dS, double& dV)
 {
-    int const    nMax{Max3(R, G, B)};
-    int const    nMin{Min3(R, G, B)};
+    int const    nMax{std::max<int>(R, std::max<int>(G, B))};
+    int const    nMin{std::min<int>(R, std::min<int>(G, B))};
     double const dMax{nMax / 255.0};
     double const dMin{nMin / 255.0};
 
@@ -127,8 +115,8 @@ void RGBtoHSL(int const R, int const G, int const B, double& dHl, double& dSl, d
     double const        dR{R / 255.};
     double const        dG{G / 255.};
     double const        dB{B / 255.};
-    double const      dMin{Min3(dR, dG, dB)};
-    double const      dMax{Max3(dR, dG, dB)};
+    double const      dMin{std::min<double>(dR, std::min<double>(dG, dB))};
+    double const      dMax{std::max<double>(dR, std::max<double>(dG, dB))};
     double const dMaxRange{dMax - dMin};
     double const        dL{(dMax + dMin) / 2.0};
     double              dH{0.};
