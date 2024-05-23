@@ -691,10 +691,14 @@ void CMainDlg::OnComboBoxSelectChange(UINT uNotifyCode, int nID, CWindow wndCtl)
 
 void CMainDlg::CloseDialog(int nVal)
 {
-    DestroyWindow();
-    ::PostQuitMessage(nVal);
+    if (m_bModal) {
+        EndDialog(nVal);
+    }
+    else {
+        DestroyWindow();
+        ::PostQuitMessage(nVal);
+    }
 }
-
 
 void CMainDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "CColorPickerDefs.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 #include <dh.tracing.h>
@@ -122,6 +122,54 @@ void RGBtoHSV(int const R, int const G, int const B, double& dH, double& dS, dou
     dH = std::min<double>(dH * 60., HSV_HUE_MAX);
 }
 
+void RGBtoHSL(int const R, int const G, int const B, double& dHl, double& dSl, double& dLl)
+{
+    double const        dR{R / 255.};
+    double const        dG{G / 255.};
+    double const        dB{B / 255.};
+    double const      dMin{Min3(dR, dG, dB)};
+    double const      dMax{Max3(dR, dG, dB)};
+    double const dMaxRange{dMax - dMin};
+    double const        dL{(dMax + dMin) / 2.0};
+    double              dH{0.};
+    double              dS{0.};
+    if (dMaxRange == 0) {       // This is a gray, no chroma...
+        dH = 0.;                // HSL results = 0 ÷ 1
+        dS = 0.;
+    }
+    else {                      // Chromatic data...
+        if (dL < 0.5) {
+            dS = dMaxRange / (dMax + dMin);
+        }
+        else {
+            dS = dMaxRange / (2.0 - dMax - dMin);
+        }
+
+        double const dRRange{((dMax - dR) / 6.0) + (dMaxRange / 2.0) / dMaxRange};
+        double const dGRange{((dMax - dG) / 6.0) + (dMaxRange / 2.0) / dMaxRange};
+        double const dBRange{((dMax - dB) / 6.0) + (dMaxRange / 2.0) / dMaxRange};
+        if (dR == dMax) {
+            dH = (dBRange - dGRange);
+        }
+        else if (dG == dMax) {
+            dH = (1.0 / 3.0) + dRRange - dBRange;
+        }
+        else if (dB == dMax) {
+            dH = (2.0 / 3.0) + dGRange - dRRange;
+        }
+
+        if (dH < 0) {
+            dH += 1;
+        }
+        if (dH > 1) {
+            dH -= 1;
+        }
+    }
+    dHl = dH * HSV_HUE_MAX;
+    dSl = dS * HSV_SAT_MAX;
+    dLl = dL * HSV_VAL_MAX;
+}
+
 CColorUnion::~CColorUnion() = default;
 
 CColorUnion::CColorUnion(double dH, double dS, double dV)
@@ -133,6 +181,9 @@ CColorUnion::CColorUnion(double dH, double dS, double dV)
     ,    m_Green{0}
     ,     m_Blue{0}
     ,    m_Alpha{0xff}
+    ,      m_dHl{0.}
+    ,      m_dSl{0.}
+    ,       m_dL{0.}
 {
     HSVtoRGB();
 }
@@ -146,57 +197,16 @@ CColorUnion::CColorUnion(COLORREF crInitial)
     ,    m_Green{GetGValue(crInitial)}
     ,     m_Blue{GetBValue(crInitial)}
     ,    m_Alpha{0xff}
+    ,      m_dHl{0.}
+    ,      m_dSl{0.}
+    ,       m_dL{0.}
 {
     RGBtoHSV();
 }
 
-#if 0
-void CColorUnion::RGBtoHSV()
+void CColorUnion::FromHSL()
 {
-    auto const    R{m_Red / RGB_MAX};
-    auto const    G{m_Green / RGB_MAX};
-    auto const    B{m_Blue / RGB_MAX};
-    auto const dMax{Max3(R, G, B)};
-    if (0 == dMax) {
-        m_dH = m_dS = m_dV = 0;
-        return;
-    }
-    auto const   dMin{Min3(R, G, B)};
-    auto const dDelta{dMax - dMin};
-
-    if (dDelta == 0.) {
-        m_dH = 0.;
-    }
-    else if(R == dMax) {
-        m_dH = std::fmod((60. * ((G - B) / dDelta)) + HSV_HUE_MAX, HSV_HUE_MAX);
-    }
-    else if (G == dMax) {
-        m_dH = std::fmod((60. * ((B - R) / dDelta)) + HSV_HUE_MID, HSV_HUE_MAX);
-    }
-    else if (B == dMax) {
-        m_dH = std::fmod((60. * ((R - G) / dDelta)) + HSV_HUE_AMID, HSV_HUE_MAX);
-    }
-    if (dMax == 0.) {
-        m_dS = 0.;
-    }
-    else {
-        m_dS = HSV_SAT_MAX * (dDelta / dMax);
-    }
-    m_dV = dMax * HSV_VAL_MAX;
-
-    if (m_dV > HSV_VAL_MAX) {
-        m_dV = HSV_VAL_MAX;
-    }
-    if (m_dS > HSV_SAT_MAX) {
-        m_dS = HSV_SAT_MAX;
-    }
-    if (m_dH > HSV_HUE_MAX) {
-        m_dH = HSV_HUE_MAX;
-    }
-    SetUpdated(true);
 }
-#endif
-
 
 CRGBSpecRect CColorUnion::GetRGBSpectrumRect(SpectrumKind nSpectrumKind) const
 {

@@ -8,12 +8,13 @@ int Run(LPTSTR /*lpstrCmdLine*/ = nullptr, int nCmdShow = SW_SHOWDEFAULT)
     CMessageLoop theLoop;
     _Module.AddMessageLoop(&theLoop);
     CMainDlg dlgMain;
-    if(!dlgMain.Create(nullptr)) {
-        ATLTRACE(_T("Main dialog creation failed!\n"));
-        return 0;
-    }
-    dlgMain.ShowWindow(nCmdShow);
-    const int nRet = theLoop.Run();
+    const int nRet = static_cast<int>(dlgMain.DoModal());
+    //if(!dlgMain.Create(nullptr)) {
+    //    ATLTRACE(_T("Main dialog creation failed!\n"));
+    //    return 0;
+    //}
+    //dlgMain.ShowWindow(nCmdShow);
+    //const int nRet = theLoop.Run();
     _Module.RemoveMessageLoop();
     return nRet;
 }

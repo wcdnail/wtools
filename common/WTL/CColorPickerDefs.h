@@ -16,6 +16,7 @@ constexpr int     RGB_MAX_INT{255};
 
 void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G, int& B);
 void RGBtoHSV(int const R, int const G, int const B, double& dH, double& dS, double& dV);
+void RGBtoHSL(int const R, int const G, int const B, double& dHl, double& dSl, double& dLl);
 
 enum SpectrumKind: int
 {
@@ -63,6 +64,9 @@ struct CColorUnion
     int     m_Green;
     int      m_Blue;
     int     m_Alpha;
+    double    m_dHl;
+    double    m_dSl;
+    double     m_dL;
 
     ~CColorUnion();
     CColorUnion(double dH, double dS, double dV);
@@ -73,8 +77,11 @@ struct CColorUnion
 
     void SetRGB(int R, int G, int B);
     void SetHSV(double dH, double dS, double dV);
+
     void HSVtoRGB();
     void RGBtoHSV();
+    void RGBtoHSL();
+    void FromHSL();
 
     int GetRed() const;
     int GetGreen() const;
@@ -129,6 +136,7 @@ inline void CColorUnion::SetHSV(double dH, double dS, double dV)
 inline void CColorUnion::HSVtoRGB()
 {
     ::HSVtoRGB(m_dH, m_dS / HSV_SAT_MAX, m_dV / HSV_VAL_MAX, m_Red, m_Green, m_Blue);
+    RGBtoHSL();
     SetUpdated(true);
 }
 
@@ -137,7 +145,13 @@ inline void CColorUnion::RGBtoHSV()
     ::RGBtoHSV(m_Red, m_Green, m_Blue, m_dH, m_dS, m_dV);
     m_dS *= HSV_SAT_MAX;
     m_dV *= HSV_VAL_MAX;
+    RGBtoHSL();
     SetUpdated(true);
+}
+
+inline void CColorUnion::RGBtoHSL()
+{
+    ::RGBtoHSL(m_Red, m_Green, m_Blue, m_dHl, m_dSl, m_dL);
 }
 
 inline int     CColorUnion::GetRed() const { return m_Red; }

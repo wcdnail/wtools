@@ -20,7 +20,7 @@ struct CSpectrumImage: CCustomControl<CSpectrumImage>
 
     bool Initialize(long cx = SPECTRUM_CX, long cy = SPECTRUM_CY);
     COLORREF GetColorRef() const;
-    CColorUnion& GetColorUnion();
+    CColorUnion& GetColor();
     void SetSpectrumKind(SpectrumKind kind);
     SpectrumKind GetSpectrumKind() const;
     SpectrumKind const& GetSpectrumKindRef() const;
@@ -64,7 +64,7 @@ inline COLORREF CSpectrumImage::GetColorRef() const
     return m_Color.GetColorRef();
 }
 
-inline CColorUnion& CSpectrumImage::GetColorUnion()
+inline CColorUnion& CSpectrumImage::GetColor()
 {
     return m_Color;
 }

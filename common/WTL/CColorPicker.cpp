@@ -132,13 +132,16 @@ private:
     END_DIALOG()
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
-        DDX_UINT_RANGE(CID_RGB_RED_VAL, m_imSpectrum.GetColorUnion().GetRed(), 0, RGB_MAX_INT);
-        DDX_UINT_RANGE(CID_RGB_GRN_VAL, m_imSpectrum.GetColorUnion().GetGreen(), 0, RGB_MAX_INT);
-        DDX_UINT_RANGE(CID_RGB_BLU_VAL, m_imSpectrum.GetColorUnion().GetBlue(), 0, RGB_MAX_INT);
-        DDX_UINT_RANGE(CID_RGB_ALP_VAL, m_imSpectrum.GetColorUnion().GetAlpha(), 0, RGB_MAX_INT);
-        DDX_FLOAT_P_RANGE(CID_HSV_HUE_VAL, m_imSpectrum.GetColorUnion().m_dH, 0, HSV_HUE_MAX, 5);
-        DDX_FLOAT_P_RANGE(CID_HSV_SAT_VAL, m_imSpectrum.GetColorUnion().m_dS, 0, HSV_SAT_MAX, 5);
-        DDX_FLOAT_P_RANGE(CID_HSV_VAL_VAL, m_imSpectrum.GetColorUnion().m_dV, 0, HSV_VAL_MAX, 5);
+        DDX_UINT_RANGE(CID_RGB_RED_VAL, m_imSpectrum.GetColor().GetRed(), 0, RGB_MAX_INT);
+        DDX_UINT_RANGE(CID_RGB_GRN_VAL, m_imSpectrum.GetColor().GetGreen(), 0, RGB_MAX_INT);
+        DDX_UINT_RANGE(CID_RGB_BLU_VAL, m_imSpectrum.GetColor().GetBlue(), 0, RGB_MAX_INT);
+        DDX_UINT_RANGE(CID_RGB_ALP_VAL, m_imSpectrum.GetColor().GetAlpha(), 0, RGB_MAX_INT);
+        DDX_FLOAT_P_RANGE(CID_HSV_HUE_VAL, m_imSpectrum.GetColor().m_dH, 0, HSV_HUE_MAX, 5);
+        DDX_FLOAT_P_RANGE(CID_HSV_SAT_VAL, m_imSpectrum.GetColor().m_dS, 0, HSV_SAT_MAX, 5);
+        DDX_FLOAT_P_RANGE(CID_HSV_VAL_VAL, m_imSpectrum.GetColor().m_dV, 0, HSV_VAL_MAX, 5);
+        DDX_FLOAT_P_RANGE(CID_HSL_HUE_VAL, m_imSpectrum.GetColor().m_dHl, 0, HSV_HUE_MAX, 5);
+        DDX_FLOAT_P_RANGE(CID_HSL_SAT_VAL, m_imSpectrum.GetColor().m_dSl, 0, HSV_SAT_MAX, 5);
+        DDX_FLOAT_P_RANGE(CID_HSL_LTN_VAL, m_imSpectrum.GetColor().m_dL, 0, HSV_VAL_MAX, 5);
         DDX_TEXT(CID_RGB_HEX_VAL, m_sColorHex);
         DDX_TEXT(CID_RGB_HTM_VAL, m_sColorHtml);
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
@@ -208,7 +211,7 @@ CColorPicker::Impl::~Impl() = default;
 CColorPicker::Impl::Impl()
     :    m_imSpectrum{0xffffff, SPEC_HSV_Hue}
     , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
-    ,      m_imSlider{m_imSpectrum.GetSpectrumKindRef(), m_imSpectrum.GetColorUnion()}
+    ,      m_imSlider{m_imSpectrum.GetSpectrumKindRef(), m_imSpectrum.GetColor()}
     ,       m_stColor{}
     ,     m_bSaveData{false}
 {
@@ -238,13 +241,19 @@ void CColorPicker::Impl::OnDDXChanges(UINT nID, BOOL bSaveAndValidate)
     case CID_RGB_GRN_VAL:
     case CID_RGB_BLU_VAL:
         ColorChanged(false);
-        m_imSpectrum.GetColorUnion().RGBtoHSV();
+        m_imSpectrum.GetColor().RGBtoHSV();
         break;
     case CID_HSV_HUE_VAL:
     case CID_HSV_SAT_VAL:
     case CID_HSV_VAL_VAL:
         ColorChanged(false);
-        m_imSpectrum.GetColorUnion().HSVtoRGB();
+        m_imSpectrum.GetColor().HSVtoRGB();
+        break;
+    case CID_HSL_HUE_VAL:
+    case CID_HSL_SAT_VAL:
+    case CID_HSL_LTN_VAL:
+        ColorChanged(false);
+        m_imSpectrum.GetColor().FromHSL();
         break;
     case CID_SPEC_COMBO:
         SpectruKindChanged();
@@ -271,7 +280,7 @@ void CColorPicker::Impl::OnDataValidateError(UINT nCtrlID, BOOL bSave, _XData& d
 
 void CColorPicker::Impl::UpdateDDX()
 {
-    auto const& Color{m_imSpectrum.GetColorUnion()};
+    auto const& Color{m_imSpectrum.GetColor()};
     m_sColorHex.Format(TEXT("0x%02X%02X%02X"), Color.GetBlue(), Color.GetGreen(), Color.GetRed());
     m_sColorHtml.Format(TEXT("#%02X%02X%02X"), Color.GetRed(), Color.GetGreen(), Color.GetBlue());
     DoDataExchange(DDX_LOAD);
