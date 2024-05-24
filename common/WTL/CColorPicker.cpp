@@ -14,11 +14,15 @@
 #include <atldlgs.h>
 #include <atlddx.h>
 #include <atlmisc.h>
+#include <algorithm>
+#include <cctype>
 
 struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
                            WTL::CDialogResize<Impl>,
                            WTL::CWinDataExchange<Impl>
 {
+    DELETE_COPY_MOVE_OF(Impl);
+
     using   ImplSuper = WTL::CIndirectDialogImpl<Impl>;
     using ImplResizer = WTL::CDialogResize<Impl>;
 
@@ -40,22 +44,35 @@ private:
         CID_SPECTRUM_PIC,
         CID_SPECTRUM_SLD,
         CID_GRP_RGB,
-        CID_RGB_RED_CAP, CID_RGB_RED_VAL, CID_RGB_RED_UDS,
-        CID_RGB_GRN_CAP, CID_RGB_GRN_VAL, CID_RGB_GRN_UDS,
-        CID_RGB_BLU_CAP, CID_RGB_BLU_VAL, CID_RGB_BLU_UDS,
-        CID_RGB_HEX_VAL,
-        CID_RGB_HTM_VAL,
-        CID_RGB_ALP_CAP, CID_RGB_ALP_VAL, CID_RGB_ALP_UDS,
+        CID_RGB_RED_CAP,
+        CID_RGB_GRN_CAP,
+        CID_RGB_BLU_CAP,
+        CID_RGB_ALP_CAP,
         CID_GRP_HSL,
-        CID_HSL_HUE_CAP, CID_HSL_HUE_VAL, CID_HSL_HUE_UDS,
-        CID_HSL_SAT_CAP, CID_HSL_SAT_VAL, CID_HSL_SAT_UDS,
-        CID_HSL_LTN_CAP, CID_HSL_LTN_VAL, CID_HSL_LTN_UDS,
+        CID_HSL_HUE_CAP,
+        CID_HSL_SAT_CAP,
+        CID_HSL_LTN_CAP,
         CID_GRP_HSV,
-        CID_HSV_HUE_CAP, CID_HSV_HUE_VAL, CID_HSV_HUE_UDS,
-        CID_HSV_SAT_CAP, CID_HSV_SAT_VAL, CID_HSV_SAT_UDS,
-        CID_HSV_VAL_CAP, CID_HSV_VAL_VAL, CID_HSV_VAL_UDS,
+        CID_HSV_HUE_CAP,
+        CID_HSV_SAT_CAP,
+        CID_HSV_VAL_CAP,
         CID_GRP_PALETTE,
-        CONTROL_COUNT = CID_GRP_PALETTE - BEFORE_FIRST_CONTROL_ID,
+        // Edit controls
+        CID_RGB_RED_VAL, CID_RGB_RED_UDS,
+        CID_RGB_GRN_VAL, CID_RGB_GRN_UDS,
+        CID_RGB_BLU_VAL, CID_RGB_BLU_UDS,
+        CID_RGB_ALP_VAL, CID_RGB_ALP_UDS,
+        CID_HSL_HUE_VAL, CID_HSL_HUE_UDS,
+        CID_HSL_SAT_VAL, CID_HSL_SAT_UDS,
+        CID_HSL_LTN_VAL, CID_HSL_LTN_UDS,
+        CID_HSV_HUE_VAL, CID_HSV_HUE_UDS,
+        CID_HSV_SAT_VAL, CID_HSV_SAT_UDS,
+        CID_HSV_VAL_VAL, CID_HSV_VAL_UDS,
+        CID_RGB_HEX_VAL, CID_HSV_HEX_UDS,
+        CID_RGB_HTM_VAL, CID_HSV_HTM_UDS,
+        CID_EDITS_LAST,
+        CID_EDITS_FIRST = CID_RGB_RED_VAL,
+        CID_EDITS_COUNT = CID_EDITS_LAST - CID_EDITS_FIRST,
     };
 
     enum Sizes: short
@@ -81,11 +98,11 @@ private:
 
     bool            m_bSaveData;
     CSpectrumImage m_imSpectrum;
+    CSpectrumSlider  m_imSlider;
+    WTL::CStatic      m_stColor;
     int         m_nSpectrumKind; // For DDX
     ATL::CString    m_sColorHex;
     ATL::CString   m_sColorHtml;
-    CSpectrumSlider  m_imSlider;
-    WTL::CStatic      m_stColor;
     WTL::CFont         m_fntHex;
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,                 X,              Y,           Width,         Height,   Styles
@@ -154,7 +171,7 @@ private:
         DDX_TEXT(CID_RGB_HTM_VAL, m_sColorHtml);
         DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
         if (static_cast<UINT>(-1) != nCtlID) {
-            OnDDXChanges(nCtlID, bSaveAndValidate);
+            OnDDXLoading(nCtlID, bSaveAndValidate);
         }
     END_DDX_MAP()
 
@@ -221,10 +238,11 @@ private:
     void UpdateHexStr();
     void UpdateHtmlStr();
     void UpdateDDX();
-    bool DoPostUpdate(int nID);
+    void DDXReloadEditsExcept(int nId);
     LRESULT ColorChanged(bool bFromWmNotify);
-    void OnDDXChanges(UINT nID, BOOL bSaveAndValidate);
+    void OnDDXLoading(UINT nID, BOOL bSaveAndValidate);
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
+    void ValidateHexInput(int nID) const;
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
@@ -235,9 +253,9 @@ CColorPicker::Impl::~Impl() = default;
 CColorPicker::Impl::Impl()
     :     m_bSaveData{true}
     ,    m_imSpectrum{0xffffff, SPEC_HSV_Hue}
-    , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
     ,      m_imSlider{m_imSpectrum.GetSpectrumKindRef(), m_imSpectrum.GetColor()}
     ,       m_stColor{}
+    , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
 {
 }
 
@@ -255,7 +273,7 @@ HRESULT CColorPicker::Impl::PreCreateWindow()
     return S_OK;
 }
 
-void CColorPicker::Impl::OnDDXChanges(UINT nID, BOOL bSaveAndValidate)
+void CColorPicker::Impl::OnDDXLoading(UINT nID, BOOL bSaveAndValidate)
 {
     if (m_bSaveData || !bSaveAndValidate) {
         return;
@@ -376,22 +394,35 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
     return 0;
 }
 
-bool CColorPicker::Impl::DoPostUpdate(int nID)
+void CColorPicker::Impl::DDXReloadEditsExcept(int nID)
 {
     CScopedBoolGuard bGuard{m_bSaveData};
-    switch (nID) {
-    case CID_RGB_HEX_VAL:
-        UpdateHtmlStr();
-        SetDlgItemText(CID_RGB_HTM_VAL, m_sColorHtml.GetString());
-        return false;
-    case CID_RGB_HTM_VAL:
-        UpdateHexStr();
-        SetDlgItemText(CID_RGB_HEX_VAL, m_sColorHex.GetString());
-        return false;
-    default:
-        break;
+    for (UINT nEdit = CID_EDITS_FIRST; nEdit < CID_EDITS_LAST; nEdit += 2) {
+        if (nEdit != nID) {
+            DoDataExchange(DDX_LOAD, nEdit);
+        }
     }
-    return true;
+}
+
+void CColorPicker::Impl::ValidateHexInput(int nID) const
+{
+    WTL::CEdit    edCtl{GetDlgItem(nID)};
+    ATL::CString sColor{};
+    edCtl.GetWindowTextW(sColor);
+
+    EHexHeadType hType{HEX_STR_PLAIN};
+    int           nLen{sColor.GetLength()};
+    PCTSTR const  pBeg{SkipHexHead(sColor.GetString(), nLen, hType)};
+    if (!pBeg) {
+        return ;
+    }
+    PCTSTR const pEnd{sColor.GetString() + nLen};
+
+    auto const& pFind{std::find_if_not(pBeg, pEnd, isxdigit)};
+    if (pFind != pEnd) {
+        sColor.Remove(*pFind);
+        edCtl.SetWindowTextW(sColor);
+    }
 }
 
 void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/)
@@ -405,14 +436,28 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     case BN_DISABLE:
     case BN_KILLFOCUS:
         break;
-    case EN_UPDATE:
+    case EN_UPDATE: {
+        WTL::CUpDownCtrl udCtl{GetDlgItem(nID + 1)};
+        if (udCtl.m_hWnd) {
+            udCtl.SetPos(udCtl.GetPos());
+        }
+        else {
+            ValidateHexInput(nID);
+        }
         if (DoDataExchange(DDX_SAVE, nID)) {
             m_imSpectrum.InvalidateRect(nullptr, FALSE);
-            if (DoPostUpdate(nID)) {
-                m_imSpectrum.NotifySend(NM_SPECTRUM_CLR_SEL);
+            m_imSlider.InvalidateRect(nullptr, FALSE);
+            m_stColor.InvalidateRect(nullptr, FALSE);
+            if (CID_RGB_HEX_VAL != nID) {
+                UpdateHexStr();
             }
+            if (CID_RGB_HTM_VAL != nID) {
+                UpdateHtmlStr();
+            }
+            DDXReloadEditsExcept(nID);
         }
         return ;
+    }
     case CBN_SELENDOK:
         DoDataExchange(DDX_SAVE, nID);
         return ;

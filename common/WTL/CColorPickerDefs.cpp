@@ -116,30 +116,44 @@ CPoint CColorUnion::GetColorPoint(SpectrumKind nSpectrumKind, CRect const& rc)
     return rv;
 }
 
-bool CColorUnion::FromString(ATL::CString& sColor, bool bSwapRB)
+PCTSTR SkipHexHead(PCTSTR pBeg, int& nLen, EHexHeadType& hType)
 {
-    int    nBeg{0};
-    int    nLen{sColor.GetLength()};
-    PCTSTR pStr{sColor.GetString()};
     if (nLen < 1) {
-        return false;
+        return nullptr;
     }
     if (nLen >= 2) {
-        if (0 == _tcsnicmp(pStr, _T("0x"), 2)) {
-            nBeg = 2;
+        if (0 == _tcsnicmp(pBeg, _T("0x"), 2)) {
+            pBeg += 2;
+            hType = HEX_STR_CPP;
         }
-        else if (0 == _tcsnicmp(pStr, _T("&H"), 2)) {
-            nBeg = 2;
+        else if (0 == _tcsnicmp(pBeg, _T("&H"), 2)) {
+            pBeg += 2;
             nLen -= 1;
-            bSwapRB = false;
+            hType = HEX_STR_ASS;
         }
-        else if (pStr[0] == _T('#')) {
-            nBeg = 1;
-            bSwapRB = true;
+        else if (pBeg[0] == _T('#')) {
+            pBeg += 1;
+            hType = HEX_STR_WEB;
         }
     }
-    PTSTR       pEnd{&sColor.GetBuffer()[nLen]};
-    ULONG const nRes{_tcstoul(&pStr[nBeg], &pEnd, 16)};
+    return pBeg;
+}
+
+bool CColorUnion::FromString(ATL::CString& sColor, bool bSwapRB)
+{
+    EHexHeadType hType{HEX_STR_PLAIN};
+    int           nLen{sColor.GetLength()};
+    PCTSTR const  pBeg{SkipHexHead(sColor.GetString(), nLen, hType)};
+    if (!pBeg) {
+        return false;
+    }
+    PTSTR pEnd{sColor.GetBuffer() + nLen};
+    switch (hType) {
+    case HEX_STR_ASS: bSwapRB = false; break;
+    case HEX_STR_WEB: bSwapRB = true; break;
+    default: break;
+    }
+    ULONG const nRes{_tcstoul(pBeg, &pEnd, 16)};
     m_R = GetRValue(nRes);
     m_G = GetGValue(nRes);
     m_B = GetBValue(nRes);

@@ -37,6 +37,16 @@ enum CCPMiscConsts: int
 
 static_assert(SPECTRUM_BPP == 32, "SPECTRUM_BPP must always be 32!");
 
+enum EHexHeadType
+{
+    HEX_STR_PLAIN,
+    HEX_STR_CPP,
+    HEX_STR_ASS,
+    HEX_STR_WEB,
+};
+
+PCTSTR SkipHexHead(PCTSTR pBeg, int& nLen, EHexHeadType& hType);
+
 struct CSpectrumImage;
 struct CSpectrumSlider;
 struct CRGBSpecRect;
