@@ -151,7 +151,7 @@ private:
     END_CONTROLS_MAP()
 
     BEGIN_DIALOG(0, 0, DLG_CX, DLG_CY)
-        DIALOG_STYLE(WS_CHILD | WS_VISIBLE)
+        DIALOG_STYLE(DS_CONTROL | WS_CHILD | WS_VISIBLE)
         DIALOG_FONT(9, _T("Lucida Console"))
     END_DIALOG()
 
@@ -231,6 +231,12 @@ private:
         MSG_WM_DRAWITEM(OnDrawItem)
         CHAIN_MSG_MAP(ImplResizer)
         REFLECT_NOTIFICATIONS()
+#ifdef _DEBUG_XTRA
+        if constexpr (true) {
+            auto const msgStr = DH::MessageToStrignW((PMSG)GetCurrentMessage());
+            DBGTPrint(LTH_CONTROL L" -DLG- [[ %s ]]\n", msgStr.c_str());
+        }
+#endif
     END_MSG_MAP()
 
     void SpectruKindChanged();
@@ -619,6 +625,33 @@ BOOL CColorPicker::PreTranslateMessage(MSG* pMsg)
     return FALSE;
 }
 
+BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
+{
+    BOOL bHandled{TRUE};
+    UNREFERENCED_PARAMETER(hWnd);
+    UNREFERENCED_PARAMETER(bHandled);
+    switch(dwMsgMapID) {
+    case 0:
+      //MSG_WM_NCPAINT(OnNcPaint)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_SIZE(OnSize)
+        REFLECT_NOTIFICATIONS()
+#ifdef _DEBUG_XTRA
+        if constexpr (true) {
+            auto const msgStr = DH::MessageToStrignW((PMSG)GetCurrentMessage());
+            DBGTPrint(LTH_CONTROL L" -WM- [[ %s ]]\n", msgStr.c_str());
+        }
+#endif
+        break;
+    default:
+        ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
+        ATLASSERT(FALSE);
+        break;
+    }
+    return FALSE;
+}
+
 #if 0
 struct CDCEx: WTL::CWindowDC
 {
@@ -637,32 +670,6 @@ struct CDCEx: WTL::CWindowDC
     ~CDCEx() = default;
 };
 #endif
-
-BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
-{
-    //if (m_pImpl->m_hWnd == hWnd) {
-    //    if (IsDialogMessage(const_cast<ATL::_ATL_MSG*>(GetCurrentMessage()))) {
-    //        return TRUE;
-    //    }
-    //}
-    BOOL bHandled{TRUE};
-    UNREFERENCED_PARAMETER(hWnd);
-    UNREFERENCED_PARAMETER(bHandled);
-    switch(dwMsgMapID) {
-    case 0:
-      //MSG_WM_NCPAINT(OnNcPaint)
-        MSG_WM_CREATE(OnCreate)
-        MSG_WM_DESTROY(OnDestroy)
-        MSG_WM_SIZE(OnSize)
-        REFLECT_NOTIFICATIONS()
-        break;
-    default:
-        ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
-        ATLASSERT(FALSE);
-        break;
-    }
-    return FALSE;
-}
 
 void CColorPicker::OnNcPaint(WTL::CRgnHandle rgn)
 {
@@ -683,6 +690,7 @@ void CColorPicker::OnNcPaint(WTL::CRgnHandle rgn)
 int CColorPicker::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     UNREFERENCED_PARAMETER(lpCreateStruct);
+    ModifyStyleEx(0, WS_EX_CONTROLPARENT);
     if (!m_pImpl->Create(m_hWnd)) {
         return -1;
     }
