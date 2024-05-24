@@ -47,6 +47,12 @@
       <Filter>WTL</Filter>
     </ClCompile>
     <ClCompile Include="color.stuff.cpp" />
+    <ClCompile Include="WTL\CDDCtl.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
+    <ClCompile Include="WTL\CCustomCtrl.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -124,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="scoped.bool.guard.h" />
     <ClInclude Include="color.stuff.h" />
+    <ClInclude Include="WTL\CDDCtl.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

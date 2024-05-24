@@ -425,7 +425,7 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
         if (DoDataExchange(DDX_SAVE, nID)) {
             m_imSpectrum.InvalidateRect(nullptr, FALSE);
             if (DoPostUpdate(nID)) {
-                m_imSpectrum.NotifySend();
+                m_imSpectrum.NotifySend(NM_SPECTRUM_CLR_SEL);
             }
         }
         return ;
@@ -545,9 +545,15 @@ void CColorPicker::Impl::SpectruKindChanged()
 CColorPicker::~CColorPicker() = default;
 
 CColorPicker::CColorPicker()
-    :   Super{}
-    , m_pImpl{std::make_unique<Impl>()}
+    : CCustomControl{}
+    ,        m_pImpl{std::make_unique<Impl>()}
 {
+}
+
+static ATOM& CColorPicker_Atom()
+{
+    static ATOM gs_CColorPicker_Atom{0};
+    return gs_CColorPicker_Atom;
 }
 
 HRESULT CColorPicker::PreCreateWindow()
@@ -556,7 +562,7 @@ HRESULT CColorPicker::PreCreateWindow()
     if (ERROR_SUCCESS != code) {
         return code;
     }
-    return Super::PreCreateWindow();
+    return CCustomControl::PreCreateWindowImpl(CColorPicker_Atom(), GetWndClassInfo());
 }
 
 BOOL CColorPicker::PreTranslateMessage(MSG* pMsg)
@@ -565,12 +571,6 @@ BOOL CColorPicker::PreTranslateMessage(MSG* pMsg)
         return TRUE;
     }
     return FALSE;
-}
-
-ATOM& CColorPicker::GetWndClassAtomRef()
-{
-    static ATOM gs_CColorPicker_Atom{0};
-    return gs_CColorPicker_Atom;
 }
 
 #if 0

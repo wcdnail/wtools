@@ -7,34 +7,23 @@
 constexpr COLORREF CLR_CHECKERS_WHITE{RGB(210, 210, 210)};
 constexpr COLORREF CLR_CHECKERS_BLACK{RGB( 92,  92,  92)};
 
-ATOM& CSpectrumImage::GetWndClassAtomRef()
-{
-    static ATOM gs_CSpectrumImage_Atom{0};
-    return gs_CSpectrumImage_Atom;
-}
-
 CSpectrumImage::~CSpectrumImage() = default;
 
 CSpectrumImage::CSpectrumImage(COLORREF crInit, SpectrumKind kind)
-    :          m_Dib{}
-    ,        m_Color{crInit}
+    :        m_Color{crInit}
     , m_SpectrumKind{kind}
 {
 }
 
-bool CSpectrumImage::Initialize(long cx /*= SPECTRUM_CX*/, long cy /*= SPECTRUM_CY*/)
+HRESULT CSpectrumImage::PreCreateWindow()
 {
-    if (!m_Dib.Create(cx, cy, SPECTRUM_BPP)) {
-        return false;
-    }
-    CDIBitmap bmCheckers{};
-    if (!bmCheckers.Create(CHECKERS_CX, CHECKERS_CX, SPECTRUM_BPP)) {
-        return false;
-    }
-    DDraw_Checkers(bmCheckers, CLR_CHECKERS_WHITE, CLR_CHECKERS_BLACK);
-    WTL::CClientDC const dc{m_hWnd};
-    m_brCheckers.CreatePatternBrush(bmCheckers.GetBitmap(dc.m_hDC));
-    return true;
+    static ATOM gs_CSpectrumImage_Atom{0};
+    return CCustomControl::PreCreateWindowImpl(gs_CSpectrumImage_Atom, GetWndClassInfo());
+}
+
+bool CSpectrumImage::Initialize(long cx /*= SPECTRUM_CX*/, long cy /*= SPECTRUM_CY*/, HBRUSH brBackground /*= nullptr*/)
+{
+    return CDDCtrl::Initialize(cx, cy, SPECTRUM_BPP, brBackground);
 }
 
 void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
@@ -46,7 +35,7 @@ void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
     CRect rc{};
     GetClientRect(rc);
     CPoint const pt{m_Color.GetColorPoint(m_SpectrumKind, rc)};
-    NotifyColorChanged(rc, pt);
+    DoNotifyMouseOver(rc, pt);
     m_Color.SetUpdated(true);
     InvalidateRect(nullptr, FALSE);
 }
@@ -56,11 +45,8 @@ BOOL CSpectrumImage::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) {
     case 0:
-        MSG_WM_CREATE(OnCreate)
         MSG_WM_PAINT(OnPaint)
-        MSG_WM_LBUTTONDOWN(OnLButtonDown)
-        MSG_WM_LBUTTONUP(OnLButtonUp)
-        MSG_WM_MOUSEMOVE(OnMouseMove)
+        CHAIN_MSG_MAP(CDDCtrl)
         break;
     default:
         ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
@@ -68,13 +54,6 @@ BOOL CSpectrumImage::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
         break;
     }
     return FALSE;
-}
-
-int CSpectrumImage::OnCreate(LPCREATESTRUCT pCS)
-{
-    UNREFERENCED_PARAMETER(pCS);
-    ATLTRACE(ATL::atlTraceControls, 0, _T("WM_CREATE OK for %p\n"), this);
-    return 0;
 }
 
 void CSpectrumImage::UpdateRaster()
@@ -115,26 +94,12 @@ void CSpectrumImage::OnPaint(WTL::CDCHandle /*dc*/)
         UpdateRaster();
         m_Color.SetUpdated(false);
     }
-    WTL::CPaintDC const dcPaint{m_hWnd};
-    WTL::CDCHandle           dc{dcPaint.m_hDC};
-    HDC const          dcSource{m_Dib.GetDC(dc)};
-    CRect const          rcDest{dcPaint.m_ps.rcPaint};
-    int const             iSave{dc.SaveDC()};
-    dc.SetStretchBltMode(COLORONCOLOR);
-    if (m_Color.m_A < RGB_MAX_INT) {
-        BLENDFUNCTION const blend{/*AC_SRC_OVER*/0, 0, static_cast<BYTE>(m_Color.m_A), 0};
-        LONG const            dCY{1 + rcDest.Height() / m_Dib.GetHeight()};
-        dc.SelectBrush(m_brCheckers);
-        dc.PatBlt(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), PATCOPY);
-        dc.AlphaBlend(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height() + dCY,
-                      dcSource, 0, 0, m_Dib.GetWidth(), m_Dib.GetHeight(), blend);
-    }
-    else {
-        dc.StretchBlt(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(),
-                      dcSource, 0, 0, m_Dib.GetWidth(), m_Dib.GetHeight(), SRCCOPY);
-    }
-    DrawMarker(dc, rcDest);
-    dc.RestoreDC(iSave);
+    CDDCtrl::OnPaint(m_Color.m_A);
+}
+
+void CSpectrumImage::DoPaint(WTL::CDCHandle dc, CRect const& rc)
+{
+    DrawMarker(dc, rc);
 }
 
 void CSpectrumImage::DrawMarker(WTL::CDCHandle dc, CRect const& rcDest)
@@ -147,24 +112,7 @@ void CSpectrumImage::DrawMarker(WTL::CDCHandle dc, CRect const& rcDest)
     dc.InvertRect(CRect(rc.left, rc.bottom, rc.right, rc.bottom + 5));
 }
 
-void CSpectrumImage::OnLButtonUp(UINT, CPoint) const
-{
-    if (GetCapture() != m_hWnd) {
-        return ;
-    }
-    ReleaseCapture();
-}
-
-void CSpectrumImage::NotifySend() const
-{
-    NMHDR nmHeader;
-    nmHeader.code = NM_SPECTRUM_CLR_SEL;
-    nmHeader.idFrom = GetDlgCtrlID();
-    nmHeader.hwndFrom = m_hWnd;
-    ::SendMessageW(GetParent(), WM_NOTIFY, nmHeader.idFrom, reinterpret_cast<LPARAM>(&nmHeader));
-}
-
-void CSpectrumImage::NotifyColorChanged(CRect const& rc, CPoint pt)
+void CSpectrumImage::DoNotifyMouseOver(CRect const& rc, CPoint pt)
 {
     auto const xScale{static_cast<double>(rc.Width()) / RGB_MAX};
     auto const yScale{static_cast<double>(rc.Height()) / RGB_MAX};
@@ -183,25 +131,5 @@ void CSpectrumImage::NotifyColorChanged(CRect const& rc, CPoint pt)
         yVal = RGB_MAX;
     }
     OnColorChanged(xVal, yVal);
-    NotifySend();
-}
-
-void CSpectrumImage::OnMouseMove(UINT, CPoint pt)
-{
-    if (GetCapture() != m_hWnd) {
-        return;
-    }
-    CRect rcClient;
-    GetClientRect(rcClient);
-    NotifyColorChanged(rcClient, pt);
-}
-
-void CSpectrumImage::OnLButtonDown(UINT, CPoint)
-{
-    if (m_hWnd != GetCapture()) {
-        SetCapture();
-    }
-    else {
-        ReleaseCapture();
-    }
+    NotifySend(NM_SPECTRUM_CLR_SEL);
 }

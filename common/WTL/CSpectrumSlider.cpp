@@ -5,27 +5,23 @@
 #include <atlcrack.h>
 #include <atlgdi.h>
 
-ATOM& CSpectrumSlider::GetWndClassAtomRef()
-{
-    static ATOM gs_CSpectrumSlider_Atom{0};
-    return gs_CSpectrumSlider_Atom;
-}
-
 CSpectrumSlider::~CSpectrumSlider() = default;
 
 CSpectrumSlider::CSpectrumSlider(SpectrumKind const& nKind, CColorUnion& unColor)
     :   m_nKind{nKind}
     , m_unColor{unColor}
-    ,     m_Dib{}
 {
 }
 
-bool CSpectrumSlider::Initialize(long cx /*= SPECTRUM_SLIDER_CX*/)
+HRESULT CSpectrumSlider::PreCreateWindow()
 {
-    if (!m_Dib.Create(cx, 1, 32)) {
-        return false;
-    }
-    return true;
+    static ATOM gs_CSpectrumSlider_Atom{0};
+    return CCustomControl::PreCreateWindowImpl(gs_CSpectrumSlider_Atom, GetWndClassInfo());
+}
+
+bool CSpectrumSlider::Initialize(long cx /*= SPECTRUM_SLIDER_CX*/, HBRUSH brBackground /*= nullptr*/)
+{
+    return CDDCtrl::Initialize(cx, 1, SPECTRUM_BPP, brBackground);
 }
 
 void CSpectrumSlider::UpdateRaster()
@@ -156,12 +152,9 @@ BOOL CSpectrumSlider::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) { 
     case 0:
-        MSG_WM_CREATE(OnCreate)
         MSG_WM_PAINT(OnPaint)
-        MSG_WM_LBUTTONDOWN(OnLButtonDown)
-        MSG_WM_LBUTTONUP(OnLButtonUp)
-        MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_MOUSEWHEEL(OnMouseWheel)
+        CHAIN_MSG_MAP(CDDCtrl)
         break;
     default:
         ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
@@ -169,12 +162,6 @@ BOOL CSpectrumSlider::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
         break;
     }
     return FALSE;
-}
-
-int CSpectrumSlider::OnCreate(LPCREATESTRUCT pCS)
-{
-    ATLTRACE(ATL::atlTraceControls, 0, _T("WM_CREATE OK for %p\n"), this);
-    return 0;
 }
 
 void CSpectrumSlider::DrawRaster(WTL::CDCHandle dc, CRect const& rc) const
@@ -227,43 +214,6 @@ void CSpectrumSlider::OnPaint(WTL::CDCHandle /*dc*/) const
     dc.RestoreDC(iSaveDC);
 }
 
-void CSpectrumSlider::NotifySend() const
-{
-    NMHDR nmHeader;
-    nmHeader.code = NM_SLIDER_CLR_SEL;
-    nmHeader.idFrom = GetDlgCtrlID();
-    nmHeader.hwndFrom = m_hWnd;
-    ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)nmHeader.idFrom, reinterpret_cast<LPARAM>(&nmHeader));
-}
-
-void CSpectrumSlider::OnLButtonUp(UINT, CPoint) const
-{
-    if (m_hWnd != GetCapture()) {
-        return ;
-    }
-    ReleaseCapture();
-}
-
-void CSpectrumSlider::OnMouseMove(UINT, CPoint pt)
-{
-    if (m_hWnd != GetCapture()) {
-        return;
-    }
-    SetValueByY(pt.y);
-    NotifySend();
-    InvalidateRect(nullptr, FALSE);
-}
-
-void CSpectrumSlider::OnLButtonDown(UINT, CPoint pt)
-{
-    if (m_hWnd != GetCapture()) {
-        SetCapture();
-    }
-    else {
-        ReleaseCapture();
-    }
-}
-
 BOOL CSpectrumSlider::OnMouseWheel(UINT nFlags, short zDelta, CPoint)
 {
     long        nPos{0};
@@ -276,7 +226,14 @@ BOOL CSpectrumSlider::OnMouseWheel(UINT nFlags, short zDelta, CPoint)
         nPos += nStep;
     }
     SetValue(nPos, nMax);
-    NotifySend();
+    NotifySend(NM_SLIDER_CLR_SEL);
     InvalidateRect(nullptr, FALSE);
     return TRUE;
+}
+
+void CSpectrumSlider::DoNotifyMouseOver(CRect const& /*rc*/, CPoint pt)
+{
+    SetValueByY(pt.y);
+    NotifySend(NM_SLIDER_CLR_SEL);
+    InvalidateRect(nullptr, FALSE);
 }

@@ -1,53 +1,40 @@
 #pragma once
 
 #include "CColorPickerDefs.h"
-#include "CCustomCtrl.h"
+#include "CDDCtl.h"
 #include <wcdafx.api.h>
-#include <DDraw.DGI/CeXDib.h>
 #include <atlgdi.h>
 
 struct CRGBSpecRect;
 
-struct CSpectrumImage: CCustomControl<CSpectrumImage>
+struct CSpectrumImage: CDDCtrl
 {
-    using Super = CCustomControl<CSpectrumImage>;
-
     DELETE_COPY_MOVE_OF(CSpectrumImage);
+
     DECLARE_WND_SUPERCLASS2(CSPECIMG_CLASS, CSpectrumImage, nullptr)
 
-    ~CSpectrumImage() override;
-    CSpectrumImage(COLORREF crInit, SpectrumKind kind);
+    WCDAFX_API ~CSpectrumImage() override;
+    WCDAFX_API CSpectrumImage(COLORREF crInit, SpectrumKind kind);
 
-    bool Initialize(long cx = SPECTRUM_CX, long cy = SPECTRUM_CY);
-    COLORREF GetColorRef() const;
-    CColorUnion& GetColor();
-    void SetSpectrumKind(SpectrumKind kind);
-    SpectrumKind GetSpectrumKind() const;
-    SpectrumKind const& GetSpectrumKindRef() const;
-    void OnColorChanged(double xPos, double yPos);
-    void NotifySend() const;
+    WCDAFX_API HRESULT PreCreateWindow() override;
+    WCDAFX_API bool Initialize(long cx = SPECTRUM_CX, long cy = SPECTRUM_CY, HBRUSH brBackground = nullptr);
+    WCDAFX_API COLORREF GetColorRef() const;
+    WCDAFX_API CColorUnion& GetColor();
+    WCDAFX_API void SetSpectrumKind(SpectrumKind kind);
+    WCDAFX_API SpectrumKind GetSpectrumKind() const;
+    WCDAFX_API SpectrumKind const& GetSpectrumKindRef() const;
+    WCDAFX_API void OnColorChanged(double xPos, double yPos);
 
 private:
-    friend Super;
-
-    CDIBitmap             m_Dib;
     CColorUnion         m_Color;
     SpectrumKind m_SpectrumKind;
-    WTL::CBrush    m_brCheckers;
-
-    static ATOM& GetWndClassAtomRef();
-
-    BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 
     void UpdateRaster();
     void DrawMarker(WTL::CDCHandle dc, CRect const& rc);
-
-    int OnCreate(LPCREATESTRUCT pCS);
     void OnPaint(WTL::CDCHandle dc);
-    void OnLButtonDown(UINT nFlags, CPoint point);
-    void OnLButtonUp(UINT nFlags, CPoint point) const;
-    void NotifyColorChanged(CRect const& rc, CPoint pt);
-    void OnMouseMove(UINT nFlags, CPoint pt);
+    void DoPaint(WTL::CDCHandle dc, CRect const& rc) override;
+    void DoNotifyMouseOver(CRect const& rc, CPoint pt) override;
+    BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 };
 
 inline SpectrumKind CSpectrumImage::GetSpectrumKind() const

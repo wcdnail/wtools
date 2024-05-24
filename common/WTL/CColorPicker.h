@@ -5,11 +5,9 @@
 #include <atlapp.h>
 #include <memory>
 
-struct CColorPicker: CCustomControl<CColorPicker>,
+struct CColorPicker: CCustomControl,
                      WTL::CMessageFilter
 {
-    using Super = CCustomControl<CColorPicker>;
-
     enum Sizes: short
     {
         DLG_CX  = 360,
@@ -25,16 +23,15 @@ struct CColorPicker: CCustomControl<CColorPicker>,
     BOOL PreTranslateMessage(MSG* pMsg) override;
 
 private:
-    friend Super;
+    //friend Super;
     struct Impl;
 
     std::unique_ptr<Impl> m_pImpl;
-
-    static ATOM& GetWndClassAtomRef();
-    BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 
     void OnNcPaint(WTL::CRgnHandle rgn);
     int OnCreate(LPCREATESTRUCT lpCreateStruct);
     void OnDestroy();
     void OnSize(UINT nType, CSize size) const;
+
+    BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 };
