@@ -4,6 +4,7 @@
 #include "CDDCtl.h"
 #include <wcdafx.api.h>
 #include <atlgdi.h>
+#include <utility>
 
 struct CRGBSpecRect;
 
@@ -19,6 +20,7 @@ struct CSpectrumImage: CDDCtrl
     WCDAFX_API HRESULT PreCreateWindow() override;
     WCDAFX_API bool Initialize(long cx, long cy, HBRUSH brBackground);
     WCDAFX_API COLORREF GetColorRef() const;
+    WCDAFX_API COLORREF GetMinColorRef(int mR, int mG, int mB) const;
     WCDAFX_API CColorUnion& GetColor();
     WCDAFX_API void SetSpectrumKind(SpectrumKind kind);
     WCDAFX_API SpectrumKind GetSpectrumKind() const;
@@ -46,12 +48,19 @@ inline SpectrumKind const& CSpectrumImage::GetSpectrumKindRef() const
     return m_nKind;
 }
 
+inline CColorUnion& CSpectrumImage::GetColor()
+{
+    return m_Color;
+}
+
 inline COLORREF CSpectrumImage::GetColorRef() const
 {
     return m_Color.GetColorRef();
 }
 
-inline CColorUnion& CSpectrumImage::GetColor()
+inline COLORREF CSpectrumImage::GetMinColorRef(int mR, int mG, int mB) const
 {
-    return m_Color;
+    return RGB(std::max<BYTE>(mR, m_Color.m_R),
+               std::max<BYTE>(mG, m_Color.m_G),
+               std::max<BYTE>(mB, m_Color.m_B));
 }

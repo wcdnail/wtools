@@ -168,7 +168,7 @@ BOOL CSpectrumSlider::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
 void CSpectrumSlider::DrawPosition(WTL::CDCHandle dc, CRect const& rc) const
 {
-    constexpr long BarCY{8};
+    constexpr long BarCY{4};
     long            nPos{0};
     double const  dRange{GetValueAndRange(nPos)};
     double const  dScale{static_cast<double>(rc.Height()) / dRange};

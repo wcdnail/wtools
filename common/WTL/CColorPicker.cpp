@@ -13,6 +13,7 @@
 #include <atlframe.h>
 #include <atldlgs.h>
 #include <atlddx.h>
+#include <atlmisc.h>
 
 struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
                            WTL::CDialogResize<Impl>,
@@ -500,11 +501,10 @@ void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
             CRect const        rcColor{0, 0, 1, 1};
             WTL::CDC           dcColor{CreateCompatibleDC(dc)};
             WTL::CBitmap const bmColor{CreateCompatibleBitmap(dc, rcColor.Width(), rcColor.Height())};
-            WTL::CBrush const  brColor{CreateSolidBrush(m_imSpectrum.GetColorRef())};
             int const           iSave2{dcColor.SaveDC()};
             BLENDFUNCTION const  blend{AC_SRC_OVER, 0, static_cast<BYTE>(unColor.m_A), 0};
             dcColor.SelectBitmap(bmColor);
-            dcColor.FillRect(rcColor, brColor);
+            dcColor.FillSolidRect(rc, m_imSpectrum.GetMinColorRef(1, 1, 1));
             dc.SelectBrush(m_imSpectrum.GetBackBrush());
             dc.PatBlt(rc.left, rc.top, rc.Width(), rc.Height(), PATCOPY);
             dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(),
