@@ -17,7 +17,7 @@ struct CSpectrumImage: CDDCtrl
     WCDAFX_API CSpectrumImage(COLORREF crInit, SpectrumKind kind);
 
     WCDAFX_API HRESULT PreCreateWindow() override;
-    WCDAFX_API bool Initialize(long cx = SPECTRUM_CX, long cy = SPECTRUM_CY, HBRUSH brBackground = nullptr);
+    WCDAFX_API bool Initialize(long cx, long cy, HBRUSH brBackground);
     WCDAFX_API COLORREF GetColorRef() const;
     WCDAFX_API CColorUnion& GetColor();
     WCDAFX_API void SetSpectrumKind(SpectrumKind kind);
@@ -26,12 +26,11 @@ struct CSpectrumImage: CDDCtrl
     WCDAFX_API void OnColorChanged(double xPos, double yPos);
 
 private:
-    CColorUnion         m_Color;
-    SpectrumKind m_SpectrumKind;
+    CColorUnion  m_Color;
+    SpectrumKind m_nKind;
 
     void UpdateRaster();
     void DrawMarker(WTL::CDCHandle dc, CRect const& rc);
-    void OnPaint(WTL::CDCHandle dc);
     void DoPaint(WTL::CDCHandle dc, CRect const& rc) override;
     void DoNotifyMouseOver(CRect const& rc, CPoint pt) override;
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
@@ -39,12 +38,12 @@ private:
 
 inline SpectrumKind CSpectrumImage::GetSpectrumKind() const
 {
-    return m_SpectrumKind;
+    return m_nKind;
 }
 
 inline SpectrumKind const& CSpectrumImage::GetSpectrumKindRef() const
 {
-    return m_SpectrumKind;
+    return m_nKind;
 }
 
 inline COLORREF CSpectrumImage::GetColorRef() const

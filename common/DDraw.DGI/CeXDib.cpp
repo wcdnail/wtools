@@ -37,6 +37,14 @@ DWORD CDibEx::GetImageSize() const
     return GetSize(*GetInfoHdr(), m_nColors);
 }
 
+DWORD CDibEx::GetDataSize() const
+{
+    if (!m_pDib) {
+        return 0;
+    }
+    return GetInfoHdr()->biSizeImage;
+}
+
 DWORD CDibEx::GetPaletteSize(LONG wColors)
 {
     return (wColors * sizeof(RGBQUAD));

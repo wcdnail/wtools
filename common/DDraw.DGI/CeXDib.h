@@ -85,6 +85,7 @@ struct CDibEx
 
     LPBITMAPINFOHEADER GetInfoHdr() const;
     DWORD GetImageSize() const;
+    DWORD GetDataSize() const;
 
 protected:
     using DIBPtr = std::unique_ptr<uint8_t[]>;

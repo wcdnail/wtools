@@ -43,6 +43,23 @@ bool CDDCtrl::Initialize(long cx, long cy, long bpp, HBRUSH brBackground)
     return true;
 }
 
+void CDDCtrl::DrawRaster(WTL::CDCHandle dc, CRect const& rc, int nAlpha, CDIBitmap& diRaster) const
+{
+    HDC const dcSource{diRaster.GetDC(dc)};
+    if (nAlpha < 255) {
+        BLENDFUNCTION const blend{AC_SRC_OVER, 0, static_cast<BYTE>(nAlpha), 0};
+        LONG const            dCY{1 + rc.Height() / diRaster.GetHeight()};
+        dc.SelectBrush(m_brBack);
+        dc.PatBlt(rc.left, rc.top, rc.Width(), rc.Height(), PATCOPY);
+        dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height() + dCY,
+                      dcSource, 0, 0, diRaster.GetWidth(), diRaster.GetHeight(), blend);
+    }
+    else {
+        dc.StretchBlt(rc.left, rc.top, rc.Width(), rc.Height(),
+                     dcSource, 0, 0, diRaster.GetWidth(), diRaster.GetHeight(), SRCCOPY);
+    }
+}
+
 void CDDCtrl::DoPaint(WTL::CDCHandle dc, CRect const& rc)
 {
     UNREFERENCED_PARAMETER(dc);
@@ -66,26 +83,13 @@ void CDDCtrl::NotifySend(UINT code) const
     ::SendMessageW(GetParent(), WM_NOTIFY, nmHeader.idFrom, reinterpret_cast<LPARAM>(&nmHeader));
 }
 
-void CDDCtrl::OnPaint(int nAlpha)
+void CDDCtrl::OnPaint(HDC)
 {
     WTL::CPaintDC const dcPaint{m_hWnd};
     WTL::CDCHandle           dc{dcPaint.m_hDC};
-    HDC const          dcSource{m_Dib.GetDC(dc)};
     CRect const          rcDest{dcPaint.m_ps.rcPaint};
     int const             iSave{dc.SaveDC()};
     dc.SetStretchBltMode(COLORONCOLOR);
-    if (nAlpha < 255) {
-        BLENDFUNCTION const blend{/*AC_SRC_OVER*/0, 0, static_cast<BYTE>(nAlpha), 0};
-        LONG const            dCY{1 + rcDest.Height() / m_Dib.GetHeight()};
-        dc.SelectBrush(m_brBack);
-        dc.PatBlt(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), PATCOPY);
-        dc.AlphaBlend(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height() + dCY,
-                      dcSource, 0, 0, m_Dib.GetWidth(), m_Dib.GetHeight(), blend);
-    }
-    else {
-        dc.StretchBlt(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(),
-                      dcSource, 0, 0, m_Dib.GetWidth(), m_Dib.GetHeight(), SRCCOPY);
-    }
     DoPaint(dc, rcDest);
     dc.RestoreDC(iSave);
 }
@@ -123,6 +127,7 @@ BOOL CDDCtrl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) { 
     case 0:
+        MSG_WM_PAINT(OnPaint)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)

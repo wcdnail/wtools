@@ -513,8 +513,8 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     }
 #endif
 
-    m_imSlider.Initialize();
-    m_imSpectrum.Initialize();
+    m_imSpectrum.Initialize(SPECTRUM_CX, SPECTRUM_CY, nullptr);
+    m_imSlider.Initialize(SPECTRUM_SLIDER_CX, m_imSpectrum.GetBackBrush());
     UpdateDDX();
     SpectruKindChanged();
     DlgResize_Init(false, true, 0);

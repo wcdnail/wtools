@@ -16,7 +16,7 @@ struct CSpectrumSlider: CDDCtrl
     WCDAFX_API CSpectrumSlider(SpectrumKind const& nKind, CColorUnion& unColor);
 
     WCDAFX_API HRESULT PreCreateWindow() override;
-    WCDAFX_API bool Initialize(long cx = SPECTRUM_SLIDER_CX, HBRUSH brBackground = nullptr);
+    WCDAFX_API bool Initialize(long cx, HBRUSH brBackground);
     WCDAFX_API void UpdateRaster();
 
 private:
@@ -24,14 +24,14 @@ private:
 
     SpectrumKind const& m_nKind;
     CColorUnion&      m_unColor;
+    CDIBitmap          m_bmVert;
 
     double GetValueAndRange(long& nPos) const;
     void ColorChanged() const;
     void SetValue(long nPos, long nMax) const;
     void SetValueByY(long nY) const;
-    void DrawRaster(WTL::CDCHandle dc, CRect const& rc) const;
     void DrawPosition(WTL::CDCHandle dc, CRect const& rc) const;
-    void OnPaint(WTL::CDCHandle dc) const;
+    void DoPaint(WTL::CDCHandle dc, CRect const& rc) override;
     BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
     void DoNotifyMouseOver(CRect const& rc, CPoint pt) override;

@@ -19,7 +19,7 @@ HRESULT CSpectrumSlider::PreCreateWindow()
     return CCustomControl::PreCreateWindowImpl(gs_CSpectrumSlider_Atom, GetWndClassInfo());
 }
 
-bool CSpectrumSlider::Initialize(long cx /*= SPECTRUM_SLIDER_CX*/, HBRUSH brBackground /*= nullptr*/)
+bool CSpectrumSlider::Initialize(long cx, HBRUSH brBackground)
 {
     return CDDCtrl::Initialize(cx, 1, SPECTRUM_BPP, brBackground);
 }
@@ -37,8 +37,11 @@ void CSpectrumSlider::UpdateRaster()
         ATLASSERT(FALSE);
         break;
     }
-    m_Dib.FreeResources();
-    Invalidate();
+    CDIBitmap bmVert;
+    bmVert.Create(m_Dib.GetHeight(), m_Dib.GetWidth(), m_Dib.GetBitCount());
+    memcpy(bmVert.GetData(), m_Dib.GetData(), m_Dib.GetDataSize());
+    bmVert.Swap(m_bmVert);
+    InvalidateRect(nullptr, FALSE);
 }
 
 double CSpectrumSlider::GetValueAndRange(long& nPos) const
@@ -152,7 +155,6 @@ BOOL CSpectrumSlider::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) { 
     case 0:
-        MSG_WM_PAINT(OnPaint)
         MSG_WM_MOUSEWHEEL(OnMouseWheel)
         CHAIN_MSG_MAP(CDDCtrl)
         break;
@@ -163,29 +165,6 @@ BOOL CSpectrumSlider::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
     }
     return FALSE;
 }
-
-void CSpectrumSlider::DrawRaster(WTL::CDCHandle dc, CRect const& rc) const
-{
-    BITMAPINFO const bmpInfo{
-        {
-        /* biSize;          */ sizeof(bmpInfo.bmiHeader),
-        /* biWidth;         */ m_Dib.GetHeight(),
-        /* biHeight;        */ m_Dib.GetWidth(),
-        /* biPlanes;        */ 1,
-        /* biBitCount;      */ m_Dib.GetBitCount(),
-        /* biCompression;   */ 0,
-        /* biSizeImage;     */ m_Dib.GetImageSize(),
-        /* biXPelsPerMeter; */ 0,
-        /* biYPelsPerMeter; */ 0,
-        /* biClrUsed;       */ 0,
-        /* biClrImportant;  */ 0
-        },
-        {0}
-    };
-    dc.StretchDIBits(rc.left, rc.top, rc.Width(), rc.Height(),
-                        0, 0, m_Dib.GetHeight(), m_Dib.GetWidth(),
-                        m_Dib.GetData(), &bmpInfo, DIB_RGB_COLORS, SRCCOPY);
- }
 
 void CSpectrumSlider::DrawPosition(WTL::CDCHandle dc, CRect const& rc) const
 {
@@ -203,15 +182,10 @@ void CSpectrumSlider::DrawPosition(WTL::CDCHandle dc, CRect const& rc) const
     dc.InvertRect(rcPos);
 }
 
-void CSpectrumSlider::OnPaint(WTL::CDCHandle /*dc*/) const
+void CSpectrumSlider::DoPaint(WTL::CDCHandle dc, CRect const& rc)
 {
-    WTL::CPaintDC const dcPaint{m_hWnd};
-    WTL::CDCHandle           dc{dcPaint.m_hDC};
-    CRect const          rcDest{dcPaint.m_ps.rcPaint};
-    int const           iSaveDC{dc.SaveDC()};
-    DrawRaster(dc, rcDest);
-    DrawPosition(dc, rcDest);
-    dc.RestoreDC(iSaveDC);
+    DrawRaster(dc, rc, m_unColor.m_A, m_bmVert);
+    DrawPosition(dc, rc);
 }
 
 BOOL CSpectrumSlider::OnMouseWheel(UINT nFlags, short zDelta, CPoint)

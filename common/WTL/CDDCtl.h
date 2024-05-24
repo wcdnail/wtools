@@ -14,19 +14,27 @@ struct CDDCtrl: CCustomControl
 
     WCDAFX_API bool Initialize(long cx, long cy, long bpp, HBRUSH brBackground);
     WCDAFX_API void NotifySend(UINT code) const;
-    WCDAFX_API void OnPaint(int nAlpha);
+
+    HBRUSH GetBackBrush() const;
 
 protected:
     CDIBitmap      m_Dib;
     WTL::CBrush m_brBack;
     bool    m_bBackOwner;
 
+    void DrawRaster(WTL::CDCHandle dc, CRect const& rc, int nAlpha, CDIBitmap& diRaster) const;
     virtual void DoPaint(WTL::CDCHandle dc, CRect const& rc);
     virtual void DoNotifyMouseOver(CRect const& rc, CPoint pt);
     WCDAFX_API BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 
 private:
+    void OnPaint(HDC);
     void OnLButtonDown(UINT nFlags, CPoint point);
     void OnLButtonUp(UINT nFlags, CPoint point) const;
     void OnMouseMove(UINT nFlags, CPoint pt);
 };
+
+inline HBRUSH CDDCtrl::GetBackBrush() const
+{
+    return m_brBack.m_hBrush;
+}
