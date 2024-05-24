@@ -1,25 +1,11 @@
 #pragma once
 
 #include <wcdafx.api.h>
+#include <color.stuff.h>
 #include <utility>
 
 constexpr TCHAR CSPECIMG_CLASS[] = _T("WCCF::CSpectrumImage");
 constexpr TCHAR CSPECSLD_CLASS[] = _T("WCCF::CSpectrumSlider");
-
-constexpr double  HSV_HUE_MAX{360.};
-constexpr int HSV_HUE_MAX_INT{360};
-constexpr double  HSV_HUE_MID{120.};
-constexpr double HSV_HUE_AMID{270.};
-constexpr double  HSV_SAT_MAX{100.};
-constexpr int HSV_SAT_MAX_INT{100};
-constexpr double  HSV_VAL_MAX{100.};
-constexpr int HSV_VAL_MAX_INT{100};
-constexpr double      RGB_MAX{255.};
-constexpr int     RGB_MAX_INT{255};
-
-void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G, int& B);
-void RGBtoHSV(int const R, int const G, int const B, double& dH, double& dS, double& dV);
-void RGBtoHSL(int const R, int const G, int const B, double& dHl, double& dSl, double& dLl);
 
 enum SpectrumKind: int
 {
@@ -57,23 +43,22 @@ struct CRGBSpecRect;
 
 struct CColorUnion
 {
-    DECL_COPY_MOVE_OF(CColorUnion);
-
-    bool m_bUpdated;
-    int         m_H;
-    int         m_S;
-    int         m_V;
-    int         m_R;
-    int         m_G;
-    int         m_B;
-    int         m_A;
-    int        m_Hl;
-    int        m_Sl;
-    int         m_L;
+    bool m_bUp;
+    int    m_H;
+    int    m_S;
+    int    m_V;
+    int    m_R;
+    int    m_G;
+    int    m_B;
+    int    m_A;
+    int   m_Hl;
+    int   m_Sl;
+    int    m_L;
 
     ~CColorUnion();
     CColorUnion(double dH, double dS, double dV);
     CColorUnion(COLORREF crInitial);
+    DECL_COPY_MOVE_OF(CColorUnion);
 
     bool IsUpdated() const;
     void SetUpdated(bool bUpdated);
@@ -82,8 +67,8 @@ struct CColorUnion
     void SetHSV(double dH, double dS, double dV);
 
     void HSVtoRGB();
-    void RGBtoHSV();
-    void RGBtoHSL();
+    void RGBtoHSV(bool bNoHSL = false);
+    void HSVtoHSL();
     void FromHSL();
 
     int GetRed() const;
@@ -111,8 +96,8 @@ private:
     void SetRGBPlain(int R, int G, int B);
 };
 
-inline bool CColorUnion::IsUpdated() const { return m_bUpdated; }
-inline void CColorUnion::SetUpdated(bool bUpdated) { m_bUpdated = bUpdated; }
+inline bool CColorUnion::IsUpdated() const { return m_bUp; }
+inline void CColorUnion::SetUpdated(bool bUpdated) { m_bUp = bUpdated; }
 
 inline void CColorUnion::SetRGBPlain(int R, int G, int B)
 {
@@ -131,36 +116,46 @@ inline void CColorUnion::SetRGB(int R, int G, int B)
 inline void CColorUnion::SetHSV(double dH, double dS, double dV)
 {
     m_H = static_cast<int>(std::min<double>(dH, HSV_HUE_MAX));
-    m_S = static_cast<int>(std::min<double>(dS, HSV_SAT_MAX));
-    m_V = static_cast<int>(std::min<double>(dV, HSV_VAL_MAX));
+    m_S = static_cast<int>(std::min<double>(dS, HSV_100PERC));
+    m_V = static_cast<int>(std::min<double>(dV, HSV_100PERC));
     HSVtoRGB();
 }
 
 inline void CColorUnion::HSVtoRGB()
 {
-    ::HSVtoRGB(m_H, m_S / HSV_SAT_MAX, m_V / HSV_VAL_MAX, m_R, m_G, m_B);
-    RGBtoHSL();
-    SetUpdated(true);
+    CF::HSVtoRGB(m_H, m_S / HSV_100PERC, m_V / HSV_100PERC, m_R, m_G, m_B);
+    HSVtoHSL();
 }
 
-inline void CColorUnion::RGBtoHSV()
+inline void CColorUnion::RGBtoHSV(bool bNoHSL /*= false*/)
 {
     double dH, dS, dV;
-    ::RGBtoHSV(m_R, m_G, m_B, dH, dS, dV);
+    CF::RGBtoHSV(m_R, m_G, m_B, dH, dS, dV);
     m_H = static_cast<int>(dH);
-    m_S = static_cast<int>(dS * HSV_SAT_MAX);
-    m_V = static_cast<int>(dV * HSV_VAL_MAX);
-    RGBtoHSL();
+    m_S = static_cast<int>(dS * HSV_100PERC);
+    m_V = static_cast<int>(dV * HSV_100PERC);
+    if (!bNoHSL) {
+        HSVtoHSL();
+    }
+    else {
+        SetUpdated(true);
+    }
+}
+
+inline void CColorUnion::HSVtoHSL()
+{
+    double dH, dS, dL;
+    CF::HSVtoHSL(m_H, m_S / HSV_100PERC, m_V / HSV_100PERC, dH, dS, dL);
+    m_Hl = static_cast<int>(dH);
+    m_Sl = static_cast<int>(dS * HSV_100PERC);
+    m_L = static_cast<int>(dL * HSV_100PERC);
     SetUpdated(true);
 }
 
-inline void CColorUnion::RGBtoHSL()
+inline void CColorUnion::FromHSL()
 {
-    double dH, dS, dL;
-    ::RGBtoHSL(m_R, m_G, m_B, dH, dS, dL);
-    m_Hl = static_cast<int>(dH * HSV_HUE_MAX);
-    m_Sl = static_cast<int>(dS * HSV_SAT_MAX);
-    m_L = static_cast<int>(dL * HSV_VAL_MAX);
+    CF::HSLtoRGB(m_Hl, m_Sl / HSV_100PERC, m_L / HSV_100PERC, m_R, m_G, m_B);
+    RGBtoHSV(true);
 }
 
 inline int     CColorUnion::GetRed() const { return m_R; }

@@ -436,11 +436,11 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         { CID_RGB_GRN_UDS, 0, RGB_MAX_INT },
         { CID_RGB_BLU_UDS, 0, RGB_MAX_INT },
         { CID_HSV_HUE_UDS, 0, HSV_HUE_MAX_INT },
-        { CID_HSV_SAT_UDS, 0, HSV_SAT_MAX_INT },
-        { CID_HSV_VAL_UDS, 0, HSV_VAL_MAX_INT },
+        { CID_HSV_SAT_UDS, 0, HSV_100PERC_INT },
+        { CID_HSV_VAL_UDS, 0, HSV_100PERC_INT },
         { CID_HSL_HUE_UDS, 0, HSV_HUE_MAX_INT },
-        { CID_HSL_SAT_UDS, 0, HSV_SAT_MAX_INT },
-        { CID_HSL_LTN_UDS, 0, HSV_VAL_MAX_INT },
+        { CID_HSL_SAT_UDS, 0, HSV_100PERC_INT },
+        { CID_HSL_LTN_UDS, 0, HSV_100PERC_INT },
     };
     for (auto const& spConf: udSpinnerConf) {
         WTL::CUpDownCtrl ctlSpinner{GetDlgItem(spConf.nID)};

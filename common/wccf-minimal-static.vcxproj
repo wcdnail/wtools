@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\exa\wtl.color.picker\GTDrawHelper.cpp" />
+    <ClCompile Include="color.stuff.cpp" />
     <ClCompile Include="DDraw.DGI\CeXDib.cpp" />
     <ClCompile Include="DDraw.DGI\DDGDIStuff.cpp" />
     <ClCompile Include="dev.assistance\dev.assist.cpp" />
@@ -55,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\exa\wtl.color.picker\GTDrawHelper.h" />
+    <ClInclude Include="color.stuff.h" />
     <ClInclude Include="DDraw.DGI\CeXDib.h" />
     <ClInclude Include="DDraw.DGI\DDGDIStuff.h" />
     <ClInclude Include="debug.dump.msg.h" />

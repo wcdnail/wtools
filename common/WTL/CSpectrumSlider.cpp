@@ -52,8 +52,8 @@ double CSpectrumSlider::GetValueAndRange(long& nPos) const
     case SPEC_RGB_Green:      nPos = m_unColor.GetGreen(); break;
     case SPEC_RGB_Blue:       nPos = m_unColor.GetBlue(); break;
     case SPEC_HSV_Hue:        nPos = m_unColor.m_H; return HSV_HUE_MAX;
-    case SPEC_HSV_Saturation: nPos = m_unColor.m_S; return HSV_SAT_MAX;
-    case SPEC_HSV_Brightness: nPos = m_unColor.m_V; return HSV_VAL_MAX;
+    case SPEC_HSV_Saturation: nPos = m_unColor.m_S; return HSV_100PERC;
+    case SPEC_HSV_Brightness: nPos = m_unColor.m_V; return HSV_100PERC;
     default:
         ATLASSERT(FALSE);
         break;
@@ -133,13 +133,13 @@ void CSpectrumSlider::SetValueByY(long nY) const
         break;
     }
     case SPEC_HSV_Saturation:{
-        auto const dScale{static_cast<double>(rc.Height()) / static_cast<double>(HSV_SAT_MAX)};
+        auto const dScale{static_cast<double>(rc.Height()) / static_cast<double>(HSV_100PERC)};
         auto const   dPos{static_cast<double>(rc.bottom - nY) / dScale};
         m_unColor.m_S = static_cast<int>(dPos);
         break;
     }
     case SPEC_HSV_Brightness:{
-        auto const dScale{static_cast<double>(rc.Height()) / static_cast<double>(HSV_VAL_MAX)};
+        auto const dScale{static_cast<double>(rc.Height()) / static_cast<double>(HSV_100PERC)};
         auto const   dPos{static_cast<double>(rc.bottom - nY) / dScale};
         m_unColor.m_V = static_cast<int>(dPos);
         break;

@@ -46,6 +46,7 @@
     <ClCompile Include="WTL\CAppModuleRef.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
+    <ClCompile Include="color.stuff.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -122,6 +123,7 @@
       <Filter>WTL</Filter>
     </ClInclude>
     <ClInclude Include="scoped.bool.guard.h" />
+    <ClInclude Include="color.stuff.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">
