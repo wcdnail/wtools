@@ -95,3 +95,6 @@ inline bool DDraw_HSV_Val(CDibEx const& dibDest, double dVal)
 {
     return DDraw_Spectrum(dibDest, dVal, DDraw_HSV_Val);
 }
+
+void DDraw_Checkers(PDWORD pDest, int nWidth, int nHeight, DWORD nLinePitch, COLORREF crA, COLORREF crB);
+void DDraw_Checkers(CDibEx const& dibDest, COLORREF crA, COLORREF crB);

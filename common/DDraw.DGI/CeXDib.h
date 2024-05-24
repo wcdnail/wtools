@@ -108,7 +108,8 @@ struct CDIBitmap: CDibEx
 
     void Swap(CDIBitmap& rhs) noexcept;
 
-    WTL::CDCHandle GetDC(WTL::CDCHandle dc);
+    HBITMAP GetBitmap(WTL::CDCHandle dc);
+    HDC GetDC(WTL::CDCHandle dc);
     void Draw(WTL::CDCHandle dc, CRect const& rc);
     void Borrow(WTL::CDCHandle dc, int dwX, int dwY);
 

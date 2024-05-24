@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DDGDIStuff.h"
 #include "CeXDib.h"
+#include <color.stuff.h>
 #include <cmath>
 
 //
@@ -310,8 +311,39 @@ bool DDraw_Gradient(CDibEx const& dibDest, double dA, double dB, PGradDrawer pGr
     ATLASSUME(pGradDrawer != nullptr);
     ATLASSUME(dibDest.GetBitCount() == 32);
     return pGradDrawer(reinterpret_cast<DWORD*>(dibDest.GetData()),
-                       dibDest.GetWidth(),
-                       dibDest.GetHeight(),
+                       dibDest.GetWidth(), dibDest.GetHeight(),
                        dibDest.GetStride() / sizeof(DWORD),
                        dA, dB);
+}
+
+void DDraw_Checkers(PDWORD pDest, int nWidth, int nHeight, DWORD nLinePitch, COLORREF crA, COLORREF crB)
+{
+    int const       cx{nWidth / 2};
+    int const       cy{nHeight / 2};
+    DWORD const dwSkip{static_cast<int>(nLinePitch) > nWidth ? nLinePitch - nWidth : 0};
+    int          nSide{0};
+    COLORREF    crFill{0};
+    for (int c = 0; c < 2; c++) {
+        nSide = 1 - nSide;
+        for (int i = 0; i < cy; i++) {
+            crFill = nSide ? crA : crB;
+            for (int j = 0; j < cx; j++) {
+                *pDest++ = crFill;
+            }
+            crFill = nSide ? crB : crA;
+            for (int j = 0; j < cx; j++) {
+                *pDest++ = crFill;
+            }
+            pDest += dwSkip;
+        }
+    }
+}
+
+void DDraw_Checkers(CDibEx const& dibDest, COLORREF crA, COLORREF crB)
+{
+    ATLASSUME(dibDest.GetBitCount() == 32);
+    return DDraw_Checkers(reinterpret_cast<DWORD*>(dibDest.GetData()),
+                          dibDest.GetWidth(), dibDest.GetHeight(),
+                          dibDest.GetStride() / sizeof(DWORD),
+                          crA, crB);
 }

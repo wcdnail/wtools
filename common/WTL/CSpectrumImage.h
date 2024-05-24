@@ -33,6 +33,7 @@ private:
     CDIBitmap             m_Dib;
     CColorUnion         m_Color;
     SpectrumKind m_SpectrumKind;
+    WTL::CBrush    m_brCheckers;
 
     static ATOM& GetWndClassAtomRef();
 

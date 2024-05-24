@@ -308,7 +308,7 @@ BOOL CDibEx::WriteBMP(LPCTSTR bmpFileName) const
     return TRUE;
 } // End of WriteBMP
 
-WTL::CDCHandle CDIBitmap::GetDC(WTL::CDCHandle dc)
+HBITMAP CDIBitmap::GetBitmap(WTL::CDCHandle dc)
 {
     if (!m_Bitmap) {
         LPVOID    lpBits{nullptr};
@@ -320,13 +320,18 @@ WTL::CDCHandle CDIBitmap::GetDC(WTL::CDCHandle dc)
         m_Bitmap.Attach(bmp.Detach());
         memcpy(lpBits, GetData(), GetInfoHdr()->biSizeImage);
     }
+    return m_Bitmap.m_hBitmap;
+}
+
+HDC CDIBitmap::GetDC(WTL::CDCHandle dc)
+{
     if (!m_DC) {
         WTL::CDC dcTemp{CreateCompatibleDC(dc)};
         if (!dcTemp) {
             return {};
         }
         m_DC.Attach(dcTemp.Detach());
-        m_hOldBm = m_DC.SelectBitmap(m_Bitmap);
+        m_hOldBm = m_DC.SelectBitmap(GetBitmap(dc));
     }
     return m_DC.m_hDC;
 }

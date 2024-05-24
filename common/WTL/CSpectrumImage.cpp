@@ -4,6 +4,9 @@
 #include <rect.putinto.h>
 #include <atlcrack.h>
 
+constexpr COLORREF CLR_CHECKERS_WHITE{RGB(210, 210, 210)};
+constexpr COLORREF CLR_CHECKERS_BLACK{RGB( 92,  92,  92)};
+
 ATOM& CSpectrumImage::GetWndClassAtomRef()
 {
     static ATOM gs_CSpectrumImage_Atom{0};
@@ -24,6 +27,13 @@ bool CSpectrumImage::Initialize(long cx /*= SPECTRUM_CX*/, long cy /*= SPECTRUM_
     if (!m_Dib.Create(cx, cy, SPECTRUM_BPP)) {
         return false;
     }
+    CDIBitmap bmCheckers{};
+    if (!bmCheckers.Create(CHECKERS_CX, CHECKERS_CX, SPECTRUM_BPP)) {
+        return false;
+    }
+    DDraw_Checkers(bmCheckers, CLR_CHECKERS_WHITE, CLR_CHECKERS_BLACK);
+    WTL::CClientDC const dc{m_hWnd};
+    m_brCheckers.CreatePatternBrush(bmCheckers.GetBitmap(dc.m_hDC));
     return true;
 }
 
@@ -109,9 +119,22 @@ void CSpectrumImage::OnPaint(WTL::CDCHandle /*dc*/)
     WTL::CDCHandle           dc{dcPaint.m_hDC};
     HDC const          dcSource{m_Dib.GetDC(dc)};
     CRect const          rcDest{dcPaint.m_ps.rcPaint};
-    dc.StretchBlt(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(),
-                  dcSource, 0, 0, m_Dib.GetWidth(), m_Dib.GetHeight(), SRCCOPY);
+    int const             iSave{dc.SaveDC()};
+    dc.SetStretchBltMode(COLORONCOLOR);
+    if (m_Color.m_A < RGB_MAX_INT) {
+        BLENDFUNCTION const blend{/*AC_SRC_OVER*/0, 0, static_cast<BYTE>(m_Color.m_A), 0};
+        LONG const            dCY{1 + rcDest.Height() / m_Dib.GetHeight()};
+        dc.SelectBrush(m_brCheckers);
+        dc.PatBlt(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), PATCOPY);
+        dc.AlphaBlend(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height() + dCY,
+                      dcSource, 0, 0, m_Dib.GetWidth(), m_Dib.GetHeight(), blend);
+    }
+    else {
+        dc.StretchBlt(rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(),
+                      dcSource, 0, 0, m_Dib.GetWidth(), m_Dib.GetHeight(), SRCCOPY);
+    }
     DrawMarker(dc, rcDest);
+    dc.RestoreDC(iSave);
 }
 
 void CSpectrumImage::DrawMarker(WTL::CDCHandle dc, CRect const& rcDest)

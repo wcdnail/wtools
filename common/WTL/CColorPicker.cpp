@@ -53,8 +53,8 @@ private:
         CID_HSV_HUE_CAP, CID_HSV_HUE_VAL, CID_HSV_HUE_UDS,
         CID_HSV_SAT_CAP, CID_HSV_SAT_VAL, CID_HSV_SAT_UDS,
         CID_HSV_VAL_CAP, CID_HSV_VAL_VAL, CID_HSV_VAL_UDS,
-        CID_GRP_PICKER,
-        CONTROL_COUNT = CID_GRP_PICKER - BEFORE_FIRST_CONTROL_ID,
+        CID_GRP_PALETTE,
+        CONTROL_COUNT = CID_GRP_PALETTE - BEFORE_FIRST_CONTROL_ID,
     };
 
     enum Sizes: short
@@ -129,7 +129,7 @@ private:
         CONTROL_CONTROL(_T(""),  CID_HSV_SAT_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN2_X+24,     HLCYS*5+16,       HHCX/2-22,           HLCY,   0)
             CONTROL_EDITTEXT(                             CID_HSV_VAL_VAL,                     CLMN2_X,     HLCYS*6+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
         CONTROL_CONTROL(_T(""),  CID_HSV_VAL_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN2_X+24,     HLCYS*6+16,       HHCX/2-22,           HLCY,   0)
-        CONTROL_GROUPBOX(           _T("Picker"),          CID_GRP_PICKER,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
+        CONTROL_GROUPBOX(          _T("Palette"),         CID_GRP_PALETTE,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
     END_CONTROLS_MAP()
 
     BEGIN_DIALOG(0, 0, DLG_CX, DLG_CY)
@@ -203,7 +203,7 @@ private:
             DLGRESIZE_CONTROL(CID_HSV_VAL_CAP, DLSZ_MOVE_X)
             DLGRESIZE_CONTROL(CID_HSV_VAL_VAL, DLSZ_MOVE_X)
             DLGRESIZE_CONTROL(CID_HSV_VAL_UDS, DLSZ_MOVE_X)
-        DLGRESIZE_CONTROL(CID_GRP_PICKER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_GRP_PALETTE, DLSZ_SIZE_Y | DLSZ_MOVE_X)
     END_DLGRESIZE_MAP()
 
     BEGIN_MSG_MAP(CColorPicker::Impl)
@@ -505,7 +505,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         CID_RGB_HTM_VAL,
         CID_GRP_HSL,
         CID_GRP_HSV,
-        CID_GRP_PICKER,
+        CID_GRP_PALETTE,
     };
     for (auto const& id: cuFixedFont) {
         ATL::CWindow ctl{GetDlgItem(id)};
@@ -594,11 +594,11 @@ struct CDCEx: WTL::CWindowDC
 
 BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
-    if (m_pImpl->m_hWnd == hWnd) {
-        if (IsDialogMessage(const_cast<ATL::_ATL_MSG*>(GetCurrentMessage()))) {
-            return TRUE;
-        }
-    }
+    //if (m_pImpl->m_hWnd == hWnd) {
+    //    if (IsDialogMessage(const_cast<ATL::_ATL_MSG*>(GetCurrentMessage()))) {
+    //        return TRUE;
+    //    }
+    //}
     BOOL bHandled{TRUE};
     UNREFERENCED_PARAMETER(hWnd);
     UNREFERENCED_PARAMETER(bHandled);
