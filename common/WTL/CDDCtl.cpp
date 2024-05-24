@@ -2,9 +2,10 @@
 #include "CDDCtl.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 #include <rect.putinto.h>
+#include <color.stuff.h>
 #include <atlcrack.h>
 
-constexpr int             CHECKERS_CX{24};
+constexpr int             CHECKERS_CX{18};
 constexpr COLORREF CLR_CHECKERS_WHITE{RGB(210, 210, 210)};
 constexpr COLORREF CLR_CHECKERS_BLACK{RGB( 92,  92,  92)};
 
@@ -46,12 +47,11 @@ bool CDDCtrl::Initialize(long cx, long cy, long bpp, HBRUSH brBackground)
 void CDDCtrl::DrawRaster(WTL::CDCHandle dc, CRect const& rc, int nAlpha, CDIBitmap& diRaster) const
 {
     HDC const dcSource{diRaster.GetDC(dc)};
-    if (nAlpha < 255) {
+    if (nAlpha < RGB_MAX_INT) {
         BLENDFUNCTION const blend{AC_SRC_OVER, 0, static_cast<BYTE>(nAlpha), 0};
-        LONG const            dCY{1 + rc.Height() / diRaster.GetHeight()};
         dc.SelectBrush(m_brBack);
         dc.PatBlt(rc.left, rc.top, rc.Width(), rc.Height(), PATCOPY);
-        dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height() + dCY,
+        dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(),
                       dcSource, 0, 0, diRaster.GetWidth(), diRaster.GetHeight(), blend);
     }
     else {

@@ -85,7 +85,7 @@ private:
     ATL::CString   m_sColorHtml;
     CSpectrumSlider  m_imSlider;
     WTL::CStatic      m_stColor;
-    WTL::CFont       m_fntFixed;
+    WTL::CFont         m_fntHex;
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,                 X,              Y,           Width,         Height,   Styles
         CONTROL_GROUPBOX(         _T("Spectrum"),        CID_GRP_SPECTRUM,                           2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
@@ -298,23 +298,6 @@ void CColorPicker::Impl::OnDDXChanges(UINT nID, BOOL bSaveAndValidate)
     }
 }
 
-#if 0
-void CColorPicker::Impl::OnDataValidateError(UINT nCtrlID, BOOL bSave, _XData& data)
-{
-    switch (nCtrlID) {
-    case CID_RGB_RED_VAL:
-    case CID_RGB_GRN_VAL:
-    case CID_RGB_BLU_VAL:{
-        if (bSave) {
-            CScopedBoolGuard bGuard{m_bSaveData};
-            SetDlgItemInt(nCtrlID, data.intData.nMax);
-        }
-        break;
-    }
-    }
-}
-#endif
-
 void CColorPicker::Impl::UpdateHexStr()
 {
     auto const& Color{m_imSpectrum.GetColor()};
@@ -377,7 +360,7 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
         return 0;
     }
     switch (pnmh->code) {
-    case TBN_SAVE:            // skip
+    case TBN_SAVE:             // skip
         return 0;
     case NM_SLIDER_CLR_SEL:
     case NM_SPECTRUM_CLR_SEL:
@@ -460,8 +443,6 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
 
-    //m_fntFixed = CreateFontW(-11, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, L"Lucida Console");
-
     WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
     cbSpectrum.AddString(L"RGB/红");
     cbSpectrum.AddString(L"RGB/绿");
@@ -487,32 +468,17 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         ctlSpinner.SetRange(spConf.nMin, spConf.nMax);
     }
 
-#if 0
-    constexpr UINT cuFixedFont[] = {
-        CID_GRP_SPECTRUM,
-        CID_GRP_RGB,
-        CID_RGB_RED_CAP, CID_RGB_RED_VAL,
-        CID_RGB_GRN_CAP, CID_RGB_GRN_VAL,
-        CID_RGB_BLU_CAP, CID_RGB_BLU_VAL,
-        CID_RGB_ALP_CAP, CID_RGB_ALP_VAL,
-        CID_HSV_HUE_CAP, CID_HSV_HUE_VAL,
-        CID_HSV_SAT_CAP, CID_HSV_SAT_VAL,
-        CID_HSV_VAL_CAP, CID_HSV_VAL_VAL,
-        CID_HSL_HUE_CAP, CID_HSL_HUE_VAL,
-        CID_HSL_SAT_CAP, CID_HSL_SAT_VAL,
-        CID_HSL_LTN_CAP, CID_HSL_LTN_VAL,
-        CID_RGB_HEX_VAL,
-        CID_RGB_HTM_VAL,
-        CID_GRP_HSL,
-        CID_GRP_HSV,
-        CID_GRP_PALETTE,
-    };
-    for (auto const& id: cuFixedFont) {
-        ATL::CWindow ctl{GetDlgItem(id)};
-        ctl.SetFont(m_fntFixed.m_hFont, FALSE);
+    m_fntHex = CreateFontW(-13, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, L"Anonymous Pro");
+    if (m_fntHex) {
+        constexpr UINT cuFixedFont[] = {
+            CID_RGB_HEX_VAL,
+            CID_RGB_HTM_VAL,
+        };
+        for (auto const& id: cuFixedFont) {
+            ATL::CWindow ctl{GetDlgItem(id)};
+            ctl.SetFont(m_fntHex.m_hFont, FALSE);
+        }
     }
-#endif
-
     m_imSpectrum.Initialize(SPECTRUM_CX, SPECTRUM_CY, nullptr);
     m_imSlider.Initialize(SPECTRUM_SLIDER_CX, m_imSpectrum.GetBackBrush());
     UpdateDDX();
@@ -525,10 +491,30 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
 {
     switch (nID) {
-    case CID_SPEC_COLOR_SEL:{
-        WTL::CDCHandle dc{pDI->hDC};
-        CRect const    rc{pDI->rcItem};
-        dc.FillSolidRect(rc, m_imSpectrum.GetColorRef());
+    case CID_SPEC_COLOR_SEL: {
+        WTL::CDCHandle          dc{pDI->hDC};
+        int const            iSave{dc.SaveDC()};
+        CRect const             rc{pDI->rcItem};
+        CColorUnion const& unColor{m_imSpectrum.GetColor()};
+        if (unColor.m_A < RGB_MAX_INT) {
+            CRect const        rcColor{0, 0, 1, 1};
+            WTL::CDC           dcColor{CreateCompatibleDC(dc)};
+            WTL::CBitmap const bmColor{CreateCompatibleBitmap(dc, rcColor.Width(), rcColor.Height())};
+            WTL::CBrush const  brColor{CreateSolidBrush(m_imSpectrum.GetColorRef())};
+            int const           iSave2{dcColor.SaveDC()};
+            BLENDFUNCTION const  blend{AC_SRC_OVER, 0, static_cast<BYTE>(unColor.m_A), 0};
+            dcColor.SelectBitmap(bmColor);
+            dcColor.FillRect(rcColor, brColor);
+            dc.SelectBrush(m_imSpectrum.GetBackBrush());
+            dc.PatBlt(rc.left, rc.top, rc.Width(), rc.Height(), PATCOPY);
+            dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(),
+                          dcColor, 0, 0, rcColor.Width(), rcColor.Height(), blend);
+            dcColor.RestoreDC(iSave2);
+        }
+        else {
+            dc.FillSolidRect(rc, m_imSpectrum.GetColorRef());
+        }
+        dc.RestoreDC(iSave);
         return;
     }
     }

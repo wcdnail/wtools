@@ -93,7 +93,12 @@ void CSpectrumImage::DoPaint(WTL::CDCHandle dc, CRect const& rc)
         UpdateRaster();
         m_Color.SetUpdated(false);
     }
-    DrawRaster(dc, rc, m_Color.m_A, m_Dib);
+    CRect rcRaster = rc;
+    if (m_Color.m_A < RGB_MAX_INT) {
+        LONG const dCY{1 + rc.Height() / m_Dib.GetHeight()};
+        rcRaster.bottom += dCY;
+    }
+    DrawRaster(dc, rcRaster, m_Color.m_A, m_Dib);
     DrawMarker(dc, rc);
 }
 
