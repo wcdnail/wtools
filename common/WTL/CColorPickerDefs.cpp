@@ -115,3 +115,36 @@ CPoint CColorUnion::GetColorPoint(SpectrumKind nSpectrumKind, CRect const& rc)
     }
     return rv;
 }
+
+bool CColorUnion::FromString(ATL::CString& sColor, bool bSwapRB)
+{
+    int    nBeg{0};
+    int    nLen{sColor.GetLength()};
+    PCTSTR pStr{sColor.GetString()};
+    if (nLen < 1) {
+        return false;
+    }
+    if (nLen >= 2) {
+        if (0 == _tcsnicmp(pStr, _T("0x"), 2)) {
+            nBeg = 2;
+        }
+        else if (0 == _tcsnicmp(pStr, _T("&H"), 2)) {
+            nBeg = 2;
+            nLen -= 1;
+            bSwapRB = false;
+        }
+        else if (pStr[0] == _T('#')) {
+            nBeg = 1;
+            bSwapRB = true;
+        }
+    }
+    PTSTR       pEnd{&sColor.GetBuffer()[nLen]};
+    ULONG const nRes{_tcstoul(&pStr[nBeg], &pEnd, 16)};
+    m_R = GetRValue(nRes);
+    m_G = GetGValue(nRes);
+    m_B = GetBValue(nRes);
+    if (bSwapRB) {
+        std::swap(m_R, m_B);
+    }
+    return true;
+}

@@ -92,6 +92,8 @@ struct CColorUnion
     CRGBSpecRect GetRGBSpectrumRect(SpectrumKind nSpectrumKind) const;
     CPoint GetColorPoint(SpectrumKind nSpectrumKind, CRect const& rc);
 
+    bool FromString(ATL::CString& sColor, bool bSwapRB);
+
 private:
     void SetRGBPlain(int R, int G, int B);
 };

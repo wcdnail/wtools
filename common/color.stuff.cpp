@@ -52,51 +52,54 @@ namespace CF
     // 
     void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G, int& B)
     {
-        double const       dHex{dH / 60.};
-        int const      nPrimary{static_cast<int>(dHex)};
-        double const nSecondary{dHex - nPrimary};
-        double const         dX{(1. - dS) * dV};
-        double const         dY{(1. - (dS * nSecondary)) * dV};
-        double const         dZ{(1. - (dS * (1. - nSecondary))) * dV};
-        double               dR{0.};
-        double               dG{0.};
-        double               dB{0.};
-        switch (nPrimary) {
+        double const   dHex{dH / 60.};
+        int const      nSeg{static_cast<int>(dHex)};
+        double const  nPrev{dHex - nSeg};
+        double const     dX{(1. - dS) * dV};
+        double const     dY{(1. - (dS * nPrev)) * dV};
+        double const     dZ{(1. - (dS * (1. - nPrev))) * dV};
+        double           dR{0.};
+        double           dG{0.};
+        double           dB{0.};
+        switch (nSeg) {
         default: // HUE MAX == 360, nPrimary may be 6
-        case 0:
-            dR = (dV * 255.) + 0.5;
-            dG = (dZ * 255.) + 0.5;
-            dB = (dX * 255.) + 0.5;
-            break;
-        case 1:
-            dR = (dY * 255.) + 0.5;
-            dG = (dV * 255.) + 0.5;
-            dB = (dX * 255.) + 0.5;
-            break;
-        case 2:
-            dR = (dX * 255.) + 0.5;
-            dG = (dV * 255.) + 0.5;
-            dB = (dZ * 255.) + 0.5;
-            break;
-        case 3:
-            dR = (dX * 255.) + 0.5;
-            dG = (dY * 255.) + 0.5;
-            dB = (dV * 255.) + 0.5;
-            break;
-        case 4:
-            dR = (dZ * 255.) + 0.5;
-            dG = (dX * 255.) + 0.5;
-            dB = (dV * 255.) + 0.5;
-            break;
-        case 5:
-            dR = (dV * 255.) + 0.5;
-            dG = (dX * 255.) + 0.5;
-            dB = (dY * 255.) + 0.5;
-            break;
+        case 0: dR = dV; dG = dZ; dB = dX; break;
+        case 1: dR = dY; dG = dV; dB = dX; break;
+        case 2: dR = dX; dG = dV; dB = dZ; break;
+        case 3: dR = dX; dG = dY; dB = dV; break;
+        case 4: dR = dZ; dG = dX; dB = dV; break;
+        case 5: dR = dV; dG = dX; dB = dY; break;
         }
-        R = static_cast<int>(dR);
-        G = static_cast<int>(dG);
-        B = static_cast<int>(dB);
+        R = static_cast<int>((dR * RGB_MAX) + 0.5);
+        G = static_cast<int>((dG * RGB_MAX) + 0.5);
+        B = static_cast<int>((dB * RGB_MAX) + 0.5);
+    }
+
+    //
+    // https://en.wikipedia.org/wiki/HSL_and_HSV#Color_conversion_formulae
+    //
+    void HSLtoRGB(double const dH, double const dS, double const dL, int& R, int& G, int& B)
+    {
+        double const dHex{dH / 60.};
+        double const   dC{(1 - std::abs(2. * dL - 1.)) * dS};
+        double const   dX{dC * (1 - std::abs(std::fmod(dHex, 2) - 1))};
+        double const   dM{dL - (dC / 2.)};
+        int const    nSeg{static_cast<int>(dHex)};
+        double         dR{0.};
+        double         dG{0.};
+        double         dB{0.};
+        switch (nSeg) {
+        default: // HUE MAX == 360, nSeg may be 6
+        case 0: dR = dC; dG = dX; dB = 0.; break;
+        case 1: dR = dX; dG = dC; dB = 0.; break;
+        case 2: dR = 0.; dG = dC; dB = dX; break;
+        case 3: dR = 0.; dG = dX; dB = dC; break;
+        case 4: dR = dX; dG = 0.; dB = dC; break;
+        case 5: dR = dC; dG = 0.; dB = dX; break;
+        }
+        R = static_cast<int>((dR + dM) * RGB_MAX);
+        G = static_cast<int>((dG + dM) * RGB_MAX);
+        B = static_cast<int>((dB + dM) * RGB_MAX);
     }
 
     //
@@ -247,29 +250,5 @@ namespace CF
         else {
             dSl = (dV - dLl) / std::min<double>(dLl, 1. - dLl);
         }
-    }
-
-    void HSLtoRGB(double const dH, double const dS, double const dL, int& R, int& G, int& B)
-    {
-        double const   dC{(1 - std::abs(2.*dL - 1.)) * dS};
-        double const dHex{dH / 60.};
-        double const   dX{dC * (1 - std::abs(std::fmod(dHex, 2) - 1))};
-        double const   dM{dL - (dC / 2.)};
-        int const    nSeg{static_cast<int>(dHex)};
-        double         dR{0.};
-        double         dG{0.};
-        double         dB{0.};
-        switch (nSeg) {
-        default: // HUE MAX == 360, nSeg may be 6
-        case 0: dR = dC; dG = dX; dB = 0.; break;
-        case 1: dR = dX; dG = dC; dB = 0.; break;
-        case 2: dR = 0.; dG = dC; dB = dX; break;
-        case 3: dR = 0.; dG = dX; dB = dC; break;
-        case 4: dR = dX; dG = 0.; dB = dC; break;
-        case 5: dR = dC; dG = 0.; dB = dX; break;
-        }
-        R = static_cast<int>((dR + dM) * RGB_MAX);
-        G = static_cast<int>((dG + dM) * RGB_MAX);
-        B = static_cast<int>((dB + dM) * RGB_MAX);
     }
 }

@@ -138,7 +138,7 @@ void CSpectrumImage::NotifySend() const
     nmHeader.code = NM_SPECTRUM_CLR_SEL;
     nmHeader.idFrom = GetDlgCtrlID();
     nmHeader.hwndFrom = m_hWnd;
-    ::SendMessageW(GetParent(), WM_NOTIFY, (WPARAM)nmHeader.idFrom, reinterpret_cast<LPARAM>(&nmHeader));
+    ::SendMessageW(GetParent(), WM_NOTIFY, nmHeader.idFrom, reinterpret_cast<LPARAM>(&nmHeader));
 }
 
 void CSpectrumImage::NotifyColorChanged(CRect const& rc, CPoint pt)

@@ -97,8 +97,8 @@ inline BOOL CTatorMainDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         pLoop->AddMessageFilter(this);
     }
 
-    if constexpr (true) {
-        MoveToMonitor{}.Move(m_hWnd, 3, PutAt::YCenter | PutAt::Left);
+    if constexpr (false) {
+        MoveToMonitor{}.Move(m_hWnd, 1, PutAt::YCenter | PutAt::Left);
     }
     else {
         CenterWindow(GetParent());

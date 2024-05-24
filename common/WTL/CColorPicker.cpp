@@ -218,8 +218,10 @@ private:
     void SpectruKindChanged();
     LRESULT SliderChanged(bool bNotify);
     void UpdateDDX();
-    LRESULT ColorChanged(bool bNotify);
+    LRESULT ColorChanged(bool bFromWmNotify);
     void OnDDXChanges(UINT nID, BOOL bSaveAndValidate);
+    void UpdateHexStr();
+    void UpdateHtmlStr();
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
@@ -257,29 +259,41 @@ void CColorPicker::Impl::OnDDXChanges(UINT nID, BOOL bSaveAndValidate)
         return;
     }
     switch (nID) {
+    case CID_SPEC_COMBO:
+        SpectruKindChanged();
+        break;
     case CID_RGB_RED_VAL:
     case CID_RGB_GRN_VAL:
     case CID_RGB_BLU_VAL:
-        ColorChanged(false);
         m_imSpectrum.GetColor().RGBtoHSV();
         break;
     case CID_HSV_HUE_VAL:
     case CID_HSV_SAT_VAL:
     case CID_HSV_VAL_VAL:
-        ColorChanged(false);
         m_imSpectrum.GetColor().HSVtoRGB();
         break;
     case CID_HSL_HUE_VAL:
     case CID_HSL_SAT_VAL:
     case CID_HSL_LTN_VAL:
-        ColorChanged(false);
         m_imSpectrum.GetColor().FromHSL();
         break;
-    case CID_SPEC_COMBO:
-        SpectruKindChanged();
+    case CID_RGB_HEX_VAL:
+        if (!m_imSpectrum.GetColor().FromString(m_sColorHex, false)) {
+            break;
+        }
+        goto updated;
+    case CID_RGB_HTM_VAL:
+        if (!m_imSpectrum.GetColor().FromString(m_sColorHtml, true)) {
+            break;
+        }
+    updated:
+        m_imSpectrum.GetColor().RGBtoHSV();
         break;
     default: 
         break;
+    }
+    if (m_imSpectrum.GetColor().IsUpdated()) {
+        ColorChanged(false);
     }
 }
 
@@ -300,21 +314,31 @@ void CColorPicker::Impl::OnDataValidateError(UINT nCtrlID, BOOL bSave, _XData& d
 }
 #endif
 
-
-void CColorPicker::Impl::UpdateDDX()
+void CColorPicker::Impl::UpdateHexStr()
 {
     auto const& Color{m_imSpectrum.GetColor()};
     m_sColorHex.Format(TEXT("0x%02x%02x%02x"), Color.GetBlue(), Color.GetGreen(), Color.GetRed());
+}
+
+void CColorPicker::Impl::UpdateHtmlStr()
+{
+    auto const& Color{m_imSpectrum.GetColor()};
     m_sColorHtml.Format(TEXT("#%02X%02X%02X"), Color.GetRed(), Color.GetGreen(), Color.GetBlue());
+}
+
+void CColorPicker::Impl::UpdateDDX()
+{
+    UpdateHexStr();
+    UpdateHtmlStr();
     DoDataExchange(DDX_LOAD);
 }
 
-LRESULT CColorPicker::Impl::ColorChanged(bool bNotify)
+LRESULT CColorPicker::Impl::ColorChanged(bool bFromWmNotify)
 {
     if (SPEC_HSV_Hue != m_imSpectrum.GetSpectrumKind()) {
         m_imSlider.UpdateRaster();
     }
-    if (bNotify) {
+    if (bFromWmNotify) {
         CScopedBoolGuard bGuard{m_bSaveData};
         UpdateDDX();
     }
@@ -381,6 +405,21 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     case EN_UPDATE:
         if (DoDataExchange(DDX_SAVE, nID)) {
             m_imSpectrum.InvalidateRect(nullptr, FALSE);
+            {
+                CScopedBoolGuard bGuard{m_bSaveData};
+                switch (nID) {
+                case CID_RGB_HEX_VAL:
+                    UpdateHtmlStr();
+                    SetDlgItemText(CID_RGB_HTM_VAL, m_sColorHtml.GetString());
+                    return ;
+                case CID_RGB_HTM_VAL:
+                    UpdateHexStr();
+                    SetDlgItemText(CID_RGB_HEX_VAL, m_sColorHex.GetString());
+                    return ;
+                default:
+                    break;
+                }
+            }
             m_imSpectrum.NotifySend();
         }
         return ;
