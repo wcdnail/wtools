@@ -83,6 +83,7 @@ void CDDCtrl::NotifySend(UINT code) const
     ::SendMessageW(GetParent(), WM_NOTIFY, nmHeader.idFrom, reinterpret_cast<LPARAM>(&nmHeader));
 }
 
+#if 0
 void CDDCtrl::OnPaint(HDC)
 {
     WTL::CPaintDC const dcPaint{m_hWnd};
@@ -93,6 +94,7 @@ void CDDCtrl::OnPaint(HDC)
     DoPaint(dc, rcDest);
     dc.RestoreDC(iSave);
 }
+#endif
 
 void CDDCtrl::OnLButtonUp(UINT, CPoint) const
 {
@@ -127,10 +129,10 @@ BOOL CDDCtrl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) { 
     case 0:
-        MSG_WM_PAINT(OnPaint)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
+        CHAIN_MSG_MAP(WTL::CBufferedPaintImpl<CDDCtrl>)
         break;
     default:
         ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);

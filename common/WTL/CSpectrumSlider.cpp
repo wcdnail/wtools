@@ -184,8 +184,11 @@ void CSpectrumSlider::DrawPosition(WTL::CDCHandle dc, CRect const& rc) const
 
 void CSpectrumSlider::DoPaint(WTL::CDCHandle dc, CRect const& rc)
 {
+    int const iSave{dc.SaveDC()};
+    dc.SetStretchBltMode(COLORONCOLOR);
     DrawRaster(dc, rc, m_unColor.m_A, m_bmVert);
     DrawPosition(dc, rc);
+    dc.RestoreDC(iSave);
 }
 
 BOOL CSpectrumSlider::OnMouseWheel(UINT nFlags, short zDelta, CPoint)

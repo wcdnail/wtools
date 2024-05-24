@@ -4,8 +4,10 @@
 #include <wcdafx.api.h>
 #include <DDraw.DGI/CeXDib.h>
 #include <atlgdi.h>
+#include <atltheme.h>
 
-struct CDDCtrl: CCustomControl
+struct CDDCtrl: public  CCustomControl,
+                private WTL::CBufferedPaintImpl<CDDCtrl>
 {
     DELETE_COPY_MOVE_OF(CDDCtrl);
 
@@ -18,6 +20,8 @@ struct CDDCtrl: CCustomControl
     HBRUSH GetBackBrush() const;
 
 protected:
+    friend WTL::CBufferedPaintImpl<CDDCtrl>;
+
     CDIBitmap      m_Dib;
     WTL::CBrush m_brBack;
     bool    m_bBackOwner;
@@ -28,7 +32,6 @@ protected:
     WCDAFX_API BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 
 private:
-    void OnPaint(HDC);
     void OnLButtonDown(UINT nFlags, CPoint point);
     void OnLButtonUp(UINT nFlags, CPoint point) const;
     void OnMouseMove(UINT nFlags, CPoint pt);

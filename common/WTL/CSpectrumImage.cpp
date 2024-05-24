@@ -98,8 +98,11 @@ void CSpectrumImage::DoPaint(WTL::CDCHandle dc, CRect const& rc)
         LONG const dCY{1 + rc.Height() / m_Dib.GetHeight()};
         rcRaster.bottom += dCY;
     }
+    int const iSave{dc.SaveDC()};
+    dc.SetStretchBltMode(COLORONCOLOR);
     DrawRaster(dc, rcRaster, m_Color.m_A, m_Dib);
     DrawMarker(dc, rc);
+    dc.RestoreDC(iSave);
 }
 
 void CSpectrumImage::DrawMarker(WTL::CDCHandle dc, CRect const& rcDest)
