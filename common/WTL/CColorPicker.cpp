@@ -134,7 +134,7 @@ private:
 
     BEGIN_DIALOG(0, 0, DLG_CX, DLG_CY)
         DIALOG_STYLE(WS_CHILD | WS_VISIBLE)
-        DIALOG_FONT(8, _T("MS Shell Dlg 2"))
+        DIALOG_FONT(9, _T("Lucida Console"))
     END_DIALOG()
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
@@ -217,11 +217,12 @@ private:
 
     void SpectruKindChanged();
     LRESULT SliderChanged(bool bNotify);
-    void UpdateDDX();
-    LRESULT ColorChanged(bool bFromWmNotify);
-    void OnDDXChanges(UINT nID, BOOL bSaveAndValidate);
     void UpdateHexStr();
     void UpdateHtmlStr();
+    void UpdateDDX();
+    bool DoPostUpdate(int nID);
+    LRESULT ColorChanged(bool bFromWmNotify);
+    void OnDDXChanges(UINT nID, BOOL bSaveAndValidate);
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
@@ -391,6 +392,24 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
     return 0;
 }
 
+bool CColorPicker::Impl::DoPostUpdate(int nID)
+{
+    CScopedBoolGuard bGuard{m_bSaveData};
+    switch (nID) {
+    case CID_RGB_HEX_VAL:
+        UpdateHtmlStr();
+        SetDlgItemText(CID_RGB_HTM_VAL, m_sColorHtml.GetString());
+        return false;
+    case CID_RGB_HTM_VAL:
+        UpdateHexStr();
+        SetDlgItemText(CID_RGB_HEX_VAL, m_sColorHex.GetString());
+        return false;
+    default:
+        break;
+    }
+    return true;
+}
+
 void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/)
 {
     if (m_bSaveData) {
@@ -405,22 +424,9 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     case EN_UPDATE:
         if (DoDataExchange(DDX_SAVE, nID)) {
             m_imSpectrum.InvalidateRect(nullptr, FALSE);
-            {
-                CScopedBoolGuard bGuard{m_bSaveData};
-                switch (nID) {
-                case CID_RGB_HEX_VAL:
-                    UpdateHtmlStr();
-                    SetDlgItemText(CID_RGB_HTM_VAL, m_sColorHtml.GetString());
-                    return ;
-                case CID_RGB_HTM_VAL:
-                    UpdateHexStr();
-                    SetDlgItemText(CID_RGB_HEX_VAL, m_sColorHex.GetString());
-                    return ;
-                default:
-                    break;
-                }
+            if (DoPostUpdate(nID)) {
+                m_imSpectrum.NotifySend();
             }
-            m_imSpectrum.NotifySend();
         }
         return ;
     case CBN_SELENDOK:
@@ -447,12 +453,6 @@ struct UDSpinnerConf
     int nMax;
 };
 
-struct CUFontConf
-{
-    UINT    nID;
-    HFONT hFont;
-};
-
 BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
     UNREFERENCED_PARAMETER(wndFocus);
@@ -460,7 +460,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
 
-    m_fntFixed = CreateFontW(-13, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, L"Courier");
+    //m_fntFixed = CreateFontW(-11, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, L"Lucida Console");
 
     WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
     cbSpectrum.AddString(L"RGB/红");
@@ -474,6 +474,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         { CID_RGB_RED_UDS, 0, RGB_MAX_INT },
         { CID_RGB_GRN_UDS, 0, RGB_MAX_INT },
         { CID_RGB_BLU_UDS, 0, RGB_MAX_INT },
+        { CID_RGB_ALP_UDS, 0, RGB_MAX_INT },
         { CID_HSV_HUE_UDS, 0, HSV_HUE_MAX_INT },
         { CID_HSV_SAT_UDS, 0, HSV_100PERC_INT },
         { CID_HSV_VAL_UDS, 0, HSV_100PERC_INT },
@@ -486,14 +487,31 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         ctlSpinner.SetRange(spConf.nMin, spConf.nMax);
     }
 
-    static const CUFontConf cuFontConf[] = {
-        { CID_RGB_HEX_VAL, m_fntFixed },
-        { CID_RGB_HTM_VAL, m_fntFixed },
+#if 0
+    constexpr UINT cuFixedFont[] = {
+        CID_GRP_SPECTRUM,
+        CID_GRP_RGB,
+        CID_RGB_RED_CAP, CID_RGB_RED_VAL,
+        CID_RGB_GRN_CAP, CID_RGB_GRN_VAL,
+        CID_RGB_BLU_CAP, CID_RGB_BLU_VAL,
+        CID_RGB_ALP_CAP, CID_RGB_ALP_VAL,
+        CID_HSV_HUE_CAP, CID_HSV_HUE_VAL,
+        CID_HSV_SAT_CAP, CID_HSV_SAT_VAL,
+        CID_HSV_VAL_CAP, CID_HSV_VAL_VAL,
+        CID_HSL_HUE_CAP, CID_HSL_HUE_VAL,
+        CID_HSL_SAT_CAP, CID_HSL_SAT_VAL,
+        CID_HSL_LTN_CAP, CID_HSL_LTN_VAL,
+        CID_RGB_HEX_VAL,
+        CID_RGB_HTM_VAL,
+        CID_GRP_HSL,
+        CID_GRP_HSV,
+        CID_GRP_PICKER,
     };
-    for (auto const& fntConf: cuFontConf) {
-        ATL::CWindow ctl{GetDlgItem(fntConf.nID)};
-        ctl.SetFont(fntConf.hFont, FALSE);
+    for (auto const& id: cuFixedFont) {
+        ATL::CWindow ctl{GetDlgItem(id)};
+        ctl.SetFont(m_fntFixed.m_hFont, FALSE);
     }
+#endif
 
     m_imSlider.Initialize();
     m_imSpectrum.Initialize();
@@ -576,10 +594,15 @@ struct CDCEx: WTL::CWindowDC
 
 BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
+    if (m_pImpl->m_hWnd == hWnd) {
+        if (IsDialogMessage(const_cast<ATL::_ATL_MSG*>(GetCurrentMessage()))) {
+            return TRUE;
+        }
+    }
     BOOL bHandled{TRUE};
     UNREFERENCED_PARAMETER(hWnd);
     UNREFERENCED_PARAMETER(bHandled);
-    switch(dwMsgMapID) { 
+    switch(dwMsgMapID) {
     case 0:
       //MSG_WM_NCPAINT(OnNcPaint)
         MSG_WM_CREATE(OnCreate)
