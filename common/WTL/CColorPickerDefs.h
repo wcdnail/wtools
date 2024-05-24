@@ -43,6 +43,7 @@ enum EHexHeadType
     HEX_STR_CPP,
     HEX_STR_ASS,
     HEX_STR_WEB,
+    HEX_STR_LEN_MAX = 6,
 };
 
 PCTSTR SkipHexHead(PCTSTR pBeg, int& nLen, EHexHeadType& hType);

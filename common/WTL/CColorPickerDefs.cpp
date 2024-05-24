@@ -124,6 +124,7 @@ PCTSTR SkipHexHead(PCTSTR pBeg, int& nLen, EHexHeadType& hType)
     if (nLen >= 2) {
         if (0 == _tcsnicmp(pBeg, _T("0x"), 2)) {
             pBeg += 2;
+            nLen -= 2;
             hType = HEX_STR_CPP;
         }
         else if (0 == _tcsnicmp(pBeg, _T("&H"), 2)) {
@@ -133,6 +134,7 @@ PCTSTR SkipHexHead(PCTSTR pBeg, int& nLen, EHexHeadType& hType)
         }
         else if (pBeg[0] == _T('#')) {
             pBeg += 1;
+            nLen -= 1;
             hType = HEX_STR_WEB;
         }
     }

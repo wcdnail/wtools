@@ -242,7 +242,7 @@ private:
     LRESULT ColorChanged(bool bFromWmNotify);
     void OnDDXLoading(UINT nID, BOOL bSaveAndValidate);
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
-    void ValidateHexInput(int nID) const;
+    void ValidateHexInput(WTL::CEdit& edCtrl);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
@@ -404,11 +404,16 @@ void CColorPicker::Impl::DDXReloadEditsExcept(int nID)
     }
 }
 
-void CColorPicker::Impl::ValidateHexInput(int nID) const
+static void CEdit_CursorToEnd(WTL::CEdit& edCtrl)
 {
-    WTL::CEdit    edCtl{GetDlgItem(nID)};
+    edCtrl.SetSel(0,-1);
+    edCtrl.SetSel(-1);
+}
+
+void CColorPicker::Impl::ValidateHexInput(WTL::CEdit& edCtrl)
+{
     ATL::CString sColor{};
-    edCtl.GetWindowTextW(sColor);
+    edCtrl.GetWindowTextW(sColor);
 
     EHexHeadType hType{HEX_STR_PLAIN};
     int           nLen{sColor.GetLength()};
@@ -416,12 +421,20 @@ void CColorPicker::Impl::ValidateHexInput(int nID) const
     if (!pBeg) {
         return ;
     }
-    PCTSTR const pEnd{sColor.GetString() + nLen};
+    PCTSTR const pEnd{pBeg + nLen};
+    if (nLen > HEX_STR_LEN_MAX) {
+        sColor.ReleaseBufferSetLength(static_cast<int>(pEnd - pBeg) + 1);
+        CScopedBoolGuard bGuard{m_bSaveData};
+        edCtrl.SetWindowTextW(sColor);
+        CEdit_CursorToEnd(edCtrl);
+    }
 
     auto const& pFind{std::find_if_not(pBeg, pEnd, isxdigit)};
     if (pFind != pEnd) {
         sColor.Remove(*pFind);
-        edCtl.SetWindowTextW(sColor);
+        CScopedBoolGuard bGuard{m_bSaveData};
+        edCtrl.SetWindowTextW(sColor);
+        CEdit_CursorToEnd(edCtrl);
     }
 }
 
@@ -437,12 +450,14 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     case BN_KILLFOCUS:
         break;
     case EN_UPDATE: {
+        WTL::CEdit      edCtrl{GetDlgItem(nID)};
         WTL::CUpDownCtrl udCtl{GetDlgItem(nID + 1)};
         if (udCtl.m_hWnd) {
             udCtl.SetPos(udCtl.GetPos());
+            CEdit_CursorToEnd(edCtrl);
         }
         else {
-            ValidateHexInput(nID);
+            ValidateHexInput(edCtrl);
         }
         if (DoDataExchange(DDX_SAVE, nID)) {
             m_imSpectrum.InvalidateRect(nullptr, FALSE);
