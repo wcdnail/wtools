@@ -12,7 +12,7 @@ enum EMagnifierPos: int
 
 struct CMagnifierCtrl: private CCustomControl
 {
-    using OnClickFn = std::function<void(UINT, CPoint const&)>;
+    using OnClickFn = std::function<void(UINT, CPoint const&, bool)>;
 
     DECLARE_WND_CLASS(_T("WCCF::CMagnifierCtrl"))
     DELETE_MOVE_OF(CMagnifierCtrl);
@@ -22,7 +22,7 @@ struct CMagnifierCtrl: private CCustomControl
     
     WCDAFX_API HRESULT PreCreateWindow() override;
 
-    WCDAFX_API bool Initialize(HWND hWnd, float fFactor, OnClickFn&& onClick);
+    WCDAFX_API bool Initialize(HWND hWnd, float fFactor, HCURSOR hCursor, OnClickFn&& onClick);
 
     void SetSourcePos(CPoint pt);
     void SetRect(CRect const& rc);
@@ -38,13 +38,17 @@ protected:
     CRect         m_rcMag;
     CPoint        m_ptPos;
     EMagnifierPos  m_ePos;
+    HCURSOR     m_hCursor;
     ATL::CWindow m_ctlMag;
     OnClickFn   m_onClick;
 
     WCDAFX_API BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
+    void OnRectUpdated();
     int OnCreate(LPCREATESTRUCT pCS);
     void OnDestroy();
+    BOOL OnSetCursor(HWND, UINT nHitTest, UINT message) const;
     void OnLButtonDown(UINT nFlags, CPoint point) const;
+    void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) const;
 };
 
 inline void CMagnifierCtrl::SetSourcePos(CPoint pt)
@@ -58,14 +62,14 @@ inline void CMagnifierCtrl::SetSourcePos(CPoint pt)
 inline void CMagnifierCtrl::SetRect(CRect const& rc)
 {
     m_rcMag = rc;
-    UpdatePosition();
+    OnRectUpdated();
 }
 
 inline void CMagnifierCtrl::SetSize(LONG cx, LONG cy)
 {
     m_rcMag.right = m_rcMag.left + cx;
     m_rcMag.bottom = m_rcMag.top + cy;
-    UpdatePosition();
+    OnRectUpdated();;
 }
 
 inline void CMagnifierCtrl::Show(BOOL bShow)

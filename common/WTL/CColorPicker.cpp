@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <cctype>
 
-constexpr float MAG_FACTOR{5.f};
+constexpr float MAG_FACTOR{7.f};
 
 struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
                            WTL::CDialogResize<Impl>,
@@ -121,6 +121,7 @@ private:
     ATL::CString    m_sColorHex;
     ATL::CString   m_sColorHtml;
     WTL::CFont         m_fntHex;
+    WTL::CCursor    m_curPicker;
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,                 X,              Y,           Width,         Height,   Styles
         CONTROL_GROUPBOX(         _T("Spectrum"),        CID_GRP_SPECTRUM,                           2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
@@ -276,7 +277,7 @@ private:
     void SetColorRef(COLORREF crColor);
     void GetColorFromWindowDC(CPoint const& pt);
     void GetColorFromDesktopDC(CPoint const& pt);
-    void ColorpickEnd(UINT, CPoint const&);
+    void ColorpickEnd(UINT, CPoint const&, bool bSelect);
     void OnTimer(UINT_PTR nIDEvent);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDestroy();
@@ -613,13 +614,15 @@ void CColorPicker::Impl::GetColorFromDesktopDC(CPoint const& pt)
     DH::TPrintf(LTH_COLORPICKER L" (%5d, %5d) ==> 0x%08x\n", pt.x, pt.y, crPixel);
 }
 
-void CColorPicker::Impl::ColorpickEnd(UINT, CPoint const& pt)
+void CColorPicker::Impl::ColorpickEnd(UINT, CPoint const& pt, bool bSelect)
 {
     WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
     bnPick.EnableWindow(TRUE);
     m_Magnifier.Show(FALSE);
     KillTimer(TIMER_COLORPICK);
-    GetColorFromDesktopDC(pt);
+    if (bSelect) {
+        GetColorFromDesktopDC(pt);
+    }
 }
 
 void CColorPicker::Impl::OnTimer(UINT_PTR nIDEvent)
@@ -635,6 +638,11 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
     UNREFERENCED_PARAMETER(wndFocus);
     UNREFERENCED_PARAMETER(lInitParam);
+
+    m_curPicker = LoadCursorW(nullptr, IDC_CROSS);
+    WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
+    bnPick.SetBitmap((HBITMAP)m_curPicker.m_hCursor);
+
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
 
@@ -686,9 +694,9 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     UpdateDDX();
     SpectruKindChanged();
 
-    m_Magnifier.Initialize(nullptr, MAG_FACTOR,
-        [this](UINT nFlags, CPoint const& pt) {
-            ColorpickEnd(nFlags, pt);
+    m_Magnifier.Initialize(nullptr, MAG_FACTOR, m_curPicker,
+        [this](UINT nFlags, CPoint const& pt, bool bSelect) {
+            ColorpickEnd(nFlags, pt, bSelect);
         }
     );
     TogglePalette(TRUE);

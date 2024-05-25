@@ -9,13 +9,17 @@
 #include <Magnification.h>
 #include <string>
 
+constexpr LONG MAG_RADIUS{257};
+
 CMagnifierCtrl::~CMagnifierCtrl() = default;
 
 CMagnifierCtrl::CMagnifierCtrl()
-    :  m_rcMag{0, 0, 256, 256}
-    ,  m_ptPos{0, 0}
-    ,   m_ePos{MAGPOS_FOLLOW_MICE}
-    , m_ctlMag{}
+    :   m_rcMag{0, 0, MAG_RADIUS, MAG_RADIUS}
+    ,   m_ptPos{0, 0}
+    ,    m_ePos{MAGPOS_FOLLOW_MICE}
+    , m_hCursor{nullptr}
+    ,  m_ctlMag{}
+    , m_onClick{}
 {
     UNREFERENCED_PARAMETER(CMagnifierInit::Instance());
 }
@@ -28,14 +32,14 @@ HRESULT CMagnifierCtrl::PreCreateWindow()
 
 BOOL CMagnifierCtrl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
-    BOOL bHandled{TRUE};
     UNREFERENCED_PARAMETER(hWnd);
-    UNREFERENCED_PARAMETER(bHandled);
     switch(dwMsgMapID) {
     case 0:
         MSG_WM_CREATE(OnCreate)
         MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_SETCURSOR(OnSetCursor)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_KEYDOWN(OnKeyDown)
 #ifdef _DEBUG_XTRA
         if constexpr (true) {
             auto const msgStr = DH::MessageToStrignW((PMSG)GetCurrentMessage());
@@ -51,7 +55,19 @@ BOOL CMagnifierCtrl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
     return FALSE;
 }
 
-bool CMagnifierCtrl::Initialize(HWND hWnd, float fFactor, OnClickFn&& onClick)
+void CMagnifierCtrl::OnRectUpdated()
+{
+    if (!m_hWnd) {
+        return ;
+    }
+    WTL::CRgn rgnRound;
+    if (!rgnRound.CreateEllipticRgn(m_rcMag.left+1, m_rcMag.top+1, m_rcMag.right-1, m_rcMag.bottom-1)) {
+        return ;
+    }
+    SetWindowRgn(rgnRound, FALSE);
+}
+
+bool CMagnifierCtrl::Initialize(HWND hWnd, float fFactor, HCURSOR hCursor, OnClickFn&& onClick)
 {
     std::wstring sFunc{L"NONE"};
     HRESULT      hCode{S_OK};
@@ -69,12 +85,20 @@ bool CMagnifierCtrl::Initialize(HWND hWnd, float fFactor, OnClickFn&& onClick)
             sFunc = L"CreateWindowEx('" + std::wstring{GetWndClassInfo().m_wc.lpszClassName} + L"')";
             goto raiseError;
         }
+        OnRectUpdated();
     }
     if (!SetMagnification(fFactor, fFactor)) {
         hCode = static_cast<HRESULT>(GetLastError());
         DH::TPrintf(LTH_CONTROL L" SetMagnification failed: 0x%08x\n", sFunc.c_str(), hCode);
     }
     m_onClick = std::move(onClick);
+    if (!hCursor) {
+        m_hCursor = LoadCursorW(nullptr, IDC_CROSS);
+    }
+    else {
+        m_hCursor = hCursor;
+    }
+    SetCursor(m_hCursor);
     return true;
 raiseError:
     auto const msg{Str::ErrorCode<>::SystemMessage(hCode)};
@@ -85,8 +109,8 @@ raiseError:
 int CMagnifierCtrl::OnCreate(LPCREATESTRUCT pCS)
 {
     UNREFERENCED_PARAMETER(pCS);
-    HRESULT      hCode{S_OK};
-    std::wstring sFunc{L"NONE"};
+    HRESULT       hCode{S_OK};
+    std::wstring  sFunc{L"NONE"};
     if (!SetLayeredWindowAttributes(m_hWnd, 0, 255, LWA_ALPHA)) {
         hCode = static_cast<HRESULT>(GetLastError());
         sFunc = L"SetLayeredWindowAttributes";
@@ -111,10 +135,27 @@ void CMagnifierCtrl::OnDestroy()
     SetMsgHandled(FALSE);
 }
 
+BOOL CMagnifierCtrl::OnSetCursor(HWND, UINT nHitTest, UINT message) const
+{
+    UNREFERENCED_PARAMETER(nHitTest);
+    UNREFERENCED_PARAMETER(message);
+    SetCursor(m_hCursor);
+    return TRUE;
+}
+
 void CMagnifierCtrl::OnLButtonDown(UINT nFlags, CPoint) const
 {
     if (m_onClick) {
-        m_onClick(nFlags, m_ptPos);
+        m_onClick(nFlags, m_ptPos, true);
+    }
+}
+
+void CMagnifierCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) const
+{
+    if (VK_ESCAPE == nChar) {
+        if (m_onClick) {
+            m_onClick(nFlags, m_ptPos, false);
+        }
     }
 }
 
