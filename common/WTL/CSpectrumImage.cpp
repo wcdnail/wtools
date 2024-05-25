@@ -51,6 +51,7 @@ BOOL CSpectrumImage::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
     case 0:
         MSG_WM_GETDLGCODE(OnGetDlgCode)
         MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_LBUTTONDBLCLK(OnLButtonDblClk)
         CHAIN_MSG_MAP(CDDCtrl)
         break;
     default:
@@ -165,4 +166,12 @@ void CSpectrumImage::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     }
     GetClientRect(rc);
     OnColorChangedByCoords(rc, m_ptPos);
+}
+
+void CSpectrumImage::OnLButtonDblClk(UINT nFlags, CPoint pt)
+{
+    CRect rc{};
+    GetClientRect(rc);
+    OnColorChangedByCoords(rc, pt);
+    NotifySend(STN_DBLCLK);
 }

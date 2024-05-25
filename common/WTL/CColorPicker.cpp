@@ -456,6 +456,13 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
     case TBN_SAVE:             // skip
     case BCN_HOTITEMCHANGE:
         return 0;
+    case STN_DBLCLK:
+        switch (nID) {
+        case CID_SPECTRUM_PIC:
+            ColorToHistory();
+            return 0;
+        }
+        break;
     case NM_SLIDER_CLR_SEL:
     case NM_SPECTRUM_CLR_SEL:
         switch (nID) {
@@ -589,7 +596,6 @@ void CColorPicker::Impl::TogglePalette(BOOL bPalVisible) const
     grpMagnifier.ShowWindow(nMagShow);
 }
 #endif
-
 
 void CColorPicker::Impl::ColorpickBegin()
 {
@@ -782,19 +788,23 @@ void CColorPicker::Impl::ColorToHistory()
 void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
 {
     if (CID_STA_HISTORY == nID) {
-        WTL::CDCHandle dc{pDI->hDC};
-        CRect const    rc{pDI->rcItem};
-        int const   iSave{dc.SaveDC()};
-        CRect      rcItem{0, 0, CHECKERS_CX, CHECKERS_CX};
-        int          nTop{0};
+        WTL::CDCHandle  dc{pDI->hDC};
+        CRect const     rc{pDI->rcItem};
+        int const    iSave{dc.SaveDC()};
+        HBRUSH const brBrd{WTL::AtlGetStockBrush(GRAY_BRUSH)};
+        CRect       rcItem{0, 0, CHECKERS_CX, CHECKERS_CX};
+        int           nTop{0};
         for (auto& it: m_deqHistory) {
             DrawColorRect(dc, rcItem, it, m_imSpectrum.GetBackBrush());
-            dc.DrawEdge(rcItem, EDGE_BUMP, BF_FLAT | BF_RECT);
+            dc.FrameRect(rcItem, brBrd);
             rcItem.left += CHECKERS_CX;
             rcItem.right = rcItem.left + CHECKERS_CX;
             if (rcItem.left > rc.right) {
                 nTop += rcItem.Height();
                 rcItem.SetRect(0, nTop, CHECKERS_CX, nTop + CHECKERS_CX);
+                if (rcItem.top > rc.bottom) {
+                    break;
+                }
             }
         }
         dc.RestoreDC(iSave);

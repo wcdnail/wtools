@@ -40,6 +40,7 @@ private:
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
     UINT OnGetDlgCode(LPMSG lpMsg) const;
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+    void OnLButtonDblClk(UINT nFlags, CPoint pt);
 };
 
 inline SpectrumKind CSpectrumImage::GetSpectrumKind() const
