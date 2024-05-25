@@ -85,6 +85,9 @@
     <ClCompile Include="WTL\CColorStatic.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
+    <ClCompile Include="WTL\CMagnifierCtrl.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -205,6 +208,9 @@
       <Filter>Unsorted</Filter>
     </ClInclude>
     <ClInclude Include="WTL\CColorStatic.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
+    <ClInclude Include="WTL\CMagnifierCtrl.h">
       <Filter>WTL</Filter>
     </ClInclude>
   </ItemGroup>

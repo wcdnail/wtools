@@ -4,8 +4,10 @@
 #include "CSpectrumImage.h"
 #include "CSpectrumSlider.h"
 #include "CColorStatic.h"
+#include "CMagnifierCtrl.h"
 #include "CAppModuleRef.h"
 #include <dev.assistance/dev.assist.h>
+#include <string.utils.error.code.h>
 #include <scoped.bool.guard.h>
 #include <dh.tracing.defs.h>
 #include <dh.tracing.h>
@@ -41,6 +43,7 @@ private:
         BEFORE_FIRST_CONTROL_ID = 1905,
         CID_GRP_SPECTRUM,
         CID_SPEC_COMBO,
+        CID_BTN_PICK_COLOR,
         CID_SPEC_COLOR_CAP, CID_SPEC_COLOR_SEL,
         CID_SPECTRUM_PIC,
         CID_SPECTRUM_SLD,
@@ -58,6 +61,7 @@ private:
         CID_HSV_SAT_CAP,
         CID_HSV_VAL_CAP,
         CID_GRP_PALETTE,
+      //CID_GRP_MAGNIFIER, CID_PLC_MAGNIFIER,
         // Edit controls
         CID_RGB_RED_VAL, CID_RGB_RED_UDS,
         CID_RGB_GRN_VAL, CID_RGB_GRN_UDS,
@@ -101,6 +105,7 @@ private:
     CSpectrumImage m_imSpectrum;
     CSpectrumSlider  m_imSlider;
     CColorStatic      m_stColor;
+    CMagnifierCtrl  m_Magnifier;
     int         m_nSpectrumKind; // For DDX
     ATL::CString    m_sColorHex;
     ATL::CString   m_sColorHtml;
@@ -108,7 +113,8 @@ private:
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,                 X,              Y,           Width,         Height,   Styles
         CONTROL_GROUPBOX(         _T("Spectrum"),        CID_GRP_SPECTRUM,                           2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
-            CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                           8,             14,        HHCX*2-8,       DLG_CY-4,   CBS_AUTOHSCROLL | CBS_DROPDOWNLIST, 0)
+            CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                           8,             14,         HHCX+20,       DLG_CY-4,   CBS_AUTOHSCROLL | CBS_DROPDOWNLIST, 0)
+            CONTROL_PUSHBUTTON(           _T(""),      CID_BTN_PICK_COLOR,           SPEC_CX-HHCY-HHCX,             14,        HHCX/4+4,         HLCY+2,   BS_BITMAP, 0)
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS,   CC_CHILD,               8,        18+HLCY, SPEC_CX-HHCY-20, DLG_CY-HLCY-26,   WS_EX_STATICEDGE)
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,          CSPECSLD_CLASS,   CC_CHILD, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-26,   WS_EX_STATICEDGE)
             CONTROL_RTEXT(          _T("Color:"),      CID_SPEC_COLOR_CAP,      SPEC_CX-HHCY-HHCX/2-10,             14,        HHCX/2-8,           HLCY,   SS_CENTERIMAGE, 0)
@@ -150,6 +156,7 @@ private:
             CONTROL_EDITTEXT(                             CID_RGB_ALP_VAL,                     CLMN2_X,     HLCYS*2+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
         CONTROL_CONTROL(_T(""),  CID_RGB_ALP_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN2_X+24,     HLCYS*4+16,       HHCX/2-22,           HLCY,   0)
         CONTROL_GROUPBOX(          _T("Palette"),         CID_GRP_PALETTE,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
+      //CONTROL_GROUPBOX(        _T("Magnifier"),       CID_GRP_MAGNIFIER,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
     END_CONTROLS_MAP()
 
     BEGIN_DIALOG(0, 0, DLG_CX, DLG_CY)
@@ -180,6 +187,7 @@ private:
     BEGIN_DLGRESIZE_MAP(CTatorMainDlg)
         DLGRESIZE_CONTROL(CID_GRP_SPECTRUM, DLSZ_SIZE_Y | DLSZ_SIZE_X)
         DLGRESIZE_CONTROL(CID_SPEC_COMBO, DLSZ_SIZE_X)
+        DLGRESIZE_CONTROL(CID_BTN_PICK_COLOR, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_SPEC_COLOR_CAP, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_SPEC_COLOR_SEL, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_SPECTRUM_PIC, DLSZ_SIZE_Y | DLSZ_SIZE_X)
@@ -224,13 +232,13 @@ private:
             DLGRESIZE_CONTROL(CID_HSV_VAL_VAL, DLSZ_MOVE_X)
             DLGRESIZE_CONTROL(CID_HSV_VAL_UDS, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_PALETTE, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+      //DLGRESIZE_CONTROL(CID_GRP_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
     END_DLGRESIZE_MAP()
 
     BEGIN_MSG_MAP(CColorPicker::Impl)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
-      //MSG_WM_DRAWITEM(OnDrawItem)
         CHAIN_MSG_MAP(ImplResizer)
         REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
@@ -247,8 +255,8 @@ private:
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void ValidateHexInput(WTL::CEdit& edCtrl);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
+    void TogglePalette(BOOL bPalVisible) const;
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
-  //void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
 };
 
 CColorPicker::Impl::~Impl() = default;
@@ -265,6 +273,10 @@ CColorPicker::Impl::Impl()
 HRESULT CColorPicker::Impl::PreCreateWindow()
 {
     HRESULT code{S_OK};
+    code = m_Magnifier.PreCreateWindow();
+    if (ERROR_SUCCESS != code) {
+        return code;
+    }
     code = m_imSlider.PreCreateWindow();
     if (ERROR_SUCCESS != code) {
         return code;
@@ -500,6 +512,19 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     SetMsgHandled(FALSE);
 }
 
+void CColorPicker::Impl::TogglePalette(BOOL bPalVisible) const
+{
+#if 0
+    WTL::CButton   grpPalette{GetDlgItem(CID_GRP_PALETTE)};
+    WTL::CButton grpMagnifier{GetDlgItem(CID_GRP_MAGNIFIER)};
+    int const        nPalShow{bPalVisible ? SW_SHOW : SW_HIDE};
+    int const        nMagShow{bPalVisible ? SW_HIDE : SW_SHOW};
+
+    grpPalette.ShowWindow(nPalShow);
+    grpMagnifier.ShowWindow(nMagShow);
+#endif
+}
+
 struct UDSpinnerConf
 {
     UINT nID;
@@ -513,6 +538,12 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     UNREFERENCED_PARAMETER(lInitParam);
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
+
+    HRESULT code{S_OK};
+    if (m_Magnifier.Initialize()) {
+        m_Magnifier.SetMagnificationFactor(4.f, 4.f);
+        m_Magnifier.ShowWindow(SW_HIDE);
+    }
 
     WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
     cbSpectrum.AddString(L"RGB/红");
@@ -551,8 +582,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         }
     }
 
-    WTL::CButton grpPalette(GetDlgItem(CID_GRP_PALETTE));
-
+    TogglePalette(TRUE);
     m_imSpectrum.Initialize(SPECTRUM_CX, SPECTRUM_CY, nullptr);
     m_imSlider.Initialize(SPECTRUM_SLIDER_CX, m_imSpectrum.GetBackBrush());
     UpdateDDX();
@@ -561,42 +591,6 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     m_bSaveData = false;
     return TRUE;
 }
-
-#if 0
-void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
-{
-    switch (nID) {
-    case CID_SPEC_COLOR_SEL: {
-        WTL::CDCHandle          dc{pDI->hDC};
-        int const            iSave{dc.SaveDC()};
-        CRect const             rc{pDI->rcItem};
-        CColorUnion const& unColor{m_imSpectrum.GetColor()};
-        if (unColor.m_A < RGB_MAX_INT) {
-            CRect const        rcColor{0, 0, 1, 1};
-            WTL::CDC           dcColor{CreateCompatibleDC(dc)};
-            WTL::CBitmap const bmColor{CreateCompatibleBitmap(dc, rcColor.Width(), rcColor.Height())};
-            int const           iSave2{dcColor.SaveDC()};
-            BLENDFUNCTION const  blend{AC_SRC_OVER, 0, static_cast<BYTE>(unColor.m_A), 0};
-            dcColor.SelectBitmap(bmColor);
-            dcColor.FillSolidRect(rc, m_imSpectrum.GetMinColorRef(1, 1, 1));
-            dc.SelectBrush(m_imSpectrum.GetBackBrush());
-            dc.PatBlt(rc.left, rc.top, rc.Width(), rc.Height(), PATCOPY);
-            dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(),
-                          dcColor, 0, 0, rcColor.Width(), rcColor.Height(), blend);
-            dcColor.RestoreDC(iSave2);
-        }
-        else {
-            dc.FillSolidRect(rc, m_imSpectrum.GetColorRef());
-        }
-        dc.RestoreDC(iSave);
-        return;
-    }
-    }
-    SetMsgHandled(FALSE);
-    DBGTPrint(LTH_WM_DRAWITEM L" id:%-4d ct:%-4d\n", nID, pDI->CtlType);
-}
-#endif
-
 
 void CColorPicker::Impl::SpectruKindChanged()
 {

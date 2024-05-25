@@ -23,9 +23,7 @@ struct CColorPicker: CCustomControl,
     BOOL PreTranslateMessage(MSG* pMsg) override;
 
 private:
-    //friend Super;
     struct Impl;
-
     std::unique_ptr<Impl> m_pImpl;
 
     void OnNcPaint(WTL::CRgnHandle rgn);
