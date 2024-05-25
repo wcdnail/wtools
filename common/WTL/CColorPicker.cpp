@@ -17,6 +17,7 @@
 #include <atldlgs.h>
 #include <atlddx.h>
 #include <atlmisc.h>
+#include <Magnification.h>
 #include <algorithm>
 #include <cctype>
 
@@ -61,7 +62,7 @@ private:
         CID_HSV_SAT_CAP,
         CID_HSV_VAL_CAP,
         CID_GRP_PALETTE,
-      //CID_GRP_MAGNIFIER, CID_PLC_MAGNIFIER,
+        CID_GRP_MAGNIFIER, CID_PLC_MAGNIFIER,
         // Edit controls
         CID_RGB_RED_VAL, CID_RGB_RED_UDS,
         CID_RGB_GRN_VAL, CID_RGB_GRN_UDS,
@@ -97,8 +98,9 @@ private:
 
     enum Styles: DWORD
     {
-        CC_CHILD = WS_CHILD | WS_VISIBLE | WS_TABSTOP,
-        UD_CHILD = UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | WS_GROUP,
+        CC_CHILD  = WS_CHILD | WS_VISIBLE | WS_TABSTOP,
+        UD_CHILD  = UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | WS_GROUP,
+        MAG_CHILD = WS_CHILD | WS_VISIBLE | MS_SHOWMAGNIFIEDCURSOR,
     };
 
     bool            m_bSaveData;
@@ -156,7 +158,9 @@ private:
             CONTROL_EDITTEXT(                             CID_RGB_ALP_VAL,                     CLMN2_X,     HLCYS*2+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
         CONTROL_CONTROL(_T(""),  CID_RGB_ALP_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN2_X+24,     HLCYS*4+16,       HHCX/2-22,           HLCY,   0)
         CONTROL_GROUPBOX(          _T("Palette"),         CID_GRP_PALETTE,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
-      //CONTROL_GROUPBOX(        _T("Magnifier"),       CID_GRP_MAGNIFIER,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
+        CONTROL_GROUPBOX(        _T("Magnifier"),       CID_GRP_MAGNIFIER,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
+          //CONTROL_CTEXT(       _T("MAGNIFIER"),       CID_PLC_MAGNIFIER,                   CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   SS_SUNKEN | SS_CENTERIMAGE, 0)
+        CONTROL_CONTROL(_T(""), CID_PLC_MAGNIFIER,           WC_MAGNIFIER, MAG_CHILD,        CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   0)
     END_CONTROLS_MAP()
 
     BEGIN_DIALOG(0, 0, DLG_CX, DLG_CY)
@@ -232,7 +236,8 @@ private:
             DLGRESIZE_CONTROL(CID_HSV_VAL_VAL, DLSZ_MOVE_X)
             DLGRESIZE_CONTROL(CID_HSV_VAL_UDS, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_PALETTE, DLSZ_SIZE_Y | DLSZ_MOVE_X)
-      //DLGRESIZE_CONTROL(CID_GRP_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_GRP_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_PLC_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
     END_DLGRESIZE_MAP()
 
     BEGIN_MSG_MAP(CColorPicker::Impl)
@@ -240,6 +245,8 @@ private:
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
+      //MSG_WM_SIZE(OnSize)
+      //MSG_WM_MOVE(OnMove)
         CHAIN_MSG_MAP(ImplResizer)
         REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
@@ -256,7 +263,10 @@ private:
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void ValidateHexInput(WTL::CEdit& edCtrl);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
-    void TogglePalette(BOOL bPalVisible) const;
+    void TogglePalette(BOOL bPalVisible);
+  //void SetMagPos();
+  //void OnSize(UINT nType, CSize size);
+  //void OnMove(CPoint ptPos);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDestroy();
 };
@@ -270,15 +280,16 @@ CColorPicker::Impl::Impl()
     ,       m_stColor{m_imSpectrum.GetMinColorRef(1, 1, 1)}
     , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
 {
+    UNREFERENCED_PARAMETER(CMagnifierInit::Instance());
 }
 
 HRESULT CColorPicker::Impl::PreCreateWindow()
 {
     HRESULT code{S_OK};
-    code = m_Magnifier.PreCreateWindow();
-    if (ERROR_SUCCESS != code) {
-        return code;
-    }
+  //code = m_Magnifier.PreCreateWindow();
+  //if (ERROR_SUCCESS != code) {
+  //    return code;
+  //}
     code = m_imSlider.PreCreateWindow();
     if (ERROR_SUCCESS != code) {
         return code;
@@ -404,6 +415,7 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
     }
     switch (pnmh->code) {
     case TBN_SAVE:             // skip
+    case BCN_HOTITEMCHANGE:
         return 0;
     case NM_SLIDER_CLR_SEL:
     case NM_SPECTRUM_CLR_SEL:
@@ -413,7 +425,7 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
         }
         break;
     }
-    DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+    DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
     SetMsgHandled(FALSE);
     return 0;
 }
@@ -508,31 +520,47 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     case EN_MAXTEXT:
         return ;
     default:
-        DBGTPrint(LTH_WM_COMMAND L" id:%-4d nc:%-4d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+        DBGTPrint(LTH_WM_COMMAND L" id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
         break;
     }
     SetMsgHandled(FALSE);
 }
 
-void CColorPicker::Impl::TogglePalette(BOOL bPalVisible) const
+void CColorPicker::Impl::TogglePalette(BOOL bPalVisible)
 {
-#if 0
     WTL::CButton   grpPalette{GetDlgItem(CID_GRP_PALETTE)};
     WTL::CButton grpMagnifier{GetDlgItem(CID_GRP_MAGNIFIER)};
+    ATL::CWindow plcMagnifier{GetDlgItem(CID_PLC_MAGNIFIER)};
     int const        nPalShow{bPalVisible ? SW_SHOW : SW_HIDE};
     int const        nMagShow{bPalVisible ? SW_HIDE : SW_SHOW};
-
     grpPalette.ShowWindow(nPalShow);
     grpMagnifier.ShowWindow(nMagShow);
-#endif
+    plcMagnifier.ShowWindow(nMagShow);
 }
 
-struct UDSpinnerConf
+#if 0
+void CColorPicker::Impl::SetMagPos()
 {
-    UINT nID;
-    int nMin;
-    int nMax;
-};
+    WTL::CButton const   grpPalette{GetDlgItem(CID_GRP_PALETTE)};
+    ATL::CWindow const plcMagnifier{GetDlgItem(CID_PLC_MAGNIFIER)};
+    int const              nMagShow{grpPalette.IsWindowVisible() ? SW_HIDE : SW_SHOW};
+    CRect rcMag{};
+    plcMagnifier.GetWindowRect(rcMag);
+    m_Magnifier.SetRect(rcMag);
+    m_Magnifier.ShowWindow(nMagShow);
+}
+
+void CColorPicker::Impl::OnSize(UINT, CSize)
+{
+    SetMsgHandled(FALSE);
+    SetMagPos();
+}
+
+void CColorPicker::Impl::OnMove(CPoint)
+{
+    SetMagPos();
+}
+#endif
 
 BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
@@ -540,12 +568,6 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     UNREFERENCED_PARAMETER(lInitParam);
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
-
-    HRESULT code{S_OK};
-    if (m_Magnifier.Initialize()) {
-        m_Magnifier.SetMagnificationFactor(4.f, 4.f);
-        m_Magnifier.ShowWindow(SW_HIDE);
-    }
 
     WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
     cbSpectrum.AddString(L"RGB/红");
@@ -555,6 +577,12 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     cbSpectrum.AddString(L"HSV/饱和度");
     cbSpectrum.AddString(L"HSV/明度");
 
+    struct UDSpinnerConf
+    {
+        UINT nID;
+        int nMin;
+        int nMax;
+    };
     constexpr UDSpinnerConf udSpinnerConf[] = {
         { CID_RGB_RED_UDS, 0, RGB_MAX_INT },
         { CID_RGB_GRN_UDS, 0, RGB_MAX_INT },
@@ -584,11 +612,14 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         }
     }
 
-    TogglePalette(TRUE);
     m_imSpectrum.Initialize(SPECTRUM_CX, SPECTRUM_CY, nullptr);
     m_imSlider.Initialize(SPECTRUM_SLIDER_CX, m_imSpectrum.GetBackBrush());
     UpdateDDX();
     SpectruKindChanged();
+
+    m_Magnifier.Initialize(GetDlgItem(CID_PLC_MAGNIFIER), 4.f, 4.f);
+    TogglePalette(FALSE);
+
     DlgResize_Init(false, true, 0);
     m_bSaveData = false;
     return TRUE;
@@ -596,7 +627,9 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 
 void CColorPicker::Impl::OnDestroy()
 {
-    m_Magnifier.DestroyWindow();
+    if (m_Magnifier.m_hWnd) {
+        m_Magnifier.DestroyWindow();
+    }
     SetMsgHandled(FALSE);
 }
 

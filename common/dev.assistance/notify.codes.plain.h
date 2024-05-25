@@ -26,7 +26,14 @@
     _ON_CONST(BN_SETFOCUS     );
     _ON_CONST(BN_KILLFOCUS    );
 #endif /* WINVER >= 0x0400 */
-/*
+#if (NTDDI_VERSION >= NTDDI_WINXP)
+    _ON_CONST(BCN_HOTITEMCHANGE);
+#endif
+#if (NTDDI_VERSION >= NTDDI_VISTA)
+    _ON_CONST(BCN_DROPDOWN);
+#endif
+    _ON_CONST(NM_GETCUSTOMSPLITRECT);
+    /*
  * Listbox Notification Codes
  */
     _ON_CONST(LBN_ERRSPACE );

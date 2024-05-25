@@ -42,6 +42,8 @@ CMagnifierCtrl::~CMagnifierCtrl() = default;
 
 CMagnifierCtrl::CMagnifierCtrl()
     :  m_rcMag{0, 0, 256, 256}
+    ,  m_ptPos{0, 0}
+    ,   m_ePos{MAGPOS_FOLLOW_MICE}
     , m_ctlMag{}
 {
     UNREFERENCED_PARAMETER(CMagnifierInit::Instance());
@@ -77,15 +79,28 @@ BOOL CMagnifierCtrl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
     return FALSE;
 }
 
-bool CMagnifierCtrl::Initialize()
+bool CMagnifierCtrl::Initialize(HWND hWnd, float fXFactor, float fYFactor)
 {
-    HWND const hWndRes{Create(nullptr, nullptr, nullptr, WS_CLIPCHILDREN, WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT)};
     std::wstring sFunc{L"NONE"};
     HRESULT      hCode{S_OK};
-    if (!hWndRes) {
+    if (hWnd) {
+        m_ePos = MAGPOS_FIXED;
+        m_ctlMag.Attach(hWnd);
+    }
+    else {
+        HWND const hWndRes{Create(nullptr, nullptr, nullptr,
+            WS_BORDER | WS_POPUP | WS_CLIPCHILDREN,
+            WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT
+        )};
+        if (!hWndRes) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc = L"CreateWindowEx('" + std::wstring{GetWndClassInfo().m_wc.lpszClassName} + L"')";
+            goto raiseError;
+        }
+    }
+    if (!SetMagnification(fXFactor, fYFactor)) {
         hCode = static_cast<HRESULT>(GetLastError());
-        sFunc = L"CreateWindowEx('" + std::wstring{GetWndClassInfo().m_wc.lpszClassName} + L"')";
-        goto raiseError;
+        DH::TPrintf(LTH_CONTROL L" SetMagnification failed: 0x%08x\n", sFunc.c_str(), hCode);
     }
     return true;
 raiseError:
@@ -123,7 +138,7 @@ void CMagnifierCtrl::OnDestroy()
     SetMsgHandled(FALSE);
 }
 
-BOOL CMagnifierCtrl::SetMagnificationFactor(float fXFactor, float fYFactor) const
+BOOL CMagnifierCtrl::SetMagnification(float fXFactor, float fYFactor) const
 {
     if (!m_ctlMag.m_hWnd) {
         return FALSE;
@@ -135,13 +150,14 @@ BOOL CMagnifierCtrl::SetMagnificationFactor(float fXFactor, float fYFactor) cons
     return MagSetWindowTransform(m_ctlMag.m_hWnd, &trMatrix);
 }
 
-void CMagnifierCtrl::MoveToMousePos()
+void CMagnifierCtrl::UpdatePosition()
 {
     if (!m_ctlMag.m_hWnd) {
         return ;
     }
-    CPoint pt{};
-    GetCursorPos(&pt);
+    if (MAGPOS_FOLLOW_MICE == m_ePos) {
+        GetCursorPos(&m_ptPos);
+    }
     CRect          rcSource{m_rcMag};
     int const   borderWidth{GetSystemMetrics(SM_CXFIXEDFRAME)};
     int const captionHeight{GetSystemMetrics(SM_CYCAPTION)};
@@ -149,16 +165,21 @@ void CMagnifierCtrl::MoveToMousePos()
     MagGetWindowTransform(m_ctlMag.m_hWnd, &trMatrix);
     float const fXFactor{trMatrix.v[0][0]};
     float const fYFactor{trMatrix.v[1][1]};
-    rcSource.left = (pt.x - static_cast<int>((m_rcMag.Width() / 2) / fXFactor)) +
+    rcSource.left = (m_ptPos.x - static_cast<int>((m_rcMag.Width() / 2) / fXFactor)) +
                             static_cast<int>(borderWidth / fXFactor);
-    rcSource.top = (pt.y -  static_cast<int>((m_rcMag.Height() / 2) / fYFactor)) +
+    rcSource.top = (m_ptPos.y -  static_cast<int>((m_rcMag.Height() / 2) / fYFactor)) +
                             static_cast<int>(captionHeight / fYFactor) +
                             static_cast<int>(borderWidth / fYFactor);
     MagSetWindowSource(m_ctlMag.m_hWnd, rcSource);
-    MoveWindow(pt.x - m_rcMag.Width() / 2,
-               pt.y - m_rcMag.Height() / 2,
-               m_rcMag.Width(),
-               m_rcMag.Height(),
-               FALSE);
+    if (MAGPOS_FOLLOW_MICE == m_ePos) {
+        MoveWindow(m_ptPos.x - m_rcMag.Width() / 2,
+                   m_ptPos.y - m_rcMag.Height() / 2,
+                   m_rcMag.Width(),
+                   m_rcMag.Height(),
+                   FALSE);
+    }
+    else {
+        MoveWindow(m_rcMag, FALSE);
+    }
     m_ctlMag.InvalidateRect(nullptr, TRUE);
 }
