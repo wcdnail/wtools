@@ -6,6 +6,10 @@
 #include <atlgdi.h>
 #include <atltheme.h>
 
+constexpr int             CHECKERS_CX{18};
+constexpr COLORREF CLR_CHECKERS_WHITE{RGB(210, 210, 210)};
+constexpr COLORREF CLR_CHECKERS_BLACK{RGB( 92,  92,  92)};
+
 struct CDDCtrl: public  CCustomControl,
                 private WTL::CBufferedPaintImpl<CDDCtrl>
 {

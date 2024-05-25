@@ -5,9 +5,6 @@
 #include <dh.tracing.h>
 #include <atlcrack.h>
 
-constexpr COLORREF CLR_CHECKERS_WHITE{RGB(210, 210, 210)};
-constexpr COLORREF CLR_CHECKERS_BLACK{RGB( 92,  92,  92)};
-
 CSpectrumImage::~CSpectrumImage() = default;
 
 CSpectrumImage::CSpectrumImage(COLORREF crInit, SpectrumKind kind)

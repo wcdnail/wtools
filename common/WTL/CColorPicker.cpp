@@ -20,6 +20,8 @@
 #include <atlmisc.h>
 #include <Magnification.h>
 #include <algorithm>
+#include <memory>
+#include <deque>
 #include <cctype>
 
 constexpr float MAG_FACTOR{7.f};
@@ -41,6 +43,14 @@ struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
 private:
     friend ImplResizer;
     friend ImplSuper;
+
+    struct HistoryItem
+    {
+        COLORREF crColor;
+        int       nAlpha;
+    };
+
+    using HistoryCont = std::deque<HistoryItem>;
 
     enum ControlIds: int
     {
@@ -64,7 +74,7 @@ private:
         CID_HSV_HUE_CAP,
         CID_HSV_SAT_CAP,
         CID_HSV_VAL_CAP,
-        CID_GRP_PALETTE,
+        CID_GRP_HISTORY, CID_STA_HISTORY,
         CID_GRP_MAGNIFIER, CID_PLC_MAGNIFIER,
         // Edit controls
         CID_RGB_RED_VAL, CID_RGB_RED_UDS,
@@ -117,6 +127,7 @@ private:
     CSpectrumSlider  m_imSlider;
     CColorStatic      m_stColor;
     CMagnifierCtrl  m_Magnifier;
+    HistoryCont    m_deqHistory;
     int         m_nSpectrumKind; // For DDX
     ATL::CString    m_sColorHex;
     ATL::CString   m_sColorHtml;
@@ -132,7 +143,7 @@ private:
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS,   CC_CHILD,               8,        18+HLCY, SPEC_CX-HHCY-20, DLG_CY-HLCY-26,   WS_EX_STATICEDGE)
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,          CSPECSLD_CLASS,   CC_CHILD, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-26,   WS_EX_STATICEDGE)
             CONTROL_RTEXT(          _T("Color:"),      CID_SPEC_COLOR_CAP,      SPEC_CX-HHCY-HHCX/2-10,             14,        HHCX/2-8,           HLCY,   SS_CENTERIMAGE, 0)
-            CONTROL_CTEXT(           _T("COLOR"),      CID_SPEC_COLOR_SEL,             SPEC_CX-HHCY-10,             14,          HHCY+2,         HHCY-2,   SS_CENTERIMAGE | SS_OWNERDRAW, WS_EX_STATICEDGE)
+            CONTROL_CTEXT(           _T("COLOR"),      CID_SPEC_COLOR_SEL,             SPEC_CX-HHCY-10,             14,          HHCY+2,         HHCY-2,   SS_NOTIFY | WS_TABSTOP, WS_EX_STATICEDGE)
         CONTROL_GROUPBOX(              _T("RGB"),             CID_GRP_RGB,                     CLMNT_X,              2,        RGB_CX-8,       RGB_CY-4,   0, 0)
             CONTROL_RTEXT(               _T("R"),         CID_RGB_RED_CAP,                   CLMNT_X+2,     HLCYS*0+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
             CONTROL_RTEXT(               _T("G"),         CID_RGB_GRN_CAP,                   CLMNT_X+2,     HLCYS*1+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
@@ -169,8 +180,9 @@ private:
             CONTROL_RTEXT(               _T("A"),         CID_RGB_ALP_CAP,          SPEC_CX+3+RGB_CX/2,     HLCYS*2+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
             CONTROL_EDITTEXT(                             CID_RGB_ALP_VAL,                     CLMN2_X,     HLCYS*2+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
         CONTROL_CONTROL(_T(""),  CID_RGB_ALP_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN2_X+24,     HLCYS*4+16,       HHCX/2-22,           HLCY,   0)
-        CONTROL_GROUPBOX(          _T("Palette"),         CID_GRP_PALETTE,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
-        CONTROL_GROUPBOX(        _T("Magnifier"),       CID_GRP_MAGNIFIER,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
+        CONTROL_GROUPBOX(          _T("History"),         CID_GRP_HISTORY,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
+           CONTROL_CTEXT(                 _T(""),         CID_STA_HISTORY,                   CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   SS_SUNKEN | SS_CENTERIMAGE | SS_OWNERDRAW, 0)
+      //CONTROL_GROUPBOX(        _T("Magnifier"),       CID_GRP_MAGNIFIER,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
           //CONTROL_CTEXT(       _T("MAGNIFIER"),       CID_PLC_MAGNIFIER,                   CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   SS_SUNKEN | SS_CENTERIMAGE, 0)
       //CONTROL_CONTROL(_T(""), CID_PLC_MAGNIFIER,           WC_MAGNIFIER, MAG_CHILD,        CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   0)
     END_CONTROLS_MAP()
@@ -247,8 +259,9 @@ private:
             DLGRESIZE_CONTROL(CID_HSV_VAL_CAP, DLSZ_MOVE_X)
             DLGRESIZE_CONTROL(CID_HSV_VAL_VAL, DLSZ_MOVE_X)
             DLGRESIZE_CONTROL(CID_HSV_VAL_UDS, DLSZ_MOVE_X)
-        DLGRESIZE_CONTROL(CID_GRP_PALETTE, DLSZ_SIZE_Y | DLSZ_MOVE_X)
-        DLGRESIZE_CONTROL(CID_GRP_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_GRP_HISTORY, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_STA_HISTORY, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+      //DLGRESIZE_CONTROL(CID_GRP_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
       //DLGRESIZE_CONTROL(CID_PLC_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
     END_DLGRESIZE_MAP()
 
@@ -258,6 +271,7 @@ private:
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_TIMER(OnTimer)
+        MSG_WM_DRAWITEM(OnDrawItem)
         CHAIN_MSG_MAP(ImplResizer)
         REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
@@ -273,6 +287,7 @@ private:
     void OnDDXLoading(UINT nID, BOOL bSaveAndValidate);
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void ValidateHexInput(WTL::CEdit& edCtrl);
+    void ColorToPalette();
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     void TogglePalette(BOOL bPalVisible) const;
     void ColorpickBegin();
@@ -283,6 +298,7 @@ private:
     void OnTimer(UINT_PTR nIDEvent);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDestroy();
+    void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI) const;
 };
 
 CColorPicker::Impl::~Impl() = default;
@@ -486,6 +502,15 @@ void CColorPicker::Impl::ValidateHexInput(WTL::CEdit& edCtrl)
     }
 }
 
+void CColorPicker::Impl::ColorToPalette()
+{
+    COLORREF const crColor{m_imSpectrum.GetMinColorRef(1, 1, 1)};
+    int const       nAlpha{m_imSpectrum.GetColor().m_A};
+    HistoryItem const item{crColor, nAlpha};
+    m_deqHistory.push_front(item);
+    ATL::CWindow{GetDlgItem(CID_STA_HISTORY)}.InvalidateRect(nullptr, FALSE);
+}
+
 void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/)
 {
     if (m_bSaveData) {
@@ -493,18 +518,23 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     }
     switch (uNotifyCode) {
     case BN_UNHILITE:
-    case BN_PAINT:
     case BN_DISABLE:
     case BN_KILLFOCUS:
         break;
-    case BN_CLICKED:{
+    case STN_DBLCLK:
+        switch (nID) {
+        case CID_SPEC_COLOR_SEL:
+            ColorToPalette();
+            return ;
+        }
+        break;
+    case BN_CLICKED:
         switch (nID) {
         case CID_BTN_PICK_COLOR:
             ColorpickBegin();
             return ;
         }
         break;
-    }
     case EN_UPDATE: {
         WTL::CEdit      edCtrl{GetDlgItem(nID)};
         WTL::CUpDownCtrl udCtl{GetDlgItem(nID + 1)};
@@ -546,15 +576,18 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     SetMsgHandled(FALSE);
 }
 
+#if 0
 void CColorPicker::Impl::TogglePalette(BOOL bPalVisible) const
 {
-    WTL::CButton   grpPalette{GetDlgItem(CID_GRP_PALETTE)};
+    WTL::CButton   grpPalette{GetDlgItem(CID_GRP_HISTORY)};
     WTL::CButton grpMagnifier{GetDlgItem(CID_GRP_MAGNIFIER)};
     int const        nPalShow{bPalVisible ? SW_SHOW : SW_HIDE};
     int const        nMagShow{bPalVisible ? SW_HIDE : SW_SHOW};
     grpPalette.ShowWindow(nPalShow);
     grpMagnifier.ShowWindow(nMagShow);
 }
+#endif
+
 
 void CColorPicker::Impl::ColorpickBegin()
 {
@@ -568,6 +601,7 @@ void CColorPicker::Impl::SetColorRef(COLORREF crColor)
 {
     m_imSpectrum.GetColor().SetColorRef(crColor);
     ColorChanged(true);
+    ColorToPalette();
 }
 
 void CColorPicker::Impl::GetColorFromWindowDC(CPoint const& pt)
@@ -614,18 +648,14 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
     UNREFERENCED_PARAMETER(wndFocus);
     UNREFERENCED_PARAMETER(lInitParam);
-
     m_curArrow = LoadCursorW(nullptr, IDC_ARROW);
     m_curCross = LoadCursorW(nullptr, IDC_CROSS);
     m_curPicker = LoadCursorW(nullptr, IDC_CROSS);
   //WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
   //bnPick.SetBitmap((HBITMAP)m_curPicker.m_hCursor);
-
     SetCursor(m_curArrow);
-
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
-
     WTL::CComboBox cbSpectrum(GetDlgItem(CID_SPEC_COMBO));
     cbSpectrum.AddString(L"RGB/红");
     cbSpectrum.AddString(L"RGB/绿");
@@ -633,7 +663,6 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     cbSpectrum.AddString(L"HSV/色调");
     cbSpectrum.AddString(L"HSV/饱和度");
     cbSpectrum.AddString(L"HSV/明度");
-
     struct UDSpinnerConf
     {
         UINT nID;
@@ -656,7 +685,6 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         WTL::CUpDownCtrl ctlSpinner{GetDlgItem(spConf.nID)};
         ctlSpinner.SetRange(spConf.nMin, spConf.nMax);
     }
-
     m_fntHex = CreateFontW(-13, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, L"Anonymous Pro");
     if (m_fntHex) {
         constexpr UINT cuFixedFont[] = {
@@ -668,19 +696,16 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
             ctl.SetFont(m_fntHex.m_hFont, FALSE);
         }
     }
-
     m_imSpectrum.Initialize(SPECTRUM_CX, SPECTRUM_CY, nullptr, m_curArrow);
     m_imSlider.Initialize(SPECTRUM_SLIDER_CX, m_imSpectrum.GetBackBrush(), m_curCross);
     UpdateDDX();
     SpectruKindChanged();
-
     m_Magnifier.Initialize(nullptr, MAG_FACTOR, m_curPicker,
         [this](UINT nFlags, CPoint const& pt, bool bSelect) {
             ColorpickEnd(nFlags, pt, bSelect);
         }
     );
-    TogglePalette(TRUE);
-
+  //TogglePalette(TRUE);
     DlgResize_Init(false, true, 0);
     m_bSaveData = false;
     return TRUE;
@@ -692,6 +717,28 @@ void CColorPicker::Impl::OnDestroy()
         m_Magnifier.DestroyWindow();
     }
     SetMsgHandled(FALSE);
+}
+
+void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI) const
+{
+    if (CID_STA_HISTORY == nID) {
+        WTL::CDCHandle dc{pDI->hDC};
+        CRect const    rc{pDI->rcItem};
+        int const   iSave{dc.SaveDC()};
+        CRect      rcItem{0, 0, CHECKERS_CX, CHECKERS_CX};
+        int          nTop{0};
+        for (auto const it: m_deqHistory) {
+            DrawColorRect(dc, rcItem, it.crColor, it.nAlpha, m_imSpectrum.GetBackBrush());
+            dc.DrawEdge(rcItem, BDR_OUTER, BF_FLAT | BF_RECT);
+            rcItem.left += CHECKERS_CX;
+            rcItem.right = rcItem.left + CHECKERS_CX;
+            if (rcItem.left > rc.right) {
+                nTop += rcItem.Height();
+                rcItem.SetRect(0, nTop, CHECKERS_CX, nTop + CHECKERS_CX);
+            }
+        }
+        dc.RestoreDC(iSave);
+    }
 }
 
 void CColorPicker::Impl::SpectruKindChanged()

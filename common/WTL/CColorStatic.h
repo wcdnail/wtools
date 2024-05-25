@@ -2,6 +2,8 @@
 
 #include <wcdafx.api.h>
 
+void DrawColorRect(WTL::CDCHandle dc, CRect const& rc, COLORREF crColor, int nAlpha, HBRUSH brBack);
+
 struct CColorStatic: private ATL::CWindowImpl<CColorStatic, WTL::CStatic>,
                      private WTL::CBufferedPaintImpl<CColorStatic>
 {
@@ -10,12 +12,13 @@ struct CColorStatic: private ATL::CWindowImpl<CColorStatic, WTL::CStatic>,
     DELETE_COPY_MOVE_OF(CColorStatic);
 
     WCDAFX_API ~CColorStatic() override;
-    WCDAFX_API CColorStatic(COLORREF crColor);
+    WCDAFX_API CColorStatic(COLORREF crColor = 0xffffff);
 
     void Reset(COLORREF crColor, int nAlpha = 255, HBRUSH brBack = nullptr);
 
     using WndSuper::m_hWnd;
     using WndSuper::SubclassWindow;
+    using WndSuper::Create;
 
 protected:
     friend WTL::CBufferedPaintImpl<CColorStatic>;
@@ -25,7 +28,6 @@ protected:
     WTL::CBrushHandle m_brBack;
 
     void DoPaint(WTL::CDCHandle dc, CRect const& rc) const;
-
     WCDAFX_API BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 };
 
