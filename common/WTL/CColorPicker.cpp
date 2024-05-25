@@ -266,13 +266,16 @@ private:
     void UpdateDDX();
     void UpdateColorStatic();
     void DDXReloadEditsExcept(int nId);
-    LRESULT ColorChanged(bool bFromWmNotify);
+    LRESULT ColorChanged(bool bUpdateDDX);
     void OnDDXLoading(UINT nID, BOOL bSaveAndValidate);
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void ValidateHexInput(WTL::CEdit& edCtrl);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     void TogglePalette(BOOL bPalVisible) const;
     void ColorpickBegin();
+    void SetColorRef(COLORREF crColor);
+    void GetColorFromWindowDC(CPoint const& pt);
+    void GetColorFromDesktopDC(CPoint const& pt);
     void ColorpickEnd(UINT, CPoint const&);
     void OnTimer(UINT_PTR nIDEvent);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
@@ -379,18 +382,16 @@ void CColorPicker::Impl::UpdateColorStatic()
                     m_imSpectrum.GetBackBrush());
 }
 
-LRESULT CColorPicker::Impl::ColorChanged(bool bFromWmNotify)
+LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX)
 {
     if (SPEC_HSV_Hue != m_imSpectrum.GetSpectrumKind()) {
         m_imSlider.UpdateRaster();
     }
-    if (bFromWmNotify) {
+    if (bUpdateDDX) {
         CScopedBoolGuard bGuard{m_bSaveData};
         UpdateDDX();
     }
-    else {
-        m_imSpectrum.InvalidateRect(nullptr, FALSE);
-    }
+    m_imSpectrum.InvalidateRect(nullptr, FALSE);
     m_imSlider.InvalidateRect(nullptr, FALSE);
     UpdateColorStatic();
     return 0;
@@ -586,24 +587,39 @@ void CColorPicker::Impl::ColorpickBegin()
     SetTimer(TIMER_COLORPICK, TIMER_COLORPICK_MSEC);
 }
 
+void CColorPicker::Impl::SetColorRef(COLORREF crColor)
+{
+    m_imSpectrum.GetColor().SetColorRef(crColor);
+    ColorChanged(true);
+}
+
+void CColorPicker::Impl::GetColorFromWindowDC(CPoint const& pt)
+{
+    ATL::CWindow const  wnd{WindowFromPoint(pt)};
+    WTL::CWindowDC const dc{wnd};
+    CPoint            ptWin{pt};
+    wnd.ScreenToClient(&ptWin);
+    COLORREF const  crPixel{dc.GetPixel(ptWin)};
+    SetColorRef(crPixel);
+    DH::TPrintf(LTH_COLORPICKER L" [%p] (%5d, %5d) ==> 0x%08x\n", wnd.m_hWnd, pt.x, pt.y, crPixel);
+}
+
+void CColorPicker::Impl::GetColorFromDesktopDC(CPoint const& pt)
+{
+    WTL::CDCHandle const dc{::GetDC(nullptr)};
+    COLORREF const  crPixel{dc.GetPixel(pt)};
+    ::ReleaseDC(nullptr, dc);
+    SetColorRef(crPixel);
+    DH::TPrintf(LTH_COLORPICKER L" (%5d, %5d) ==> 0x%08x\n", pt.x, pt.y, crPixel);
+}
+
 void CColorPicker::Impl::ColorpickEnd(UINT, CPoint const& pt)
 {
     WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
     bnPick.EnableWindow(TRUE);
     m_Magnifier.Show(FALSE);
     KillTimer(TIMER_COLORPICK);
-    {
-        ATL::CWindow const  wnd{WindowFromPoint(pt)};
-        WTL::CWindowDC const dc{wnd};
-        CPoint            ptWin{pt};
-        wnd.ScreenToClient(&ptWin);
-        COLORREF const  crPixel{dc.GetPixel(ptWin)};
-
-        m_imSpectrum.GetColor().SetColorRef(crPixel);
-        ColorChanged(false);
-
-        DH::TPrintf(LTH_COLORPICKER L" [%p] (%-5d, %-5d) ==> 0x%08x\n", wnd.m_hWnd, pt.x, pt.y, crPixel);
-    }
+    GetColorFromDesktopDC(pt);
 }
 
 void CColorPicker::Impl::OnTimer(UINT_PTR nIDEvent)
