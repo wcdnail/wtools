@@ -83,19 +83,6 @@ void CDDCtrl::NotifySend(UINT code) const
     ::SendMessageW(GetParent(), WM_NOTIFY, nmHeader.idFrom, reinterpret_cast<LPARAM>(&nmHeader));
 }
 
-#if 0
-void CDDCtrl::OnPaint(HDC)
-{
-    WTL::CPaintDC const dcPaint{m_hWnd};
-    WTL::CDCHandle           dc{dcPaint.m_hDC};
-    CRect const          rcDest{dcPaint.m_ps.rcPaint};
-    int const             iSave{dc.SaveDC()};
-    dc.SetStretchBltMode(COLORONCOLOR);
-    DoPaint(dc, rcDest);
-    dc.RestoreDC(iSave);
-}
-#endif
-
 void CDDCtrl::OnLButtonUp(UINT, CPoint) const
 {
     if (GetCapture() != m_hWnd) {
@@ -117,6 +104,7 @@ void CDDCtrl::OnMouseMove(UINT, CPoint pt)
 void CDDCtrl::OnLButtonDown(UINT, CPoint)
 {
     if (m_hWnd != GetCapture()) {
+        SetFocus();
         SetCapture();
     }
     else {

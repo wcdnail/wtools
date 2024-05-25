@@ -102,6 +102,11 @@ void CSpectrumImage::DoPaint(WTL::CDCHandle dc, CRect const& rc)
     dc.SetStretchBltMode(COLORONCOLOR);
     DrawRaster(dc, rcRaster, m_Color.m_A, m_Dib);
     DrawMarker(dc, rc);
+    //if (GetFocus() == m_hWnd) {
+    //    CRect rcFocus = rc;
+    //    rcFocus.InflateRect(2, 2);
+    //    dc.DrawFocusRect(rcFocus);
+    //}
     dc.RestoreDC(iSave);
 }
 

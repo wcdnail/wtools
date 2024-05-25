@@ -92,7 +92,7 @@ private:
 
     enum Styles: DWORD
     {
-        CC_CHILD = WS_CHILD | WS_VISIBLE,
+        CC_CHILD = WS_CHILD | WS_VISIBLE | WS_TABSTOP,
         UD_CHILD = UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | WS_GROUP,
     };
 
@@ -547,6 +547,9 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
             ctl.SetFont(m_fntHex.m_hFont, FALSE);
         }
     }
+
+    WTL::CButton grpPalette(GetDlgItem(CID_GRP_PALETTE));
+
     m_imSpectrum.Initialize(SPECTRUM_CX, SPECTRUM_CY, nullptr);
     m_imSlider.Initialize(SPECTRUM_SLIDER_CX, m_imSpectrum.GetBackBrush());
     UpdateDDX();
@@ -652,25 +655,6 @@ BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     }
     return FALSE;
 }
-
-#if 0
-struct CDCEx: WTL::CWindowDC
-{
-    CDCEx(HWND hWnd, WTL::CRgnHandle rgn, DWORD dwFlags)
-        : WTL::CWindowDC(nullptr)
-    {
-        ATLASSERT((hWnd == NULL) || ::IsWindow(hWnd));
-        m_hWnd = hWnd;
-        m_hDC = ::GetDCEx(hWnd, rgn, dwFlags);
-        if (!m_hDC) {
-            auto const code = static_cast<HRESULT>(GetLastError());
-            ATLTRACE(L"GetDCEx failed! <%d>\n", code);
-        }
-    }
-
-    ~CDCEx() = default;
-};
-#endif
 
 void CColorPicker::OnNcPaint(WTL::CRgnHandle rgn)
 {
