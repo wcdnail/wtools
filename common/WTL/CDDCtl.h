@@ -35,6 +35,8 @@ private:
     void OnLButtonDown(UINT nFlags, CPoint point);
     void OnLButtonUp(UINT nFlags, CPoint point) const;
     void OnMouseMove(UINT nFlags, CPoint pt);
+    void OnNcPaint(HRGN) const;
+    void OnSetFocus(HWND);
 };
 
 inline HBRUSH CDDCtrl::GetBackBrush() const

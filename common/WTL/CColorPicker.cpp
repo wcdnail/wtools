@@ -153,7 +153,7 @@ private:
 
     BEGIN_DIALOG(0, 0, DLG_CX, DLG_CY)
         DIALOG_STYLE(DS_CONTROL | WS_CHILD | WS_VISIBLE)
-        DIALOG_FONT(9, _T("Lucida Console"))
+        DIALOG_FONT(8, _T("Cascadia Mono Light"))
     END_DIALOG()
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)

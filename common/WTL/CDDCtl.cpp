@@ -3,7 +3,9 @@
 #include <DDraw.DGI/DDGDIStuff.h>
 #include <rect.putinto.h>
 #include <color.stuff.h>
+#include <dh.tracing.h>
 #include <atlcrack.h>
+
 
 constexpr int             CHECKERS_CX{18};
 constexpr COLORREF CLR_CHECKERS_WHITE{RGB(210, 210, 210)};
@@ -112,11 +114,38 @@ void CDDCtrl::OnLButtonDown(UINT, CPoint)
     }
 }
 
+void CDDCtrl::OnNcPaint(HRGN) const
+{
+    CRect          rc{};
+    WTL::CWindowDC dc{m_hWnd};
+    GetClipBox(dc, rc);
+
+    HWND const hWndFocus{GetFocus()};
+    //DBGTPrint(L"FOCUS == %p [%p]\n", hWndFocus, m_hWnd);
+    if (hWndFocus == m_hWnd) {
+        dc.FillSolidRect(rc, RGB(255, 0, 0));
+        //dc.DrawFocusRect(rc);
+    }
+    else {
+        dc.DrawEdge(rc, EDGE_ETCHED, BF_FLAT | BF_RECT);
+    }
+}
+
+void CDDCtrl::OnSetFocus(HWND hOldFocus)
+{
+    SendMessage(WM_NCPAINT);
+    RedrawWindow();
+    //DBGTPrint(L"FOCUS >> %p [%p]\n", m_hWnd, hOldFocus);
+}
+
 BOOL CDDCtrl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) { 
     case 0:
+        MSG_WM_NCPAINT(OnNcPaint)
+        MSG_WM_SETFOCUS(OnSetFocus)
+        MSG_WM_KILLFOCUS(OnSetFocus)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
