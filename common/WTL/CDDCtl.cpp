@@ -22,10 +22,11 @@ CDDCtrl::CDDCtrl()
     :        m_Dib{}
     ,     m_brBack{}
     , m_bBackOwner{true}
+    ,    m_hCursor{nullptr}
 {
 }
 
-bool CDDCtrl::Initialize(long cx, long cy, long bpp, HBRUSH brBackground)
+bool CDDCtrl::Initialize(long cx, long cy, long bpp, HBRUSH brBackground, HCURSOR hCursor)
 {
     if (!m_Dib.Create(cx, cy, bpp)) {
         return false;
@@ -43,6 +44,7 @@ bool CDDCtrl::Initialize(long cx, long cy, long bpp, HBRUSH brBackground)
         WTL::CClientDC const dc{m_hWnd};
         m_brBack.CreatePatternBrush(bmCheckers.GetBitmap(dc.m_hDC));
     }
+    m_hCursor = hCursor;
     return true;
 }
 
@@ -138,6 +140,15 @@ void CDDCtrl::OnSetFocus(HWND hOldFocus)
     //DBGTPrint(L"FOCUS >> %p [%p]\n", m_hWnd, hOldFocus);
 }
 
+BOOL CDDCtrl::OnSetCursor(HWND, UINT, UINT) const
+{
+    if (m_hCursor) {
+        SetCursor(m_hCursor);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 BOOL CDDCtrl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
     UNREFERENCED_PARAMETER(hWnd);
@@ -149,6 +160,7 @@ BOOL CDDCtrl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_SETCURSOR(OnSetCursor)
         CHAIN_MSG_MAP(WTL::CBufferedPaintImpl<CDDCtrl>)
         break;
     default:

@@ -39,6 +39,7 @@ BOOL CMagnifierCtrl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_SETCURSOR(OnSetCursor)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_MOUSEWHEEL(OnMouseWheel)
         MSG_WM_KEYDOWN(OnKeyDown)
 #ifdef _DEBUG_XTRA
         if constexpr (true) {
@@ -148,6 +149,27 @@ void CMagnifierCtrl::OnLButtonDown(UINT nFlags, CPoint) const
     if (m_onClick) {
         m_onClick(nFlags, m_ptPos, true);
     }
+}
+
+BOOL CMagnifierCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) const
+{
+    if (!m_ctlMag.m_hWnd) {
+        return FALSE;
+    }
+    MAGTRANSFORM trMatrix{0};
+    if (!MagGetWindowTransform(m_ctlMag.m_hWnd, &trMatrix)) {
+        return FALSE;
+    }
+    float&   fXFactor{trMatrix.v[0][0]};
+    float&   fYFactor{trMatrix.v[1][1]};
+    float const fStep{static_cast<float>(zDelta) / 1200.f};
+    if (fStep < 0 && fXFactor < 0.5) {
+        return TRUE;
+    }
+    fXFactor += fStep;
+    fYFactor += fStep;
+    BOOL const bRes{MagSetWindowTransform(m_ctlMag.m_hWnd, &trMatrix)};
+    return bRes;
 }
 
 void CMagnifierCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) const

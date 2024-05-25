@@ -14,7 +14,7 @@ struct CDDCtrl: public  CCustomControl,
     WCDAFX_API ~CDDCtrl() override;
     WCDAFX_API CDDCtrl();
 
-    WCDAFX_API bool Initialize(long cx, long cy, long bpp, HBRUSH brBackground);
+    WCDAFX_API bool Initialize(long cx, long cy, long bpp, HBRUSH brBackground, HCURSOR hCursor);
     WCDAFX_API void NotifySend(UINT code) const;
 
     HBRUSH GetBackBrush() const;
@@ -25,6 +25,7 @@ protected:
     CDIBitmap      m_Dib;
     WTL::CBrush m_brBack;
     bool    m_bBackOwner;
+    HCURSOR    m_hCursor;
 
     void DrawRaster(WTL::CDCHandle dc, CRect const& rc, int nAlpha, CDIBitmap& diRaster) const;
     virtual void DoPaint(WTL::CDCHandle dc, CRect const& rc);
@@ -37,6 +38,7 @@ private:
     void OnMouseMove(UINT nFlags, CPoint pt);
     void OnNcPaint(HRGN) const;
     void OnSetFocus(HWND);
+    BOOL OnSetCursor(HWND, UINT nHitTest, UINT message) const;
 };
 
 inline HBRUSH CDDCtrl::GetBackBrush() const

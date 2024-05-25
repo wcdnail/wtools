@@ -10,13 +10,13 @@ struct CSpectrumSlider: CDDCtrl
 {
     DELETE_COPY_MOVE_OF(CSpectrumSlider);
 
-    DECLARE_WND_SUPERCLASS2(CSPECSLD_CLASS, CSpectrumSlider, nullptr)
+    DECLARE_WND_CLASS(CSPECSLD_CLASS)
 
     WCDAFX_API ~CSpectrumSlider() override;
     WCDAFX_API CSpectrumSlider(SpectrumKind const& nKind, CColorUnion& unColor);
 
     WCDAFX_API HRESULT PreCreateWindow() override;
-    WCDAFX_API bool Initialize(long cx, HBRUSH brBackground);
+    WCDAFX_API bool Initialize(long cx, HBRUSH brBackground, HCURSOR hCursor);
     WCDAFX_API void UpdateRaster();
 
 private:

@@ -109,7 +109,7 @@ private:
     enum Timers: int
     {
         TIMER_COLORPICK      = 1024,
-        TIMER_COLORPICK_MSEC = 25,
+        TIMER_COLORPICK_MSEC = 5,
     };
 
     bool            m_bSaveData;
@@ -121,7 +121,9 @@ private:
     ATL::CString    m_sColorHex;
     ATL::CString   m_sColorHtml;
     WTL::CFont         m_fntHex;
+    WTL::CCursor     m_curArrow;
     WTL::CCursor    m_curPicker;
+    WTL::CCursor     m_curCross;
 
     BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,                 X,              Y,           Width,         Height,   Styles
         CONTROL_GROUPBOX(         _T("Spectrum"),        CID_GRP_SPECTRUM,                           2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
@@ -548,37 +550,11 @@ void CColorPicker::Impl::TogglePalette(BOOL bPalVisible) const
 {
     WTL::CButton   grpPalette{GetDlgItem(CID_GRP_PALETTE)};
     WTL::CButton grpMagnifier{GetDlgItem(CID_GRP_MAGNIFIER)};
-  //ATL::CWindow plcMagnifier{GetDlgItem(CID_PLC_MAGNIFIER)};
     int const        nPalShow{bPalVisible ? SW_SHOW : SW_HIDE};
     int const        nMagShow{bPalVisible ? SW_HIDE : SW_SHOW};
     grpPalette.ShowWindow(nPalShow);
     grpMagnifier.ShowWindow(nMagShow);
-  //plcMagnifier.ShowWindow(nMagShow);
 }
-
-#if 0
-void CColorPicker::Impl::SetMagPos()
-{
-    WTL::CButton const   grpPalette{GetDlgItem(CID_GRP_PALETTE)};
-    ATL::CWindow const plcMagnifier{GetDlgItem(CID_PLC_MAGNIFIER)};
-    int const              nMagShow{grpPalette.IsWindowVisible() ? SW_HIDE : SW_SHOW};
-    CRect rcMag{};
-    plcMagnifier.GetWindowRect(rcMag);
-    m_Magnifier.SetRect(rcMag);
-    m_Magnifier.ShowWindow(nMagShow);
-}
-
-void CColorPicker::Impl::OnSize(UINT, CSize)
-{
-    SetMsgHandled(FALSE);
-    SetMagPos();
-}
-
-void CColorPicker::Impl::OnMove(CPoint)
-{
-    SetMagPos();
-}
-#endif
 
 void CColorPicker::Impl::ColorpickBegin()
 {
@@ -602,7 +578,7 @@ void CColorPicker::Impl::GetColorFromWindowDC(CPoint const& pt)
     wnd.ScreenToClient(&ptWin);
     COLORREF const  crPixel{dc.GetPixel(ptWin)};
     SetColorRef(crPixel);
-    DH::TPrintf(LTH_COLORPICKER L" [%p] (%5d, %5d) ==> 0x%08x\n", wnd.m_hWnd, pt.x, pt.y, crPixel);
+    DBGTPrint(LTH_COLORPICKER L" [%p] {%d, %d} ==> 0x%08x\n", wnd.m_hWnd, pt.x, pt.y, crPixel);
 }
 
 void CColorPicker::Impl::GetColorFromDesktopDC(CPoint const& pt)
@@ -611,7 +587,7 @@ void CColorPicker::Impl::GetColorFromDesktopDC(CPoint const& pt)
     COLORREF const  crPixel{dc.GetPixel(pt)};
     ::ReleaseDC(nullptr, dc);
     SetColorRef(crPixel);
-    DH::TPrintf(LTH_COLORPICKER L" (%5d, %5d) ==> 0x%08x\n", pt.x, pt.y, crPixel);
+    DBGTPrint(LTH_COLORPICKER L" {%d, %d} ==> 0x%08x\n", pt.x, pt.y, crPixel);
 }
 
 void CColorPicker::Impl::ColorpickEnd(UINT, CPoint const& pt, bool bSelect)
@@ -639,9 +615,13 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     UNREFERENCED_PARAMETER(wndFocus);
     UNREFERENCED_PARAMETER(lInitParam);
 
+    m_curArrow = LoadCursorW(nullptr, IDC_ARROW);
+    m_curCross = LoadCursorW(nullptr, IDC_CROSS);
     m_curPicker = LoadCursorW(nullptr, IDC_CROSS);
-    WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
-    bnPick.SetBitmap((HBITMAP)m_curPicker.m_hCursor);
+  //WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
+  //bnPick.SetBitmap((HBITMAP)m_curPicker.m_hCursor);
+
+    SetCursor(m_curArrow);
 
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
@@ -689,8 +669,8 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         }
     }
 
-    m_imSpectrum.Initialize(SPECTRUM_CX, SPECTRUM_CY, nullptr);
-    m_imSlider.Initialize(SPECTRUM_SLIDER_CX, m_imSpectrum.GetBackBrush());
+    m_imSpectrum.Initialize(SPECTRUM_CX, SPECTRUM_CY, nullptr, m_curArrow);
+    m_imSlider.Initialize(SPECTRUM_SLIDER_CX, m_imSpectrum.GetBackBrush(), m_curCross);
     UpdateDDX();
     SpectruKindChanged();
 

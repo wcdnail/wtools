@@ -12,13 +12,13 @@ struct CSpectrumImage: CDDCtrl
 {
     DELETE_COPY_MOVE_OF(CSpectrumImage);
 
-    DECLARE_WND_SUPERCLASS2(CSPECIMG_CLASS, CSpectrumImage, nullptr)
+    DECLARE_WND_CLASS(CSPECIMG_CLASS)
 
     WCDAFX_API ~CSpectrumImage() override;
     WCDAFX_API CSpectrumImage(COLORREF crInit, SpectrumKind kind);
 
     WCDAFX_API HRESULT PreCreateWindow() override;
-    WCDAFX_API bool Initialize(long cx, long cy, HBRUSH brBackground);
+    WCDAFX_API bool Initialize(long cx, long cy, HBRUSH brBackground, HCURSOR hCursor);
     WCDAFX_API COLORREF GetColorRef() const;
     WCDAFX_API COLORREF GetMinColorRef(int mR, int mG, int mB) const;
     WCDAFX_API CColorUnion& GetColor();

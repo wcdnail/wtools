@@ -48,6 +48,7 @@ protected:
     void OnDestroy();
     BOOL OnSetCursor(HWND, UINT nHitTest, UINT message) const;
     void OnLButtonDown(UINT nFlags, CPoint point) const;
+    BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) const;
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) const;
 };
 

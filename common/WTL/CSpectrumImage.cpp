@@ -23,9 +23,9 @@ HRESULT CSpectrumImage::PreCreateWindow()
     return CCustomControl::PreCreateWindowImpl(gs_CSpectrumImage_Atom, GetWndClassInfo());
 }
 
-bool CSpectrumImage::Initialize(long cx, long cy, HBRUSH brBackground)
+bool CSpectrumImage::Initialize(long cx, long cy, HBRUSH brBackground, HCURSOR hCursor)
 {
-    return CDDCtrl::Initialize(cx, cy, SPECTRUM_BPP, brBackground);
+    return CDDCtrl::Initialize(cx, cy, SPECTRUM_BPP, brBackground, hCursor);
 }
 
 void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
@@ -154,7 +154,7 @@ void CSpectrumImage::DoNotifyMouseOver(CRect const& rc, CPoint pt)
 
 void CSpectrumImage::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-    DBGTPrint(L"KEYDWN %p %d [%d '%c']\n", nFlags, nRepCnt, nChar, nChar);
+    //DBGTPrint(L"KEYDWN %p %d [%d '%c']\n", nFlags, nRepCnt, nChar, nChar);
     CRect      rc{};
     LONG const sx{1};
     LONG const sy{1};

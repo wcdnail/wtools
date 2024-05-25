@@ -19,9 +19,9 @@ HRESULT CSpectrumSlider::PreCreateWindow()
     return CCustomControl::PreCreateWindowImpl(gs_CSpectrumSlider_Atom, GetWndClassInfo());
 }
 
-bool CSpectrumSlider::Initialize(long cx, HBRUSH brBackground)
+bool CSpectrumSlider::Initialize(long cx, HBRUSH brBackground, HCURSOR hCursor)
 {
-    return CDDCtrl::Initialize(cx, 1, SPECTRUM_BPP, brBackground);
+    return CDDCtrl::Initialize(cx, 1, SPECTRUM_BPP, brBackground, hCursor);
 }
 
 void CSpectrumSlider::UpdateRaster()
