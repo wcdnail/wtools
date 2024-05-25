@@ -2,8 +2,6 @@
 
 #include <wcdafx.api.h>
 
-void DrawColorRect(WTL::CDCHandle dc, CRect const& rc, COLORREF crColor, int nAlpha, HBRUSH brBack);
-
 struct CColorStatic: private ATL::CWindowImpl<CColorStatic, WTL::CStatic>,
                      private WTL::CBufferedPaintImpl<CColorStatic>
 {
