@@ -3,6 +3,7 @@
 #include "CColorPickerDefs.h"
 #include "CSpectrumImage.h"
 #include "CSpectrumSlider.h"
+#include "CColorStatic.h"
 #include "CAppModuleRef.h"
 #include <dev.assistance/dev.assist.h>
 #include <scoped.bool.guard.h>
@@ -99,7 +100,7 @@ private:
     bool            m_bSaveData;
     CSpectrumImage m_imSpectrum;
     CSpectrumSlider  m_imSlider;
-    WTL::CStatic      m_stColor;
+    CColorStatic      m_stColor;
     int         m_nSpectrumKind; // For DDX
     ATL::CString    m_sColorHex;
     ATL::CString   m_sColorHtml;
@@ -157,7 +158,7 @@ private:
     END_DIALOG()
 
     BEGIN_DDX_MAP(CSpectrumColorPicker)
-        DDX_CONTROL_HANDLE(CID_SPEC_COLOR_SEL, m_stColor)
+        DDX_CONTROL(CID_SPEC_COLOR_SEL, m_stColor)
         DDX_UINT(CID_RGB_RED_VAL, m_imSpectrum.GetColor().m_R);
         DDX_UINT(CID_RGB_GRN_VAL, m_imSpectrum.GetColor().m_G);
         DDX_UINT(CID_RGB_BLU_VAL, m_imSpectrum.GetColor().m_B);
@@ -229,15 +230,9 @@ private:
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
-        MSG_WM_DRAWITEM(OnDrawItem)
+      //MSG_WM_DRAWITEM(OnDrawItem)
         CHAIN_MSG_MAP(ImplResizer)
         REFLECT_NOTIFICATIONS()
-#ifdef _DEBUG_XTRA
-        if constexpr (true) {
-            auto const msgStr = DH::MessageToStrignW((PMSG)GetCurrentMessage());
-            DBGTPrint(LTH_CONTROL L" -DLG- [[ %s ]]\n", msgStr.c_str());
-        }
-#endif
     END_MSG_MAP()
 
     void SpectruKindChanged();
@@ -245,6 +240,7 @@ private:
     void UpdateHexStr();
     void UpdateHtmlStr();
     void UpdateDDX();
+    void UpdateColorStatic();
     void DDXReloadEditsExcept(int nId);
     LRESULT ColorChanged(bool bFromWmNotify);
     void OnDDXLoading(UINT nID, BOOL bSaveAndValidate);
@@ -252,7 +248,7 @@ private:
     void ValidateHexInput(WTL::CEdit& edCtrl);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
-    void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
+  //void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
 };
 
 CColorPicker::Impl::~Impl() = default;
@@ -261,7 +257,7 @@ CColorPicker::Impl::Impl()
     :     m_bSaveData{true}
     ,    m_imSpectrum{0xffffff, SPEC_HSV_Hue}
     ,      m_imSlider{m_imSpectrum.GetSpectrumKindRef(), m_imSpectrum.GetColor()}
-    ,       m_stColor{}
+    ,       m_stColor{m_imSpectrum.GetMinColorRef(1, 1, 1)}
     , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
 {
 }
@@ -343,6 +339,13 @@ void CColorPicker::Impl::UpdateDDX()
     DoDataExchange(DDX_LOAD);
 }
 
+void CColorPicker::Impl::UpdateColorStatic()
+{
+    m_stColor.Reset(m_imSpectrum.GetMinColorRef(1, 1, 1),
+                    m_imSpectrum.GetColor().m_A,
+                    m_imSpectrum.GetBackBrush());
+}
+
 LRESULT CColorPicker::Impl::ColorChanged(bool bFromWmNotify)
 {
     if (SPEC_HSV_Hue != m_imSpectrum.GetSpectrumKind()) {
@@ -356,7 +359,7 @@ LRESULT CColorPicker::Impl::ColorChanged(bool bFromWmNotify)
         m_imSpectrum.InvalidateRect(nullptr, FALSE);
     }
     m_imSlider.InvalidateRect(nullptr, FALSE);
-    m_stColor.InvalidateRect(nullptr, FALSE);
+    UpdateColorStatic();
     return 0;
 }
 
@@ -367,7 +370,7 @@ LRESULT CColorPicker::Impl::SliderChanged(bool bNotify)
         UpdateDDX();
     }
     m_imSpectrum.InvalidateRect(nullptr, FALSE);
-    m_stColor.InvalidateRect(nullptr, FALSE);
+    UpdateColorStatic();
     return 0;
 }
 
@@ -469,7 +472,7 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
         if (DoDataExchange(DDX_SAVE, nID)) {
             m_imSpectrum.InvalidateRect(nullptr, FALSE);
             m_imSlider.InvalidateRect(nullptr, FALSE);
-            m_stColor.InvalidateRect(nullptr, FALSE);
+            UpdateColorStatic();
             if (CID_RGB_HEX_VAL != nID) {
                 UpdateHexStr();
             }
@@ -559,6 +562,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     return TRUE;
 }
 
+#if 0
 void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
 {
     switch (nID) {
@@ -591,6 +595,8 @@ void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
     SetMsgHandled(FALSE);
     DBGTPrint(LTH_WM_DRAWITEM L" id:%-4d ct:%-4d\n", nID, pDI->CtlType);
 }
+#endif
+
 
 void CColorPicker::Impl::SpectruKindChanged()
 {

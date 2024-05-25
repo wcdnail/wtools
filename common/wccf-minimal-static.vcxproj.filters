@@ -82,6 +82,9 @@
     <ClCompile Include="windows.wtl.buffered.paint.cpp">
       <Filter>Unsorted</Filter>
     </ClCompile>
+    <ClCompile Include="WTL\CColorStatic.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -200,6 +203,9 @@
     </ClInclude>
     <ClInclude Include="windows.wtl.buffered.paint.h">
       <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="WTL\CColorStatic.h">
+      <Filter>WTL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
