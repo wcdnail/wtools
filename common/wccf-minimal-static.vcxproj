@@ -56,6 +56,7 @@
     <ClCompile Include="WTL\CDCEx.cpp" />
     <ClCompile Include="WTL\CDDCtl.cpp" />
     <ClCompile Include="WTL\CMagnifierCtrl.cpp" />
+    <ClCompile Include="WTL\CMagnifierInit.cpp" />
     <ClCompile Include="WTL\CSpectrumImage.cpp" />
     <ClCompile Include="WTL\CSpectrumSlider.cpp" />
   </ItemGroup>
@@ -98,6 +99,7 @@
     <ClInclude Include="WTL\CDCEx.h" />
     <ClInclude Include="WTL\CDDCtl.h" />
     <ClInclude Include="WTL\CMagnifierCtrl.h" />
+    <ClInclude Include="WTL\CMagnifierInit.h" />
     <ClInclude Include="WTL\CSliderCtrl.h" />
     <ClInclude Include="WTL\CSpectrumImage.h" />
     <ClInclude Include="WTL\CSpectrumSlider.h" />

@@ -74,6 +74,7 @@ struct CColorUnion
     bool IsUpdated() const;
     void SetUpdated(bool bUpdated);
 
+    void SetColorRef(COLORREF crColor);
     void SetRGB(int R, int G, int B);
     void SetHSV(double dH, double dS, double dV);
 
@@ -118,6 +119,11 @@ inline void CColorUnion::SetRGBPlain(int R, int G, int B)
     GetGreen() = std::min<int>(G, RGB_MAX_INT);
     GetBlue()  = std::min<int>(B, RGB_MAX_INT);
     SetUpdated(true);
+}
+
+inline void CColorUnion::SetColorRef(COLORREF crColor)
+{
+    SetRGB(GetRValue(crColor), GetGValue(crColor), GetBValue(crColor));
 }
 
 inline void CColorUnion::SetRGB(int R, int G, int B)

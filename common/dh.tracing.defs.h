@@ -16,3 +16,4 @@
 #define LTH_DESK_WALLPPR    L"DesktopWallppr|"
 #define LTH_APPEARANCE      L"    Appearance|"
 #define LTH_GLOBALS         L"       Globals|"
+#define LTH_COLORPICKER     L"   ColorPicker|"

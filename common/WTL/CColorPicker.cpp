@@ -5,6 +5,7 @@
 #include "CSpectrumSlider.h"
 #include "CColorStatic.h"
 #include "CMagnifierCtrl.h"
+#include "CMagnifierInit.h"
 #include "CAppModuleRef.h"
 #include <dev.assistance/dev.assist.h>
 #include <string.utils.error.code.h>
@@ -20,6 +21,8 @@
 #include <Magnification.h>
 #include <algorithm>
 #include <cctype>
+
+constexpr float MAG_FACTOR{5.f};
 
 struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
                            WTL::CDialogResize<Impl>,
@@ -103,6 +106,12 @@ private:
         MAG_CHILD = WS_CHILD | WS_VISIBLE | MS_SHOWMAGNIFIEDCURSOR,
     };
 
+    enum Timers: int
+    {
+        TIMER_COLORPICK      = 1024,
+        TIMER_COLORPICK_MSEC = 25,
+    };
+
     bool            m_bSaveData;
     CSpectrumImage m_imSpectrum;
     CSpectrumSlider  m_imSlider;
@@ -160,7 +169,7 @@ private:
         CONTROL_GROUPBOX(          _T("Palette"),         CID_GRP_PALETTE,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
         CONTROL_GROUPBOX(        _T("Magnifier"),       CID_GRP_MAGNIFIER,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
           //CONTROL_CTEXT(       _T("MAGNIFIER"),       CID_PLC_MAGNIFIER,                   CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   SS_SUNKEN | SS_CENTERIMAGE, 0)
-        CONTROL_CONTROL(_T(""), CID_PLC_MAGNIFIER,           WC_MAGNIFIER, MAG_CHILD,        CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   0)
+      //CONTROL_CONTROL(_T(""), CID_PLC_MAGNIFIER,           WC_MAGNIFIER, MAG_CHILD,        CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   0)
     END_CONTROLS_MAP()
 
     BEGIN_DIALOG(0, 0, DLG_CX, DLG_CY)
@@ -237,7 +246,7 @@ private:
             DLGRESIZE_CONTROL(CID_HSV_VAL_UDS, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_PALETTE, DLSZ_SIZE_Y | DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_GRP_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
-        DLGRESIZE_CONTROL(CID_PLC_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+      //DLGRESIZE_CONTROL(CID_PLC_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
     END_DLGRESIZE_MAP()
 
     BEGIN_MSG_MAP(CColorPicker::Impl)
@@ -245,8 +254,7 @@ private:
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
-      //MSG_WM_SIZE(OnSize)
-      //MSG_WM_MOVE(OnMove)
+        MSG_WM_TIMER(OnTimer)
         CHAIN_MSG_MAP(ImplResizer)
         REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
@@ -263,10 +271,10 @@ private:
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void ValidateHexInput(WTL::CEdit& edCtrl);
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
-    void TogglePalette(BOOL bPalVisible);
-  //void SetMagPos();
-  //void OnSize(UINT nType, CSize size);
-  //void OnMove(CPoint ptPos);
+    void TogglePalette(BOOL bPalVisible) const;
+    void ColorpickBegin();
+    void ColorpickEnd(UINT, CPoint const&);
+    void OnTimer(UINT_PTR nIDEvent);
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDestroy();
 };
@@ -286,10 +294,10 @@ CColorPicker::Impl::Impl()
 HRESULT CColorPicker::Impl::PreCreateWindow()
 {
     HRESULT code{S_OK};
-  //code = m_Magnifier.PreCreateWindow();
-  //if (ERROR_SUCCESS != code) {
-  //    return code;
-  //}
+    code = m_Magnifier.PreCreateWindow();
+    if (ERROR_SUCCESS != code) {
+        return code;
+    }
     code = m_imSlider.PreCreateWindow();
     if (ERROR_SUCCESS != code) {
         return code;
@@ -485,6 +493,14 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     case BN_DISABLE:
     case BN_KILLFOCUS:
         break;
+    case BN_CLICKED:{
+        switch (nID) {
+        case CID_BTN_PICK_COLOR:
+            ColorpickBegin();
+            return ;
+        }
+        break;
+    }
     case EN_UPDATE: {
         WTL::CEdit      edCtrl{GetDlgItem(nID)};
         WTL::CUpDownCtrl udCtl{GetDlgItem(nID + 1)};
@@ -526,16 +542,16 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
     SetMsgHandled(FALSE);
 }
 
-void CColorPicker::Impl::TogglePalette(BOOL bPalVisible)
+void CColorPicker::Impl::TogglePalette(BOOL bPalVisible) const
 {
     WTL::CButton   grpPalette{GetDlgItem(CID_GRP_PALETTE)};
     WTL::CButton grpMagnifier{GetDlgItem(CID_GRP_MAGNIFIER)};
-    ATL::CWindow plcMagnifier{GetDlgItem(CID_PLC_MAGNIFIER)};
+  //ATL::CWindow plcMagnifier{GetDlgItem(CID_PLC_MAGNIFIER)};
     int const        nPalShow{bPalVisible ? SW_SHOW : SW_HIDE};
     int const        nMagShow{bPalVisible ? SW_HIDE : SW_SHOW};
     grpPalette.ShowWindow(nPalShow);
     grpMagnifier.ShowWindow(nMagShow);
-    plcMagnifier.ShowWindow(nMagShow);
+  //plcMagnifier.ShowWindow(nMagShow);
 }
 
 #if 0
@@ -561,6 +577,43 @@ void CColorPicker::Impl::OnMove(CPoint)
     SetMagPos();
 }
 #endif
+
+void CColorPicker::Impl::ColorpickBegin()
+{
+    WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
+    bnPick.EnableWindow(FALSE);
+    m_Magnifier.Show(TRUE);
+    SetTimer(TIMER_COLORPICK, TIMER_COLORPICK_MSEC);
+}
+
+void CColorPicker::Impl::ColorpickEnd(UINT, CPoint const& pt)
+{
+    WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
+    bnPick.EnableWindow(TRUE);
+    m_Magnifier.Show(FALSE);
+    KillTimer(TIMER_COLORPICK);
+    {
+        ATL::CWindow const  wnd{WindowFromPoint(pt)};
+        WTL::CWindowDC const dc{wnd};
+        CPoint            ptWin{pt};
+        wnd.ScreenToClient(&ptWin);
+        COLORREF const  crPixel{dc.GetPixel(ptWin)};
+
+        m_imSpectrum.GetColor().SetColorRef(crPixel);
+        ColorChanged(false);
+
+        DH::TPrintf(LTH_COLORPICKER L" [%p] (%-5d, %-5d) ==> 0x%08x\n", wnd.m_hWnd, pt.x, pt.y, crPixel);
+    }
+}
+
+void CColorPicker::Impl::OnTimer(UINT_PTR nIDEvent)
+{
+    switch (nIDEvent) {
+    case TIMER_COLORPICK:
+        m_Magnifier.UpdatePosition();
+        break;
+    }
+}
 
 BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
@@ -617,8 +670,12 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     UpdateDDX();
     SpectruKindChanged();
 
-    m_Magnifier.Initialize(GetDlgItem(CID_PLC_MAGNIFIER), 4.f, 4.f);
-    TogglePalette(FALSE);
+    m_Magnifier.Initialize(nullptr, MAG_FACTOR,
+        [this](UINT nFlags, CPoint const& pt) {
+            ColorpickEnd(nFlags, pt);
+        }
+    );
+    TogglePalette(TRUE);
 
     DlgResize_Init(false, true, 0);
     m_bSaveData = false;
