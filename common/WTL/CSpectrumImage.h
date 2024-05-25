@@ -30,12 +30,16 @@ struct CSpectrumImage: CDDCtrl
 private:
     CColorUnion  m_Color;
     SpectrumKind m_nKind;
+    CPoint       m_ptPos;
 
     void UpdateRaster();
     void DrawMarker(WTL::CDCHandle dc, CRect const& rc);
+    void OnColorChangedByCoords(CRect const& rc, CPoint pt);
     void DoPaint(WTL::CDCHandle dc, CRect const& rc) override;
     void DoNotifyMouseOver(CRect const& rc, CPoint pt) override;
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
+    UINT OnGetDlgCode(LPMSG lpMsg) const;
+    void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
 inline SpectrumKind CSpectrumImage::GetSpectrumKind() const

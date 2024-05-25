@@ -1,24 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="info\runtime.information.cpp">
       <Filter>info</Filter>
     </ClCompile>
-    <ClCompile Include="dh.timer.cpp" />
-    <ClCompile Include="dh.tracing.cpp" />
-    <ClCompile Include="rectz.cpp" />
-    <ClCompile Include="string.utils.format.cpp" />
     <ClCompile Include="dev.assistance\dev.assist.cpp">
       <Filter>dev.assistance</Filter>
     </ClCompile>
-    <ClCompile Include="rect.alloc.cpp" />
-    <ClCompile Include="shell.imagelist.cpp" />
-    <ClCompile Include="icons.dll.cpp" />
-    <ClCompile Include="settings.cpp" />
-    <ClCompile Include="windows.uses.gdi+.cpp" />
-    <ClCompile Include="icons.save.m1.cpp" />
-    <ClCompile Include="windows.wtl.buffered.paint.cpp" />
     <ClCompile Include="WTL\CColorButton.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
@@ -46,7 +34,6 @@
     <ClCompile Include="WTL\CAppModuleRef.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
-    <ClCompile Include="color.stuff.cpp" />
     <ClCompile Include="WTL\CDDCtl.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
@@ -56,16 +43,50 @@
     <ClCompile Include="WTL\CDCEx.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
+    <ClCompile Include="color.stuff.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="dh.timer.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="dh.tracing.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="icons.dll.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="icons.save.m1.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="rect.alloc.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="rectz.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="settings.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="shell.imagelist.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="string.utils.format.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="windows.uses.gdi+.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="windows.wtl.buffered.paint.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="info\runtime.information.h">
       <Filter>info</Filter>
     </ClInclude>
-    <ClInclude Include="dh.timer.h" />
-    <ClInclude Include="dh.tracing.h" />
-    <ClInclude Include="rectz.h" />
-    <ClInclude Include="string.utils.format.h" />
     <ClInclude Include="dev.assistance\dev.assist.h">
       <Filter>dev.assistance</Filter>
     </ClInclude>
@@ -84,17 +105,6 @@
     <ClInclude Include="dev.assistance\window.messages.consts.h">
       <Filter>dev.assistance</Filter>
     </ClInclude>
-    <ClInclude Include="rect.alloc.h" />
-    <ClInclude Include="rect.aspect.ratio.h" />
-    <ClInclude Include="rect.gdi+.h" />
-    <ClInclude Include="rect.putinto.h" />
-    <ClInclude Include="rect.screen.h" />
-    <ClInclude Include="shell.imagelist.h" />
-    <ClInclude Include="icons.dll.h" />
-    <ClInclude Include="settings.h" />
-    <ClInclude Include="windows.uses.gdi+.h" />
-    <ClInclude Include="debug.dump.msg.h" />
-    <ClInclude Include="windows.wtl.buffered.paint.h" />
     <ClInclude Include="WTL\CColorPicker.h">
       <Filter>WTL</Filter>
     </ClInclude>
@@ -131,13 +141,65 @@
     <ClInclude Include="WTL\CAppModuleRef.h">
       <Filter>WTL</Filter>
     </ClInclude>
-    <ClInclude Include="scoped.bool.guard.h" />
-    <ClInclude Include="color.stuff.h" />
     <ClInclude Include="WTL\CDDCtl.h">
       <Filter>WTL</Filter>
     </ClInclude>
     <ClInclude Include="WTL\CDCEx.h">
       <Filter>WTL</Filter>
+    </ClInclude>
+    <ClInclude Include="color.stuff.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.dump.msg.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="dh.timer.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="dh.tracing.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="icons.dll.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.alloc.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.aspect.ratio.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.gdi+.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.putinto.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.screen.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="rectz.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="scoped.bool.guard.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="shell.imagelist.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="string.utils.format.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.uses.gdi+.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.wtl.buffered.paint.h">
+      <Filter>Unsorted</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +214,9 @@
     </Filter>
     <Filter Include="DDraw.DGI">
       <UniqueIdentifier>{1e6f2916-ae30-47df-94ea-361edd95b386}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Unsorted">
+      <UniqueIdentifier>{c4c54ce6-b441-4385-90c3-1cd0bc2ed81e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

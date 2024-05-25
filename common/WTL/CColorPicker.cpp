@@ -606,19 +606,14 @@ CColorPicker::CColorPicker()
 {
 }
 
-static ATOM& CColorPicker_Atom()
-{
-    static ATOM gs_CColorPicker_Atom{0};
-    return gs_CColorPicker_Atom;
-}
-
 HRESULT CColorPicker::PreCreateWindow()
 {
     auto const code = m_pImpl->PreCreateWindow();
     if (ERROR_SUCCESS != code) {
         return code;
     }
-    return CCustomControl::PreCreateWindowImpl(CColorPicker_Atom(), GetWndClassInfo());
+    static ATOM gs_CColorPicker_Atom{0};
+    return CCustomControl::PreCreateWindowImpl(gs_CColorPicker_Atom, GetWndClassInfo());
 }
 
 BOOL CColorPicker::PreTranslateMessage(MSG* pMsg)

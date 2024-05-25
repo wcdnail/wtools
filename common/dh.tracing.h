@@ -102,6 +102,7 @@ namespace DH
         //::memset(dest, 0, CountValue * sizeof(CharType));
         Impl::CopyCharsForPrinting(dest, CountValue - 1, source, sl);
     }
+}
 
 #ifdef _DEBUG
 #   define DBGPrint(...)            DH::Printf(__VA_ARGS__)
@@ -114,5 +115,3 @@ namespace DH
     inline void DBGCPrint( ...)     {}
     static const bool DebugTrue = false;
 #endif
-}
-

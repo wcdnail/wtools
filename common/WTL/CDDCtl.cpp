@@ -123,8 +123,8 @@ void CDDCtrl::OnNcPaint(HRGN) const
     HWND const hWndFocus{GetFocus()};
     //DBGTPrint(L"FOCUS == %p [%p]\n", hWndFocus, m_hWnd);
     if (hWndFocus == m_hWnd) {
-        dc.FillSolidRect(rc, RGB(255, 0, 0));
-        //dc.DrawFocusRect(rc);
+        dc.FillSolidRect(rc, RGB(255, 255, 255));
+        dc.DrawFocusRect(rc);
     }
     else {
         dc.DrawEdge(rc, EDGE_ETCHED, BF_FLAT | BF_RECT);
@@ -134,7 +134,7 @@ void CDDCtrl::OnNcPaint(HRGN) const
 void CDDCtrl::OnSetFocus(HWND hOldFocus)
 {
     SendMessage(WM_NCPAINT);
-    RedrawWindow();
+    RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOFRAME);
     //DBGTPrint(L"FOCUS >> %p [%p]\n", m_hWnd, hOldFocus);
 }
 

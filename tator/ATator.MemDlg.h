@@ -124,6 +124,7 @@ inline void CTatorMainDlg::OnDestroy()
 
 inline LRESULT CTatorMainDlg::OnCloseCmd(WORD, WORD wID, HWND, BOOL&)
 {
+#ifdef _DEBUG
     if (m_bModal) {
         EndDialog(wID);
     }
@@ -131,5 +132,8 @@ inline LRESULT CTatorMainDlg::OnCloseCmd(WORD, WORD wID, HWND, BOOL&)
         DestroyWindow();
         PostQuitMessage(wID);
     }
+#else
+    EndDialog(wID);
+#endif
     return 0;
 }

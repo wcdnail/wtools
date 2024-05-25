@@ -2,6 +2,7 @@
 #include "CSpectrumImage.h"
 #include <DDraw.DGI/DDGDIStuff.h>
 #include <rect.putinto.h>
+#include <dh.tracing.h>
 #include <atlcrack.h>
 
 constexpr COLORREF CLR_CHECKERS_WHITE{RGB(210, 210, 210)};
@@ -12,6 +13,7 @@ CSpectrumImage::~CSpectrumImage() = default;
 CSpectrumImage::CSpectrumImage(COLORREF crInit, SpectrumKind kind)
     : m_Color{crInit}
     , m_nKind{kind}
+    , m_ptPos{0, 0}
 {
 }
 
@@ -40,11 +42,18 @@ void CSpectrumImage::SetSpectrumKind(SpectrumKind kind)
     InvalidateRect(nullptr, FALSE);
 }
 
+UINT CSpectrumImage::OnGetDlgCode(LPMSG) const
+{
+    return DLGC_WANTARROWS;
+}
+
 BOOL CSpectrumImage::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) {
     case 0:
+        MSG_WM_GETDLGCODE(OnGetDlgCode)
+        MSG_WM_KEYDOWN(OnKeyDown)
         CHAIN_MSG_MAP(CDDCtrl)
         break;
     default:
@@ -102,11 +111,6 @@ void CSpectrumImage::DoPaint(WTL::CDCHandle dc, CRect const& rc)
     dc.SetStretchBltMode(COLORONCOLOR);
     DrawRaster(dc, rcRaster, m_Color.m_A, m_Dib);
     DrawMarker(dc, rc);
-    //if (GetFocus() == m_hWnd) {
-    //    CRect rcFocus = rc;
-    //    rcFocus.InflateRect(2, 2);
-    //    dc.DrawFocusRect(rcFocus);
-    //}
     dc.RestoreDC(iSave);
 }
 
@@ -120,7 +124,7 @@ void CSpectrumImage::DrawMarker(WTL::CDCHandle dc, CRect const& rcDest)
     dc.InvertRect(CRect(rc.left, rc.bottom, rc.right, rc.bottom + 5));
 }
 
-void CSpectrumImage::DoNotifyMouseOver(CRect const& rc, CPoint pt)
+void CSpectrumImage::OnColorChangedByCoords(CRect const& rc, CPoint pt)
 {
     auto const xScale{static_cast<double>(rc.Width()) / RGB_MAX};
     auto const yScale{static_cast<double>(rc.Height()) / RGB_MAX};
@@ -140,4 +144,28 @@ void CSpectrumImage::DoNotifyMouseOver(CRect const& rc, CPoint pt)
     }
     OnColorChanged(xVal, yVal);
     NotifySend(NM_SPECTRUM_CLR_SEL);
+}
+
+void CSpectrumImage::DoNotifyMouseOver(CRect const& rc, CPoint pt)
+{
+    OnColorChangedByCoords(rc, pt);
+    m_ptPos = pt;
+}
+
+void CSpectrumImage::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+    DBGTPrint(L"KEYDWN %p %d [%d '%c']\n", nFlags, nRepCnt, nChar, nChar);
+    CRect      rc{};
+    LONG const sx{1};
+    LONG const sy{1};
+    switch (nChar) {
+    case VK_LEFT:  m_ptPos.x -= sx; break;
+    case VK_RIGHT: m_ptPos.x += sx; break;
+    case VK_UP:    m_ptPos.y -= sy; break;
+    case VK_DOWN:  m_ptPos.y += sy; break;
+    default:
+        return;
+    }
+    GetClientRect(rc);
+    OnColorChangedByCoords(rc, m_ptPos);
 }

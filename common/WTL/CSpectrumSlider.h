@@ -32,8 +32,9 @@ private:
     void SetValueByY(long nY) const;
     void DrawPosition(WTL::CDCHandle dc, CRect const& rc) const;
     void DoPaint(WTL::CDCHandle dc, CRect const& rc) override;
-    BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
-
     void DoNotifyMouseOver(CRect const& rc, CPoint pt) override;
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
+    BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+    UINT OnGetDlgCode(LPMSG lpMsg) const;
+    void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 };

@@ -150,12 +150,19 @@ void CSpectrumSlider::SetValueByY(long nY) const
     ColorChanged();
 }
 
+UINT CSpectrumSlider::OnGetDlgCode(LPMSG) const
+{
+    return DLGC_WANTARROWS;
+}
+
 BOOL CSpectrumSlider::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) { 
     case 0:
         MSG_WM_MOUSEWHEEL(OnMouseWheel)
+        MSG_WM_GETDLGCODE(OnGetDlgCode)
+        MSG_WM_KEYDOWN(OnKeyDown)
         CHAIN_MSG_MAP(CDDCtrl)
         break;
     default:
@@ -213,4 +220,14 @@ void CSpectrumSlider::DoNotifyMouseOver(CRect const& /*rc*/, CPoint pt)
     SetValueByY(pt.y);
     NotifySend(NM_SLIDER_CLR_SEL);
     InvalidateRect(nullptr, FALSE);
+}
+
+void CSpectrumSlider::OnKeyDown(UINT nChar, UINT, UINT nFlags)
+{
+    switch (nChar) {
+    case VK_LEFT:
+    case VK_UP:    OnMouseWheel(0,  1, {}); break;
+    case VK_RIGHT:
+    case VK_DOWN:  OnMouseWheel(0, -1, {}); break;
+    }
 }
