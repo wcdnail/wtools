@@ -3,6 +3,15 @@
 #include "CCustomCtrl.h"
 #include <wcdafx.api.h>
 
+struct CMagnifierInit
+{
+    static CMagnifierInit& Instance();
+
+private:
+    CMagnifierInit();
+    ~CMagnifierInit();
+};
+
 struct CMagnifierCtrl: private CCustomControl
 {
     DECLARE_WND_CLASS(_T("WCCF::CMagnifierCtrl"))
@@ -19,7 +28,8 @@ struct CMagnifierCtrl: private CCustomControl
     WCDAFX_API BOOL SetMagnificationFactor(float fXFactor, float fYFactor) const;
     WCDAFX_API void MoveToMousePos();
 
-    using CCustomControl::ShowWindow;
+    using WndSuper::ShowWindow;
+    using WndSuper::DestroyWindow;
 
 protected:
     CRect         m_rcMag;
@@ -27,6 +37,7 @@ protected:
 
     WCDAFX_API BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
     int OnCreate(LPCREATESTRUCT pCS);
+    void OnDestroy();
 };
 
 inline BOOL CMagnifierCtrl::SetSize(LONG cx, LONG cy)

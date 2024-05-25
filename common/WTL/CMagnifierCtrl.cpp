@@ -10,12 +10,41 @@
 
 #pragma comment(lib, "Magnification.lib")
 
+CMagnifierInit& CMagnifierInit::Instance()
+{
+    static CMagnifierInit gs_MagnifierInit;
+    return gs_MagnifierInit;
+}
+
+CMagnifierInit::CMagnifierInit()
+{
+    if (MagInitialize()) {
+        DH::TPrintf(LTH_GLOBALS L" MagInitialize OK\n");
+        return ;
+    }
+    auto const hCode{static_cast<HRESULT>(GetLastError())};
+    auto const  sMsg{Str::ErrorCode<>::SystemMessage(hCode)};
+    DH::TPrintf(LTH_GLOBALS L" MagInitialize failed: 0x%08x %s\n", hCode, sMsg.GetString());
+}
+
+CMagnifierInit::~CMagnifierInit()
+{
+    if (MagUninitialize()) {
+        DH::TPrintf(LTH_GLOBALS L" MagUninitialize OK\n");
+        return ;
+    }
+    auto const hCode{static_cast<HRESULT>(GetLastError())};
+    auto const  sMsg{Str::ErrorCode<>::SystemMessage(hCode)};
+    DH::TPrintf(LTH_GLOBALS L" MagUninitialize failed: 0x%08x %s\n", hCode, sMsg.GetString());
+}
+
 CMagnifierCtrl::~CMagnifierCtrl() = default;
 
 CMagnifierCtrl::CMagnifierCtrl()
     :  m_rcMag{0, 0, 256, 256}
     , m_ctlMag{}
 {
+    UNREFERENCED_PARAMETER(CMagnifierInit::Instance());
 }
 
 HRESULT CMagnifierCtrl::PreCreateWindow()
@@ -32,6 +61,7 @@ BOOL CMagnifierCtrl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
     switch(dwMsgMapID) {
     case 0:
         MSG_WM_CREATE(OnCreate)
+        MSG_WM_DESTROY(OnDestroy)
 #ifdef _DEBUG_XTRA
         if constexpr (true) {
             auto const msgStr = DH::MessageToStrignW((PMSG)GetCurrentMessage());
@@ -85,6 +115,12 @@ raiseError:
     auto const msg{Str::ErrorCode<>::SystemMessage(hCode)};
     DH::TPrintf(LTH_CONTROL L" %s failed: 0x%08x %s\n", sFunc.c_str(), hCode, msg.GetString());
     return -1;
+}
+
+void CMagnifierCtrl::OnDestroy()
+{
+    m_ctlMag.DestroyWindow();
+    SetMsgHandled(FALSE);
 }
 
 BOOL CMagnifierCtrl::SetMagnificationFactor(float fXFactor, float fYFactor) const

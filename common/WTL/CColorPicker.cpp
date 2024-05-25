@@ -114,7 +114,7 @@ private:
     BEGIN_CONTROLS_MAP()  //             Text/ID,            ID/ClassName,    Style,                 X,              Y,           Width,         Height,   Styles
         CONTROL_GROUPBOX(         _T("Spectrum"),        CID_GRP_SPECTRUM,                           2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
             CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                           8,             14,         HHCX+20,       DLG_CY-4,   CBS_AUTOHSCROLL | CBS_DROPDOWNLIST, 0)
-            CONTROL_PUSHBUTTON(           _T(""),      CID_BTN_PICK_COLOR,           SPEC_CX-HHCY-HHCX,             14,        HHCX/4+4,         HLCY+2,   BS_BITMAP, 0)
+          CONTROL_PUSHBUTTON(             _T(""),      CID_BTN_PICK_COLOR,           SPEC_CX-HHCY-HHCX,             14,        HHCX/4+4,         HLCY+2,   BS_BITMAP, 0)
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS,   CC_CHILD,               8,        18+HLCY, SPEC_CX-HHCY-20, DLG_CY-HLCY-26,   WS_EX_STATICEDGE)
         CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,          CSPECSLD_CLASS,   CC_CHILD, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-26,   WS_EX_STATICEDGE)
             CONTROL_RTEXT(          _T("Color:"),      CID_SPEC_COLOR_CAP,      SPEC_CX-HHCY-HHCX/2-10,             14,        HHCX/2-8,           HLCY,   SS_CENTERIMAGE, 0)
@@ -237,6 +237,7 @@ private:
 
     BEGIN_MSG_MAP(CColorPicker::Impl)
         MSG_WM_INITDIALOG(OnInitDialog)
+        MSG_WM_DESTROY(OnDestroy)
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
         CHAIN_MSG_MAP(ImplResizer)
@@ -257,6 +258,7 @@ private:
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     void TogglePalette(BOOL bPalVisible) const;
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
+    void OnDestroy();
 };
 
 CColorPicker::Impl::~Impl() = default;
@@ -590,6 +592,12 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     DlgResize_Init(false, true, 0);
     m_bSaveData = false;
     return TRUE;
+}
+
+void CColorPicker::Impl::OnDestroy()
+{
+    m_Magnifier.DestroyWindow();
+    SetMsgHandled(FALSE);
 }
 
 void CColorPicker::Impl::SpectruKindChanged()
