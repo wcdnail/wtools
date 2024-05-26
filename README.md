@@ -14,9 +14,9 @@ MSVC solution files.
 CMake will be provided later.
 
 ### Build deps
-- WTL
-- WIL
-- GTEST (optional)
+- [WTL](https://sourceforge.net/projects/wtl/)
+- [WIL](https://github.com/microsoft/wil)
+- [GTEST](https://github.com/google/googletest) (optional)
 
 ### Build prepare
 Clone VCPKG, for example [my fork](https://github.com/wcdnail/wcpkg.git)
