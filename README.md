@@ -29,6 +29,9 @@ call bootstrap-vcpkg.bat -disableMetrics
 vcpkg install wtl wil
 rem optional
 vcpkg install gtest
+rem ...
+rem See legacy alert
+vcpkg install boost
 ```
 
 ### Legacy alert
