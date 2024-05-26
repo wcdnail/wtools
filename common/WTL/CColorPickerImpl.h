@@ -23,10 +23,11 @@ namespace CPInt
 
         ~HistoryItem();
         HistoryItem(COLORREF crClr, int nA);
-        HistoryItem(HistoryItem&& rhs);
-        HistoryItem& operator = (HistoryItem&& rhs);
 
+        HistoryItem(HistoryItem&& rhs) noexcept;
+        HistoryItem& operator = (HistoryItem&& rhs) noexcept;
         void Swap(HistoryItem& rhs) noexcept;
+
         HDC GetDC(HDC dc, CRect const& rc);
         bool operator == (const HistoryItem&) const;
 
@@ -293,9 +294,12 @@ private:
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void ValidateHexInput(WTL::CEdit& edCtrl);
     void OnEditUpdate(int nID);
-    void ColorToHistory();
-    void SetColorFrom(HistoryCont::const_reference item);
-    void PickFromHistory();
+    void HistoryDropTail();
+    void HistoryStore();
+    void HistorySelect(HistoryCont::const_reference item);
+    size_t HistoryMax() const;
+    void HistoryPick();
+    void HistoryLoad(CF::ColorTabItem const* crTab, size_t nCount);
     void OnCommand(UINT uNotifyCode, int nID, HWND);
     void TogglePalette(BOOL bPalVisible) const;
     void ColorpickBegin();

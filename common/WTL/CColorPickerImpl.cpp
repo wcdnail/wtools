@@ -35,14 +35,14 @@ namespace CPInt
     {
     }
 
-    HistoryItem::HistoryItem(HistoryItem&& rhs)
+    HistoryItem::HistoryItem(HistoryItem&& rhs) noexcept
         : crColor{rhs.crColor}
         ,  nAlpha{rhs.nAlpha}
         , m_hPrev{nullptr}
     {
     }
 
-    HistoryItem& HistoryItem::operator=(HistoryItem&& rhs)
+    HistoryItem& HistoryItem::operator=(HistoryItem&& rhs) noexcept
     {
         rhs.Swap(*this);
         return *this;
@@ -317,13 +317,13 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, HWND)
     case STN_DBLCLK:
         switch (nID) {
         case CID_SPECTRUM_PIC:
-        case CID_SPEC_COLOR_SEL: ColorToHistory(); return ;
+        case CID_SPEC_COLOR_SEL: HistoryStore(); return ;
         }
         break;
     case BN_CLICKED: // STN_CLICKED
         switch (nID) {
         case CID_BTN_PICK_COLOR: ColorpickBegin(); return ;
-        case CID_STA_HISTORY:    PickFromHistory(); return ;
+        case CID_STA_HISTORY:    HistoryPick(); return ;
         }
         break;
     case EN_UPDATE:     OnEditUpdate(nID); return ;
@@ -365,7 +365,7 @@ void CColorPicker::Impl::SetColorRef(COLORREF crColor, bool bStoreToHistory)
     m_imSpectrum.GetColor().SetColorRef(crColor);
     ColorChanged(true);
     if (bStoreToHistory) {
-        ColorToHistory();
+        HistoryStore();
     }
 }
 
@@ -425,7 +425,16 @@ void CColorPicker::Impl::DrawColorRect(WTL::CDCHandle dc, CRect const& rc, CPInt
     }
 }
 
-void CColorPicker::Impl::ColorToHistory()
+void CColorPicker::Impl::HistoryDropTail()
+{
+    auto const nHistMax{HistoryMax()};
+    if (m_deqHistory.size() > nHistMax) {
+        auto const pos{std::next(m_deqHistory.begin(), nHistMax)};
+        m_deqHistory.erase(pos, m_deqHistory.end());
+    }
+}
+
+void CColorPicker::Impl::HistoryStore()
 {
     COLORREF const crColor{m_imSpectrum.GetMinColorRef(1, 1, 1)};
     int const       nAlpha{m_imSpectrum.GetColor().m_A};
@@ -434,15 +443,26 @@ void CColorPicker::Impl::ColorToHistory()
     }
     m_deqHistory.emplace_front(std::move(it));
     ATL::CWindow{GetDlgItem(CID_STA_HISTORY)}.InvalidateRect(nullptr, FALSE);
+    HistoryDropTail();
 }
 
-void CColorPicker::Impl::SetColorFrom(HistoryCont::const_reference item)
+void CColorPicker::Impl::HistorySelect(HistoryCont::const_reference item)
 {
     m_imSpectrum.GetColor().m_A = item.nAlpha;
     SetColorRef(item.crColor, false);
 }
 
-void CColorPicker::Impl::PickFromHistory()
+size_t CColorPicker::Impl::HistoryMax() const
+{
+    ATL::CWindow const staHistory{GetDlgItem(CID_STA_HISTORY)};
+    CRect                      rc{};
+    staHistory.GetClientRect(rc);
+    auto const xCount{static_cast<size_t>(rc.Width() / CPInt::HCELL_RADIUS) + 1};
+    auto const yCount{static_cast<size_t>(rc.Height() / CPInt::HCELL_RADIUS) + 1};
+    return xCount * yCount;
+}
+
+void CColorPicker::Impl::HistoryPick()
 {
     ATL::CWindow const staHistory{GetDlgItem(CID_STA_HISTORY)};
     CRect                      rc{};
@@ -452,11 +472,24 @@ void CColorPicker::Impl::PickFromHistory()
     staHistory.ScreenToClient(&pt);
     auto const   xPos{static_cast<size_t>(pt.x / CPInt::HCELL_RADIUS)};
     auto const   yPos{static_cast<size_t>(pt.y / CPInt::HCELL_RADIUS)};
-    auto const xWidth{static_cast<size_t>(rc.Width() / CPInt::HCELL_RADIUS)};
-    auto const nIndex{xPos + yPos * xWidth};
+    auto const xCount{static_cast<size_t>(rc.Width() / CPInt::HCELL_RADIUS) + 1};
+    auto const nIndex{xPos + yPos * xCount};
     if (nIndex < m_deqHistory.size()) {
-        SetColorFrom(m_deqHistory[nIndex]);
+        HistorySelect(m_deqHistory[nIndex]);
     }
+}
+
+void CColorPicker::Impl::HistoryLoad(CF::ColorTabItem const* crTab, size_t nCount)
+{
+    if (nCount < 1 || !crTab) {
+        return ;
+    }
+    HistoryCont deqTemp;
+    for (size_t i = 0; i < nCount; i++) {
+        CPInt::HistoryItem it{crTab[i].clrColor, RGB_MAX_INT};
+        deqTemp.emplace_front(std::move(it));
+    }
+    deqTemp.swap(m_deqHistory);
 }
 
 void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
@@ -547,6 +580,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         }
     );
   //TogglePalette(TRUE);
+    HistoryLoad(CF::CLR_PALETTE0, CF::CLR_PALETTE0_COUNT);
     DlgResize_Init(false, true, 0);
     m_bSaveData = false;
     return TRUE;

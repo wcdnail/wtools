@@ -196,12 +196,6 @@ class CColorButton : public CColorButtonSuper
 public:
     using String = std::basic_string<TCHAR>; // ATL::CString is great, but lacks some transactional behaviour 
 
-    struct ColorTableEntry
-    {
-        COLORREF clrColor;
-        LPCTSTR   pszName;
-    };
-
     // @cmember General destructor
     ~CColorButton() override;
 
