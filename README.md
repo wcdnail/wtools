@@ -19,6 +19,7 @@ CMake will be provided later.
 Clone VCPKG
 CD "VCPKG"
 
+Win CMD:
 ```cmd
 setx VCPKG_ROOT=%CD%
 call bootstrap-vcpkg.bat -disableMetrics
