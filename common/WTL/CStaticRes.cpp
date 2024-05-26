@@ -37,13 +37,9 @@ struct TBitmapDef
 static bool StaticLoadIcon(BYTE const* pBytes, size_t nSize, WTL::CIcon& icoTarget)
 {
     using HGlobal = std::shared_ptr<void>;
-    using PBitmap = std::unique_ptr<Gdiplus::Bitmap>;
     ATL::CComPtr<IStream> pStream{};
-    PBitmap               pBitmap{nullptr};
-    HICON                    hIco{nullptr};
     LPVOID                 pImage{nullptr};
     HRESULT                 hCode{S_OK};
-    Gdiplus::Status    gdipStatus{Gdiplus::Status::Ok};
     std::wstring            sFunc{L"NONE"};
     HGlobal const            hMem{GlobalAlloc(GMEM_MOVEABLE, nSize), GlobalFree};
     if (!hMem) {
@@ -64,15 +60,18 @@ static bool StaticLoadIcon(BYTE const* pBytes, size_t nSize, WTL::CIcon& icoTarg
         sFunc = L"CreateStreamOnHGlobal";
         goto reportError;
     }
-    pBitmap = std::make_unique<Gdiplus::Bitmap>(pStream);
-    gdipStatus = pBitmap->GetHICON(&hIco);
-    if (Gdiplus::Status::Ok != gdipStatus) {
-        hCode = static_cast<HRESULT>(GetLastError());
-        sFunc = L"Gdiplus::Bitmap::GetHICON(HICON*)";
-        goto reportError;
+    {
+        HICON             hIco{nullptr};
+        Gdiplus::Bitmap bitmap{pStream};
+        auto const  gdipStatus{bitmap.GetHICON(&hIco)};
+        if (Gdiplus::Status::Ok != gdipStatus) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc = L"Gdiplus::Bitmap::GetHICON(HICON*)";
+            goto reportError;
+        }
+        icoTarget.Attach(hIco);
+        return true;
     }
-    icoTarget.Attach(hIco);
-    return true;
 reportError:
     auto const  message{Str::ErrorCode<>::SystemMessage(hCode)};
     DH::TPrintf(LTH_GLOBALS L" %s failed: 0x%08x %s\n", sFunc.c_str(), hCode, message.GetString());
