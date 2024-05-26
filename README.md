@@ -2,6 +2,8 @@
 Misc Windows Tools
 
 ## [WCD] Color Picker
+May be buGs with HSL/HSV colors, need investigating
+
 First Release [1.0](https://github.com/wcdnail/wtools/releases/tag/WCPKR-1.0)
 
 ![WCPKRS1](wcd.color.picker/wcd.color.picker.png)
