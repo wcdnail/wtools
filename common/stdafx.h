@@ -25,6 +25,7 @@
 #endif
 
 #ifdef _WIN32
+#  define  GDIPVER 0x0110
 #  define  _CRT_SECURE_NO_WARNINGS
 #  define WIN32_LEAN_AND_MEAN
 #  define STRICT

@@ -1,5 +1,6 @@
 #pragma once
 
+#define  GDIPVER 0x0110
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
 #define _ATL_APARTMENT_THREADED

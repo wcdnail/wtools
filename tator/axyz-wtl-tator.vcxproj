@@ -40,6 +40,9 @@
   <ItemGroup>
     <Image Include="ATator.Main.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="ATator.exe.manifest" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>axyz-wtl-tator</ProjectName>
     <Keyword>Win32Proj</Keyword>

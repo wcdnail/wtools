@@ -37,4 +37,9 @@
       <Filter>rez</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="ATator.exe.manifest">
+      <Filter>rez</Filter>
+    </Manifest>
+  </ItemGroup>
 </Project>

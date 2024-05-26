@@ -355,8 +355,8 @@ void CColorPicker::Impl::TogglePalette(BOOL bPalVisible) const
 
 void CColorPicker::Impl::ColorpickBegin()
 {
-    WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
-    bnPick.EnableWindow(FALSE);
+    //WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
+    //bnPick.EnableWindow(FALSE);
     m_Magnifier.Show(TRUE);
     SetTimer(TIMER_COLORPICK, TIMER_COLORPICK_MSEC);
 }
@@ -392,8 +392,8 @@ void CColorPicker::Impl::GetColorFromDesktopDC(CPoint const& pt, bool bStoreToHi
 
 void CColorPicker::Impl::ColorpickEnd(UINT, CPoint const& pt, bool bSelect)
 {
-    WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
-    bnPick.EnableWindow(TRUE);
+    //WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
+    //bnPick.EnableWindow(TRUE);
     m_Magnifier.Show(FALSE);
     KillTimer(TIMER_COLORPICK);
     if (bSelect) {

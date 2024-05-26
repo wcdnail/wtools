@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "CStaticRes.h"
+#include "static-rez/IconPicker.h"
 #include <dh.tracing.h>
 #include <dh.tracing.defs.h>
 #include <string.utils.error.code.h>
 #include <atlimage.h>
+#include <wil/com.h>
 #include <memory>
 #include <string>
-
-#include "static-rez/IconPicker.h"
 
 CStaticRes const& CStaticRes::Instance()
 {
@@ -36,12 +36,13 @@ struct TBitmapDef
 
 static bool StaticLoadIcon(BYTE const* pBytes, size_t nSize, WTL::CIcon& icoTarget)
 {
-    using HGlobal = std::shared_ptr<void>;
-    ATL::CComPtr<IStream> pStream{};
-    LPVOID                 pImage{nullptr};
-    HRESULT                 hCode{S_OK};
-    std::wstring            sFunc{L"NONE"};
-    HGlobal const            hMem{GlobalAlloc(GMEM_MOVEABLE, nSize), GlobalFree};
+    using  HGlobal = std::shared_ptr<void>;
+    using PIStream = wil::com_ptr_nothrow<IStream>;
+    PIStream   pStream{};
+    LPVOID      pImage{nullptr};
+    HRESULT      hCode{S_OK};
+    std::wstring sFunc{L"NONE"};
+    HGlobal const hMem{GlobalAlloc(GMEM_MOVEABLE, nSize), GlobalFree};
     if (!hMem) {
         hCode = static_cast<HRESULT>(GetLastError());
         sFunc = L"GlobalAlloc";
@@ -62,7 +63,7 @@ static bool StaticLoadIcon(BYTE const* pBytes, size_t nSize, WTL::CIcon& icoTarg
     }
     {
         HICON             hIco{nullptr};
-        Gdiplus::Bitmap bitmap{pStream};
+        Gdiplus::Bitmap bitmap{pStream.get()};
         auto const  gdipStatus{bitmap.GetHICON(&hIco)};
         if (Gdiplus::Status::Ok != gdipStatus) {
             hCode = static_cast<HRESULT>(GetLastError());

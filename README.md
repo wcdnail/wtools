@@ -1,6 +1,12 @@
 # WTools
 Misc Windows Tools
 
+## Build
+
+### VCPKG deps
+- WTL
+- WIL
+
 ## Thanks
 - [VCPKG team](https://github.com/microsoft/vcpkg)
 - [WTL team](https://sourceforge.net/projects/wtl/)
