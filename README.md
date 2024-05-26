@@ -16,6 +16,7 @@ CMake will be provided later.
 ### Build deps
 - WTL
 - WIL
+- GTEST (optional)
 
 ### Build prepare
 Clone VCPKG
@@ -26,6 +27,8 @@ Win CMD:
 setx VCPKG_ROOT=%CD%
 call bootstrap-vcpkg.bat -disableMetrics
 vcpkg install wtl wil
+rem optional
+vcpkg install gtest
 ```
 
 ## Thanks to
