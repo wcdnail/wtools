@@ -16,9 +16,10 @@ CMake will be provided later.
 - WIL
 
 ### Build prepare
+Clone VCPKG
+CD "VCPKG"
+
 ```cmd
-rem clone VCPKG
-rem cd <VCPKG>
 setx VCPKG_ROOT=%CD%
 call bootstrap-vcpkg.bat -disableMetrics
 vcpkg install wtl wil
