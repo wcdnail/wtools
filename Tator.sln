@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "axyz-wtl-tator", "tator\axy
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wtl.color.picker", "exa\wtl.color.picker\wtl.color.picker.vcxproj", "{5117D2CB-0CCA-4744-9C67-83F4E496EB32}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "axyz-wtl-tator", "wcd.color.picker\wcd.color.picker.vcxproj", "{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|x64 = debug|x64
@@ -71,6 +73,18 @@ Global
 		{5117D2CB-0CCA-4744-9C67-83F4E496EB32}.Release|x64.Build.0 = Release|x64
 		{5117D2CB-0CCA-4744-9C67-83F4E496EB32}.Release|x86.ActiveCfg = Release|Win32
 		{5117D2CB-0CCA-4744-9C67-83F4E496EB32}.Release|x86.Build.0 = Release|Win32
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.debug|x64.ActiveCfg = debug|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.debug|x64.Build.0 = debug|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.debug|x86.ActiveCfg = debug|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.debug|x86.Build.0 = debug|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.product|x64.ActiveCfg = product|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.product|x64.Build.0 = product|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.product|x86.ActiveCfg = product|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.product|x86.Build.0 = product|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.Release|x64.ActiveCfg = product|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.Release|x64.Build.0 = product|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.Release|x86.ActiveCfg = product|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.Release|x86.Build.0 = product|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

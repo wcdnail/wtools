@@ -2,12 +2,23 @@
 Misc Windows Tools
 
 ## Build
+MSVC solution files.
+CMake will be provided later.
 
-### VCPKG deps
+### Build deps
 - WTL
 - WIL
 
-## Thanks
+### Build prepare
+```cmd
+rem clone VCPKG
+rem cd <VCPKG>
+setx VCPKG_ROOT=%CD%
+call bootstrap-vcpkg.bat -disableMetrics
+vcpkg install wtl wil
+```
+
+## Thanks to
 - [VCPKG team](https://github.com/microsoft/vcpkg)
 - [WTL team](https://sourceforge.net/projects/wtl/)
 - [Franco Tortoriello et al.](https://gitlab.com/ftortoriello)

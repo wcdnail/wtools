@@ -81,11 +81,11 @@ reportError:
 
 void CStaticRes::MakeBitmaps()
 {
+    StaticLoadIcon(gs_baPickerIcon, gs_baPickerIconSize, m_icoPicker);
+
     constexpr TBitmapDef<11, 11, 1> bCross{0xBF, 0xA0, 0x1F, 0x00, 0x8E, 0x20,
                                            0xC4, 0x60, 0xE0, 0xE0, 0xF1, 0xE0,
                                            0xE0, 0xE0, 0xC4, 0x60, 0x8E, 0x20,
                                            0x1F, 0x00, 0xBF, 0xA0};
     bCross.Create(m_bmCross);
-
-    StaticLoadIcon(gs_baPickerIcon, gs_baPickerIconSize, m_icoPicker);
 }

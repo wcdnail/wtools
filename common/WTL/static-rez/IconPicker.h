@@ -1,5 +1,12 @@
 #pragma once
 
+//
+// MSYS2 ucrt
+//
+// cd /c/_/wtools/tator/rez
+// hexdump -v -e '16/1 "_x%02X" "\n"' picker_icon_clr.ico | sed 's/_/\\/g; s/\\x  //g; s/.*/    "&"/' > picker_icon.ico.txt
+//
+
 constexpr BYTE gs_baPickerIconBW[] =
     "\x00\x00\x01\x00\x01\x00\x18\x18\x00\x00\x20\x00\x20\x00\x88\x09"
     "\x00\x00\x16\x00\x00\x00\x28\x00\x00\x00\x18\x00\x00\x00\x30\x00"
