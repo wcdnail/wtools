@@ -1,12 +1,12 @@
 #pragma once
 
 #include "CCustomCtrl.h"
+#include <wcdafx.api.h>
 #include <atlgdi.h>
 #include <atlapp.h>
 #include <memory>
 
-struct CColorPicker: CCustomControl,
-                     WTL::CMessageFilter
+struct CColorPicker: CCustomControl, WTL::CMessageFilter
 {
     enum Sizes: short
     {
@@ -15,12 +15,13 @@ struct CColorPicker: CCustomControl,
     };
 
     DECLARE_WND_CLASS(_T("WCCF::CColorPicker"))
+    DELETE_COPY_MOVE_OF(CColorPicker);
 
-    ~CColorPicker() override;
-    CColorPicker();
+    WCDAFX_API ~CColorPicker() override;
+    WCDAFX_API CColorPicker();
 
-    HRESULT PreCreateWindow() override;
-    BOOL PreTranslateMessage(MSG* pMsg) override;
+    WCDAFX_API HRESULT PreCreateWindow() override;
+    WCDAFX_API BOOL PreTranslateMessage(MSG* pMsg) override;
 
 private:
     struct Impl;

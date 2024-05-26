@@ -91,6 +91,9 @@
     <ClCompile Include="WTL\CMagnifierInit.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
+    <ClCompile Include="WTL\CColorPickerImpl.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -217,6 +220,9 @@
       <Filter>WTL</Filter>
     </ClInclude>
     <ClInclude Include="WTL\CMagnifierInit.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
+    <ClInclude Include="WTL\CColorPickerImpl.h">
       <Filter>WTL</Filter>
     </ClInclude>
   </ItemGroup>

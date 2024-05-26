@@ -51,6 +51,7 @@
     <ClCompile Include="WTL\CColorButton.cpp" />
     <ClCompile Include="WTL\CColorPicker.cpp" />
     <ClCompile Include="WTL\CColorPickerDefs.cpp" />
+    <ClCompile Include="WTL\CColorPickerImpl.cpp" />
     <ClCompile Include="WTL\CColorStatic.cpp" />
     <ClCompile Include="WTL\CCustomCtrl.cpp" />
     <ClCompile Include="WTL\CDCEx.cpp" />
@@ -94,6 +95,7 @@
     <ClInclude Include="WTL\CColorButton.h" />
     <ClInclude Include="WTL\CColorPicker.h" />
     <ClInclude Include="WTL\CColorPickerDefs.h" />
+    <ClInclude Include="WTL\CColorPickerImpl.h" />
     <ClInclude Include="WTL\CColorStatic.h" />
     <ClInclude Include="WTL\CCustomCtrl.h" />
     <ClInclude Include="WTL\CDCEx.h" />
