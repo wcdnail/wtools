@@ -8,13 +8,27 @@
 
 WTL::CAppModule _Module{};
 
-static int Run(LPTSTR lpstrCmdLine, int nCmdShow)
+static int Run(HINSTANCE hInstance, LPTSTR lpstrCmdLine, int nCmdShow)
 {
     HRESULT             hCode{ERROR_SUCCESS};
     int                  nRet{0};
     WTL::CMessageLoop theLoop{};
+    CWCDColorPicker       dlg{};
+    hCode = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    if (FAILED(hCode)) {
+        goto reportError;
+    }
+    // this resolves ATL window thunking problem when Microsoft Layer for Unicode (MSLU) is used
+    DefWindowProc(nullptr, 0, 0, 0L);
+    if (!WTL::AtlInitCommonControls(ICC_COOL_CLASSES | ICC_BAR_CLASSES)) {
+        hCode = static_cast<HRESULT>(GetLastError());
+        goto reportError;
+    }
+    hCode = _Module.Init(nullptr, hInstance);
+    if (FAILED(hCode)) {
+        goto reportError;
+    }
     _Module.AddMessageLoop(&theLoop);
-    CWCDColorPicker dlg;
     if (ERROR_SUCCESS != (hCode = dlg.Initialize())) {
         goto reportError;
     }
@@ -37,18 +51,11 @@ reportError:
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int nCmdShow)
 {
     CScopedAppRegistrator sAppReg{_Module};
-    HRESULT                 hCode{S_OK};
-    SetErrorMode(SetErrorMode(0) | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
-    hCode = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-    ATLASSERT(SUCCEEDED(hCode));
-    // this resolves ATL window thunking problem when Microsoft Layer for Unicode (MSLU) is used
-    DefWindowProc(nullptr, 0, 0, 0L);
+    int                      nRes{0};
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
-    WTL::AtlInitCommonControls(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
-    hCode = _Module.Init(nullptr, hInstance);
-    ATLASSERT(SUCCEEDED(hCode));
-    hCode = Run(lpstrCmdLine, nCmdShow);
+    SetErrorMode(SetErrorMode(0) | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
+    nRes = Run(hInstance, lpstrCmdLine, nCmdShow);
     _Module.Term();
     ::CoUninitialize();
-    return static_cast<int>(hCode);
+    return nRes;
 }

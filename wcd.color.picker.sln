@@ -15,6 +15,8 @@ Global
 		debug|x86 = debug|x86
 		product|x64 = product|x64
 		product|x86 = product|x86
+		product-scrt|x64 = product-scrt|x64
+		product-scrt|x86 = product-scrt|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -27,6 +29,10 @@ Global
 		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.product|x64.Build.0 = product|x64
 		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.product|x86.ActiveCfg = product|Win32
 		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.product|x86.Build.0 = product|Win32
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.product-scrt|x64.ActiveCfg = product-scrt|x64
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.product-scrt|x64.Build.0 = product-scrt|x64
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.product-scrt|x86.ActiveCfg = product-scrt|Win32
+		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.product-scrt|x86.Build.0 = product-scrt|Win32
 		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.Release|x64.ActiveCfg = product|x64
 		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.Release|x64.Build.0 = product|x64
 		{DC0C6531-B048-4C6C-BCD3-71F3F7CF9AB3}.Release|x86.ActiveCfg = product|Win32
@@ -39,6 +45,10 @@ Global
 		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.product|x64.Build.0 = product|x64
 		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.product|x86.ActiveCfg = product|x64
 		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.product|x86.Build.0 = product|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.product-scrt|x64.ActiveCfg = product-scrt|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.product-scrt|x64.Build.0 = product-scrt|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.product-scrt|x86.ActiveCfg = product-scrt|x64
+		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.product-scrt|x86.Build.0 = product-scrt|x64
 		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.Release|x64.ActiveCfg = product|x64
 		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.Release|x64.Build.0 = product|x64
 		{B34D3F4D-54D9-40BC-AB70-0F92E3BEA0F3}.Release|x86.ActiveCfg = product|x64

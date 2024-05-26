@@ -25,9 +25,6 @@
     <ClCompile Include="WTL\CSpectrumSlider.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
-    <ClCompile Include="..\exa\wtl.color.picker\GTDrawHelper.cpp">
-      <Filter>DDraw.DGI</Filter>
-    </ClCompile>
     <ClCompile Include="WTL\CColorPickerDefs.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
@@ -146,9 +143,6 @@
     </ClInclude>
     <ClInclude Include="WTL\CSpectrumSlider.h">
       <Filter>WTL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\exa\wtl.color.picker\GTDrawHelper.h">
-      <Filter>DDraw.DGI</Filter>
     </ClInclude>
     <ClInclude Include="WTL\CColorPickerDefs.h">
       <Filter>WTL</Filter>

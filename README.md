@@ -1,6 +1,11 @@
 # WTools
 Misc Windows Tools
 
+## [WCD] Color Picker
+[1.0](https://github.com/wcdnail/wtools/releases/tag/WCPKR-1.0)
+![WCPKRS1](wcd.color.picker/wcd.color.picker.png)
+![WCPKRS2](wcd.color.picker/wcd.color.picker.mag.png)
+
 ## Build
 MSVC solution files.
 CMake will be provided later.
