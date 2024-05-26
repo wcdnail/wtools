@@ -191,7 +191,7 @@ private:
             CONTROL_EDITTEXT(                             CID_RGB_ALP_VAL,                     CLMN2_X,     HLCYS*2+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
         CONTROL_CONTROL(_T(""),  CID_RGB_ALP_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN2_X+24,     HLCYS*4+16,       HHCX/2-22,           HLCY,   0)
         CONTROL_GROUPBOX(          _T("History"),         CID_GRP_HISTORY,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
-           CONTROL_CTEXT(                 _T(""),         CID_STA_HISTORY,                   CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   SS_OWNERDRAW, 0)
+           CONTROL_CTEXT(                 _T(""),         CID_STA_HISTORY,                   CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   SS_OWNERDRAW | SS_NOTIFY, 0)
       //CONTROL_GROUPBOX(        _T("Magnifier"),       CID_GRP_MAGNIFIER,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
           //CONTROL_CTEXT(       _T("MAGNIFIER"),       CID_PLC_MAGNIFIER,                   CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   SS_SUNKEN | SS_CENTERIMAGE, 0)
       //CONTROL_CONTROL(_T(""), CID_PLC_MAGNIFIER,           WC_MAGNIFIER, MAG_CHILD,        CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   0)
@@ -297,6 +297,7 @@ private:
     void OnDDXLoading(UINT nID, BOOL bSaveAndValidate);
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void ValidateHexInput(WTL::CEdit& edCtrl);
+    void OnEditUpdate(int nID);
     void ColorToHistory();
     void OnCommand(UINT uNotifyCode, int nID, CWindow wndCtl);
     void TogglePalette(BOOL bPalVisible) const;
@@ -438,44 +439,6 @@ LRESULT CColorPicker::Impl::SliderChanged(bool bNotify)
     return 0;
 }
 
-LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
-{
-    if (NM_CUSTOMDRAW == pnmh->code) {
-        if constexpr (false) {
-            LPNMCUSTOMDRAW nmcd{reinterpret_cast<LPNMCUSTOMDRAW>(pnmh)};
-            DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-4d %s >> %05x\n", nID,
-                pnmh->code, DH::WM_NC_C2SW(pnmh->code), nmcd->dwDrawStage);
-        }
-        SetMsgHandled(FALSE);
-        return 0;
-    }
-    if (m_bSaveData) {
-        return 0;
-    }
-    switch (pnmh->code) {
-    case TBN_SAVE:             // skip
-    case BCN_HOTITEMCHANGE:
-        return 0;
-    case STN_DBLCLK:
-        switch (nID) {
-        case CID_SPECTRUM_PIC:
-            ColorToHistory();
-            return 0;
-        }
-        break;
-    case NM_SLIDER_CLR_SEL:
-    case NM_SPECTRUM_CLR_SEL:
-        switch (nID) {
-        case CID_SPECTRUM_PIC: return ColorChanged(true);
-        case CID_SPECTRUM_SLD: return SliderChanged(true);
-        }
-        break;
-    }
-    DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
-    SetMsgHandled(FALSE);
-    return 0;
-}
-
 void CColorPicker::Impl::DDXReloadEditsExcept(int nID)
 {
     CScopedBoolGuard bGuard{m_bSaveData};
@@ -520,6 +483,62 @@ void CColorPicker::Impl::ValidateHexInput(WTL::CEdit& edCtrl)
     }
 }
 
+void CColorPicker::Impl::OnEditUpdate(int nID)
+{
+    WTL::CEdit      edCtrl{GetDlgItem(nID)};
+    WTL::CUpDownCtrl udCtl{GetDlgItem(nID + 1)};
+    if (udCtl.m_hWnd) {
+        udCtl.SetPos(udCtl.GetPos());
+        CEdit_CursorToEnd(edCtrl);
+    }
+    else {
+        ValidateHexInput(edCtrl);
+    }
+    if (DoDataExchange(DDX_SAVE, nID)) {
+        m_imSpectrum.InvalidateRect(nullptr, FALSE);
+        m_imSlider.InvalidateRect(nullptr, FALSE);
+        UpdateColorStatic();
+        if (CID_RGB_HEX_VAL != nID) {
+            UpdateHexStr();
+        }
+        if (CID_RGB_HTM_VAL != nID) {
+            UpdateHtmlStr();
+        }
+        DDXReloadEditsExcept(nID);
+    }
+}
+
+LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
+{
+    if (NM_CUSTOMDRAW == pnmh->code) {
+        SetMsgHandled(FALSE);
+        return 0;
+    }
+    if (m_bSaveData) {
+        return 0;
+    }
+    switch (pnmh->code) {
+    case TBN_SAVE:
+    case BCN_HOTITEMCHANGE:
+        return 0;
+    //case STN_DBLCLK:
+    //    switch (nID) {
+    //    case CID_SPECTRUM_PIC: ColorToHistory(); return 0;
+    //    }
+    //    break;
+    case NM_SLIDER_CLR_SEL:
+    case NM_SPECTRUM_CLR_SEL:
+        switch (nID) {
+        case CID_SPECTRUM_PIC: return ColorChanged(true);
+        case CID_SPECTRUM_SLD: return SliderChanged(true);
+        }
+        break;
+    }
+    DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+    SetMsgHandled(FALSE);
+    return 0;
+}
+
 void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/)
 {
     if (m_bSaveData) {
@@ -532,45 +551,17 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, CWindow /*wndCtl*/
         break;
     case STN_DBLCLK:
         switch (nID) {
-        case CID_SPEC_COLOR_SEL:
-            ColorToHistory();
-            return ;
+        case CID_SPECTRUM_PIC:
+        case CID_SPEC_COLOR_SEL: ColorToHistory(); return ;
         }
         break;
     case BN_CLICKED:
         switch (nID) {
-        case CID_BTN_PICK_COLOR:
-            ColorpickBegin();
-            return ;
+        case CID_BTN_PICK_COLOR: ColorpickBegin(); return ;
         }
         break;
-    case EN_UPDATE: {
-        WTL::CEdit      edCtrl{GetDlgItem(nID)};
-        WTL::CUpDownCtrl udCtl{GetDlgItem(nID + 1)};
-        if (udCtl.m_hWnd) {
-            udCtl.SetPos(udCtl.GetPos());
-            CEdit_CursorToEnd(edCtrl);
-        }
-        else {
-            ValidateHexInput(edCtrl);
-        }
-        if (DoDataExchange(DDX_SAVE, nID)) {
-            m_imSpectrum.InvalidateRect(nullptr, FALSE);
-            m_imSlider.InvalidateRect(nullptr, FALSE);
-            UpdateColorStatic();
-            if (CID_RGB_HEX_VAL != nID) {
-                UpdateHexStr();
-            }
-            if (CID_RGB_HTM_VAL != nID) {
-                UpdateHtmlStr();
-            }
-            DDXReloadEditsExcept(nID);
-        }
-        return ;
-    }
-    case CBN_SELENDOK:
-        DoDataExchange(DDX_SAVE, nID);
-        return ;
+    case EN_UPDATE:     OnEditUpdate(nID); return ;
+    case CBN_SELENDOK:  DoDataExchange(DDX_SAVE, nID); return ;
     case CBN_SELENDCANCEL:
     case CBN_CLOSEUP:
     case EN_CHANGE:

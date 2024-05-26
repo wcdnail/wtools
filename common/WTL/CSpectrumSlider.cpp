@@ -210,7 +210,7 @@ BOOL CSpectrumSlider::OnMouseWheel(UINT nFlags, short zDelta, CPoint)
         nPos += nStep;
     }
     SetValue(nPos, nMax);
-    NotifySend(NM_SLIDER_CLR_SEL);
+    NotifyMaster(NM_SLIDER_CLR_SEL);
     InvalidateRect(nullptr, FALSE);
     return TRUE;
 }
@@ -218,7 +218,7 @@ BOOL CSpectrumSlider::OnMouseWheel(UINT nFlags, short zDelta, CPoint)
 void CSpectrumSlider::DoNotifyMouseOver(CRect const& /*rc*/, CPoint pt)
 {
     SetValueByY(pt.y);
-    NotifySend(NM_SLIDER_CLR_SEL);
+    NotifyMaster(NM_SLIDER_CLR_SEL);
     InvalidateRect(nullptr, FALSE);
 }
 

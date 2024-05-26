@@ -63,21 +63,28 @@ void CDDCtrl::DoPaint(WTL::CDCHandle dc, CRect const& rc)
 {
     UNREFERENCED_PARAMETER(dc);
     UNREFERENCED_PARAMETER(rc);
-    // ...
 }
 
 void CDDCtrl::DoNotifyMouseOver(CRect const& rc, CPoint pt)
 {
     UNREFERENCED_PARAMETER(rc);
     UNREFERENCED_PARAMETER(pt);
-    // ...
 }
 
-void CDDCtrl::NotifySend(UINT code) const
+void CDDCtrl::NotifyMaster(UINT code) const
 {
+    int const nID{GetDlgCtrlID()};
+    switch (code) {
+    case STN_CLICKED:
+    case STN_DBLCLK:
+        ::SendMessageW(GetParent(), WM_COMMAND, MAKEWPARAM(nID, code), reinterpret_cast<LPARAM>(m_hWnd));
+        return ;
+    default:
+        break;
+    }
     NMHDR nmHeader;
     nmHeader.code = code;
-    nmHeader.idFrom = GetDlgCtrlID();
+    nmHeader.idFrom = nID;
     nmHeader.hwndFrom = m_hWnd;
     ::SendMessageW(GetParent(), WM_NOTIFY, nmHeader.idFrom, reinterpret_cast<LPARAM>(&nmHeader));
 }

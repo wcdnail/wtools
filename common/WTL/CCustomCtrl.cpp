@@ -15,6 +15,8 @@ HRESULT CCustomControl::PreCreateWindowImpl(ATOM& rAtom, ATL::CWndClassInfo cons
     WTL::CStaticDataInitCriticalSectionLock lock;
     HRESULT code = lock.Lock();
     if (FAILED(code)) {
+        ATLTRACE2(ATL::atlTraceRegistrar, 0, _T("ERROR : Unable to lock critical section in CCustomControl::PreCreateWindowImpl.\n"));
+        ATLASSERT(FALSE);
         return code;
     }
     if (!rAtom) {

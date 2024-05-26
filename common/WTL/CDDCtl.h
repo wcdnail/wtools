@@ -19,7 +19,7 @@ struct CDDCtrl: public  CCustomControl,
     WCDAFX_API CDDCtrl();
 
     WCDAFX_API bool Initialize(long cx, long cy, long bpp, HBRUSH brBackground, HCURSOR hCursor);
-    WCDAFX_API void NotifySend(UINT code) const;
+    WCDAFX_API void NotifyMaster(UINT code) const;
 
     HBRUSH GetBackBrush() const;
 

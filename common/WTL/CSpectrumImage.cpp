@@ -141,7 +141,7 @@ void CSpectrumImage::OnColorChangedByCoords(CRect const& rc, CPoint pt)
         yVal = RGB_MAX;
     }
     OnColorChanged(xVal, yVal);
-    NotifySend(NM_SPECTRUM_CLR_SEL);
+    NotifyMaster(NM_SPECTRUM_CLR_SEL);
 }
 
 void CSpectrumImage::DoNotifyMouseOver(CRect const& rc, CPoint pt)
@@ -173,5 +173,5 @@ void CSpectrumImage::OnLButtonDblClk(UINT nFlags, CPoint pt)
     CRect rc{};
     GetClientRect(rc);
     OnColorChangedByCoords(rc, pt);
-    NotifySend(STN_DBLCLK);
+    NotifyMaster(STN_DBLCLK);
 }
