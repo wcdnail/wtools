@@ -60,6 +60,7 @@
     <ClCompile Include="WTL\CMagnifierInit.cpp" />
     <ClCompile Include="WTL\CSpectrumImage.cpp" />
     <ClCompile Include="WTL\CSpectrumSlider.cpp" />
+    <ClCompile Include="WTL\CStaticRes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\exa\wtl.color.picker\GTDrawHelper.h" />
@@ -105,6 +106,7 @@
     <ClInclude Include="WTL\CSliderCtrl.h" />
     <ClInclude Include="WTL\CSpectrumImage.h" />
     <ClInclude Include="WTL\CSpectrumSlider.h" />
+    <ClInclude Include="WTL\CStaticRes.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>wccf-minimal-static</ProjectName>

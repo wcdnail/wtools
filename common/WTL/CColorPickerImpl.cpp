@@ -3,6 +3,7 @@
 #include "CColorPickerDefs.h"
 #include "CMagnifierInit.h"
 #include "CAppModuleRef.h"
+#include "CStaticRes.h"
 #include <dev.assistance/dev.assist.h>
 #include <string.utils.error.code.h>
 #include <scoped.bool.guard.h>
@@ -457,8 +458,8 @@ size_t CColorPicker::Impl::HistoryMax() const
     ATL::CWindow const staHistory{GetDlgItem(CID_STA_HISTORY)};
     CRect                      rc{};
     staHistory.GetClientRect(rc);
-    auto const xCount{static_cast<size_t>(rc.Width() / CPInt::HCELL_RADIUS) + 1};
-    auto const yCount{static_cast<size_t>(rc.Height() / CPInt::HCELL_RADIUS) + 1};
+    auto const xCount{static_cast<size_t>((rc.Width() - 1) / CPInt::HCELL_RADIUS) + 1};
+    auto const yCount{static_cast<size_t>((rc.Height() - 1) / CPInt::HCELL_RADIUS) + 1};
     return xCount * yCount;
 }
 
@@ -472,7 +473,7 @@ void CColorPicker::Impl::HistoryPick()
     staHistory.ScreenToClient(&pt);
     auto const   xPos{static_cast<size_t>(pt.x / CPInt::HCELL_RADIUS)};
     auto const   yPos{static_cast<size_t>(pt.y / CPInt::HCELL_RADIUS)};
-    auto const xCount{static_cast<size_t>(rc.Width() / CPInt::HCELL_RADIUS) + 1};
+    auto const xCount{static_cast<size_t>((rc.Width() - 1) / CPInt::HCELL_RADIUS) + 1};
     auto const nIndex{xPos + yPos * xCount};
     if (nIndex < m_deqHistory.size()) {
         HistorySelect(m_deqHistory[nIndex]);
@@ -498,7 +499,7 @@ void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
         WTL::CDCHandle  dc{pDI->hDC};
         CRect const     rc{pDI->rcItem};
         int const    iSave{dc.SaveDC()};
-        HBRUSH const brBrd{WTL::AtlGetStockBrush(GRAY_BRUSH)};
+        HBRUSH const brBrd{WTL::AtlGetStockBrush(WHITE_BRUSH)};
         CRect       rcItem{0, 0, CPInt::HCELL_RADIUS, CPInt::HCELL_RADIUS};
         int           nTop{0};
         for (auto& it: m_deqHistory) {
@@ -506,10 +507,10 @@ void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
             dc.FrameRect(rcItem, brBrd);
             rcItem.left += CPInt::HCELL_RADIUS;
             rcItem.right = rcItem.left + CPInt::HCELL_RADIUS;
-            if (rcItem.left > rc.right) {
+            if (rcItem.left >= rc.right) {
                 nTop += rcItem.Height();
                 rcItem.SetRect(0, nTop, CPInt::HCELL_RADIUS, nTop + CPInt::HCELL_RADIUS);
-                if (rcItem.top > rc.bottom) {
+                if (rcItem.top >= rc.bottom) {
                     break;
                 }
             }
@@ -525,8 +526,8 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     m_curArrow = LoadCursorW(nullptr, IDC_ARROW);
     m_curCross = LoadCursorW(nullptr, IDC_CROSS);
     m_curPicker = LoadCursorW(nullptr, IDC_CROSS);
-  //WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
-  //bnPick.SetBitmap((HBITMAP)m_curPicker.m_hCursor);
+    WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
+    bnPick.SetIcon(CStaticRes::Instance().m_icoPicker);
     SetCursor(m_curArrow);
     ATLASSUME(m_imSpectrum.m_hWnd != nullptr);
     ATLASSUME(m_imSlider.m_hWnd != nullptr);
