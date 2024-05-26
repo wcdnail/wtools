@@ -31,6 +31,9 @@ rem optional
 vcpkg install gtest
 ```
 
+### Legacy alert
+There're a lot of legacy, to solve install boost, to do not care COMMENT code.
+
 ## Thanks to
 - [VCPKG team](https://github.com/microsoft/vcpkg)
 - [WTL team](https://sourceforge.net/projects/wtl/)
