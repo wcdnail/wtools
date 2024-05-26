@@ -62,6 +62,7 @@ struct CWCDColorPicker: ATL::CDialogImpl<CWCDColorPicker>,
     void OnMove(CPoint pt)
     {
         if (pt.y > Rc::Screen.bottom) {
+            // TODO: investigate drawing out screen issues
             m_ColorPicker.InvalidateRect(nullptr, FALSE);
         }
     }
