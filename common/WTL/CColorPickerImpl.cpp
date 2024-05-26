@@ -441,6 +441,7 @@ void CColorPicker::Impl::HistoryStore()
     int const       nAlpha{m_imSpectrum.GetColor().m_A};
     CPInt::HistoryItem it{crColor, nAlpha};
     if (!m_deqHistory.empty() && it == m_deqHistory.front()) {
+        return ;
     }
     m_deqHistory.emplace_front(std::move(it));
     ATL::CWindow{GetDlgItem(CID_STA_HISTORY)}.InvalidateRect(nullptr, FALSE);

@@ -19,11 +19,11 @@ CMake will be provided later.
 - GTEST (optional)
 
 ### Build prepare
-Clone VCPKG
-CD "VCPKG"
+Clone VCPKG, for example [my fork](https://github.com/wcdnail/wcpkg.git)
 
 Win CMD:
 ```cmd
+cd /D "c:\PATH\TO\VCPKG"
 setx VCPKG_ROOT=%CD%
 call bootstrap-vcpkg.bat -disableMetrics
 vcpkg install wtl wil
