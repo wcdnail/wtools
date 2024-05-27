@@ -53,6 +53,7 @@ struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
     HRESULT PreCreateWindow();
 
 private:
+    friend CColorPicker;
     friend ImplResizer;
     friend ImplSuper;
 
@@ -127,6 +128,8 @@ private:
         TIMER_COLORPICK      = 1024,
         TIMER_COLORPICK_MSEC = 5,
     };
+
+    static int     gs_nRasterCX;
 
     bool            m_bSaveData;
     CSpectrumImage m_imSpectrum;

@@ -16,17 +16,20 @@ CMake will be provided later.
 ### Build deps
 - [WTL](https://sourceforge.net/projects/wtl/)
 - [WIL](https://github.com/microsoft/wil)
+- [CLIPP](https://github.com/wcdnail/clipp) WARNING: use my fork instead original (TCHAR support)
 - [GTEST](https://github.com/google/googletest) (optional)
 
 ### Build prepare
-Clone VCPKG, for example [my fork](https://github.com/wcdnail/wcpkg.git)
+Clone VCPKG;
+
+WARNING: Use [my fork](https://github.com/wcdnail/wcpkg.git), there're CLIPP with TCHAR support
 
 Win CMD:
 ```cmd
 cd /D "c:\PATH\TO\VCPKG"
 setx VCPKG_ROOT=%CD%
 call bootstrap-vcpkg.bat -disableMetrics
-vcpkg install wtl wil
+vcpkg install wtl wil clipp
 rem optional
 vcpkg install gtest
 rem ...

@@ -5,10 +5,11 @@
 #include <string.utils.error.code.h>
 #include <dh.tracing.h>
 #include <WTL/CAppModuleRef.h>
+#include <clipp.h>
 
 WTL::CAppModule _Module{};
 
-static int Run(HINSTANCE hInstance, LPTSTR lpstrCmdLine, int nCmdShow)
+static int Run(HINSTANCE hInstance)
 {
     HRESULT             hCode{ERROR_SUCCESS};
     int                  nRet{0};
@@ -48,13 +49,45 @@ reportError:
     return static_cast<int>(hCode);
 }
 
+static bool ParseCmdLine(LPTSTR lpstrCmdLine)
+{
+    using namespace clipp;
+    using CmdLinePtr = std::shared_ptr<void>;
+
+    bool bShowUsage{false};
+    tgroup<TCHAR> const cli{
+        toption<TCHAR>(_T("-h"), _T("--help")).set(bShowUsage).doc(_T("show this info")),
+       (toption<TCHAR>(_T("-u"), _T("--spectrum-size")) & tvalue<TCHAR>(_T("width"), CColorPicker::RasterCX())).doc(_T("set spectrum bitmap's size (min: 16, max: 512)")),
+    };
+    int              argc{1};
+    CmdLinePtr const argv{CommandLineToArgvW(lpstrCmdLine, &argc), LocalFree};
+    auto const        res{parse<TCHAR>(argc, static_cast<PWSTR*>(argv.get()), cli, 0)};
+    if (bShowUsage) {
+        auto const    man{clipp::make_man_page<TCHAR>(cli).get_string()};
+        ATL::CString sMsg{};
+        sMsg.Format(_T("[WCD] Color Picker\r\n\r\n%s"), man.c_str());
+        MessageBox(GetActiveWindow(), sMsg.GetString(), _T("INFO"), MB_ICONINFORMATION);
+        return false;
+    }
+    if (CColorPicker::RasterCX() < 16) {
+        CColorPicker::RasterCX() = 16;
+    }
+    else if (CColorPicker::RasterCX() > 512) {
+        CColorPicker::RasterCX() = 512;
+    }
+    return true;
+}
+
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int nCmdShow)
 {
     CScopedAppRegistrator sAppReg{_Module};
     int                      nRes{0};
+    if (!ParseCmdLine(lpstrCmdLine)) {
+        return nRes;
+    }
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
     SetErrorMode(SetErrorMode(0) | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
-    nRes = Run(hInstance, lpstrCmdLine, nCmdShow);
+    nRes = Run(hInstance);
     _Module.Term();
     ::CoUninitialize();
     return nRes;

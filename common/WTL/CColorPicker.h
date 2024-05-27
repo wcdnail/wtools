@@ -23,6 +23,8 @@ struct CColorPicker: CCustomControl, WTL::CMessageFilter
     WCDAFX_API HRESULT PreCreateWindow() override;
     WCDAFX_API BOOL PreTranslateMessage(MSG* pMsg) override;
 
+    WCDAFX_API static int& RasterCX();
+
 private:
     struct Impl;
     std::unique_ptr<Impl> m_pImpl;

@@ -14,6 +14,13 @@ struct CWCDColorPicker: ATL::CDialogImpl<CWCDColorPicker>,
 
     CColorPicker m_ColorPicker;
 
+    ~CWCDColorPicker() = default;
+
+    CWCDColorPicker()
+        : m_ColorPicker{}
+    {
+    }
+
     BOOL PreTranslateMessage(MSG* pMsg) override
     {
         return IsDialogMessageW(pMsg);

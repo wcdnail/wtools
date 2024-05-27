@@ -32,6 +32,11 @@ BOOL CColorPicker::PreTranslateMessage(MSG* pMsg)
     return FALSE;
 }
 
+int& CColorPicker::RasterCX()
+{
+    return Impl::gs_nRasterCX;
+}
+
 BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
     BOOL bHandled{TRUE};
@@ -44,12 +49,10 @@ BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_SIZE(OnSize)
         REFLECT_NOTIFICATIONS()
-#ifdef _DEBUG_XTRA
-        if constexpr (true) {
+        if constexpr (false) {
             auto const msgStr = DH::MessageToStrignW((PMSG)GetCurrentMessage());
             DBGTPrint(LTH_CONTROL L" -WM- [[ %s ]]\n", msgStr.c_str());
         }
-#endif
         break;
     default:
         ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);

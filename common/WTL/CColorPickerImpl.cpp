@@ -20,6 +20,8 @@
 
 constexpr float MAG_FACTOR{5.f};
 
+int CColorPicker::Impl::gs_nRasterCX{SPEC_BITMAP_WDTH};
+
 namespace CPInt
 {
     HistoryItem::~HistoryItem()
@@ -572,8 +574,8 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
             ctl.SetFont(m_fntHex.m_hFont, FALSE);
         }
     }
-    m_imSpectrum.Initialize(SPECTRUM_CX, SPECTRUM_CY, nullptr, m_curArrow);
-    m_imSlider.Initialize(SPECTRUM_SLIDER_CX, m_imSpectrum.GetBackBrush(), m_curCross);
+    m_imSpectrum.Initialize(gs_nRasterCX, gs_nRasterCX, nullptr, m_curArrow);
+    m_imSlider.Initialize(gs_nRasterCX, m_imSpectrum.GetBackBrush(), m_curCross);
     UpdateDDX();
     SpectruKindChanged();
     m_Magnifier.Initialize(nullptr, MAG_FACTOR, m_curPicker,
