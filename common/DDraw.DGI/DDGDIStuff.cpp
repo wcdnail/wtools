@@ -174,7 +174,7 @@ bool DDraw_HSV_HUE_Line(DWORD* pDest, int nWidth, double dSat, double dVal)
     //GTDrawHelper dh;
     //dh.HSV_HUE(pDest, nWidth, dSat, dVal);
     //return true;
-    if (nWidth <= 0) {
+    if (nWidth <= 10) {
         // TODO: report nWidth - INVAL
         return false;
     }

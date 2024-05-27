@@ -51,13 +51,18 @@ reportError:
 
 static bool ParseCmdLine(LPTSTR lpstrCmdLine)
 {
+    #define TSTRINGIZE(V)   _T(_STRINGIZE(V))
+    #define MIN_SPEC_CX     12
+    #define MAX_SPEC_CX     512
+
     using namespace clipp;
     using CmdLinePtr = std::shared_ptr<void>;
 
     bool bShowUsage{false};
     tgroup<TCHAR> const cli{
         toption<TCHAR>(_T("-h"), _T("--help")).set(bShowUsage).doc(_T("show this info")),
-       (toption<TCHAR>(_T("-u"), _T("--spectrum-size")) & tvalue<TCHAR>(_T("width"), CColorPicker::RasterCX())).doc(_T("set spectrum bitmap's size (min: 16, max: 512)")),
+        (toption<TCHAR>(_T("-u"), _T("--spectrum-size")) & tvalue<TCHAR>(_T("width"), CColorPicker::RasterCX()))
+        .doc(_T("set spectrum bitmap's size (min: ") TSTRINGIZE(MIN_SPEC_CX) _T(", max: ") TSTRINGIZE(MAX_SPEC_CX) _T(")")),
     };
     int              argc{1};
     CmdLinePtr const argv{CommandLineToArgvW(lpstrCmdLine, &argc), LocalFree};
@@ -69,11 +74,11 @@ static bool ParseCmdLine(LPTSTR lpstrCmdLine)
         MessageBox(GetActiveWindow(), sMsg.GetString(), _T("INFO"), MB_ICONINFORMATION);
         return false;
     }
-    if (CColorPicker::RasterCX() < 16) {
-        CColorPicker::RasterCX() = 16;
+    if (CColorPicker::RasterCX() < MIN_SPEC_CX) {
+        CColorPicker::RasterCX() = MIN_SPEC_CX;
     }
-    else if (CColorPicker::RasterCX() > 512) {
-        CColorPicker::RasterCX() = 512;
+    else if (CColorPicker::RasterCX() > MAX_SPEC_CX) {
+        CColorPicker::RasterCX() = MAX_SPEC_CX;
     }
     return true;
 }
