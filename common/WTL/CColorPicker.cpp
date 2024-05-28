@@ -37,6 +37,11 @@ int& CColorPicker::RasterCX()
     return Impl::gs_nRasterCX;
 }
 
+COLORREF CColorPicker::GetColorRef() const
+{
+    return m_pImpl->GetColorRef();
+}
+
 BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
     BOOL bHandled{TRUE};

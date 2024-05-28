@@ -25,6 +25,8 @@ struct CColorPicker: CCustomControl, WTL::CMessageFilter
 
     WCDAFX_API static int& RasterCX();
 
+    COLORREF GetColorRef() const;
+
 private:
     struct Impl;
     std::unique_ptr<Impl> m_pImpl;

@@ -51,6 +51,7 @@ struct CColorPicker::Impl: WTL::CIndirectDialogImpl<Impl>,
     Impl();
 
     HRESULT PreCreateWindow();
+    COLORREF GetColorRef() const;
 
 private:
     friend CColorPicker;
@@ -316,3 +317,8 @@ private:
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDestroy();
 };
+
+inline COLORREF CColorPicker::Impl::GetColorRef() const
+{
+    return m_imSpectrum.GetColorRef();
+}

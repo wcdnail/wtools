@@ -94,6 +94,9 @@
     <ClCompile Include="WTL\CStaticRes.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
+    <ClCompile Include="WTL\CColorPickerDlg.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -223,6 +226,9 @@
       <Filter>WTL</Filter>
     </ClInclude>
     <ClInclude Include="WTL\CStaticRes.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
+    <ClInclude Include="WTL\CColorPickerDlg.h">
       <Filter>WTL</Filter>
     </ClInclude>
   </ItemGroup>

@@ -42,8 +42,8 @@ static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
     _Module.AddMessageLoop(&theLoop);
 
     if constexpr (true) {
-      //CDefaultWin32Dlg dlg;
-        CTatorMainDlg dlg;
+        CDefaultWin32Dlg dlg;
+      //CTatorMainDlg dlg;
         if (ERROR_SUCCESS != (code = dlg.Initialize())) {
             bError = true;
         }

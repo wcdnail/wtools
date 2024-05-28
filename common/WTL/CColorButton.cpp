@@ -97,6 +97,7 @@
 //-----------------------------------------------------------------------------
 #include "stdafx.h"
 #include "CColorButton.h"
+#include "CColorPickerDlg.h"
 #include <color.stuff.h>
 
 //
@@ -724,10 +725,8 @@ void CColorButton::DrawArrow(WTL::CDC& dc, const RECT& rect,
                              int iDirection, COLORREF clrArrow)
 {
     POINT ptsArrow[3];
-
     switch (iDirection) {
     case 0: // Down
-    {
         ptsArrow[0].x = rect.left;
         ptsArrow[0].y = rect.top;
         ptsArrow[1].x = rect.right;
@@ -735,10 +734,7 @@ void CColorButton::DrawArrow(WTL::CDC& dc, const RECT& rect,
         ptsArrow[2].x = (rect.left + rect.right) / 2;
         ptsArrow[2].y = rect.bottom;
         break;
-    }
-
     case 1: // Up
-    {
         ptsArrow[0].x = rect.left;
         ptsArrow[0].y = rect.bottom;
         ptsArrow[1].x = rect.right;
@@ -746,10 +742,7 @@ void CColorButton::DrawArrow(WTL::CDC& dc, const RECT& rect,
         ptsArrow[2].x = (rect.left + rect.right) / 2;
         ptsArrow[2].y = rect.top;
         break;
-    }
-
     case 2: // Left
-    {
         ptsArrow[0].x = rect.right;
         ptsArrow[0].y = rect.top;
         ptsArrow[1].x = rect.right;
@@ -757,10 +750,7 @@ void CColorButton::DrawArrow(WTL::CDC& dc, const RECT& rect,
         ptsArrow[2].x = rect.left;
         ptsArrow[2].y = (rect.top + rect.bottom) / 2;
         break;
-    }
-
     case 3: // Right
-    {
         ptsArrow[0].x = rect.left;
         ptsArrow[0].y = rect.top;
         ptsArrow[1].x = rect.left;
@@ -769,22 +759,19 @@ void CColorButton::DrawArrow(WTL::CDC& dc, const RECT& rect,
         ptsArrow[2].y = (rect.top + rect.bottom) / 2;
         break;
     }
-    }
-
-    WTL::CBrush brArrow;
+    WTL::CBrush brArrow{};
+    WTL::CPen  penArrow{};
     brArrow.CreateSolidBrush(clrArrow);
-    WTL::CPen penArrow;
     penArrow.CreatePen(PS_SOLID, 0, clrArrow);
 
-    HBRUSH hbrOld = dc.SelectBrush(brArrow);
-    HPEN hpenOld = dc.SelectPen(penArrow);
+    HBRUSH const hbrOld{dc.SelectBrush(brArrow)};
+    HPEN const  hpenOld{dc.SelectPen(penArrow)};
 
     dc.SetPolyFillMode(WINDING);
     dc.Polygon(ptsArrow, 3);
 
     dc.SelectBrush(hbrOld);
     dc.SelectPen(hpenOld);
-    return;
 }
 
 //-----------------------------------------------------------------------------
@@ -1026,8 +1013,9 @@ BOOL CColorButton::CPickerImpl::Picker()
         //
         if (fOked) {
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
-                WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
-                if (dlg.DoModal() == IDOK) {
+                CColorPickerDlg dlg;
+                //WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
+                if (dlg.DoModal(m_rMaster.m_hWnd) == IDOK) {
                     m_rMaster.m_clrCurrent = dlg.GetColor();
                 }
                 else {

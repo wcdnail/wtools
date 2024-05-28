@@ -1,7 +1,7 @@
 #pragma once
 
 #include "resource.h"
-#include "WTL/CColorButton.h"
+#include <WTL/CColorButton.h>
 #include <atlwin.h>
 #include <atlcrack.h>
 
