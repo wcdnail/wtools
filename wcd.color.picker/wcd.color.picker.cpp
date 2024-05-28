@@ -68,7 +68,7 @@ static bool ParseCmdLine(LPTSTR lpstrCmdLine)
     CmdLinePtr const argv{CommandLineToArgvW(lpstrCmdLine, &argc), LocalFree};
     auto const        res{parse<TCHAR>(argc, static_cast<PWSTR*>(argv.get()), cli, 0)};
     if (bShowUsage) {
-        auto const    man{clipp::make_man_page<TCHAR>(cli).get_string()};
+        auto const    man{clipp::tmake_man_page<TCHAR>(cli).get_string()};
         ATL::CString sMsg{};
         sMsg.Format(_T("[WCD] Color Picker\r\n\r\n%s"), man.c_str());
         MessageBox(GetActiveWindow(), sMsg.GetString(), _T("INFO"), MB_ICONINFORMATION);
