@@ -51,7 +51,6 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
     void OnCommand(UINT uNotifyCode, int nID, HWND)
     {
         switch (nID) {
-        case ID_APP_ABOUT:  OnAppAbout(); return;
         case IDOK:
         case IDCANCEL:      OnEndDialog(nID); return ;
         default:
@@ -61,6 +60,21 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         SetMsgHandled(FALSE);
     }
 
+    LRESULT OnEndDialog(int wID)
+    {
+        EndDialog(wID);
+        return 0;
+    }
+
+    void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
+    {
+        if (IDC_COLOR1 == nID) {
+            m_crCell1.Draw(pDI->hDC, pDI->rcItem, nullptr);
+        }
+        else {
+            SetMsgHandled(FALSE);
+        }
+    }
 
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     {
@@ -81,32 +95,11 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
         m_crCell1.SetColor(0xff00ff, 255);
         m_crCell1.SetHolder(GetDlgItem(IDC_COLOR1));
-        m_btnMyColor1.SetColorTarget({&m_crCell1});
-        m_cpDlg.Show(m_hWnd, {&m_btnMyColor1});
 
+        m_btnMyColor1.SetColorTarget(m_crCell1);
+        m_cpDlg.SetColorTarget(m_btnMyColor1);
+
+        m_cpDlg.Show(m_hWnd);
         return TRUE;
-    }
-
-    LRESULT OnAppAbout() const
-    {
-        //ATL::CSimpleDialog<IDD_ABOUTBOX, FALSE> dlg;
-        //dlg.DoModal();
-        return 0;
-    }
-
-    LRESULT OnEndDialog(int wID)
-    {
-        EndDialog(wID);
-        return 0;
-    }
-
-    void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
-    {
-        if (IDC_COLOR1 == nID) {
-            m_crCell1.Draw(pDI->hDC, pDI->rcItem, nullptr);
-        }
-        else {
-            SetMsgHandled(FALSE);
-        }
     }
 };

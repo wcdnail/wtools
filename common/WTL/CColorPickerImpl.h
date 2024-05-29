@@ -13,7 +13,8 @@
 
 struct CColorPicker::Impl: private WTL::CIndirectDialogImpl<Impl>,
                            private WTL::CDialogResize<Impl>,
-                           private WTL::CWinDataExchange<Impl>
+                           private WTL::CWinDataExchange<Impl>,
+                           public  IColorTarget
 {
     DELETE_COPY_MOVE_OF(Impl);
 
@@ -36,7 +37,6 @@ private:
     CSpectrumSlider      m_imSlider;
     CColorStatic          m_stColor;
     CMagnifierCtrl      m_Magnifier;
-    CColorTarget      m_ColorTarget;
     ATL::CWindow        m_stHistory;
 
     // DDX variables
@@ -55,6 +55,10 @@ private:
     void DoInitControls();
     static const WTL::_AtlDlgResizeMap* GetDlgResizeMap();
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
+
+    COLORREF GetColorRef() const override;
+    int GetAlpha() const override;
+    void SetColor(COLORREF crColor, int nAlpha) override;
 
     void SpectruKindChanged();
     LRESULT SliderChanged(bool bNotify);

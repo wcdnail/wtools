@@ -217,7 +217,7 @@ public:
     void SetColor(COLORREF clrCurrent, int nAlpha = 255) override;
 
     // @cmember Set tracking color target
-    void SetColorTarget(CColorTarget crTarget);
+    void SetColorTarget(IColorTarget& crTarget) override;
 
     // @cmember Get the default color
     COLORREF GetDefaultColor() const;
@@ -318,7 +318,7 @@ protected:
     struct CThemed;
     struct CPickerImpl;
 
-    CColorTarget m_ColorTarget;
+    bool m_bNotifyParent;
 
     // @cmember Default text
     String m_pszDefaultText;
@@ -346,7 +346,6 @@ protected:
 
     // @cmember The contained themed impl
     std::unique_ptr<CThemed> m_pThemed;
-    // If CColorButton will derive from WTL::CThemeImpl, it will be damage itself...
 };
 
 inline COLORREF CColorButton::GetDefaultColor() const

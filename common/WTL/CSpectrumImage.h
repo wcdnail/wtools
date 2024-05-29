@@ -22,6 +22,7 @@ struct CSpectrumImage: CDDCtrl
     WCDAFX_API COLORREF GetColorRef() const;
     WCDAFX_API COLORREF GetMinColorRef(int mR, int mG, int mB) const;
     WCDAFX_API CColorUnion& GetColor();
+    WCDAFX_API CColorUnion const& GetColor() const;
     WCDAFX_API void SetSpectrumKind(SpectrumKind kind);
     WCDAFX_API SpectrumKind GetSpectrumKind() const;
     WCDAFX_API SpectrumKind const& GetSpectrumKindRef() const;
@@ -43,25 +44,11 @@ private:
     void OnLButtonDblClk(UINT nFlags, CPoint pt);
 };
 
-inline SpectrumKind CSpectrumImage::GetSpectrumKind() const
-{
-    return m_nKind;
-}
-
-inline SpectrumKind const& CSpectrumImage::GetSpectrumKindRef() const
-{
-    return m_nKind;
-}
-
-inline CColorUnion& CSpectrumImage::GetColor()
-{
-    return m_Color;
-}
-
-inline COLORREF CSpectrumImage::GetColorRef() const
-{
-    return m_Color.GetColorRef();
-}
+inline SpectrumKind        CSpectrumImage::GetSpectrumKind() const    { return m_nKind; }
+inline SpectrumKind const& CSpectrumImage::GetSpectrumKindRef() const { return m_nKind; }
+inline CColorUnion&        CSpectrumImage::GetColor()                 { return m_Color; }
+inline CColorUnion const&  CSpectrumImage::GetColor() const           { return m_Color; }
+inline COLORREF            CSpectrumImage::GetColorRef() const        { return m_Color.GetColorRef(); }
 
 inline COLORREF CSpectrumImage::GetMinColorRef(int mR, int mG, int mB) const
 {

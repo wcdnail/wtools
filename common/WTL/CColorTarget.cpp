@@ -1,19 +1,44 @@
 #include "stdafx.h"
 #include "CColorTarget.h"
-#include <atlwin.h>
+#include <dh.tracing.h>
 
 IColorTarget::~IColorTarget() = default;
+IColorTarget::IColorTarget() = default;
 
-void CColorTarget::OnUpdateColor(COLORREF crColor, int nAlpha) const
+COLORREF IColorTarget::GetColorRef() const
 {
-    if (m_pTarget) {
-        m_pTarget->SetColor(crColor, nAlpha);
-    }
+    DH::TPrintf(L"%s: NOT IMPLEMENTED\n", __FUNCTIONW__);
+    ATLASSERT(false);
+    return CLR_INVALID;
 }
 
-void CColorTarget::UpdateHostColor() const
+int IColorTarget::GetAlpha() const
 {
-    if (m_pHost && m_pTarget) {
-        m_pHost->SetColor(m_pTarget->GetColorRef(), m_pTarget->GetAlpha());
-    }
+    DH::TPrintf(L"%s: NOT IMPLEMENTED\n", __FUNCTIONW__);
+    ATLASSERT(false);
+    return -1;
+}
+
+void IColorTarget::SetColor(COLORREF crColor, int nAlpha)
+{
+    UNREFERENCED_PARAMETER(crColor);
+    UNREFERENCED_PARAMETER(nAlpha);
+    DH::TPrintf(L"%s: NOT IMPLEMENTED\n", __FUNCTIONW__);
+    ATLASSERT(false);
+}
+
+void IColorTarget::SetColorTarget(IColorTarget& rTarget)
+{
+    SourceSetColor(rTarget);
+}
+
+void IColorTarget::SourceSetColor(IColorTarget const& trgSource)
+{
+    SetColor(trgSource.GetColorRef(), trgSource.GetAlpha());
+}
+
+void IColorTarget::TargetColorUpdate(COLORREF crColor, int nAlpha)
+{
+    UNREFERENCED_PARAMETER(crColor);
+    UNREFERENCED_PARAMETER(nAlpha);
 }

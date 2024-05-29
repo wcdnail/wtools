@@ -39,27 +39,22 @@ BOOL CColorPicker::PreTranslateMessage(MSG* pMsg)
 //-----------------------------------------------------------------------------
 COLORREF CColorPicker::GetColorRef() const
 {
-    return m_pImpl->m_imSpectrum.GetColorRef();
+    return m_pImpl->GetColorRef();
 }
 
 int CColorPicker::GetAlpha() const
 {
-    return m_pImpl->m_imSpectrum.GetColor().m_A;
+    return m_pImpl->GetAlpha();
 }
 
-void CColorPicker::SetColor(COLORREF crColor, int nAlpha)
+void CColorPicker::SetColor(COLORREF crColor, int nAlpha) const
 {
     m_pImpl->SetColor(crColor, nAlpha, false);
 }
 
-bool CColorPicker::SetColorTarget(CColorTarget crTarget)
+void CColorPicker::SetColorTarget(IColorTarget& crTarget) const
 {
-    m_pImpl->m_ColorTarget = std::move(crTarget);
-    if (!m_pImpl->m_ColorTarget.m_pHost) {
-        m_pImpl->m_ColorTarget.m_pHost = this;
-    }
-    m_pImpl->m_ColorTarget.UpdateHostColor();
-    return true;
+    m_pImpl->SetColorTarget(crTarget);
 }
 
 int& CColorPicker::RasterCX()

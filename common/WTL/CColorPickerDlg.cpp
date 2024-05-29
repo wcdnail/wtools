@@ -9,7 +9,7 @@ CColorPickerDlg::~CColorPickerDlg() = default;
 
 CColorPickerDlg::CColorPickerDlg()
     :     m_wndMaster{nullptr}
-    , m_ccColorPicker{}
+    ,   m_ColorPicker{}
     ,       m_rcPlace{0, 0, 0, 0}
     ,    m_bModalLoop{false}
 {
@@ -23,12 +23,7 @@ BOOL CColorPickerDlg::PreTranslateMessage(MSG* pMsg)
     return FALSE;
 }
 
-HRESULT CColorPickerDlg::Initialize()
-{
-    return m_ccColorPicker.PreCreateWindow();
-}
-
-bool CColorPickerDlg::Show(HWND hWndMaster, CColorTarget crTarget, bool bModal)
+bool CColorPickerDlg::Show(HWND hWndMaster, bool bModal)
 {
     std::wstring sFunc{L"NONE"};
     HRESULT      hCode{Initialize()};
@@ -37,13 +32,12 @@ bool CColorPickerDlg::Show(HWND hWndMaster, CColorTarget crTarget, bool bModal)
         goto reportError;
     }
     m_wndMaster = hWndMaster;
-    m_ccColorPicker.SetColorTarget(std::move(crTarget));
     m_bModalLoop = bModal;
     if (m_bModalLoop) {
-        auto const nRes{WTL::CIndirectDialogImpl<CColorPickerDlg>::DoModal(hWndMaster)};
+        auto const nRes{DoModal(hWndMaster)};
         return nRes == IDOK;
     }
-    if (!WTL::CIndirectDialogImpl<CColorPickerDlg>::Create(hWndMaster)) {
+    if (!Create(hWndMaster)) {
         hCode = static_cast<HRESULT>(GetLastError());
         sFunc = L"Create";
         goto reportError;
@@ -138,11 +132,11 @@ BOOL CColorPickerDlg::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_COMMAND(OnCommand)
-        CHAIN_MSG_MAP(CDialogResize<CColorPickerDlg>)
+        CHAIN_MSG_MAP(CDialogResize)
         REFLECT_NOTIFICATIONS()
         break;
     default: 
-        ATLTRACE(static_cast<int>(ATL::atlTraceWindowing), 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
+        ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
         ATLASSERT(FALSE);
         break;
     }

@@ -1,21 +1,22 @@
 #pragma once
 
+#include <wcdafx.api.h>
+
 class IColorTarget
 {
 protected:
-    virtual ~IColorTarget();
+    WCDAFX_API virtual ~IColorTarget();
+    WCDAFX_API IColorTarget();
+
+    WCDAFX_API virtual void SourceSetColor(IColorTarget const& trgSource);
+    WCDAFX_API virtual void TargetColorUpdate(COLORREF crColor, int nAlpha);
 
 public:
-    virtual COLORREF GetColorRef() const = 0;
-    virtual int GetAlpha() const = 0;
-    virtual void SetColor(COLORREF crColor, int nAlpha) = 0;
-};
+    WCDAFX_API virtual COLORREF GetColorRef() const = 0;
+    WCDAFX_API virtual int GetAlpha() const = 0;
+    WCDAFX_API virtual void SetColor(COLORREF crColor, int nAlpha) = 0;
 
-struct CColorTarget
-{
-    IColorTarget* m_pTarget{nullptr};
-    IColorTarget*   m_pHost{nullptr};
+    WCDAFX_API virtual void SetColorTarget(IColorTarget& rTarget);
 
-    void OnUpdateColor(COLORREF crColor, int nAlpha) const;
-    void UpdateHostColor() const;
+    DELETE_COPY_MOVE_OF(IColorTarget);
 };

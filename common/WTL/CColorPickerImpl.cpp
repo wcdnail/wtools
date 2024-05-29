@@ -49,7 +49,7 @@ namespace
         CID_HSV_SAT_CAP,
         CID_HSV_VAL_CAP,
         CID_GRP_HISTORY, CID_STA_HISTORY,
-        CID_GRP_MAGNIFIER, CID_PLC_MAGNIFIER,
+        CID_GRP_MAGNIFIER,
         // Edit controls
         CID_RGB_RED_VAL, CID_RGB_RED_UDS,
         CID_RGB_GRN_VAL, CID_RGB_GRN_UDS,
@@ -107,7 +107,6 @@ CColorPicker::Impl::Impl()
     ,      m_imSlider{m_imSpectrum.GetSpectrumKindRef(), m_imSpectrum.GetColor()}
     ,       m_stColor{m_imSpectrum.GetMinColorRef(1, 1, 1)}
     ,     m_Magnifier{}
-    ,   m_ColorTarget{}
     ,     m_stHistory{nullptr}
     , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
 {
@@ -282,8 +281,6 @@ const WTL::_AtlDlgResizeMap* CColorPicker::Impl::GetDlgResizeMap()
         DLGRESIZE_CONTROL(CID_HSV_VAL_UDS, DLSZ_MOVE_X)
     DLGRESIZE_CONTROL(CID_GRP_HISTORY, DLSZ_SIZE_Y | DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(CID_STA_HISTORY, DLSZ_SIZE_Y | DLSZ_MOVE_X)
-        //DLGRESIZE_CONTROL(CID_GRP_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
-        //DLGRESIZE_CONTROL(CID_PLC_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
     { -1, 0 },
     };
     return theMap;
@@ -313,6 +310,20 @@ BOOL CColorPicker::Impl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wPara
     return FALSE;
 }
 
+COLORREF CColorPicker::Impl::GetColorRef() const
+{
+    return m_imSpectrum.GetColorRef();
+}
+
+int CColorPicker::Impl::GetAlpha() const
+{
+    return m_imSpectrum.GetColor().m_A;
+}
+
+void CColorPicker::Impl::SetColor(COLORREF crColor, int nAlpha)
+{
+    SetColor(crColor, nAlpha, false);
+}
 
 void CColorPicker::Impl::SpectruKindChanged()
 {
@@ -344,7 +355,8 @@ void CColorPicker::Impl::UpdateColor()
     m_stColor.Reset(m_imSpectrum.GetMinColorRef(1, 1, 1),
                     m_imSpectrum.GetColor().m_A,
                     m_imSpectrum.GetBackBrush());
-    m_ColorTarget.OnUpdateColor(m_imSpectrum.GetColorRef(), m_imSpectrum.GetColor().m_A);
+
+    TargetColorUpdate(m_imSpectrum.GetColorRef(), m_imSpectrum.GetColor().m_A);
 }
 
 LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX)

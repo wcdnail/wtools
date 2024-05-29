@@ -92,3 +92,8 @@ void CColorCell::SetColor(COLORREF crColor, int nAlpha)
         InvalidateRect(m_hHolder, nullptr, FALSE);
     }
 }
+
+void CColorCell::TargetColorUpdate(COLORREF crColor, int nAlpha)
+{
+    SetColor(crColor, nAlpha);
+}

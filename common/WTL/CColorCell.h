@@ -35,6 +35,8 @@ private:
     HBITMAP       m_hPrev;
     WTL::CDC         m_DC;
     WTL::CBitmap m_Bitmap;
+
+    void TargetColorUpdate(COLORREF crColor, int nAlpha) override;
 };
 
 inline void CColorCell::SetHolder(HWND hHolder)

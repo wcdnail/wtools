@@ -286,8 +286,6 @@ struct CColorButton::CPickerImpl
     COLORREF m_clrText;
     // @cmember The contained picker control
     ATL::CContainedWindow m_wndPicker;
-    // @cmember The windows which will be receive WM_NOTIFY
-    HWND m_hNotifyTarget;
 
     ~CPickerImpl();
     CPickerImpl(CColorButton& master);
@@ -363,7 +361,6 @@ CColorButton::CPickerImpl::CPickerImpl(CColorButton& master)
     ,   m_clrHiLightText{0x00000000}
     ,          m_clrText{0x00000000}
     ,        m_wndPicker{&master, 1}
-    ,    m_hNotifyTarget{nullptr}
 {
     UNREFERENCED_PARAMETER(StaticInit::Init());
 }
@@ -390,7 +387,7 @@ CColorButton::~CColorButton() = default;
 //
 //-----------------------------------------------------------------------------
 CColorButton::CColorButton()
-    :     m_ColorTarget{nullptr, nullptr}
+    :   m_bNotifyParent{true}
     ,  m_pszDefaultText{_T("Automatic")}
     ,   m_pszCustomText{_T("More Colors...")}
     ,      m_clrCurrent{CLR_DEFAULT}
@@ -484,7 +481,6 @@ BOOL CColorButton::SubclassWindow(HWND hWnd)
     if (!m_pThemed->OpenThemeData(L"Button")) {
         // TODO: report...
     }
-    m_pPicker->m_hNotifyTarget = GetParent();
     return TRUE;
 }
 
@@ -518,17 +514,11 @@ void CColorButton::SetColor(COLORREF clrCurrent, int nAlpha)
 // Setting up tracking color
 //
 //-----------------------------------------------------------------------------
-void CColorButton::SetColorTarget(CColorTarget crTarget)
+void CColorButton::SetColorTarget(IColorTarget& rTarget)
 {
-    m_ColorTarget = std::move(crTarget);
-    if (!m_ColorTarget.m_pHost) {
-        m_ColorTarget.m_pHost = this;
-    }
-    m_ColorTarget.UpdateHostColor();
-    if (m_ColorTarget.m_pTarget) {
-        SetTrackSelection(true);
-        m_pPicker->m_hNotifyTarget = nullptr;
-    }
+    m_bNotifyParent = false;
+    SetTrackSelection(true);
+    IColorTarget::SetColorTarget(rTarget);
 }
 
 //-----------------------------------------------------------------------------
@@ -583,8 +573,8 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
         if (m_fTrackSelection) {
             if (clrOldColor != m_clrCurrent) {
                 m_clrCurrent = clrOldColor;
+                TargetColorUpdate(m_clrCurrent, RGB_MAX_INT);
                 m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
-                m_ColorTarget.OnUpdateColor(m_clrCurrent, RGB_MAX_INT);
             }
         }
         m_pPicker->SendNotification(CPN_CLOSEUP, m_clrCurrent, TRUE);
@@ -592,8 +582,8 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
     }
     else {
         if (clrOldColor != m_clrCurrent) {
+            TargetColorUpdate(m_clrCurrent, RGB_MAX_INT);
             m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
-            m_ColorTarget.OnUpdateColor(m_clrCurrent, RGB_MAX_INT);
         }
         m_pPicker->SendNotification(CPN_CLOSEUP, m_clrCurrent, TRUE);
         m_pPicker->SendNotification(CPN_SELENDOK, m_clrCurrent, TRUE);
@@ -1064,7 +1054,8 @@ BOOL CColorButton::CPickerImpl::Picker()
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
                 CColorPickerDlg dlg;
                 //WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
-                if (dlg.Show(m_rMaster.m_hWnd, {&m_rMaster}, true)) {
+                dlg.SetColorTarget(m_rMaster);
+                if (dlg.Show(m_rMaster.m_hWnd, true)) {
                     fOked = TRUE;
                 }
                 else {
@@ -1436,7 +1427,7 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex, BOOL fTrackSel
     if (fTrackSelection) {
         if (fValid) {
             m_rMaster.m_clrCurrent = clr;
-            m_rMaster.m_ColorTarget.OnUpdateColor(m_rMaster.m_clrCurrent, RGB_MAX_INT);
+            m_rMaster.TargetColorUpdate(m_rMaster.m_clrCurrent, RGB_MAX_INT);
         }
         m_rMaster.InvalidateRect(nullptr);
         SendNotification(CPN_SELCHANGE, m_rMaster.m_clrCurrent, fValid);
@@ -1892,7 +1883,7 @@ LRESULT CColorButton::OnPickerPaletteChanged(UINT uMsg, WPARAM wParam, LPARAM lP
 //-----------------------------------------------------------------------------
 void CColorButton::CPickerImpl::SendNotification(UINT nCode, COLORREF clr, BOOL fColorValid)
 {
-    if (!m_hNotifyTarget) {
+    if (!m_rMaster.m_bNotifyParent) {
         return ;
     }
     NMCOLORBUTTON nmclr;
@@ -1901,7 +1892,7 @@ void CColorButton::CPickerImpl::SendNotification(UINT nCode, COLORREF clr, BOOL 
     nmclr.hdr.idFrom = m_rMaster.GetDlgCtrlID();
     nmclr.fColorValid = fColorValid;
     nmclr.clr = clr;
-    SendMessage(m_hNotifyTarget, WM_NOTIFY,
+    SendMessage(m_rMaster.GetParent(), WM_NOTIFY,
         static_cast<WPARAM>(m_rMaster.GetDlgCtrlID()),
         reinterpret_cast<LPARAM>(&nmclr));
 }
