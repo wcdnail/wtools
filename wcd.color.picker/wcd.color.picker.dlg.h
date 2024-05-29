@@ -48,7 +48,7 @@ struct CWCDColorPicker: ATL::CDialogImpl<CWCDColorPicker>,
 
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     {
-        ATLASSERT(m_ColorPicker.m_hWnd != nullptr);
+        ATLASSERT(m_ColorPicker.IsWindow());
 
         CenterWindow();
 

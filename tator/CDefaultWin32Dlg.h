@@ -41,24 +41,26 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     {
-        // center the dialog on the screen
-        CenterWindow();
-
-        m_cpDlg.Show(m_hWnd, m_crCell1.crColor);
-
-        // set icons
-        WTL::CIcon icon(LoadIconW(WTL::ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
-        SetIcon(icon, TRUE);
-        SetIcon(icon, FALSE);
-
         m_btnMyColor1.SubclassWindow(GetDlgItem(IDC_BUTTON1));
         m_btnMyColor2.SubclassWindow(GetDlgItem(IDC_BUTTON2));
         m_btnMyColor3.SubclassWindow(GetDlgItem(IDC_BUTTON3));
+
+        const WTL::CIcon icon(LoadIconW(WTL::ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
+        SetIcon(icon, TRUE);
+        SetIcon(icon, FALSE);
 
         m_btnMyColor2.SetDefaultText(_T(""));
         m_btnMyColor2.SetCustomText(_T(""));
         m_btnMyColor3.SetDefaultText(_T("My Default Text"));
         m_btnMyColor3.SetCustomText(_T(""));
+
+        CenterWindow();
+
+        m_crCell1.SetColor(0xff00ff, 255);
+        m_crCell1.SetHolder(GetDlgItem(IDC_COLOR1));
+        m_btnMyColor1.SetColorTarget({&m_crCell1});
+        m_cpDlg.Show(m_hWnd, {&m_btnMyColor1});
+
         return TRUE;
     }
 

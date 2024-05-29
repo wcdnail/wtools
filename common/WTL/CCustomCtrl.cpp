@@ -27,6 +27,8 @@ HRESULT CCustomControl::PreCreateWindowImpl(ATOM& rAtom, ATL::CWndClassInfo cons
             return code;
         }
         rAtom = atom;
+        ATLTRACE(ATL::atlTraceRegistrar, 0, _T("ATOM: %d '%s' for %p\n"),
+            rAtom, clsInfo.m_wc.lpszClassName, this);
     }
     lock.Unlock();
     if (!this->m_thunk.Init(nullptr, nullptr)) {
@@ -35,11 +37,5 @@ HRESULT CCustomControl::PreCreateWindowImpl(ATOM& rAtom, ATL::CWndClassInfo cons
         return code;
     }
     WTL::ModuleHelper::AddCreateWndData(&this->m_thunk.cd, this);
-
-    ATLTRACE(ATL::atlTraceRegistrar, 0, _T("ATOM: %d '%s' for %p\n"),
-        rAtom,
-        clsInfo.m_wc.lpszClassName,
-        this
-    );
     return S_OK;
 }

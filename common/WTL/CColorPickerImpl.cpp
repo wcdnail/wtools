@@ -20,7 +20,8 @@
 
 constexpr float MAG_FACTOR{5.f};
 
-int         CColorPicker::Impl::gs_nRasterCX{SPEC_BITMAP_WDTH};
+int CColorPicker::Impl::gs_nRasterCX{SPEC_BITMAP_WDTH};
+
 CColorHistory CColorPicker::Impl::gs_History{};
 
 namespace
@@ -106,9 +107,9 @@ CColorPicker::Impl::Impl()
     ,      m_imSlider{m_imSpectrum.GetSpectrumKindRef(), m_imSpectrum.GetColor()}
     ,       m_stColor{m_imSpectrum.GetMinColorRef(1, 1, 1)}
     ,     m_Magnifier{}
-    , m_pTrackedColor{nullptr}
-    , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
+    ,   m_ColorTarget{}
     ,     m_stHistory{nullptr}
+    , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
 {
     UNREFERENCED_PARAMETER(CMagnifierInit::Instance());
 }
@@ -338,15 +339,19 @@ void CColorPicker::Impl::UpdateDDX()
     DoDataExchange(DDX_LOAD);
 }
 
-void CColorPicker::Impl::UpdateColorStatic()
+void CColorPicker::Impl::UpdateColor()
 {
     m_stColor.Reset(m_imSpectrum.GetMinColorRef(1, 1, 1),
                     m_imSpectrum.GetColor().m_A,
                     m_imSpectrum.GetBackBrush());
+    m_ColorTarget.OnUpdateColor(m_imSpectrum.GetColorRef(), m_imSpectrum.GetColor().m_A);
 }
 
 LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX)
 {
+    if (!m_hWnd) {
+        return 0;
+    }
     if (SPEC_HSV_Hue != m_imSpectrum.GetSpectrumKind()) {
         m_imSlider.UpdateRaster();
     }
@@ -356,7 +361,7 @@ LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX)
     }
     m_imSpectrum.InvalidateRect(nullptr, FALSE);
     m_imSlider.InvalidateRect(nullptr, FALSE);
-    UpdateColorStatic();
+    UpdateColor();
     return 0;
 }
 
@@ -367,7 +372,7 @@ LRESULT CColorPicker::Impl::SliderChanged(bool bNotify)
         UpdateDDX();
     }
     m_imSpectrum.InvalidateRect(nullptr, FALSE);
-    UpdateColorStatic();
+    UpdateColor();
     return 0;
 }
 
@@ -473,7 +478,7 @@ void CColorPicker::Impl::OnEditUpdate(int nID)
     if (DoDataExchange(DDX_SAVE, nID)) {
         m_imSpectrum.InvalidateRect(nullptr, FALSE);
         m_imSlider.InvalidateRect(nullptr, FALSE);
-        UpdateColorStatic();
+        UpdateColor();
         if (CID_RGB_HEX_VAL != nID) {
             UpdateHexStr();
         }
@@ -574,18 +579,12 @@ void CColorPicker::Impl::HistoryStore()
 void CColorPicker::Impl::HistoryPick()
 {
     auto const& chPick{gs_History.Pick(m_stHistory)};
-    m_imSpectrum.GetColor().m_A = chPick.nAlpha;
-    SetColorRef(chPick.crColor, false);
+    SetColor(chPick.GetColorRef(), chPick.GetAlpha(), false);
 }
 
-//void CColorPicker::Impl::HistorySelect(CHistoryStore::const_reference item)
-//{
-//    m_imSpectrum.GetColor().m_A = item.nAlpha;
-//    SetColorRef(item.crColor, false);
-//}
-
-void CColorPicker::Impl::SetColorRef(COLORREF crColor, bool bStoreToHistory)
+void CColorPicker::Impl::SetColor(COLORREF crColor, int nAlpha, bool bStoreToHistory)
 {
+    m_imSpectrum.GetColor().m_A = nAlpha;
     m_imSpectrum.GetColor().SetColorRef(crColor);
     ColorChanged(true);
     if (bStoreToHistory) {
@@ -600,7 +599,7 @@ void CColorPicker::Impl::GetColorFromWindowDC(CPoint const& pt, bool bStoreToHis
     CPoint            ptWin{pt};
     wnd.ScreenToClient(&ptWin);
     COLORREF const  crPixel{dc.GetPixel(ptWin)};
-    SetColorRef(crPixel, bStoreToHistory);
+    SetColor(crPixel, m_imSpectrum.GetColor().m_A, bStoreToHistory);
     DBGTPrint(LTH_COLORPICKER L" [%p] {%d, %d} ==> 0x%08x\n", wnd.m_hWnd, pt.x, pt.y, crPixel);
 }
 
@@ -609,7 +608,7 @@ void CColorPicker::Impl::GetColorFromDesktopDC(CPoint const& pt, bool bStoreToHi
     WTL::CDCHandle const dc{::GetDC(nullptr)};
     COLORREF const  crPixel{dc.GetPixel(pt)};
     ::ReleaseDC(nullptr, dc);
-    SetColorRef(crPixel, bStoreToHistory);
+    SetColor(crPixel, m_imSpectrum.GetColor().m_A, bStoreToHistory);
     DBGTPrint(LTH_COLORPICKER L" {%d, %d} ==> 0x%08x\n", pt.x, pt.y, crPixel);
 }
 

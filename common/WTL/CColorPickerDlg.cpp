@@ -28,7 +28,7 @@ HRESULT CColorPickerDlg::Initialize()
     return m_ccColorPicker.PreCreateWindow();
 }
 
-bool CColorPickerDlg::Show(HWND hWndMaster, COLORREF& crTarget, bool bModal)
+bool CColorPickerDlg::Show(HWND hWndMaster, CColorTarget crTarget, bool bModal)
 {
     std::wstring sFunc{L"NONE"};
     HRESULT      hCode{Initialize()};
@@ -37,7 +37,7 @@ bool CColorPickerDlg::Show(HWND hWndMaster, COLORREF& crTarget, bool bModal)
         goto reportError;
     }
     m_wndMaster = hWndMaster;
-    m_ccColorPicker.SetTracked(crTarget);
+    m_ccColorPicker.SetColorTarget(std::move(crTarget));
     m_bModalLoop = bModal;
     if (m_bModalLoop) {
         auto const nRes{WTL::CIndirectDialogImpl<CColorPickerDlg>::DoModal(hWndMaster)};

@@ -387,7 +387,7 @@ CColorButton::~CColorButton() = default;
 //
 //-----------------------------------------------------------------------------
 CColorButton::CColorButton()
-    : CColorButtonSuper{}
+    :     m_ColorTarget{nullptr, nullptr}
     ,  m_pszDefaultText{_T("Automatic")}
     ,   m_pszCustomText{_T("More Colors...")}
     ,      m_clrCurrent{CLR_DEFAULT}
@@ -482,6 +482,48 @@ BOOL CColorButton::SubclassWindow(HWND hWnd)
         // TODO: report...
     }
     return TRUE;
+}
+
+
+//-----------------------------------------------------------------------------
+//
+// IColorTarget overrides
+//
+//-----------------------------------------------------------------------------
+COLORREF CColorButton::GetColorRef() const
+{
+    return m_clrCurrent;
+}
+
+int CColorButton::GetAlpha() const
+{
+    return RGB_MAX_INT;
+}
+
+void CColorButton::SetColor(COLORREF clrCurrent, int nAlpha)
+{
+    UNREFERENCED_PARAMETER(nAlpha);
+    m_clrCurrent = clrCurrent;
+    if (IsWindow()) {
+        InvalidateRect(nullptr);
+    }
+}
+
+//-----------------------------------------------------------------------------
+//
+// Setting up tracking color
+//
+//-----------------------------------------------------------------------------
+void CColorButton::SetColorTarget(CColorTarget crTarget)
+{
+    m_ColorTarget = std::move(crTarget);
+    if (!m_ColorTarget.m_pHost) {
+        m_ColorTarget.m_pHost = this;
+    }
+    m_ColorTarget.UpdateHostColor();
+    if (m_ColorTarget.m_pTarget) {
+        SetTrackSelection(TRUE);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1015,7 +1057,7 @@ BOOL CColorButton::CPickerImpl::Picker()
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
                 CColorPickerDlg dlg;
                 //WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
-                if (dlg.Show(m_rMaster.m_hWnd, m_rMaster.m_clrCurrent, true)) {
+                if (dlg.Show(m_rMaster.m_hWnd, {&m_rMaster}, true)) {
                     fOked = TRUE;
                 }
                 else {

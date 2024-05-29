@@ -103,6 +103,9 @@
     <ClCompile Include="WTL\CColorCell.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
+    <ClCompile Include="WTL\CColorTarget.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -241,6 +244,9 @@
       <Filter>WTL</Filter>
     </ClInclude>
     <ClInclude Include="WTL\CColorCell.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
+    <ClInclude Include="WTL\CColorTarget.h">
       <Filter>WTL</Filter>
     </ClInclude>
   </ItemGroup>

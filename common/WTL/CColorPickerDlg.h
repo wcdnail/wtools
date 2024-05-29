@@ -14,7 +14,7 @@ struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
     WCDAFX_API CColorPickerDlg();
 
     WCDAFX_API HRESULT Initialize();
-    WCDAFX_API bool Show(HWND hWndMaster, COLORREF& crTarget, bool bModal = false);
+    WCDAFX_API bool Show(HWND hWndMaster, CColorTarget crTarget, bool bModal = false);
 
     COLORREF GetColor() const;
 

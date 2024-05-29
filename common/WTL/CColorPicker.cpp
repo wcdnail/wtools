@@ -32,14 +32,33 @@ BOOL CColorPicker::PreTranslateMessage(MSG* pMsg)
     return FALSE;
 }
 
+//-----------------------------------------------------------------------------
+//
+// IColorTarget overrides
+//
+//-----------------------------------------------------------------------------
 COLORREF CColorPicker::GetColorRef() const
 {
     return m_pImpl->m_imSpectrum.GetColorRef();
 }
 
-bool CColorPicker::SetTracked(COLORREF& crTarget) const
+int CColorPicker::GetAlpha() const
 {
-    m_pImpl->m_pTrackedColor = &crTarget;
+    return m_pImpl->m_imSpectrum.GetColor().m_A;
+}
+
+void CColorPicker::SetColor(COLORREF crColor, int nAlpha)
+{
+    m_pImpl->SetColor(crColor, nAlpha, false);
+}
+
+bool CColorPicker::SetColorTarget(CColorTarget crTarget)
+{
+    m_pImpl->m_ColorTarget = std::move(crTarget);
+    if (!m_pImpl->m_ColorTarget.m_pHost) {
+        m_pImpl->m_ColorTarget.m_pHost = this;
+    }
+    m_pImpl->m_ColorTarget.UpdateHostColor();
     return true;
 }
 

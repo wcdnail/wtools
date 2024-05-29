@@ -6,6 +6,7 @@
 #include "CColorStatic.h"
 #include "CMagnifierCtrl.h"
 #include "CColorHistory.h"
+#include "CColorTarget.h"
 #include <wcdafx.api.h>
 #include <Magnification.h>
 #include <atlddx.h>
@@ -35,7 +36,7 @@ private:
     CSpectrumSlider      m_imSlider;
     CColorStatic          m_stColor;
     CMagnifierCtrl      m_Magnifier;
-    COLORREF*       m_pTrackedColor;
+    CColorTarget      m_ColorTarget;
     ATL::CWindow        m_stHistory;
 
     // DDX variables
@@ -60,7 +61,7 @@ private:
     void UpdateHexStr();
     void UpdateHtmlStr();
     void UpdateDDX();
-    void UpdateColorStatic();
+    void UpdateColor();
     void DDXReloadEditsExcept(int nId);
     LRESULT ColorChanged(bool bUpdateDDX);
     void OnDDXLoading(UINT nID, BOOL bSaveAndValidate);
@@ -72,7 +73,7 @@ private:
     void ColorpickBegin();
     void HistoryStore();
     void HistoryPick();
-    void SetColorRef(COLORREF crColor, bool bStoreToHistory);
+    void SetColor(COLORREF crColor, int nAlpha, bool bStoreToHistory);
     void GetColorFromWindowDC(CPoint const& pt, bool bStoreToHistory);
     void GetColorFromDesktopDC(CPoint const& pt, bool bStoreToHistory);
     void ColorpickEnd(UINT, CPoint const&, bool bSelect);

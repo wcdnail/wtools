@@ -2,6 +2,7 @@
 
 #include "wcdafx.api.h"
 #include <windef.h>
+#include <xutility>
 
 constexpr double  HSV_HUE_MAX{360.};
 constexpr int HSV_HUE_MAX_INT{360};

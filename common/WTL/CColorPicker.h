@@ -1,12 +1,16 @@
 #pragma once
 
 #include "CCustomCtrl.h"
+#include "CColorTarget.h"
 #include <wcdafx.api.h>
 #include <atlgdi.h>
 #include <atlapp.h>
 #include <memory>
 
-struct CColorPicker: CCustomControl, WTL::CMessageFilter
+
+struct CColorPicker: private CCustomControl,
+                     private WTL::CMessageFilter,
+                     public  IColorTarget
 {
     enum Sizes: short
     {
@@ -26,10 +30,16 @@ struct CColorPicker: CCustomControl, WTL::CMessageFilter
     WCDAFX_API HRESULT PreCreateWindow() override;
     WCDAFX_API BOOL PreTranslateMessage(MSG* pMsg) override;
 
-    WCDAFX_API COLORREF GetColorRef() const;
-    WCDAFX_API bool SetTracked(COLORREF& crTarget) const;
+    WCDAFX_API COLORREF GetColorRef() const override;
+    WCDAFX_API int GetAlpha() const override;
+    WCDAFX_API void SetColor(COLORREF crColor, int nAlpha = 255) override;
+
+    WCDAFX_API bool SetColorTarget(CColorTarget crTarget);
 
     WCDAFX_API static int& RasterCX();
+
+    using WndSuper::IsWindow;
+    using WndSuper::InvalidateRect;
 
 private:
     struct Impl;

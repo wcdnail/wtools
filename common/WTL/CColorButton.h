@@ -151,9 +151,13 @@
 //
 //-----------------------------------------------------------------------------
 
+#include "CColorTarget.h"
+#include <color.stuff.h>
+#include <wcdafx.api.h>
 #include <atlwin.h>
 #include <string>
 #include <memory>
+
 
 //-----------------------------------------------------------------------------
 //
@@ -185,16 +189,14 @@ struct NMCOLORBUTTON
 // Class definition
 //
 //-----------------------------------------------------------------------------
-
-class CColorButton;
-
-using CColorButtonSuper = ATL::CWindowImpl<CColorButton>;
-
-class CColorButton : public CColorButtonSuper
+class CColorButton: public ATL::CWindowImpl<CColorButton>,
+                    public IColorTarget
 {
     // @access Types and enumerations
 public:
-    using String = std::basic_string<TCHAR>; // ATL::CString is great, but lacks some transactional behaviour 
+    using String = std::basic_string<TCHAR>; // ATL::CString is great, but lacks some transactional behaviour
+
+    DELETE_COPY_MOVE_OF(CColorButton);
 
     // @cmember General destructor
     ~CColorButton() override;
@@ -206,10 +208,16 @@ public:
     BOOL SubclassWindow(HWND hWnd);
 
     // @cmember Get the current color
-    COLORREF GetColor() const;
+    COLORREF GetColorRef() const override;
+
+    // @cmember Get the current alpha
+    int GetAlpha() const override;
 
     // @cmember Set the current color
-    void SetColor(COLORREF clrCurrent);
+    void SetColor(COLORREF clrCurrent, int nAlpha = 255) override;
+
+    // @cmember Set tracking color target
+    void SetColorTarget(CColorTarget crTarget);
 
     // @cmember Get the default color
     COLORREF GetDefaultColor() const;
@@ -248,7 +256,7 @@ public:
     BOOL HasDefaultText() const;
 
 private:
-    friend CColorButtonSuper;
+    friend ATL::CWindowImpl<CColorButton>;
 
     BEGIN_MSG_MAP(CColorButton)
         if(PreProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
@@ -310,6 +318,8 @@ protected:
     struct CThemed;
     struct CPickerImpl;
 
+    CColorTarget m_ColorTarget;
+
     // @cmember Default text
     String m_pszDefaultText;
 
@@ -333,26 +343,11 @@ protected:
 
     // @cmember The contained picker control
     std::unique_ptr<CPickerImpl> m_pPicker;
-    // TODO: move implementation to separate files
 
     // @cmember The contained themed impl
     std::unique_ptr<CThemed> m_pThemed;
     // If CColorButton will derive from WTL::CThemeImpl, it will be damage itself...
-    // TODO: Need more deep investigation on it
 };
-
-inline COLORREF CColorButton::GetColor() const
-{
-    return m_clrCurrent;
-}
-
-inline void CColorButton::SetColor(COLORREF clrCurrent)
-{
-    m_clrCurrent = clrCurrent;
-    if (IsWindow()) {
-        InvalidateRect(nullptr);
-    }
-}
 
 inline COLORREF CColorButton::GetDefaultColor() const
 {
