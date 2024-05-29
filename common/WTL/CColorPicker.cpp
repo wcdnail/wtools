@@ -74,7 +74,6 @@ BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     UNREFERENCED_PARAMETER(bHandled);
     switch(dwMsgMapID) {
     case 0:
-      //MSG_WM_NCPAINT(OnNcPaint)
         MSG_WM_CREATE(OnCreate)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_SIZE(OnSize)
@@ -90,22 +89,6 @@ BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         break;
     }
     return FALSE;
-}
-
-void CColorPicker::OnNcPaint(WTL::CRgnHandle rgn)
-{
-    CRect rc{};
-    if constexpr (false) {
-        WTL::CDCHandle dc{GetDCEx(rgn, DCX_INTERSECTRGN | DCX_WINDOW)};
-        GetClipBox(dc, rc);
-        dc.DrawEdge(rc, EDGE_ETCHED, BF_FLAT | BF_RECT);
-        ReleaseDC(dc);
-    }
-    else {
-        WTL::CClientDC dc{m_hWnd};
-        GetWindowRect(rc);
-        dc.DrawEdge(rc, EDGE_ETCHED, BF_FLAT | BF_RECT);
-    }
 }
 
 int CColorPicker::OnCreate(LPCREATESTRUCT lpCreateStruct)

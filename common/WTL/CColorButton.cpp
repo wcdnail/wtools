@@ -169,7 +169,7 @@ static const CSize s_sizeBoxCore(14, 14);
 struct CColorButton::CThemed
 {
     HANDLE OpenThemeData(PCWSTR) { return INVALID_HANDLE_VALUE; }
-    bool DrawThemeBkgnd(CDCHandle, CRect&, UINT, BOOL, BOOL) { return false; }
+    bool DrawThemeBkgnd(CDCHandle, CRect&, UINT, bool, bool) { return false; }
     BOOL ProcessWindowMessage(HWND, UINT, WPARAM, LPARAM, LRESULT&) { return FALSE; }
 };
 
@@ -195,7 +195,7 @@ struct CColorButton::CThemed : public WTL::CThemeImpl<CThemed>
         return m_rMaster.GetExStyle();
     }
 
-    bool DrawThemeBkgnd(WTL::CDCHandle dc, CRect& rcDraw, UINT uState, BOOL fPopupActive, BOOL fMouseOver)
+    bool DrawThemeBkgnd(WTL::CDCHandle dc, CRect& rcDraw, UINT uState, bool fPopupActive, bool fMouseOver)
     {
         if (!m_hTheme) {
             return false;
@@ -286,6 +286,8 @@ struct CColorButton::CPickerImpl
     COLORREF m_clrText;
     // @cmember The contained picker control
     ATL::CContainedWindow m_wndPicker;
+    // @cmember The windows which will be receive WM_NOTIFY
+    HWND m_hNotifyTarget;
 
     ~CPickerImpl();
     CPickerImpl(CColorButton& master);
@@ -361,6 +363,7 @@ CColorButton::CPickerImpl::CPickerImpl(CColorButton& master)
     ,   m_clrHiLightText{0x00000000}
     ,          m_clrText{0x00000000}
     ,        m_wndPicker{&master, 1}
+    ,    m_hNotifyTarget{nullptr}
 {
     UNREFERENCED_PARAMETER(StaticInit::Init());
 }
@@ -392,9 +395,9 @@ CColorButton::CColorButton()
     ,   m_pszCustomText{_T("More Colors...")}
     ,      m_clrCurrent{CLR_DEFAULT}
     ,      m_clrDefault{::GetSysColor(COLOR_APPWORKSPACE)}
-    ,    m_fPopupActive{FALSE}
-    , m_fTrackSelection{FALSE}
-    ,      m_fMouseOver{FALSE}
+    ,    m_fPopupActive{false}
+    , m_fTrackSelection{false}
+    ,      m_fMouseOver{false}
     ,         m_pPicker{std::make_unique<CPickerImpl>(*this)}
     ,         m_pThemed{std::make_unique<CThemed>(*this)}
 {
@@ -481,6 +484,7 @@ BOOL CColorButton::SubclassWindow(HWND hWnd)
     if (!m_pThemed->OpenThemeData(L"Button")) {
         // TODO: report...
     }
+    m_pPicker->m_hNotifyTarget = GetParent();
     return TRUE;
 }
 
@@ -522,7 +526,8 @@ void CColorButton::SetColorTarget(CColorTarget crTarget)
     }
     m_ColorTarget.UpdateHostColor();
     if (m_ColorTarget.m_pTarget) {
-        SetTrackSelection(TRUE);
+        SetTrackSelection(true);
+        m_pPicker->m_hNotifyTarget = nullptr;
     }
 }
 
@@ -546,7 +551,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
     //
     // Mark button as active and invalidate button to force a redraw
     //
-    m_fPopupActive = TRUE;
+    m_fPopupActive = true;
     InvalidateRect(nullptr);
     //
     // Get the parent window
@@ -567,7 +572,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
     //
     // Cancel the popup
     //
-    m_fPopupActive = FALSE;
+    m_fPopupActive = false;
     //
     // If the popup was canceled without a selection
     //
@@ -579,6 +584,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
             if (clrOldColor != m_clrCurrent) {
                 m_clrCurrent = clrOldColor;
                 m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
+                m_ColorTarget.OnUpdateColor(m_clrCurrent, RGB_MAX_INT);
             }
         }
         m_pPicker->SendNotification(CPN_CLOSEUP, m_clrCurrent, TRUE);
@@ -587,6 +593,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
     else {
         if (clrOldColor != m_clrCurrent) {
             m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
+            m_ColorTarget.OnUpdateColor(m_clrCurrent, RGB_MAX_INT);
         }
         m_pPicker->SendNotification(CPN_CLOSEUP, m_clrCurrent, TRUE);
         m_pPicker->SendNotification(CPN_SELENDOK, m_clrCurrent, TRUE);
@@ -616,7 +623,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
 LRESULT CColorButton::OnMouseMove(UINT, WPARAM, LPARAM, BOOL& bHandled)
 {
     if (!m_fMouseOver) {
-        m_fMouseOver = TRUE;
+        m_fMouseOver = true;
         TRACKMOUSEEVENT tme;
         tme.cbSize = sizeof (tme);
         tme.dwFlags = TME_LEAVE;
@@ -646,7 +653,7 @@ LRESULT CColorButton::OnMouseMove(UINT, WPARAM, LPARAM, BOOL& bHandled)
 LRESULT CColorButton::OnMouseLeave(UINT, WPARAM, LPARAM, BOOL& bHandled)
 {
     if (m_fMouseOver) {
-        m_fMouseOver = FALSE;
+        m_fMouseOver = false;
         InvalidateRect(nullptr);
     }
     bHandled = FALSE;
@@ -1429,6 +1436,7 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex, BOOL fTrackSel
     if (fTrackSelection) {
         if (fValid) {
             m_rMaster.m_clrCurrent = clr;
+            m_rMaster.m_ColorTarget.OnUpdateColor(m_rMaster.m_clrCurrent, RGB_MAX_INT);
         }
         m_rMaster.InvalidateRect(nullptr);
         SendNotification(CPN_SELCHANGE, m_rMaster.m_clrCurrent, fValid);
@@ -1884,13 +1892,16 @@ LRESULT CColorButton::OnPickerPaletteChanged(UINT uMsg, WPARAM wParam, LPARAM lP
 //-----------------------------------------------------------------------------
 void CColorButton::CPickerImpl::SendNotification(UINT nCode, COLORREF clr, BOOL fColorValid)
 {
+    if (!m_hNotifyTarget) {
+        return ;
+    }
     NMCOLORBUTTON nmclr;
     nmclr.hdr.code = nCode;
     nmclr.hdr.hwndFrom = m_rMaster.m_hWnd;
     nmclr.hdr.idFrom = m_rMaster.GetDlgCtrlID();
     nmclr.fColorValid = fColorValid;
     nmclr.clr = clr;
-    SendMessage(m_rMaster.GetParent(), WM_NOTIFY,
+    SendMessage(m_hNotifyTarget, WM_NOTIFY,
         static_cast<WPARAM>(m_rMaster.GetDlgCtrlID()),
         reinterpret_cast<LPARAM>(&nmclr));
 }

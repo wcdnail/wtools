@@ -5,6 +5,9 @@
 #include <WTL/CColorCell.h>
 #include <WTL/CColorPickerDlg.h>
 #include <color.stuff.h>
+#include <dh.tracing.h>
+#include <dh.tracing.defs.h>
+#include <dev.assistance/dev.assist.h>
 #include <atlwin.h>
 #include <atlcrack.h>
 
@@ -32,12 +35,32 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
     BEGIN_MSG_MAP_EX(CDefaultWin32Dlg)
         MSG_WM_INITDIALOG(OnInitDialog)
-        COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)
-        COMMAND_ID_HANDLER(IDOK, OnEndDialog)
-        COMMAND_ID_HANDLER(IDCANCEL, OnEndDialog)
         MSG_WM_DRAWITEM(OnDrawItem)
+        MSG_WM_NOTIFY(OnNotify)
+        MSG_WM_COMMAND(OnCommand)
         REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
+
+    LRESULT OnNotify(int nID, LPNMHDR pnmh)
+    {
+        DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+        SetMsgHandled(FALSE);
+        return 0;
+    }
+
+    void OnCommand(UINT uNotifyCode, int nID, HWND)
+    {
+        switch (nID) {
+        case ID_APP_ABOUT:  OnAppAbout(); return;
+        case IDOK:
+        case IDCANCEL:      OnEndDialog(nID); return ;
+        default:
+            DBGTPrint(LTH_WM_COMMAND L" id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+            break;
+        }
+        SetMsgHandled(FALSE);
+    }
+
 
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     {
@@ -64,16 +87,15 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         return TRUE;
     }
 
-    LRESULT OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+    LRESULT OnAppAbout() const
     {
         //ATL::CSimpleDialog<IDD_ABOUTBOX, FALSE> dlg;
         //dlg.DoModal();
         return 0;
     }
 
-    LRESULT OnEndDialog(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+    LRESULT OnEndDialog(int wID)
     {
-        // TODO: Add validation code 
         EndDialog(wID);
         return 0;
     }

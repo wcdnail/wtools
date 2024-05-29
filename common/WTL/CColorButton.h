@@ -241,10 +241,10 @@ public:
     void SetDefaultText(UINT nID);
 
     // @cmember Get the tracking flag
-    BOOL GetTrackSelection(void) const;
+    bool GetTrackSelection(void) const;
 
     // @cmember Set the tracking flag
-    void SetTrackSelection(BOOL fTrack);
+    void SetTrackSelection(bool fTrack);
 
     // @cmember Set both strings from a resource
     void SetText(UINT nDefault, UINT nCustom);
@@ -333,13 +333,13 @@ protected:
     COLORREF m_clrDefault;
 
     // @cmember True if popup active override
-    BOOL m_fPopupActive;
+    bool m_fPopupActive;
 
     // @cmember True if tracking selection
-    BOOL m_fTrackSelection;
+    bool m_fTrackSelection;
 
     // @cmember True if the mouse is over
-    BOOL m_fMouseOver;
+    bool m_fMouseOver;
 
     // @cmember The contained picker control
     std::unique_ptr<CPickerImpl> m_pPicker;
@@ -359,12 +359,12 @@ inline void CColorButton::SetDefaultColor(COLORREF clrDefault)
     m_clrDefault = clrDefault;
 }
 
-inline BOOL CColorButton::GetTrackSelection() const
+inline bool CColorButton::GetTrackSelection() const
 {
     return m_fTrackSelection;
 }
 
-inline void CColorButton::SetTrackSelection(BOOL fTrack)
+inline void CColorButton::SetTrackSelection(bool fTrack)
 {
     m_fTrackSelection = fTrack;
 }

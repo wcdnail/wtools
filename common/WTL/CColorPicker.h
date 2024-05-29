@@ -45,10 +45,8 @@ private:
     struct Impl;
     std::unique_ptr<Impl> m_pImpl;
 
-    void OnNcPaint(WTL::CRgnHandle rgn);
+    BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
     int OnCreate(LPCREATESTRUCT lpCreateStruct);
     void OnDestroy();
     void OnSize(UINT nType, CSize size) const;
-
-    BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 };
