@@ -11,73 +11,89 @@
 #include <dh.tracing.h>
 #include <atlctrls.h>
 #include <atlframe.h>
+#include <atlcrack.h>
 #include <atldlgs.h>
 #include <atlddx.h>
 #include <atlmisc.h>
 #include <algorithm>
-#include <deque>
 #include <cctype>
 
 constexpr float MAG_FACTOR{5.f};
 
-int CColorPicker::Impl::gs_nRasterCX{SPEC_BITMAP_WDTH};
+int         CColorPicker::Impl::gs_nRasterCX{SPEC_BITMAP_WDTH};
+CColorHistory CColorPicker::Impl::gs_History{};
 
-namespace CPInt
+namespace
 {
-    HistoryItem::~HistoryItem()
+    enum ControlIds: int
     {
-        if (m_hPrev) {
-            m_DC.SelectBitmap(m_hPrev);
-        }
-    }
+        BEFORE_FIRST_CONTROL_ID = 1905,
+        CID_GRP_SPECTRUM,
+        CID_SPEC_COMBO,
+        CID_BTN_PICK_COLOR,
+        CID_SPEC_COLOR_CAP, CID_SPEC_COLOR_SEL,
+        CID_SPECTRUM_PIC,
+        CID_SPECTRUM_SLD,
+        CID_GRP_RGB,
+        CID_RGB_RED_CAP,
+        CID_RGB_GRN_CAP,
+        CID_RGB_BLU_CAP,
+        CID_RGB_ALP_CAP,
+        CID_GRP_HSL,
+        CID_HSL_HUE_CAP,
+        CID_HSL_SAT_CAP,
+        CID_HSL_LTN_CAP,
+        CID_GRP_HSV,
+        CID_HSV_HUE_CAP,
+        CID_HSV_SAT_CAP,
+        CID_HSV_VAL_CAP,
+        CID_GRP_HISTORY, CID_STA_HISTORY,
+        CID_GRP_MAGNIFIER, CID_PLC_MAGNIFIER,
+        // Edit controls
+        CID_RGB_RED_VAL, CID_RGB_RED_UDS,
+        CID_RGB_GRN_VAL, CID_RGB_GRN_UDS,
+        CID_RGB_BLU_VAL, CID_RGB_BLU_UDS,
+        CID_RGB_ALP_VAL, CID_RGB_ALP_UDS,
+        CID_HSL_HUE_VAL, CID_HSL_HUE_UDS,
+        CID_HSL_SAT_VAL, CID_HSL_SAT_UDS,
+        CID_HSL_LTN_VAL, CID_HSL_LTN_UDS,
+        CID_HSV_HUE_VAL, CID_HSV_HUE_UDS,
+        CID_HSV_SAT_VAL, CID_HSV_SAT_UDS,
+        CID_HSV_VAL_VAL, CID_HSV_VAL_UDS,
+        CID_RGB_HEX_VAL, CID_HSV_HEX_UDS,
+        CID_RGB_HTM_VAL, CID_HSV_HTM_UDS,
+        CID_EDITS_LAST,
+        CID_EDITS_FIRST = CID_RGB_RED_VAL,
+        CID_EDITS_COUNT = CID_EDITS_LAST - CID_EDITS_FIRST,
+    };
 
-    HistoryItem::HistoryItem(COLORREF crClr, int nA)
-        : crColor{crClr}
-        ,  nAlpha{nA}
-        , m_hPrev{nullptr}
+    enum Sizes: short
     {
-    }
+        TRGB_CX = CColorPicker::DLG_CX/4,
+        RGB_CX  = TRGB_CX + TRGB_CX/2,
+        RGB_CY  = CColorPicker::DLG_CY/3,
+        SPEC_CX = CColorPicker::DLG_CX - RGB_CX,
+        HHCX    = RGB_CX/2,
+        HHCY    = RGB_CY/2,
+        HLCY    = RGB_CY/4 - 4,
+        CLMNT_X = SPEC_CX + 4,                  // 1 column static X
+        CLMN1_X = SPEC_CX + HHCX/3,             // 1 column edit X
+        CLMN2_X = SPEC_CX-2+HHCX/3+RGB_CX/2,    // 2 column edit X
+        HLCYS   = HLCY + 3,                     // edit Y spacing
+    };
 
-    HistoryItem::HistoryItem(HistoryItem&& rhs) noexcept
-        : crColor{rhs.crColor}
-        ,  nAlpha{rhs.nAlpha}
-        , m_hPrev{nullptr}
+    enum Styles: DWORD
     {
-    }
+        CC_CHILD  = WS_CHILD | WS_VISIBLE | WS_TABSTOP,
+        UD_CHILD  = UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | WS_GROUP,
+        MAG_CHILD = WS_CHILD | WS_VISIBLE | MS_SHOWMAGNIFIEDCURSOR,
+    };
 
-    HistoryItem& HistoryItem::operator=(HistoryItem&& rhs) noexcept
+    enum Timers: int
     {
-        rhs.Swap(*this);
-        return *this;
-    }
-
-    void HistoryItem::Swap(HistoryItem& rhs) noexcept
-    {
-        std::swap(crColor, rhs.crColor);
-        std::swap(nAlpha, rhs.nAlpha);
-        std::swap(m_hPrev, rhs.m_hPrev);
-        std::swap(m_DC.m_hDC, rhs.m_DC.m_hDC);
-        std::swap(m_Bitmap.m_hBitmap, rhs.m_Bitmap.m_hBitmap);
-    }
-
-    HDC HistoryItem::GetDC(HDC dc, CRect const& rc)
-    {
-        if (!m_DC) {
-            if (!m_Bitmap) {
-                m_Bitmap = CreateCompatibleBitmap(dc, rc.Width(), rc.Height());
-            }
-            m_DC.CreateCompatibleDC(dc);
-            m_hPrev = m_DC.SelectBitmap(m_Bitmap);
-            m_DC.FillSolidRect(rc, crColor);
-        }
-        return m_DC.m_hDC;
-    }
-
-    bool HistoryItem::operator==(const HistoryItem& lhs) const
-    {
-        return nAlpha == lhs.nAlpha &&
-               crColor == lhs.crColor;
-    }
+        TIMER_COLORPICK      = 1024,
+        TIMER_COLORPICK_MSEC = 5,
+    };
 }
 
 CColorPicker::Impl::~Impl() = default;
@@ -109,6 +125,191 @@ HRESULT CColorPicker::Impl::PreCreateWindow()
     }
     return S_OK;
 }
+
+BOOL CColorPicker::Impl::DoDataExchange(BOOL bSaveAndValidate, UINT nCtlID)
+{
+    UNREFERENCED_PARAMETER(bSaveAndValidate);
+    UNREFERENCED_PARAMETER(nCtlID);
+    DDX_CONTROL(CID_SPEC_COLOR_SEL, m_stColor)
+    DDX_UINT(CID_RGB_RED_VAL, m_imSpectrum.GetColor().m_R);
+    DDX_UINT(CID_RGB_GRN_VAL, m_imSpectrum.GetColor().m_G);
+    DDX_UINT(CID_RGB_BLU_VAL, m_imSpectrum.GetColor().m_B);
+    DDX_UINT(CID_RGB_ALP_VAL, m_imSpectrum.GetColor().m_A);
+    DDX_UINT(CID_HSV_HUE_VAL, m_imSpectrum.GetColor().m_H);
+    DDX_UINT(CID_HSV_SAT_VAL, m_imSpectrum.GetColor().m_S);
+    DDX_UINT(CID_HSV_VAL_VAL, m_imSpectrum.GetColor().m_V);
+    DDX_UINT(CID_HSL_HUE_VAL, m_imSpectrum.GetColor().m_Hl);
+    DDX_UINT(CID_HSL_SAT_VAL, m_imSpectrum.GetColor().m_Sl);
+    DDX_UINT(CID_HSL_LTN_VAL, m_imSpectrum.GetColor().m_L);
+    DDX_TEXT(CID_RGB_HEX_VAL, m_sColorHex);
+    DDX_TEXT(CID_RGB_HTM_VAL, m_sColorHtml);
+    DDX_COMBO_INDEX(CID_SPEC_COMBO, m_nSpectrumKind);
+    if (static_cast<UINT>(-1) != nCtlID) {
+        OnDDXLoading(nCtlID, bSaveAndValidate);
+    }
+    return TRUE;
+}
+
+void CColorPicker::Impl::DoInitTemplate()
+{
+    bool constexpr       bExTemplate{true};
+    short constexpr               nX{0};
+    short constexpr               nY{0};
+    short constexpr           nWidth{DLG_CX};
+    short constexpr          nHeight{DLG_CY};
+    LPCTSTR constexpr      szCaption{_T("Color Picker")};
+    DWORD constexpr          dwStyle{DS_CONTROL | WS_CHILD | WS_VISIBLE};
+    DWORD constexpr        dwExStyle{0};
+    LPCTSTR constexpr     szFontName{_T("Cascadia Mono Light")};
+    WORD constexpr         wFontSize{8};
+    WORD constexpr           wWeight{0};
+    BYTE constexpr           bItalic{0};
+    BYTE constexpr          bCharset{0};
+    DWORD constexpr         dwHelpID{0};
+    ATL::_U_STRINGorID const    Menu{0U};
+    ATL::_U_STRINGorID const szClass{0U};
+    m_Template.Create(bExTemplate, szCaption,
+                      nX, nY, nWidth, nHeight,
+                      dwStyle, dwExStyle,
+                      szFontName, wFontSize, wWeight, bItalic, bCharset,
+                      dwHelpID, szClass, Menu);
+}
+
+void CColorPicker::Impl::DoInitControls()
+{
+    //                               Text/ID,            ID/ClassName,    Style,                 X,              Y,           Width,         Height,   Styles
+    CONTROL_GROUPBOX(         _T("Spectrum"),        CID_GRP_SPECTRUM,                           2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
+        CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                           8,             14,         HHCX+20,       DLG_CY-4,   CBS_AUTOHSCROLL | CBS_DROPDOWNLIST, 0)
+        CONTROL_PUSHBUTTON(             _T(""),      CID_BTN_PICK_COLOR,           SPEC_CX-HHCY-HHCX,             12,        HHCX/4+4,         HLCY+4,   BS_BITMAP, 0)
+    CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS,   CC_CHILD,               8,        18+HLCY, SPEC_CX-HHCY-20, DLG_CY-HLCY-26,   WS_EX_STATICEDGE)
+    CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,          CSPECSLD_CLASS,   CC_CHILD, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-26,   WS_EX_STATICEDGE)
+        CONTROL_RTEXT(          _T("Color:"),      CID_SPEC_COLOR_CAP,      SPEC_CX-HHCY-HHCX/2-10,             14,        HHCX/2-8,           HLCY,   SS_CENTERIMAGE, 0)
+        CONTROL_CTEXT(           _T("COLOR"),      CID_SPEC_COLOR_SEL,             SPEC_CX-HHCY-10,             14,          HHCY+2,         HHCY-2,   SS_NOTIFY | WS_TABSTOP, WS_EX_STATICEDGE)
+    CONTROL_GROUPBOX(              _T("RGB"),             CID_GRP_RGB,                     CLMNT_X,              2,        RGB_CX-8,       RGB_CY-4,   0, 0)
+        CONTROL_RTEXT(               _T("R"),         CID_RGB_RED_CAP,                   CLMNT_X+2,     HLCYS*0+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+        CONTROL_RTEXT(               _T("G"),         CID_RGB_GRN_CAP,                   CLMNT_X+2,     HLCYS*1+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+        CONTROL_RTEXT(               _T("B"),         CID_RGB_BLU_CAP,                   CLMNT_X+2,     HLCYS*2+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+        CONTROL_EDITTEXT(                             CID_RGB_RED_VAL,                     CLMN1_X,     HLCYS*0+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
+    CONTROL_CONTROL(_T(""),  CID_RGB_RED_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN1_X+24,     HLCYS*0+13,       HHCX/2-22,           HLCY,   0)
+        CONTROL_EDITTEXT(                             CID_RGB_GRN_VAL,                     CLMN1_X,     HLCYS*1+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
+    CONTROL_CONTROL(_T(""),  CID_RGB_GRN_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN1_X+24,     HLCYS*1+13,       HHCX/2-22,           HLCY,   0)
+        CONTROL_EDITTEXT(                             CID_RGB_BLU_VAL,                     CLMN1_X,     HLCYS*2+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
+    CONTROL_CONTROL(_T(""),  CID_RGB_BLU_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN1_X+24,     HLCYS*2+13,       HHCX/2-22,           HLCY,   0)
+    CONTROL_GROUPBOX(              _T("HSL"),             CID_GRP_HSL,                     CLMNT_X,       RGB_CY+2,      RGB_CX/2-6,       RGB_CY-4,   0, 0)
+        CONTROL_RTEXT(               _T("H"),         CID_HSL_HUE_CAP,                   CLMNT_X+2,     HLCYS*4+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+        CONTROL_RTEXT(               _T("S"),         CID_HSL_SAT_CAP,                   CLMNT_X+2,     HLCYS*5+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+        CONTROL_RTEXT(               _T("L"),         CID_HSL_LTN_CAP,                   CLMNT_X+2,     HLCYS*6+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+        CONTROL_EDITTEXT(                             CID_HSL_HUE_VAL,                     CLMN1_X,     HLCYS*4+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
+    CONTROL_CONTROL(_T(""),  CID_HSL_HUE_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN1_X+24,     HLCYS*4+16,       HHCX/2-22,           HLCY,   0)
+        CONTROL_EDITTEXT(                             CID_HSL_SAT_VAL,                     CLMN1_X,     HLCYS*5+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
+    CONTROL_CONTROL(_T(""),  CID_HSL_SAT_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN1_X+24,     HLCYS*5+16,       HHCX/2-22,           HLCY,   0)
+        CONTROL_EDITTEXT(                             CID_HSL_LTN_VAL,                     CLMN1_X,     HLCYS*6+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
+    CONTROL_CONTROL(_T(""),  CID_HSL_LTN_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN1_X+24,     HLCYS*6+16,       HHCX/2-22,           HLCY,   0)
+    CONTROL_GROUPBOX(              _T("HSV"),             CID_GRP_HSV,          SPEC_CX+2+RGB_CX/2,       RGB_CY+2,      RGB_CX/2-6,       RGB_CY-4,   0, 0)
+        CONTROL_RTEXT(               _T("H"),         CID_HSV_HUE_CAP,          SPEC_CX+3+RGB_CX/2,     HLCYS*4+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+        CONTROL_RTEXT(               _T("S"),         CID_HSV_SAT_CAP,          SPEC_CX+3+RGB_CX/2,     HLCYS*5+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+        CONTROL_RTEXT(               _T("V"),         CID_HSV_VAL_CAP,          SPEC_CX+3+RGB_CX/2,     HLCYS*6+16,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+        CONTROL_EDITTEXT(                             CID_HSV_HUE_VAL,                     CLMN2_X,     HLCYS*4+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
+    CONTROL_CONTROL(_T(""),  CID_HSV_HUE_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN2_X+24,     HLCYS*4+16,       HHCX/2-22,           HLCY,   0)
+        CONTROL_EDITTEXT(                             CID_HSV_SAT_VAL,                     CLMN2_X,     HLCYS*5+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
+    CONTROL_CONTROL(_T(""),  CID_HSV_SAT_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN2_X+24,     HLCYS*5+16,       HHCX/2-22,           HLCY,   0)
+        CONTROL_EDITTEXT(                             CID_HSV_VAL_VAL,                     CLMN2_X,     HLCYS*6+16,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
+    CONTROL_CONTROL(_T(""),  CID_HSV_VAL_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN2_X+24,     HLCYS*6+16,       HHCX/2-22,           HLCY,   0)
+        // Hex edit and Alpha is last
+        CONTROL_EDITTEXT(                             CID_RGB_HEX_VAL,          SPEC_CX-2+RGB_CX/2,     HLCYS*0+13,         HHCX-10,           HLCY,   ES_CENTER, 0)
+        CONTROL_EDITTEXT(                             CID_RGB_HTM_VAL,          SPEC_CX-2+RGB_CX/2,     HLCYS*1+13,         HHCX-10,           HLCY,   ES_CENTER, 0)
+        CONTROL_RTEXT(               _T("A"),         CID_RGB_ALP_CAP,          SPEC_CX+3+RGB_CX/2,     HLCYS*2+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
+        CONTROL_EDITTEXT(                             CID_RGB_ALP_VAL,                     CLMN2_X,     HLCYS*2+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
+    CONTROL_CONTROL(_T(""),  CID_RGB_ALP_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN2_X+24,     HLCYS*4+16,       HHCX/2-22,           HLCY,   0)
+    CONTROL_GROUPBOX(          _T("History"),         CID_GRP_HISTORY,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
+        CONTROL_CTEXT(                _T(""),         CID_STA_HISTORY,                   CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-15,      RGB_CY-22,   SS_OWNERDRAW | SS_NOTIFY, 0)
+  //CONTROL_GROUPBOX(        _T("Magnifier"),       CID_GRP_MAGNIFIER,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
+      //CONTROL_CTEXT(       _T("MAGNIFIER"),       CID_PLC_MAGNIFIER,                   CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   SS_SUNKEN | SS_CENTERIMAGE, 0)
+  //CONTROL_CONTROL(_T(""),CID_PLC_MAGNIFIER,            WC_MAGNIFIER, MAG_CHILD,        CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   0)
+}
+
+const WTL::_AtlDlgResizeMap* CColorPicker::Impl::GetDlgResizeMap()
+{
+    static constexpr WTL::_AtlDlgResizeMap theMap[] = {
+    DLGRESIZE_CONTROL(CID_GRP_SPECTRUM, DLSZ_SIZE_Y | DLSZ_SIZE_X)
+        DLGRESIZE_CONTROL(CID_SPEC_COMBO, DLSZ_SIZE_X)
+        DLGRESIZE_CONTROL(CID_BTN_PICK_COLOR, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_SPEC_COLOR_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_SPEC_COLOR_SEL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_SPECTRUM_PIC, DLSZ_SIZE_Y | DLSZ_SIZE_X)
+        DLGRESIZE_CONTROL(CID_SPECTRUM_SLD, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+    DLGRESIZE_CONTROL(CID_GRP_RGB, DLSZ_MOVE_X)
+        // Red edit
+        DLGRESIZE_CONTROL(CID_RGB_RED_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_RGB_RED_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_RGB_RED_UDS, DLSZ_MOVE_X)
+        // Green edit
+        DLGRESIZE_CONTROL(CID_RGB_GRN_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_RGB_GRN_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_RGB_GRN_UDS, DLSZ_MOVE_X)
+        // Blue edit
+        DLGRESIZE_CONTROL(CID_RGB_BLU_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_RGB_BLU_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_RGB_BLU_UDS, DLSZ_MOVE_X)
+        // Strings
+        DLGRESIZE_CONTROL(CID_RGB_HEX_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_RGB_HTM_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_RGB_ALP_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_RGB_ALP_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_RGB_ALP_UDS, DLSZ_MOVE_X)
+    DLGRESIZE_CONTROL(CID_GRP_HSL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSL_HUE_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSL_HUE_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSL_HUE_UDS, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSL_SAT_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSL_SAT_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSL_SAT_UDS, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSL_LTN_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSL_LTN_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSL_LTN_UDS, DLSZ_MOVE_X)
+    DLGRESIZE_CONTROL(CID_GRP_HSV, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSV_HUE_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSV_HUE_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSV_HUE_UDS, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSV_SAT_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSV_SAT_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSV_SAT_UDS, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSV_VAL_CAP, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSV_VAL_VAL, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_HSV_VAL_UDS, DLSZ_MOVE_X)
+    DLGRESIZE_CONTROL(CID_GRP_HISTORY, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(CID_STA_HISTORY, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+        //DLGRESIZE_CONTROL(CID_GRP_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+        //DLGRESIZE_CONTROL(CID_PLC_MAGNIFIER, DLSZ_SIZE_Y | DLSZ_MOVE_X)
+    { -1, 0 },
+    };
+    return theMap;
+}
+
+BOOL CColorPicker::Impl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
+{
+    BOOL bHandled = TRUE;
+    UNREFERENCED_PARAMETER(hWnd);
+    UNREFERENCED_PARAMETER(bHandled);
+    switch(dwMsgMapID) {
+    case 0:
+        MSG_WM_INITDIALOG(OnInitDialog)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_NOTIFY(OnNotify)
+        MSG_WM_COMMAND(OnCommand)
+        MSG_WM_TIMER(OnTimer)
+        MSG_WM_DRAWITEM(OnDrawItem)
+        CHAIN_MSG_MAP(WTL::CDialogResize<Impl>)
+        REFLECT_NOTIFICATIONS()
+        break;
+    default: 
+        ATLTRACE(static_cast<int>(ATL::atlTraceWindowing), 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
+        ATLASSERT(FALSE);
+        break;
+    }
+    return FALSE;
+}
+
 
 void CColorPicker::Impl::SpectruKindChanged()
 {
@@ -363,6 +564,24 @@ void CColorPicker::Impl::ColorpickBegin()
     SetTimer(TIMER_COLORPICK, TIMER_COLORPICK_MSEC);
 }
 
+void CColorPicker::Impl::HistoryStore()
+{
+    gs_History.PutFront(m_imSpectrum.GetMinColorRef(1, 1, 1), m_imSpectrum.GetColor().m_A);
+}
+
+void CColorPicker::Impl::HistoryPick()
+{
+    auto const& chPick{gs_History.Pick()};
+    m_imSpectrum.GetColor().m_A = chPick.nAlpha;
+    SetColorRef(chPick.crColor, false);
+}
+
+//void CColorPicker::Impl::HistorySelect(CHistoryStore::const_reference item)
+//{
+//    m_imSpectrum.GetColor().m_A = item.nAlpha;
+//    SetColorRef(item.crColor, false);
+//}
+
 void CColorPicker::Impl::SetColorRef(COLORREF crColor, bool bStoreToHistory)
 {
     m_imSpectrum.GetColor().SetColorRef(crColor);
@@ -409,116 +628,19 @@ void CColorPicker::Impl::OnTimer(UINT_PTR nIDEvent)
     case TIMER_COLORPICK:
         m_Magnifier.UpdatePosition();
         break;
+    default:
+        break;
     }
 }
 
-void CColorPicker::Impl::DrawColorRect(WTL::CDCHandle dc, CRect const& rc, CPInt::HistoryItem& item, HBRUSH brBack)
+void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI) const
 {
-    if (item.nAlpha < RGB_MAX_INT) {
-        CRect const        rcColor{0, 0, 1, 1};
-        WTL::CDCHandle const dcClr{item.GetDC(dc, rcColor)};
-        BLENDFUNCTION const  blend{AC_SRC_OVER, 0, static_cast<BYTE>(item.nAlpha), 0};
-        dc.SelectBrush(brBack);
-        dc.PatBlt(rc.left, rc.top, rc.Width(), rc.Height(), PATCOPY);
-        dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(),
-                      dcClr, 0, 0, rcColor.Width(), rcColor.Height(), blend);
-    }
-    else {
-        dc.FillSolidRect(rc, item.crColor);
-    }
-}
-
-void CColorPicker::Impl::HistoryDropTail()
-{
-    auto const nHistMax{HistoryMax()};
-    if (m_deqHistory.size() > nHistMax) {
-        auto const pos{std::next(m_deqHistory.begin(), nHistMax)};
-        m_deqHistory.erase(pos, m_deqHistory.end());
-    }
-}
-
-void CColorPicker::Impl::HistoryStore()
-{
-    COLORREF const crColor{m_imSpectrum.GetMinColorRef(1, 1, 1)};
-    int const       nAlpha{m_imSpectrum.GetColor().m_A};
-    CPInt::HistoryItem it{crColor, nAlpha};
-    if (!m_deqHistory.empty() && it == m_deqHistory.front()) {
-        return ;
-    }
-    m_deqHistory.emplace_front(std::move(it));
-    ATL::CWindow{GetDlgItem(CID_STA_HISTORY)}.InvalidateRect(nullptr, FALSE);
-    HistoryDropTail();
-}
-
-void CColorPicker::Impl::HistorySelect(HistoryCont::const_reference item)
-{
-    m_imSpectrum.GetColor().m_A = item.nAlpha;
-    SetColorRef(item.crColor, false);
-}
-
-size_t CColorPicker::Impl::HistoryMax() const
-{
-    ATL::CWindow const staHistory{GetDlgItem(CID_STA_HISTORY)};
-    CRect                      rc{};
-    staHistory.GetClientRect(rc);
-    auto const xCount{static_cast<size_t>((rc.Width() - 1) / CPInt::HCELL_RADIUS) + 1};
-    auto const yCount{static_cast<size_t>((rc.Height() - 1) / CPInt::HCELL_RADIUS) + 1};
-    return xCount * yCount;
-}
-
-void CColorPicker::Impl::HistoryPick()
-{
-    ATL::CWindow const staHistory{GetDlgItem(CID_STA_HISTORY)};
-    CRect                      rc{};
-    CPoint                     pt{};
-    GetCursorPos(&pt);
-    staHistory.GetClientRect(rc);
-    staHistory.ScreenToClient(&pt);
-    auto const   xPos{static_cast<size_t>(pt.x / CPInt::HCELL_RADIUS)};
-    auto const   yPos{static_cast<size_t>(pt.y / CPInt::HCELL_RADIUS)};
-    auto const xCount{static_cast<size_t>((rc.Width() - 1) / CPInt::HCELL_RADIUS) + 1};
-    auto const nIndex{xPos + yPos * xCount};
-    if (nIndex < m_deqHistory.size()) {
-        HistorySelect(m_deqHistory[nIndex]);
-    }
-}
-
-void CColorPicker::Impl::HistoryLoad(CF::ColorTabItem const* crTab, size_t nCount)
-{
-    if (nCount < 1 || !crTab) {
-        return ;
-    }
-    HistoryCont deqTemp;
-    for (size_t i = 0; i < nCount; i++) {
-        CPInt::HistoryItem it{crTab[i].clrColor, RGB_MAX_INT};
-        deqTemp.emplace_front(std::move(it));
-    }
-    deqTemp.swap(m_deqHistory);
-}
-
-void CColorPicker::Impl::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
-{
-    if (CID_STA_HISTORY == nID) {
-        WTL::CDCHandle  dc{pDI->hDC};
-        CRect const     rc{pDI->rcItem};
-        int const    iSave{dc.SaveDC()};
-        HBRUSH const brBrd{WTL::AtlGetStockBrush(WHITE_BRUSH)};
-        CRect       rcItem{0, 0, CPInt::HCELL_RADIUS, CPInt::HCELL_RADIUS};
-        int           nTop{0};
-        for (auto& it: m_deqHistory) {
-            DrawColorRect(dc, rcItem, it, m_imSpectrum.GetBackBrush());
-            dc.FrameRect(rcItem, brBrd);
-            rcItem.left += CPInt::HCELL_RADIUS;
-            rcItem.right = rcItem.left + CPInt::HCELL_RADIUS;
-            if (rcItem.left >= rc.right) {
-                nTop += rcItem.Height();
-                rcItem.SetRect(0, nTop, CPInt::HCELL_RADIUS, nTop + CPInt::HCELL_RADIUS);
-                if (rcItem.top >= rc.bottom) {
-                    break;
-                }
-            }
-        }
-        dc.RestoreDC(iSave);
+    switch (nID) {
+    case CID_STA_HISTORY:
+        gs_History.Draw(pDI, m_imSpectrum.GetBackBrush());
+        break;
+    default:
+        break;
     }
 }
 
@@ -526,6 +648,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
     UNREFERENCED_PARAMETER(wndFocus);
     UNREFERENCED_PARAMETER(lInitParam);
+    gs_History.Initialize(GetDlgItem(CID_STA_HISTORY));
     m_curArrow = LoadCursorW(nullptr, IDC_ARROW);
     m_curCross = LoadCursorW(nullptr, IDC_CROSS);
     m_curPicker = LoadCursorW(nullptr, IDC_CROSS);
@@ -584,7 +707,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         }
     );
   //TogglePalette(TRUE);
-    HistoryLoad(CF::CLR_PALETTE0, CF::CLR_PALETTE0_COUNT);
+    gs_History.LoadColorTable(CF::CLR_PALETTE0, CF::CLR_PALETTE0_COUNT);
     DlgResize_Init(false, true, 0);
     m_bSaveData = false;
     return TRUE;
