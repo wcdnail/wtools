@@ -49,6 +49,8 @@ struct CColorHistory
     void Draw(LPDRAWITEMSTRUCT pDI, HBRUSH brBack);
 
 private:
+    struct StaticInit;
+
     ATL::CWindow   m_stHistory;
     CHistoryStore m_deqHistory;
 

@@ -66,7 +66,6 @@ private:
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void ValidateHexInput(WTL::CEdit& edCtrl);
     void OnEditUpdate(int nID);
-  //void HistorySelect(CHistoryStore::const_reference item);
     void OnCommand(UINT uNotifyCode, int nID, HWND);
     void TogglePalette(BOOL bPalVisible) const;
     void ColorpickBegin();

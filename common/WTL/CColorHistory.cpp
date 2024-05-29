@@ -1,9 +1,23 @@
 ﻿#include "stdafx.h"
 #include "CColorHistory.h"
-
+#include <color.stuff.h>
 #include <atlmisc.h>
 
-#include "CColorPickerDefs.h"
+struct CColorHistory::StaticInit
+{
+    static StaticInit& Instance(CColorHistory& clrHistory)
+    {
+        static StaticInit inst{clrHistory};
+        return inst;
+    }
+
+private:
+    ~StaticInit() = default;
+    StaticInit(CColorHistory& clrHistory)
+    {
+        clrHistory.LoadColorTable(CF::CLR_PALETTE0, CF::CLR_PALETTE0_COUNT);
+    }
+};
 
 namespace
 {
@@ -88,6 +102,7 @@ CColorHistory::~CColorHistory() = default;
 CColorHistory::CColorHistory()
     : m_stHistory{nullptr}
 {
+    UNREFERENCED_PARAMETER(StaticInit::Instance(*this));
 }
 
 bool CColorHistory::Initialize(ATL::CWindow stHistory)

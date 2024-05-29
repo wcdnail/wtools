@@ -707,7 +707,6 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         }
     );
   //TogglePalette(TRUE);
-    gs_History.LoadColorTable(CF::CLR_PALETTE0, CF::CLR_PALETTE0_COUNT);
     DlgResize_Init(false, true, 0);
     m_bSaveData = false;
     return TRUE;
