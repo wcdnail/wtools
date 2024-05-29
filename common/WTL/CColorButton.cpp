@@ -1015,8 +1015,8 @@ BOOL CColorButton::CPickerImpl::Picker()
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
                 CColorPickerDlg dlg;
                 //WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
-                if (dlg.DoModal(m_rMaster.m_hWnd) == IDOK) {
-                    m_rMaster.m_clrCurrent = dlg.GetColor();
+                if (dlg.Show(m_rMaster.m_hWnd, m_rMaster.m_clrCurrent, true)) {
+                    fOked = TRUE;
                 }
                 else {
                     fOked = FALSE;

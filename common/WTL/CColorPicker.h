@@ -23,9 +23,10 @@ struct CColorPicker: CCustomControl, WTL::CMessageFilter
     WCDAFX_API HRESULT PreCreateWindow() override;
     WCDAFX_API BOOL PreTranslateMessage(MSG* pMsg) override;
 
-    WCDAFX_API static int& RasterCX();
+    WCDAFX_API COLORREF GetColorRef() const;
+    WCDAFX_API bool SetTracked(COLORREF& crTarget) const;
 
-    COLORREF GetColorRef() const;
+    WCDAFX_API static int& RasterCX();
 
 private:
     struct Impl;

@@ -19,14 +19,13 @@ struct CColorPicker::Impl: private WTL::CIndirectDialogImpl<Impl>,
     ~Impl() override;
     Impl();
 
-    HRESULT PreCreateWindow();
-    COLORREF GetColorRef() const;
-
 private:
     friend CColorPicker;
     friend WTL::CDialogResize<Impl>;
     friend WTL::CWinDataExchange<Impl>;
     friend WTL::CIndirectDialogImpl<Impl>;
+
+    HRESULT PreCreateWindow();
 
     static int         gs_nRasterCX;
     static CColorHistory gs_History;
@@ -36,9 +35,11 @@ private:
     CSpectrumSlider      m_imSlider;
     CColorStatic          m_stColor;
     CMagnifierCtrl      m_Magnifier;
+    COLORREF*       m_pTrackedColor;
+    ATL::CWindow        m_stHistory;
 
     // DDX variables
-    int             m_nSpectrumKind; 
+    int             m_nSpectrumKind;
     ATL::CString        m_sColorHex;
     ATL::CString       m_sColorHtml;
 
@@ -80,8 +81,3 @@ private:
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDestroy();
 };
-
-inline COLORREF CColorPicker::Impl::GetColorRef() const
-{
-    return m_imSpectrum.GetColorRef();
-}

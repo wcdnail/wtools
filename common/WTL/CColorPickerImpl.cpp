@@ -103,7 +103,10 @@ CColorPicker::Impl::Impl()
     ,    m_imSpectrum{0xffffff, SPEC_HSV_Hue}
     ,      m_imSlider{m_imSpectrum.GetSpectrumKindRef(), m_imSpectrum.GetColor()}
     ,       m_stColor{m_imSpectrum.GetMinColorRef(1, 1, 1)}
+    ,     m_Magnifier{}
+    , m_pTrackedColor{nullptr}
     , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
+    ,     m_stHistory{nullptr}
 {
     UNREFERENCED_PARAMETER(CMagnifierInit::Instance());
 }
@@ -180,7 +183,7 @@ void CColorPicker::Impl::DoInitControls()
     //                               Text/ID,            ID/ClassName,    Style,                 X,              Y,           Width,         Height,   Styles
     CONTROL_GROUPBOX(         _T("Spectrum"),        CID_GRP_SPECTRUM,                           2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
         CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                           8,             14,         HHCX+20,       DLG_CY-4,   CBS_AUTOHSCROLL | CBS_DROPDOWNLIST, 0)
-        CONTROL_PUSHBUTTON(             _T(""),      CID_BTN_PICK_COLOR,           SPEC_CX-HHCY-HHCX,             12,        HHCX/4+4,         HLCY+4,   BS_BITMAP, 0)
+        CONTROL_PUSHBUTTON(             _T(""),    CID_BTN_PICK_COLOR,           SPEC_CX-HHCY-HHCX,             12,        HHCX/4+4,         HLCY+4,   BS_BITMAP, 0)
     CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS,   CC_CHILD,               8,        18+HLCY, SPEC_CX-HHCY-20, DLG_CY-HLCY-26,   WS_EX_STATICEDGE)
     CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,          CSPECSLD_CLASS,   CC_CHILD, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-26,   WS_EX_STATICEDGE)
         CONTROL_RTEXT(          _T("Color:"),      CID_SPEC_COLOR_CAP,      SPEC_CX-HHCY-HHCX/2-10,             14,        HHCX/2-8,           HLCY,   SS_CENTERIMAGE, 0)
@@ -566,12 +569,12 @@ void CColorPicker::Impl::ColorpickBegin()
 
 void CColorPicker::Impl::HistoryStore()
 {
-    gs_History.PutFront(m_imSpectrum.GetMinColorRef(1, 1, 1), m_imSpectrum.GetColor().m_A);
+    gs_History.PutFront(m_imSpectrum.GetMinColorRef(1, 1, 1), m_imSpectrum.GetColor().m_A, m_stHistory);
 }
 
 void CColorPicker::Impl::HistoryPick()
 {
-    auto const& chPick{gs_History.Pick()};
+    auto const& chPick{gs_History.Pick(m_stHistory)};
     m_imSpectrum.GetColor().m_A = chPick.nAlpha;
     SetColorRef(chPick.crColor, false);
 }
@@ -648,7 +651,7 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
     UNREFERENCED_PARAMETER(wndFocus);
     UNREFERENCED_PARAMETER(lInitParam);
-    gs_History.Initialize(GetDlgItem(CID_STA_HISTORY));
+    m_stHistory.Attach(GetDlgItem(CID_STA_HISTORY));
     m_curArrow = LoadCursorW(nullptr, IDC_ARROW);
     m_curCross = LoadCursorW(nullptr, IDC_CROSS);
     m_curPicker = LoadCursorW(nullptr, IDC_CROSS);

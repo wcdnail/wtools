@@ -2,6 +2,9 @@
 
 #include "resource.h"
 #include <WTL/CColorButton.h>
+#include <WTL/CColorCell.h>
+#include <WTL/CColorPickerDlg.h>
+#include <color.stuff.h>
 #include <atlwin.h>
 #include <atlcrack.h>
 
@@ -10,9 +13,12 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 {
     enum { IDD = IDD_DIALOG1 };
 
-    CColorButton m_btnMyColor1;
-    CColorButton m_btnMyColor2;
-    CColorButton m_btnMyColor3;
+    CColorButton m_btnMyColor1{};
+    CColorButton m_btnMyColor2{};
+    CColorButton m_btnMyColor3{};
+
+    CColorCell       m_crCell1{0x000000, RGB_MAX_INT};
+    CColorPickerDlg    m_cpDlg{};
 
     BOOL PreTranslateMessage(MSG* pMsg) override
     {
@@ -21,7 +27,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
     HRESULT Initialize()
     {
-        return S_OK;
+        return m_cpDlg.Initialize();
     }
 
     BEGIN_MSG_MAP_EX(CDefaultWin32Dlg)
@@ -36,6 +42,8 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
     {
         // center the dialog on the screen
         CenterWindow();
+
+        m_cpDlg.Show(m_hWnd, m_crCell1.crColor);
 
         // set icons
         WTL::CIcon icon(LoadIconW(WTL::ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));

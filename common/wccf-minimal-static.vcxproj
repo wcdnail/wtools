@@ -60,6 +60,7 @@
     <ClCompile Include="windows.wtl.buffered.paint.cpp" />
     <ClCompile Include="WTL\CAppModuleRef.cpp" />
     <ClCompile Include="WTL\CColorButton.cpp" />
+    <ClCompile Include="WTL\CColorCell.cpp" />
     <ClCompile Include="WTL\CColorHistory.cpp" />
     <ClCompile Include="WTL\CColorPicker.cpp" />
     <ClCompile Include="WTL\CColorPickerDefs.cpp" />
@@ -106,6 +107,7 @@
     <ClInclude Include="WTL\CAppModuleRef.h" />
     <ClInclude Include="WTL\CButtonMenu.h" />
     <ClInclude Include="WTL\CColorButton.h" />
+    <ClInclude Include="WTL\CColorCell.h" />
     <ClInclude Include="WTL\CColorHistory.h" />
     <ClInclude Include="WTL\CColorPicker.h" />
     <ClInclude Include="WTL\CColorPickerDefs.h" />

@@ -32,14 +32,20 @@ BOOL CColorPicker::PreTranslateMessage(MSG* pMsg)
     return FALSE;
 }
 
+COLORREF CColorPicker::GetColorRef() const
+{
+    return m_pImpl->m_imSpectrum.GetColorRef();
+}
+
+bool CColorPicker::SetTracked(COLORREF& crTarget) const
+{
+    m_pImpl->m_pTrackedColor = &crTarget;
+    return true;
+}
+
 int& CColorPicker::RasterCX()
 {
     return Impl::gs_nRasterCX;
-}
-
-COLORREF CColorPicker::GetColorRef() const
-{
-    return m_pImpl->GetColorRef();
 }
 
 BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)

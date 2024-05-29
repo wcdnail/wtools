@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "CColorHistory.h"
 #include <color.stuff.h>
+#include <atltypes.h>
 #include <atlmisc.h>
 
 struct CColorHistory::StaticInit
@@ -27,108 +28,31 @@ namespace
     };
 }
 
-CColorHistoryCell::~CColorHistoryCell()
-{
-    if (m_hPrev) {
-        m_DC.SelectBitmap(m_hPrev);
-    }
-}
-
-CColorHistoryCell::CColorHistoryCell(COLORREF crClr, int nA)
-    : crColor{crClr}
-    ,  nAlpha{nA}
-    , m_hPrev{nullptr}
-{
-}
-
-CColorHistoryCell::CColorHistoryCell(CColorHistoryCell&& rhs) noexcept
-    : crColor{rhs.crColor}
-    ,  nAlpha{rhs.nAlpha}
-    , m_hPrev{nullptr}
-{
-}
-
-CColorHistoryCell& CColorHistoryCell::operator=(CColorHistoryCell&& rhs) noexcept
-{
-    rhs.Swap(*this);
-    return *this;
-}
-
-void CColorHistoryCell::Swap(CColorHistoryCell& rhs) noexcept
-{
-    std::swap(crColor, rhs.crColor);
-    std::swap(nAlpha, rhs.nAlpha);
-    std::swap(m_hPrev, rhs.m_hPrev);
-    std::swap(m_DC.m_hDC, rhs.m_DC.m_hDC);
-    std::swap(m_Bitmap.m_hBitmap, rhs.m_Bitmap.m_hBitmap);
-}
-
-HDC CColorHistoryCell::GetDC(HDC dc, CRect const& rc)
-{
-    if (!m_DC) {
-        if (!m_Bitmap) {
-            m_Bitmap = CreateCompatibleBitmap(dc, rc.Width(), rc.Height());
-        }
-        m_DC.CreateCompatibleDC(dc);
-        m_hPrev = m_DC.SelectBitmap(m_Bitmap);
-        m_DC.FillSolidRect(rc, crColor);
-    }
-    return m_DC.m_hDC;
-}
-
-bool CColorHistoryCell::operator==(const CColorHistoryCell& lhs) const
-{
-    return nAlpha == lhs.nAlpha &&
-          crColor == lhs.crColor;
-}
-
-void CColorHistoryCell::Draw(WTL::CDCHandle dc, CRect const& rc, HBRUSH brBack)
-{
-    if (nAlpha >= RGB_MAX_INT) {
-        dc.FillSolidRect(rc, crColor);
-        return ;
-    }
-    CRect const        rcColor{0, 0, 1, 1};
-    WTL::CDCHandle const dcClr{GetDC(dc, rcColor)};
-    BLENDFUNCTION const  blend{AC_SRC_OVER, 0, static_cast<BYTE>(nAlpha), 0};
-    dc.SelectBrush(brBack);
-    dc.PatBlt(rc.left, rc.top, rc.Width(), rc.Height(), PATCOPY);
-    dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(),
-                  dcClr, 0, 0, rcColor.Width(), rcColor.Height(), blend);
-}
-
 CColorHistory::~CColorHistory() = default;
 
 CColorHistory::CColorHistory()
-    : m_stHistory{nullptr}
 {
     UNREFERENCED_PARAMETER(StaticInit::Instance(*this));
 }
 
-bool CColorHistory::Initialize(ATL::CWindow stHistory)
+size_t CColorHistory::GetMaxLimit(ATL::CWindow stHistory)
 {
-    m_stHistory.Attach(stHistory);
-    return true;
-}
-
-size_t CColorHistory::GetMaxLimit() const
-{
-    if (!m_stHistory.m_hWnd) {
+    if (!stHistory.m_hWnd) {
         return 0;
     }
     CRect rc{};
-    m_stHistory.GetClientRect(rc);
+    stHistory.GetClientRect(rc);
     auto const xCount{static_cast<size_t>((rc.Width() - 1) / HC_RADIUS) + 1};
     auto const yCount{static_cast<size_t>((rc.Height() - 1) / HC_RADIUS) + 1};
     return xCount * yCount;
 }
 
-bool CColorHistory::DropTail()
+bool CColorHistory::DropTail(ATL::CWindow stHistory)
 {
-    if (!m_stHistory.m_hWnd) {
+    if (!stHistory.m_hWnd) {
         return false;
     }
-    auto const nHistMax{GetMaxLimit()};
+    auto const nHistMax{GetMaxLimit(stHistory)};
     if (m_deqHistory.size() > nHistMax) {
         auto const pos{std::next(m_deqHistory.begin(), nHistMax)};
         m_deqHistory.erase(pos, m_deqHistory.end());
@@ -137,28 +61,28 @@ bool CColorHistory::DropTail()
     return false;
 }
 
-bool CColorHistory::PutFront(COLORREF crColor, int nAlpha)
+bool CColorHistory::PutFront(COLORREF crColor, int nAlpha, ATL::CWindow stHistory)
 {
-    CColorHistoryCell it{crColor, nAlpha};
+    CColorCell it{crColor, nAlpha};
     if (!m_deqHistory.empty() && it == m_deqHistory.front()) {
         return false;
     }
     m_deqHistory.emplace_front(std::move(it));
-    m_stHistory.InvalidateRect(nullptr, FALSE);
-    DropTail();
+    stHistory.InvalidateRect(nullptr, FALSE);
+    DropTail(stHistory);
     return true;
 }
 
-CColorHistoryCell const& CColorHistory::Pick()
+CColorCell const& CColorHistory::Pick(ATL::CWindow stHistory)
 {
-    if (!m_stHistory.m_hWnd) {
+    if (!stHistory.m_hWnd) {
         return DummyColorCell();
     }
     CRect  rc{};
     CPoint pt{};
     GetCursorPos(&pt);
-    m_stHistory.GetClientRect(rc);
-    m_stHistory.ScreenToClient(&pt);
+    stHistory.GetClientRect(rc);
+    stHistory.ScreenToClient(&pt);
     auto const   xPos{static_cast<size_t>(pt.x / HC_RADIUS)};
     auto const   yPos{static_cast<size_t>(pt.y / HC_RADIUS)};
     auto const xCount{static_cast<size_t>((rc.Width() - 1) / HC_RADIUS) + 1};
@@ -169,9 +93,9 @@ CColorHistoryCell const& CColorHistory::Pick()
     return DummyColorCell();
 }
 
-CColorHistoryCell const& CColorHistory::DummyColorCell()
+CColorCell const& CColorHistory::DummyColorCell()
 {
-    static CColorHistoryCell const dummy{0xff00ff, 255};
+    static CColorCell const dummy{0xff00ff, 255};
     return dummy;
 }
 
@@ -182,7 +106,7 @@ void CColorHistory::LoadColorTable(CF::ColorTabItem const* crTab, size_t nCount)
     }
     CHistoryStore deqTemp;
     for (size_t i = 0; i < nCount; i++) {
-        CColorHistoryCell it{crTab[i].clrColor, RGB_MAX_INT};
+        CColorCell it{crTab[i].clrColor, RGB_MAX_INT};
         deqTemp.emplace_front(std::move(it));
     }
     deqTemp.swap(m_deqHistory);
