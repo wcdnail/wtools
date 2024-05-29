@@ -35,6 +35,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)
         COMMAND_ID_HANDLER(IDOK, OnEndDialog)
         COMMAND_ID_HANDLER(IDCANCEL, OnEndDialog)
+        MSG_WM_DRAWITEM(OnDrawItem)
         REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
 
@@ -73,5 +74,15 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         // TODO: Add validation code 
         EndDialog(wID);
         return 0;
+    }
+
+    void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
+    {
+        if (IDC_COLOR1 == nID) {
+            m_crCell1.Draw(pDI->hDC, pDI->rcItem, nullptr);
+        }
+        else {
+            SetMsgHandled(FALSE);
+        }
     }
 };

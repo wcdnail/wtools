@@ -10,9 +10,12 @@ struct CColorPicker: CCustomControl, WTL::CMessageFilter
 {
     enum Sizes: short
     {
-        DLG_CX  = 360,
-        DLG_CY  = 180,
+        HOST_DLG_CX  = 364,
+        HOST_DLG_CY  = 182,
     };
+
+    static constexpr auto    szDlgFont{_T("Cascadia Mono Light")};
+    static constexpr WORD wDlgFontSize{8};
 
     DECLARE_WND_CLASS(_T("WCCF::CColorPicker"))
     DELETE_COPY_MOVE_OF(CColorPicker);

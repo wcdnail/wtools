@@ -69,10 +69,12 @@ namespace
 
     enum Sizes: short
     {
-        TRGB_CX = CColorPicker::DLG_CX/4,
+        DLG_CX  = CColorPicker::HOST_DLG_CX-2,
+        DLG_CY  = CColorPicker::HOST_DLG_CY,
+        TRGB_CX = DLG_CX/4,
         RGB_CX  = TRGB_CX + TRGB_CX/2,
-        RGB_CY  = CColorPicker::DLG_CY/3,
-        SPEC_CX = CColorPicker::DLG_CX - RGB_CX,
+        RGB_CY  = DLG_CY/3,
+        SPEC_CX = DLG_CX - RGB_CX,
         HHCX    = RGB_CX/2,
         HHCY    = RGB_CY/2,
         HLCY    = RGB_CY/4 - 4,
@@ -163,8 +165,8 @@ void CColorPicker::Impl::DoInitTemplate()
     LPCTSTR constexpr      szCaption{_T("Color Picker")};
     DWORD constexpr          dwStyle{DS_CONTROL | WS_CHILD | WS_VISIBLE};
     DWORD constexpr        dwExStyle{0};
-    LPCTSTR constexpr     szFontName{_T("Cascadia Mono Light")};
-    WORD constexpr         wFontSize{8};
+    LPCTSTR constexpr     szFontName{szDlgFont};
+    WORD constexpr         wFontSize{wDlgFontSize};
     WORD constexpr           wWeight{0};
     BYTE constexpr           bItalic{0};
     BYTE constexpr          bCharset{0};
@@ -181,14 +183,14 @@ void CColorPicker::Impl::DoInitTemplate()
 void CColorPicker::Impl::DoInitControls()
 {
     //                               Text/ID,            ID/ClassName,    Style,                 X,              Y,           Width,         Height,   Styles
-    CONTROL_GROUPBOX(         _T("Spectrum"),        CID_GRP_SPECTRUM,                           2,              2,       SPEC_CX-4,       DLG_CY-4,   0, 0)
-        CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                           8,             14,         HHCX+20,       DLG_CY-4,   CBS_AUTOHSCROLL | CBS_DROPDOWNLIST, 0)
+    CONTROL_GROUPBOX(         _T("Spectrum"),        CID_GRP_SPECTRUM,                           2,              2,       SPEC_CX-4,       DLG_CY-8,   0, 0)
+        CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                           8,             14,         HHCX+20,       DLG_CY-8,   CBS_AUTOHSCROLL | CBS_DROPDOWNLIST, 0)
         CONTROL_PUSHBUTTON(             _T(""),    CID_BTN_PICK_COLOR,           SPEC_CX-HHCY-HHCX,             12,        HHCX/4+4,         HLCY+4,   BS_BITMAP, 0)
-    CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS,   CC_CHILD,               8,        18+HLCY, SPEC_CX-HHCY-20, DLG_CY-HLCY-26,   WS_EX_STATICEDGE)
-    CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,          CSPECSLD_CLASS,   CC_CHILD, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-26,   WS_EX_STATICEDGE)
+    CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS,   CC_CHILD,               8,        18+HLCY, SPEC_CX-HHCY-20, DLG_CY-HLCY-28,   WS_EX_STATICEDGE)
+    CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,          CSPECSLD_CLASS,   CC_CHILD, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-28,   WS_EX_STATICEDGE)
         CONTROL_RTEXT(          _T("Color:"),      CID_SPEC_COLOR_CAP,      SPEC_CX-HHCY-HHCX/2-10,             14,        HHCX/2-8,           HLCY,   SS_CENTERIMAGE, 0)
         CONTROL_CTEXT(           _T("COLOR"),      CID_SPEC_COLOR_SEL,             SPEC_CX-HHCY-10,             14,          HHCY+2,         HHCY-2,   SS_NOTIFY | WS_TABSTOP, WS_EX_STATICEDGE)
-    CONTROL_GROUPBOX(              _T("RGB"),             CID_GRP_RGB,                     CLMNT_X,              2,        RGB_CX-8,       RGB_CY-4,   0, 0)
+    CONTROL_GROUPBOX(              _T("RGB"),             CID_GRP_RGB,                     CLMNT_X,              2,        RGB_CX-9,       RGB_CY-4,   0, 0)
         CONTROL_RTEXT(               _T("R"),         CID_RGB_RED_CAP,                   CLMNT_X+2,     HLCYS*0+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
         CONTROL_RTEXT(               _T("G"),         CID_RGB_GRN_CAP,                   CLMNT_X+2,     HLCYS*1+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
         CONTROL_RTEXT(               _T("B"),         CID_RGB_BLU_CAP,                   CLMNT_X+2,     HLCYS*2+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
@@ -224,11 +226,8 @@ void CColorPicker::Impl::DoInitControls()
         CONTROL_RTEXT(               _T("A"),         CID_RGB_ALP_CAP,          SPEC_CX+3+RGB_CX/2,     HLCYS*2+13,       HHCX/3-10,           HLCY,   SS_CENTERIMAGE, 0)
         CONTROL_EDITTEXT(                             CID_RGB_ALP_VAL,                     CLMN2_X,     HLCYS*2+13,        HHCX/2+2,           HLCY,   ES_CENTER | ES_NUMBER | WS_GROUP, 0)
     CONTROL_CONTROL(_T(""),  CID_RGB_ALP_UDS,            UPDOWN_CLASS, UD_CHILD,        CLMN2_X+24,     HLCYS*4+16,       HHCX/2-22,           HLCY,   0)
-    CONTROL_GROUPBOX(          _T("History"),         CID_GRP_HISTORY,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
-        CONTROL_CTEXT(                _T(""),         CID_STA_HISTORY,                   CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-15,      RGB_CY-22,   SS_OWNERDRAW | SS_NOTIFY, 0)
-  //CONTROL_GROUPBOX(        _T("Magnifier"),       CID_GRP_MAGNIFIER,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-8,       RGB_CY-4,   0, 0)
-      //CONTROL_CTEXT(       _T("MAGNIFIER"),       CID_PLC_MAGNIFIER,                   CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   SS_SUNKEN | SS_CENTERIMAGE, 0)
-  //CONTROL_CONTROL(_T(""),CID_PLC_MAGNIFIER,            WC_MAGNIFIER, MAG_CHILD,        CLMNT_X+4,    14+RGB_CY*2,       RGB_CX-16,      RGB_CY-22,   0)
+    CONTROL_GROUPBOX(          _T("History"),         CID_GRP_HISTORY,                     CLMNT_X,     2+RGB_CY*2,        RGB_CX-9,       RGB_CY-6,   0, 0)
+        CONTROL_CTEXT(                _T(""),         CID_STA_HISTORY,                   CLMNT_X+3,    13+RGB_CY*2,       RGB_CX-15,      RGB_CY-22,   SS_OWNERDRAW | SS_NOTIFY, 0)
 }
 
 const WTL::_AtlDlgResizeMap* CColorPicker::Impl::GetDlgResizeMap()
@@ -709,7 +708,6 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
             ColorpickEnd(nFlags, pt, bSelect);
         }
     );
-  //TogglePalette(TRUE);
     DlgResize_Init(false, true, 0);
     m_bSaveData = false;
     return TRUE;

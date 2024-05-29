@@ -7,7 +7,50 @@
 #include "dh.tracing.h"
 #include <WTL/CAppModuleRef.h>
 #include <fstream>
-#include <iostream>
+#pragma once
+
+/**
+ * https://learn.microsoft.com/en-us/cpp/c-runtime-library/crt-library-features?view=msvc-170
+ *
+ * libucrt.lib          None                    Statically links the UCRT into your code.               /MT     _MT
+ * libucrtd.lib         None                    Debug version of the UCRT for static linking.           /MTd    _DEBUG, _MT
+ *                                              Not redistributable.
+ * ucrt.lib             ucrtbase.dll            DLL import library for the UCRT.                        /MD     _MT, _DLL
+ * ucrtd.lib            ucrtbased.dll           DLL import library for the Debug version of the UCRT.   /MDd    _DEBUG, _MT, _DLL
+ *                                              Not redistributable.
+ * libvcruntime.lib     None                    Statically linked into your code.                       /MT     _MT
+ * libvcruntimed.lib    None                    Debug version for static linking. Not redistributable.  /MTd    _MT, _DEBUG
+ * vcruntime.lib        vcruntime<version>.dll  DLL import library for the vcruntime.                   /MD     _MT, _DLL
+ * vcruntimed.lib       vcruntime<version>d.dll DLL import library for the Debug vcruntime.             /MDd    _DEBUG, _MT, _DLL
+ *                                              Not redistributable.
+ * libcmt.lib                                   Statically links the native CRT startup into your code. /MT     _MT
+ * libcmtd.lib                                  Statically links the Debug version of the native CRT    /MTd    _DEBUG, _MT
+ *                                              startup. Not redistributable.
+ * msvcrt.lib                                   Static library for the native CRT startup for use with  /MD     _MT, _DLL
+ *                                              DLL UCRT and vcruntime.  
+ * msvcrtd.lib                                  Static library for the Debug version of the native CRT  /MDd    _DEBUG, _MT, _DLL
+ *                                              startup for use with DLL UCRT and vcruntime.
+ *                                              Not redistributable.
+ * msvcmrt.lib                                  Static library for the mixed native and managed CRT     /clr
+ *                                              startup for use with DLL UCRT and vcruntime.
+ * msvcmrtd.lib                                 Static library for the Debug version of the mixed       /clr
+ *                                              native and managed CRT startup for use with DLL UCRT 
+ *                                              and vcruntime. Not redistributable.
+ *
+ * msvcurt.lib                                  Deprecated Static library for the pure managed CRT.     /clr:pure
+ * msvcurtd.lib                                 Deprecated Static library for the Debug version of      /clr:pure
+ *                                              the pure managed CRT. Not redistributable.
+ * 
+ * C++ standard library (STL) .lib files
+ * 
+ * libcpmt.lib                                  Multithreaded, static link                              /MT     _MT
+ * msvcprt.lib                                  Multithreaded, dynamic link                             /MD     _MT, _DLL
+ *                                              (import library for msvcp<version>.dll)
+ * libcpmtd.lib                                 Multithreaded, static link                              /MTd    _DEBUG, _MT
+ * msvcprtd.lib                                 Multithreaded, dynamic link                             /MDd    _DEBUG, _MT, _DLL
+ *                                              (import library for msvcp<version>d.dll)
+ *
+ */
 
 WTL::CAppModule _Module{};
 

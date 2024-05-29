@@ -25,8 +25,9 @@ private:
     ATL::CWindow     m_wndMaster;
     CColorPicker m_ccColorPicker;
     CRect              m_rcPlace;
+    bool            m_bModalLoop;
 
-    static const WTL::_AtlDlgResizeMap* GetDlgResizeMap();
+    const WTL::_AtlDlgResizeMap* GetDlgResizeMap() const;
     void PrepareRect(ATL::CWindow wndParent);
     void DoInitTemplate();
     void DoInitControls();
@@ -34,7 +35,7 @@ private:
     BOOL ProcessWindowMessage(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam, _Inout_ LRESULT& lResult, _In_ DWORD dwMsgMapID = 0) override;
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDestroy();
-    LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+    void OnCommand(UINT uNotifyCode, int nID, HWND);
 };
 
 inline COLORREF CColorPickerDlg::GetColor() const
