@@ -8,10 +8,10 @@
 CColorPickerDlg::~CColorPickerDlg() = default;
 
 CColorPickerDlg::CColorPickerDlg()
-    :     m_wndMaster{nullptr}
-    ,   m_ColorPicker{}
-    ,       m_rcPlace{0, 0, 0, 0}
-    ,    m_bModalLoop{false}
+    :   m_wndMaster{nullptr}
+    , m_ColorPicker{}
+    ,     m_rcPlace{0, 0, 0, 0}
+    ,  m_bModalLoop{false}
 {
 }
 

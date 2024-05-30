@@ -356,7 +356,7 @@ void CColorPicker::Impl::UpdateColor()
                     m_imSpectrum.GetColor().m_A,
                     m_imSpectrum.GetBackBrush());
 
-    TargetColorUpdate(m_imSpectrum.GetColorRef(), m_imSpectrum.GetColor().m_A);
+    SyncTargets(m_pColorTarget);
 }
 
 LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX)
@@ -602,6 +602,7 @@ void CColorPicker::Impl::SetColor(COLORREF crColor, int nAlpha, bool bStoreToHis
     if (bStoreToHistory) {
         HistoryStore();
     }
+    SyncHosts(m_pColorHost);
 }
 
 void CColorPicker::Impl::GetColorFromWindowDC(CPoint const& pt, bool bStoreToHistory)

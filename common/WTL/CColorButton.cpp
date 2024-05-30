@@ -502,11 +502,11 @@ int CColorButton::GetAlpha() const
 
 void CColorButton::SetColor(COLORREF clrCurrent, int nAlpha)
 {
-    UNREFERENCED_PARAMETER(nAlpha);
     m_clrCurrent = clrCurrent;
     if (IsWindow()) {
         InvalidateRect(nullptr);
     }
+    SyncHosts(m_pColorHost);
 }
 
 //-----------------------------------------------------------------------------
@@ -573,7 +573,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
         if (m_fTrackSelection) {
             if (clrOldColor != m_clrCurrent) {
                 m_clrCurrent = clrOldColor;
-                TargetColorUpdate(m_clrCurrent, RGB_MAX_INT);
+                SyncTargets(m_pColorTarget);
                 m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
             }
         }
@@ -582,7 +582,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
     }
     else {
         if (clrOldColor != m_clrCurrent) {
-            TargetColorUpdate(m_clrCurrent, RGB_MAX_INT);
+            SyncTargets(m_pColorTarget);
             m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
         }
         m_pPicker->SendNotification(CPN_CLOSEUP, m_clrCurrent, TRUE);
@@ -1427,7 +1427,7 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex, BOOL fTrackSel
     if (fTrackSelection) {
         if (fValid) {
             m_rMaster.m_clrCurrent = clr;
-            m_rMaster.TargetColorUpdate(m_rMaster.m_clrCurrent, RGB_MAX_INT);
+            m_rMaster.SyncTargets(m_rMaster.m_pColorTarget);
         }
         m_rMaster.InvalidateRect(nullptr);
         SendNotification(CPN_SELCHANGE, m_rMaster.m_clrCurrent, fValid);
