@@ -51,7 +51,8 @@ reportError:
 
 static bool ParseCmdLine(LPTSTR lpstrCmdLine)
 {
-    #define TSTRINGIZE(V)   _T(_STRINGIZE(V))
+    #define _TSTRINGIZE(V)  #V
+    #define TSTRINGIZE(V)   _T(_TSTRINGIZE(V))
     #define MIN_SPEC_CX     12
     #define MAX_SPEC_CX     256
 
@@ -64,7 +65,7 @@ static bool ParseCmdLine(LPTSTR lpstrCmdLine)
         (toption<TCHAR>(_T("-u"), _T("--spectrum-size")) & tvalue<TCHAR>(_T("width"), CColorPicker::RasterCX()))
             .doc(_T("set spectrum bitmap's size (min: ") TSTRINGIZE(MIN_SPEC_CX) _T(", max: ") TSTRINGIZE(MAX_SPEC_CX) _T(")")),
     };
-    int              argc{1};
+    int              argc{0};
     CmdLinePtr const argv{CommandLineToArgvW(lpstrCmdLine, &argc), LocalFree};
     auto const        res{parse<TCHAR>(argc, static_cast<PWSTR*>(argv.get()), cli, 0)};
     if (bShowUsage) {
