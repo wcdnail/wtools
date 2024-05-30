@@ -95,9 +95,8 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
         m_cpDlg.GetMasterColor().SetTarget(m_btnMyColor1);
         m_btnMyColor1.SetTarget(m_crCell1);
-        m_crCell1.ColorTarget().SetTarget(m_cpDlg.GetMasterColor());
 
-        m_cpDlg.Show(m_hWnd);
+        m_cpDlg.Show(m_hWnd, Rc::Bottom | Rc::XCenter, false);
 
         m_crCell1.SetColor(0x7f3a21, RGB_MAX_INT);
         m_crCell1.SetHolder(GetDlgItem(IDC_COLOR1));

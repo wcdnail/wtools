@@ -2,7 +2,7 @@
 
 #include <wcdafx.api.h>
 
-class IColor;
+struct IColor;
 
 struct CColorTarget
 {

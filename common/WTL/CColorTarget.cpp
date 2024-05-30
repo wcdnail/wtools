@@ -73,8 +73,9 @@ void CColorTarget::SetTarget(IColor& clTarget)
 
 void CColorTarget::OnColorUpdate(IColor const& clrSource) const
 {
-    if (!m_pTarget) {
-        return ;
+    IColor* pColor = m_pTarget;
+    while (pColor) {
+        pColor->SetColor(&clrSource);
+        pColor = pColor->m_pTarget;
     }
-    m_pTarget->SetColor(&clrSource);
 }

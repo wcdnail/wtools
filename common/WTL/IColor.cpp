@@ -2,12 +2,6 @@
 #include "IColor.h"
 #include <dh.tracing.h>
 
-IColor::~IColor() = default;
-
-IColor::IColor()
-{
-}
-
 COLORREF IColor::GetColorRef() const
 {
     DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);

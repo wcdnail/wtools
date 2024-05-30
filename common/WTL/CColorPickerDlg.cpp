@@ -12,6 +12,7 @@ CColorPickerDlg::CColorPickerDlg()
     , m_ColorPicker{}
     ,     m_rcPlace{0, 0, 0, 0}
     ,  m_bModalLoop{false}
+    ,   m_nPosFlags{Rc::Right}
 {
 }
 
@@ -23,7 +24,7 @@ BOOL CColorPickerDlg::PreTranslateMessage(MSG* pMsg)
     return FALSE;
 }
 
-bool CColorPickerDlg::Show(HWND hWndMaster, bool bModal)
+bool CColorPickerDlg::Show(HWND hWndMaster, unsigned nPosFlags, bool bModal)
 {
     std::wstring sFunc{L"NONE"};
     HRESULT      hCode{Initialize()};
@@ -33,6 +34,7 @@ bool CColorPickerDlg::Show(HWND hWndMaster, bool bModal)
     }
     m_wndMaster = hWndMaster;
     m_bModalLoop = bModal;
+    m_nPosFlags = nPosFlags;
     if (m_bModalLoop) {
         auto const nRes{DoModal(hWndMaster)};
         return nRes == IDOK;
@@ -102,17 +104,13 @@ void CColorPickerDlg::DoInitTemplate()
 
 void CColorPickerDlg::DoInitControls()
 {
-    DWORD dwStyleEx{0};
     short nPickerCY{DLG_CY-2};
     if (m_bModalLoop) {
         nPickerCY -= (DLG_CY_BN-14);
         CONTROL_PUSHBUTTON(_T("Cancel"), IDCANCEL,                3, DLG_CY-2,   BN_CX, BN_CY, BS_PUSHBUTTON, 0)
         CONTROL_PUSHBUTTON(_T("OK"),         IDOK, DLG_CX-BN_CX*2-3, DLG_CY-2, BN_CX*2, BN_CY, BS_DEFPUSHBUTTON, 0)
     }
-    else {
-        //dwStyleEx = WS_EX_TOOLWINDOW;
-    }
-    CONTROL_CONTROL(_T(""), IDC_COLORPICKER, _T("WCCF::CColorPicker"), 0, 2, 2, DLG_CX-2, nPickerCY, dwStyleEx)
+    CONTROL_CONTROL(_T(""), IDC_COLORPICKER, _T("WCCF::CColorPicker"), 0, 2, 2, DLG_CX-2, nPickerCY, 0)
 }
 
 const WTL::_AtlDlgResizeMap* CColorPickerDlg::GetDlgResizeMap() const
@@ -161,7 +159,25 @@ void CColorPickerDlg::PrepareRect(ATL::CWindow wndParent)
     GetWindowRect(rcMy);
     LONG const    nCX{rcMy.Width()};
     LONG const    nCY{rcMy.Height()};
-    CPoint const ptLT{rcParent.right + 2, rcParent.top};
+    CPoint       ptLT{0, 0};
+    if (m_nPosFlags & Rc::Left) {
+        ptLT.x = rcParent.left - 2 - nCX;
+    }
+    else if (m_nPosFlags & Rc::Right) {
+        ptLT.x = rcParent.right + 2;
+    }
+    else if (m_nPosFlags & Rc::XCenter) {
+        ptLT.x = rcParent.left + (rcParent.Width() - nCX) / 2;
+    }
+    if (m_nPosFlags & Rc::Top) {
+        ptLT.y = rcParent.top;
+    }
+    else if (m_nPosFlags & Rc::Bottom) {
+        ptLT.y = rcParent.bottom;
+    }
+    else if (m_nPosFlags & Rc::YCenter) {
+        ptLT.y = rcParent.top + (rcParent.Height() - nCY) / 2;
+    }
     CPoint const ptRB{ptLT.x + nCX, ptLT.y + nCY};
     m_rcPlace.SetRect(ptLT, ptRB);
 }

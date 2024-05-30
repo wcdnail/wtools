@@ -2,6 +2,7 @@
 
 #include "CColorPicker.h"
 #include <wcdafx.api.h>
+#include <rect.putinto.h>
 #include <atltypes.h>
 
 struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
@@ -14,7 +15,7 @@ struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
     WCDAFX_API CColorPickerDlg();
 
     WCDAFX_API HRESULT Initialize();
-    WCDAFX_API bool Show(HWND hWndMaster, bool bModal = false);
+    WCDAFX_API bool Show(HWND hWndMaster, unsigned nPosFlags, bool bModal = false);
 
     COLORREF GetColor() const;
     IColor& GetMasterColor() const;
@@ -27,6 +28,7 @@ private:
     CColorPicker   m_ColorPicker;
     CRect              m_rcPlace;
     bool            m_bModalLoop;
+    unsigned         m_nPosFlags;
 
     const WTL::_AtlDlgResizeMap* GetDlgResizeMap() const;
     void PrepareRect(ATL::CWindow wndParent);

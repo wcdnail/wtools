@@ -1064,7 +1064,7 @@ BOOL CColorButton::CPickerImpl::Picker()
                 CColorPickerDlg dlg;
                 //WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
                 dlg.GetMasterColor().SetTarget(m_rMaster);
-                if (dlg.Show(m_rMaster.m_hWnd, true)) {
+                if (dlg.Show(m_rMaster.GetParent(), Rc::Right | Rc::YCenter, true)) {
                     fOked = TRUE;
                 }
                 else {
