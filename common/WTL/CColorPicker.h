@@ -6,7 +6,6 @@
 #include <atlapp.h>
 #include <memory>
 
-
 struct CColorPicker: private CCustomControl,
                      private WTL::CMessageFilter
 {

@@ -107,6 +107,11 @@ void CDDCtrl::OnMouseMove(UINT, CPoint pt)
     DoNotifyMouseOver(rcClient, pt);
 }
 
+BOOL CDDCtrl::OnEraseBkgnd(HDC) const
+{
+    return TRUE;
+}
+
 void CDDCtrl::OnLButtonDown(UINT, CPoint)
 {
     if (m_hWnd != GetCapture()) {
@@ -123,11 +128,8 @@ void CDDCtrl::OnNcPaint(HRGN) const
     CRect          rc{};
     WTL::CWindowDC dc{m_hWnd};
     GetClipBox(dc, rc);
-
     HWND const hWndFocus{GetFocus()};
-    //DBGTPrint(L"FOCUS == %p [%p]\n", hWndFocus, m_hWnd);
     if (hWndFocus == m_hWnd) {
-        dc.FillSolidRect(rc, RGB(255, 255, 255));
         dc.DrawFocusRect(rc);
     }
     else {
@@ -139,7 +141,6 @@ void CDDCtrl::OnSetFocus(HWND hOldFocus)
 {
     SendMessage(WM_NCPAINT);
     RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOFRAME);
-    //DBGTPrint(L"FOCUS >> %p [%p]\n", m_hWnd, hOldFocus);
 }
 
 BOOL CDDCtrl::OnSetCursor(HWND, UINT, UINT) const
@@ -156,6 +157,7 @@ BOOL CDDCtrl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) { 
     case 0:
+        MSG_WM_ERASEBKGND(OnEraseBkgnd)
         MSG_WM_NCPAINT(OnNcPaint)
         MSG_WM_SETFOCUS(OnSetFocus)
         MSG_WM_KILLFOCUS(OnSetFocus)

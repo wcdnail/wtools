@@ -40,6 +40,7 @@ private:
     void OnLButtonDown(UINT nFlags, CPoint point);
     void OnLButtonUp(UINT nFlags, CPoint point) const;
     void OnMouseMove(UINT nFlags, CPoint pt);
+    BOOL OnEraseBkgnd(HDC) const;
     void OnNcPaint(HRGN) const;
     void OnSetFocus(HWND);
     BOOL OnSetCursor(HWND, UINT nHitTest, UINT message) const;

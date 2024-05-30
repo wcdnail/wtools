@@ -62,7 +62,7 @@ static bool ParseCmdLine(LPTSTR lpstrCmdLine)
     bool bShowUsage{false};
     tgroup<TCHAR> const cli{
         toption<TCHAR>(_T("-h"), _T("--help")).set(bShowUsage).doc(_T("show this info")),
-        (toption<TCHAR>(_T("-u"), _T("--spectrum-size")) & tvalue<TCHAR>(_T("width"), CColorPicker::RasterCX()))
+       (toption<TCHAR>(_T("-u"), _T("--spectrum-size")) & tvalue<TCHAR>(_T("width"), CColorPicker::RasterCX()))
             .doc(_T("set spectrum bitmap's size (min: ") TSTRINGIZE(MIN_SPEC_CX) _T(", max: ") TSTRINGIZE(MAX_SPEC_CX) _T(")")),
     };
     int              argc{0};

@@ -74,7 +74,7 @@ BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         MSG_WM_SIZE(OnSize)
         REFLECT_NOTIFICATIONS()
         if constexpr (false) {
-            auto const msgStr = DH::MessageToStrignW((PMSG)GetCurrentMessage());
+            auto const msgStr = DH::MessageToStrignW((MSG*)GetCurrentMessage());
             DBGTPrint(LTH_CONTROL L" -WM- [[ %s ]]\n", msgStr.c_str());
         }
         break;

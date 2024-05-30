@@ -77,7 +77,7 @@ void CColorPickerDlg::DoInitTemplate()
     short                    nHeight{DLG_CY};
     PCTSTR constexpr       szCaption{_T("Color Picker")};
     DWORD                    dwStyle{WS_POPUP | WS_BORDER};
-    DWORD constexpr        dwExStyle{0};
+    DWORD                  dwExStyle{0};
     LPCTSTR constexpr     szFontName{CColorPicker::szDlgFont};
     WORD constexpr         wFontSize{CColorPicker::wDlgFontSize};
     WORD constexpr           wWeight{0};
@@ -90,6 +90,9 @@ void CColorPickerDlg::DoInitTemplate()
         nHeight += DLG_CY_BN;
         dwStyle = WS_OVERLAPPEDWINDOW;
     }
+    else {
+        dwExStyle = WS_EX_TOOLWINDOW | WS_EX_CONTROLPARENT;
+    }
     m_Template.Create(bExTemplate, szCaption,
                       nX, nY, nWidth, nHeight,
                       dwStyle, dwExStyle,
@@ -99,13 +102,17 @@ void CColorPickerDlg::DoInitTemplate()
 
 void CColorPickerDlg::DoInitControls()
 {
+    DWORD dwStyleEx{0};
     short nPickerCY{DLG_CY-2};
     if (m_bModalLoop) {
         nPickerCY -= (DLG_CY_BN-14);
         CONTROL_PUSHBUTTON(_T("Cancel"), IDCANCEL,                3, DLG_CY-2,   BN_CX, BN_CY, BS_PUSHBUTTON, 0)
         CONTROL_PUSHBUTTON(_T("OK"),         IDOK, DLG_CX-BN_CX*2-3, DLG_CY-2, BN_CX*2, BN_CY, BS_DEFPUSHBUTTON, 0)
     }
-    CONTROL_CONTROL(_T(""), IDC_COLORPICKER, _T("WCCF::CColorPicker"), 0, 2, 2, DLG_CX-2, nPickerCY, 0)
+    else {
+        //dwStyleEx = WS_EX_TOOLWINDOW;
+    }
+    CONTROL_CONTROL(_T(""), IDC_COLORPICKER, _T("WCCF::CColorPicker"), 0, 2, 2, DLG_CX-2, nPickerCY, dwStyleEx)
 }
 
 const WTL::_AtlDlgResizeMap* CColorPickerDlg::GetDlgResizeMap() const
@@ -132,8 +139,8 @@ BOOL CColorPickerDlg::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_COMMAND(OnCommand)
-        CHAIN_MSG_MAP(CDialogResize)
         REFLECT_NOTIFICATIONS()
+        CHAIN_MSG_MAP(CDialogResize)
         break;
     default: 
         ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
