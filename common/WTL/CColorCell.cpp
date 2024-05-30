@@ -91,4 +91,5 @@ void CColorCell::SetColor(COLORREF crColor, int nAlpha)
     if (m_hHolder) {
         InvalidateRect(m_hHolder, nullptr, FALSE);
     }
+    m_clTarget.Update(*this);
 }

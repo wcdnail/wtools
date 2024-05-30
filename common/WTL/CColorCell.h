@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IColor.h"
+#include "CColorTarget.h"
 #include <wcdafx.api.h>
 #include <atlgdi.h>
 
@@ -27,17 +28,24 @@ struct CColorCell: public IColor
     void SetColor(COLORREF crColor, int nAlpha) override;
 
     void SetHolder(HWND hHolder);
+    CColorTarget& ColorTarget();
 
 private:
-    COLORREF    m_crColor;
-    int          m_nAlpha;
-    HWND        m_hHolder;
-    HBITMAP       m_hPrev;
-    WTL::CDC         m_DC;
-    WTL::CBitmap m_Bitmap;
+    COLORREF      m_crColor;
+    int            m_nAlpha;
+    HWND          m_hHolder;
+    HBITMAP         m_hPrev;
+    WTL::CDC           m_DC;
+    WTL::CBitmap   m_Bitmap;
+    CColorTarget m_clTarget;
 };
 
 inline void CColorCell::SetHolder(HWND hHolder)
 {
     m_hHolder = hHolder;
+}
+
+inline CColorTarget& CColorCell::ColorTarget()
+{
+    return m_clTarget;
 }

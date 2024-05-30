@@ -1,18 +1,20 @@
 ﻿#pragma once
 
-#include "IColor.h"
 #include <wcdafx.api.h>
+
+class IColor;
 
 struct CColorTarget
 {
-    ~CColorTarget();
-    CColorTarget(IColor& clrMaster);
+    DELETE_COPY_MOVE_OF(CColorTarget);
 
-    void SetTarget(IColor& clrTarget);
-    void Update(IColor& clrSource) const;
+    WCDAFX_API ~CColorTarget();
+    WCDAFX_API CColorTarget();
+
+    WCDAFX_API void SetTarget(IColor& clTarget);
+    WCDAFX_API void Update(IColor const& clrSource) const;
 
 private:
-    IColor* m_pMaster;
     IColor* m_pTarget;
 };
 

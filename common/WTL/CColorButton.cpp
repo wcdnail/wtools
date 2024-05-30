@@ -387,7 +387,7 @@ CColorButton::~CColorButton() = default;
 //
 //-----------------------------------------------------------------------------
 CColorButton::CColorButton()
-    :        m_clTarget{*this}
+    :        m_clTarget{}
     ,   m_bNotifyParent{true}
     ,  m_pszDefaultText{_T("Automatic")}
     ,   m_pszCustomText{_T("More Colors...")}
@@ -503,12 +503,22 @@ int CColorButton::GetAlpha() const
 
 void CColorButton::SetColor(COLORREF clrCurrent, int nAlpha)
 {
-    UNREFERENCED_PARAMETER(nAlpha);
     m_clrCurrent = clrCurrent;
+    UNREFERENCED_PARAMETER(nAlpha);
+    SetColor(this);
+    m_clTarget.Update(*this);
+}
+
+void CColorButton::SetColor(IColor const* pColor)
+{
+    if (!pColor) {
+        return ;
+    }
+    m_clrCurrent = pColor->GetColorRef();
+    UNREFERENCED_PARAMETER(pColor->GetAlpha());
     if (IsWindow()) {
         InvalidateRect(nullptr);
     }
-    m_clTarget.Update(*this);
 }
 
 //-----------------------------------------------------------------------------
@@ -1053,7 +1063,7 @@ BOOL CColorButton::CPickerImpl::Picker()
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
                 CColorPickerDlg dlg;
                 //WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
-                //dlg.SetColorTarget(m_rMaster);
+                dlg.ColorTarget().SetTarget(m_rMaster);
                 if (dlg.Show(m_rMaster.m_hWnd, true)) {
                     fOked = TRUE;
                 }

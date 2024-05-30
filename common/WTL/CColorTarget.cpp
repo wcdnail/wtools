@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CColorTarget.h"
+#include "IColor.h"
 #include <dh.tracing.h>
 #include <scoped.bool.guard.h>
 
@@ -60,19 +61,17 @@ void IColorTarget::SetColorTarget(IColorTarget& rTarget)
 
 CColorTarget::~CColorTarget() = default;
 
-CColorTarget::CColorTarget(IColor& clrMaster)
-    : m_pMaster{&clrMaster}
-    , m_pTarget{nullptr}
+CColorTarget::CColorTarget()
+    : m_pTarget{nullptr}
 {
 }
 
-void CColorTarget::SetTarget(IColor& clrTarget)
+void CColorTarget::SetTarget(IColor& clTarget)
 {
-    m_pTarget = &clrTarget;
-    m_pMaster->SetColor(m_pTarget);
+    m_pTarget = &clTarget;
 }
 
-void CColorTarget::Update(IColor& clrSource) const
+void CColorTarget::Update(IColor const& clrSource) const
 {
     if (!m_pTarget) {
         return ;

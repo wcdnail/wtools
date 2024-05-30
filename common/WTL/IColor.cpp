@@ -4,16 +4,20 @@
 
 IColor::~IColor() = default;
 
+IColor::IColor()
+{
+}
+
 COLORREF IColor::GetColorRef() const
 {
-    DH::TPrintf(L"%s: NOT IMPLEMENTED\n", __FUNCTIONW__);
+    DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
     ATLASSERT(false);
     return CLR_INVALID;
 }
 
 int IColor::GetAlpha() const
 {
-    DH::TPrintf(L"%s: NOT IMPLEMENTED\n", __FUNCTIONW__);
+    DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
     ATLASSERT(false);
     return -1;
 }
@@ -22,7 +26,7 @@ void IColor::SetColor(COLORREF crColor, int nAlpha)
 {
     UNREFERENCED_PARAMETER(crColor);
     UNREFERENCED_PARAMETER(nAlpha);
-    DH::TPrintf(L"%s: NOT IMPLEMENTED\n", __FUNCTIONW__);
+    DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
     ATLASSERT(false);
 }
 

@@ -108,7 +108,7 @@ CColorPicker::Impl::Impl()
     ,       m_stColor{m_imSpectrum.GetMinColorRef(1, 1, 1)}
     ,     m_Magnifier{}
     ,     m_stHistory{nullptr}
-    ,      m_clTarget{*this}
+    ,      m_clTarget{}
     , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
 {
     UNREFERENCED_PARAMETER(CMagnifierInit::Instance());

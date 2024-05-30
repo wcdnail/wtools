@@ -218,6 +218,9 @@ public:
     // @cmember Set the current color
     void SetColor(COLORREF clrCurrent, int nAlpha = 255) override;
 
+    // @cmember Set the current color, update pMaster
+    void SetColor(IColor const* pColor) override;
+
     // @cmember Get the default color
     COLORREF GetDefaultColor() const;
 

@@ -199,6 +199,7 @@ void CColorPickerDlg::OnDestroy()
 
 void CColorPickerDlg::OnCommand(UINT uNotifyCode, int nID, HWND)
 {
+    UNREFERENCED_PARAMETER(uNotifyCode);
     switch (nID) {
     case IDOK:
     case IDCANCEL:
