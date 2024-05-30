@@ -52,9 +52,9 @@ void CColorPicker::SetColor(COLORREF crColor, int nAlpha) const
     m_pImpl->SetColor(crColor, nAlpha, false);
 }
 
-void CColorPicker::SetColorTarget(IColorTarget& crTarget) const
+CColorTarget& CColorPicker::ColorTarget()
 {
-    m_pImpl->SetColorTarget(crTarget);
+    return m_pImpl->m_clTarget;
 }
 
 int& CColorPicker::RasterCX()
@@ -114,6 +114,7 @@ void CColorPicker::OnDestroy()
 
 void CColorPicker::OnSize(UINT nType, CSize size) const
 {
+    UNREFERENCED_PARAMETER(nType);
     if constexpr (true) {
         CRect rc{0, 0, size.cx, size.cy};
         m_pImpl->MoveWindow(rc);

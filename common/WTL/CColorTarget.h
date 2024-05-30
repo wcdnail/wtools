@@ -1,7 +1,22 @@
 ﻿#pragma once
 
+#include "IColor.h"
 #include <wcdafx.api.h>
 
+struct CColorTarget
+{
+    ~CColorTarget();
+    CColorTarget(IColor& clrMaster);
+
+    void SetTarget(IColor& clrTarget);
+    void Update(IColor& clrSource) const;
+
+private:
+    IColor* m_pMaster;
+    IColor* m_pTarget;
+};
+
+#if 0
 /**
  *
  * Linked targets example
@@ -48,3 +63,4 @@ public:
 
     DELETE_COPY_MOVE_OF(IColorTarget);
 };
+#endif

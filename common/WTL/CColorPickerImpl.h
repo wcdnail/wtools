@@ -1,12 +1,12 @@
 #pragma once
 
+#include "IColor.h"
 #include "CColorPicker.h"
 #include "CSpectrumImage.h"
 #include "CSpectrumSlider.h"
 #include "CColorStatic.h"
 #include "CMagnifierCtrl.h"
 #include "CColorHistory.h"
-#include "CColorTarget.h"
 #include <wcdafx.api.h>
 #include <Magnification.h>
 #include <atlddx.h>
@@ -14,7 +14,7 @@
 struct CColorPicker::Impl: private WTL::CIndirectDialogImpl<Impl>,
                            private WTL::CDialogResize<Impl>,
                            private WTL::CWinDataExchange<Impl>,
-                           public  IColorTarget
+                           public  IColor
 {
     DELETE_COPY_MOVE_OF(Impl);
 
@@ -38,6 +38,7 @@ private:
     CColorStatic          m_stColor;
     CMagnifierCtrl      m_Magnifier;
     ATL::CWindow        m_stHistory;
+    CColorTarget         m_clTarget;
 
     // DDX variables
     int             m_nSpectrumKind;

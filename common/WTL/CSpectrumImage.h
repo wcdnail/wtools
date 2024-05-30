@@ -52,7 +52,7 @@ inline COLORREF            CSpectrumImage::GetColorRef() const        { return m
 
 inline COLORREF CSpectrumImage::GetMinColorRef(int mR, int mG, int mB) const
 {
-    return RGB(std::max<BYTE>(mR, m_Color.m_R),
-               std::max<BYTE>(mG, m_Color.m_G),
-               std::max<BYTE>(mB, m_Color.m_B));
+    return RGB(std::max<int>(mR, m_Color.m_R),
+               std::max<int>(mG, m_Color.m_G),
+               std::max<int>(mB, m_Color.m_B));
 }

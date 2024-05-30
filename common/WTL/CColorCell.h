@@ -1,12 +1,12 @@
 #pragma once
 
-#include "CColorTarget.h"
+#include "IColor.h"
 #include <wcdafx.api.h>
 #include <atlgdi.h>
 
 class CRect;
 
-struct CColorCell: public IColorTarget
+struct CColorCell: public IColor
 {
     DELETE_COPY_OF(CColorCell);
 

@@ -76,6 +76,7 @@
     <ClCompile Include="WTL\CSpectrumImage.cpp" />
     <ClCompile Include="WTL\CSpectrumSlider.cpp" />
     <ClCompile Include="WTL\CStaticRes.cpp" />
+    <ClCompile Include="WTL\IColor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.stuff.h" />
@@ -125,6 +126,7 @@
     <ClInclude Include="WTL\CSpectrumImage.h" />
     <ClInclude Include="WTL\CSpectrumSlider.h" />
     <ClInclude Include="WTL\CStaticRes.h" />
+    <ClInclude Include="WTL\IColor.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>wccf-minimal-static</ProjectName>
@@ -371,7 +373,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Async</ExceptionHandling>
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
@@ -409,7 +411,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Async</ExceptionHandling>
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
@@ -446,7 +448,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Async</ExceptionHandling>
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>

@@ -108,6 +108,7 @@ CColorPicker::Impl::Impl()
     ,       m_stColor{m_imSpectrum.GetMinColorRef(1, 1, 1)}
     ,     m_Magnifier{}
     ,     m_stHistory{nullptr}
+    ,      m_clTarget{*this}
     , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
 {
     UNREFERENCED_PARAMETER(CMagnifierInit::Instance());
@@ -187,7 +188,7 @@ void CColorPicker::Impl::DoInitControls()
         CONTROL_COMBOBOX(                              CID_SPEC_COMBO,                           8,             14,         HHCX+20,       DLG_CY-8,   CBS_AUTOHSCROLL | CBS_DROPDOWNLIST, 0)
         CONTROL_PUSHBUTTON(             _T(""),    CID_BTN_PICK_COLOR,           SPEC_CX-HHCY-HHCX,             12,        HHCX/4+4,         HLCY+4,   BS_BITMAP, 0)
     CONTROL_CONTROL(_T(""), CID_SPECTRUM_PIC,          CSPECIMG_CLASS,   CC_CHILD,               8,        18+HLCY, SPEC_CX-HHCY-20, DLG_CY-HLCY-28,   WS_EX_STATICEDGE)
-    CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,          CSPECSLD_CLASS,   CC_CHILD, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-28,   WS_EX_STATICEDGE)
+    CONTROL_CONTROL(_T(""), CID_SPECTRUM_SLD,          CSPECSLD_CLASS,   CC_CHILD, SPEC_CX-HHCY-10,        18+HHCY,          HHCY+2, DLG_CY-HHCY-29,   WS_EX_STATICEDGE)
         CONTROL_RTEXT(          _T("Color:"),      CID_SPEC_COLOR_CAP,      SPEC_CX-HHCY-HHCX/2-10,             14,        HHCX/2-8,           HLCY,   SS_CENTERIMAGE, 0)
         CONTROL_CTEXT(           _T("COLOR"),      CID_SPEC_COLOR_SEL,             SPEC_CX-HHCY-10,             14,          HHCY+2,         HHCY-2,   SS_NOTIFY | WS_TABSTOP, WS_EX_STATICEDGE)
     CONTROL_GROUPBOX(              _T("RGB"),             CID_GRP_RGB,                     CLMNT_X,              2,        RGB_CX-9,       RGB_CY-4,   0, 0)
@@ -356,7 +357,7 @@ void CColorPicker::Impl::UpdateColor()
                     m_imSpectrum.GetColor().m_A,
                     m_imSpectrum.GetBackBrush());
 
-    SyncTargets(m_pColorTarget);
+    m_clTarget.Update(*this);
 }
 
 LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX)
@@ -435,7 +436,7 @@ void CColorPicker::Impl::OnDDXLoading(UINT nID, BOOL bSaveAndValidate)
 void CColorPicker::Impl::DDXReloadEditsExcept(int nID)
 {
     CScopedBoolGuard bGuard{m_bSaveData};
-    for (UINT nEdit = CID_EDITS_FIRST; nEdit < CID_EDITS_LAST; nEdit += 2) {
+    for (int nEdit = CID_EDITS_FIRST; nEdit < CID_EDITS_LAST; nEdit += 2) {
         if (nEdit != nID) {
             DoDataExchange(DDX_LOAD, nEdit);
         }
@@ -444,8 +445,8 @@ void CColorPicker::Impl::DDXReloadEditsExcept(int nID)
 
 static void CEdit_CursorToEnd(WTL::CEdit& edCtrl)
 {
-    edCtrl.SetSel(0,-1);
-    edCtrl.SetSel(-1);
+    edCtrl.SetSel(0, -1);
+    edCtrl.SetSel(static_cast<DWORD>(-1));
 }
 
 void CColorPicker::Impl::ValidateHexInput(WTL::CEdit& edCtrl)
@@ -602,7 +603,7 @@ void CColorPicker::Impl::SetColor(COLORREF crColor, int nAlpha, bool bStoreToHis
     if (bStoreToHistory) {
         HistoryStore();
     }
-    SyncHosts(m_pColorHost);
+    //SyncHosts(m_pColorHost);
 }
 
 void CColorPicker::Impl::GetColorFromWindowDC(CPoint const& pt, bool bStoreToHistory)

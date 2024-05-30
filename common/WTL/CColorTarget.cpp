@@ -3,34 +3,13 @@
 #include <dh.tracing.h>
 #include <scoped.bool.guard.h>
 
+#if 0
 IColorTarget::~IColorTarget() = default;
 IColorTarget::IColorTarget()
     : m_pColorTarget{nullptr}
     ,   m_pColorHost{nullptr}
     ,    m_bSyncLoop{false}
 {
-}
-
-COLORREF IColorTarget::GetColorRef() const
-{
-    DH::TPrintf(L"%s: NOT IMPLEMENTED\n", __FUNCTIONW__);
-    ATLASSERT(false);
-    return CLR_INVALID;
-}
-
-int IColorTarget::GetAlpha() const
-{
-    DH::TPrintf(L"%s: NOT IMPLEMENTED\n", __FUNCTIONW__);
-    ATLASSERT(false);
-    return -1;
-}
-
-void IColorTarget::SetColor(COLORREF crColor, int nAlpha)
-{
-    UNREFERENCED_PARAMETER(crColor);
-    UNREFERENCED_PARAMETER(nAlpha);
-    DH::TPrintf(L"%s: NOT IMPLEMENTED\n", __FUNCTIONW__);
-    ATLASSERT(false);
 }
 
 void IColorTarget::SyncTargets(IColorTarget* pCurrent, COLORREF crColor, int nAlpha, bool& bInLoop) 
@@ -76,4 +55,27 @@ void IColorTarget::SetColorTarget(IColorTarget& rTarget)
     rTarget.m_pColorHost = this;
     m_pColorTarget = &rTarget;
     SyncHosts(m_pColorTarget, rTarget.GetColorRef(), rTarget.GetAlpha(), m_bSyncLoop);
+}
+#endif
+
+CColorTarget::~CColorTarget() = default;
+
+CColorTarget::CColorTarget(IColor& clrMaster)
+    : m_pMaster{&clrMaster}
+    , m_pTarget{nullptr}
+{
+}
+
+void CColorTarget::SetTarget(IColor& clrTarget)
+{
+    m_pTarget = &clrTarget;
+    m_pMaster->SetColor(m_pTarget);
+}
+
+void CColorTarget::Update(IColor& clrSource) const
+{
+    if (!m_pTarget) {
+        return ;
+    }
+    m_pTarget->SetColor(&clrSource);
 }

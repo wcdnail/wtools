@@ -14,17 +14,17 @@ struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
     WCDAFX_API CColorPickerDlg();
 
     WCDAFX_API HRESULT Initialize();
-    WCDAFX_API void SetColorTarget(IColorTarget& crTarget) const;
     WCDAFX_API bool Show(HWND hWndMaster, bool bModal = false);
 
     COLORREF GetColor() const;
+    CColorTarget& ColorTarget();
 
 private:
     friend WTL::CIndirectDialogImpl<CColorPickerDlg>;
     friend WTL::CDialogResize<CColorPickerDlg>;
 
     ATL::CWindow     m_wndMaster;
-    CColorPicker m_ColorPicker;
+    CColorPicker   m_ColorPicker;
     CRect              m_rcPlace;
     bool            m_bModalLoop;
 
@@ -39,17 +39,17 @@ private:
     void OnCommand(UINT uNotifyCode, int nID, HWND);
 };
 
-inline COLORREF CColorPickerDlg::GetColor() const
-{
-    return m_ColorPicker.GetColorRef();
-}
-
 inline HRESULT CColorPickerDlg::Initialize()
 {
     return m_ColorPicker.PreCreateWindow();
 }
 
-inline void CColorPickerDlg::SetColorTarget(IColorTarget& crTarget) const
+inline COLORREF CColorPickerDlg::GetColor() const
 {
-    m_ColorPicker.SetColorTarget(crTarget);
+    return m_ColorPicker.GetColorRef();
+}
+
+inline CColorTarget& CColorPickerDlg::ColorTarget()
+{
+    return m_ColorPicker.ColorTarget();
 }

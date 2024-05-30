@@ -266,24 +266,22 @@ namespace DH
         }
     }
 
-    TraceCategory::TraceCategory(PCWSTR name)
-        : Name()
+    TraceCategory::~TraceCategory() = default;
+
+    TraceCategory::TraceCategory(PCWSTR pszName)
+        : Name{}
     {
-        if (0 == ::_wcsnicmp(name, LOG_MODULE_NPH, std::size(LOG_MODULE_NPH) / sizeof(LOG_MODULE_NPH[0]))) {
-            Runtime::InfoStore::String const* name = &Runtime::Info().Executable.Version.ProductName;
-            if (name->empty()) {
-                name = &Runtime::Info().Executable.Filename;
+        if (0 == ::_wcsnicmp(pszName, LOG_MODULE_NPH, std::size(LOG_MODULE_NPH) / sizeof(LOG_MODULE_NPH[0]))) {
+            Runtime::InfoStore::String const* pName{&Runtime::Info().Executable.Version.ProductName};
+            if (pName->empty()) {
+                pName = &Runtime::Info().Executable.Filename;
             }
-            std::filesystem::path tempath = *name;
+            std::filesystem::path const tempath{*pName};
             Name = tempath.filename().replace_extension().wstring();
         }
         else {
-            Name = name;
+            Name = pszName;
         }
-    }
-
-    TraceCategory::~TraceCategory()
-    {
     }
 
     WString const& TraceCategory::GetName() const

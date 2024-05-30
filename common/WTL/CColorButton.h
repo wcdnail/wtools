@@ -151,13 +151,13 @@
 //
 //-----------------------------------------------------------------------------
 
+#include "IColor.h"
 #include "CColorTarget.h"
 #include <color.stuff.h>
 #include <wcdafx.api.h>
 #include <atlwin.h>
 #include <string>
 #include <memory>
-
 
 //-----------------------------------------------------------------------------
 //
@@ -190,7 +190,7 @@ struct NMCOLORBUTTON
 //
 //-----------------------------------------------------------------------------
 class CColorButton: public ATL::CWindowImpl<CColorButton>,
-                    public IColorTarget
+                    public IColor
 {
     // @access Types and enumerations
 public:
@@ -204,6 +204,8 @@ public:
     // @cmember General constructor
     CColorButton();
 
+    CColorTarget& ColorTarget();
+
     // @cmember Subclass the window
     BOOL SubclassWindow(HWND hWnd);
 
@@ -215,9 +217,6 @@ public:
 
     // @cmember Set the current color
     void SetColor(COLORREF clrCurrent, int nAlpha = 255) override;
-
-    // @cmember Set tracking color target
-    void SetColorTarget(IColorTarget& crTarget) override;
 
     // @cmember Get the default color
     COLORREF GetDefaultColor() const;
@@ -295,7 +294,7 @@ protected:
     LRESULT OnPickerMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
     // @cmember Handle paint for picker
-    LRESULT OnPickerPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnPickerPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) const;
 
     // @cmember Handle palette query for picker
     LRESULT OnPickerQueryNewPalette(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -318,6 +317,9 @@ protected:
     struct CThemed;
     struct CPickerImpl;
 
+    CColorTarget m_clTarget;
+
+    // @cmember Send WM_NOTIFY to parent enabler
     bool m_bNotifyParent;
 
     // @cmember Default text
@@ -347,6 +349,11 @@ protected:
     // @cmember The contained themed impl
     std::unique_ptr<CThemed> m_pThemed;
 };
+
+inline CColorTarget& CColorButton::ColorTarget()
+{
+    return m_clTarget;
+}
 
 inline COLORREF CColorButton::GetDefaultColor() const
 {

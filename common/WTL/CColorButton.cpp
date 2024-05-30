@@ -387,7 +387,8 @@ CColorButton::~CColorButton() = default;
 //
 //-----------------------------------------------------------------------------
 CColorButton::CColorButton()
-    :   m_bNotifyParent{true}
+    :        m_clTarget{*this}
+    ,   m_bNotifyParent{true}
     ,  m_pszDefaultText{_T("Automatic")}
     ,   m_pszCustomText{_T("More Colors...")}
     ,      m_clrCurrent{CLR_DEFAULT}
@@ -502,11 +503,12 @@ int CColorButton::GetAlpha() const
 
 void CColorButton::SetColor(COLORREF clrCurrent, int nAlpha)
 {
+    UNREFERENCED_PARAMETER(nAlpha);
     m_clrCurrent = clrCurrent;
     if (IsWindow()) {
         InvalidateRect(nullptr);
     }
-    SyncHosts(m_pColorHost);
+    m_clTarget.Update(*this);
 }
 
 //-----------------------------------------------------------------------------
@@ -514,12 +516,12 @@ void CColorButton::SetColor(COLORREF clrCurrent, int nAlpha)
 // Setting up tracking color
 //
 //-----------------------------------------------------------------------------
-void CColorButton::SetColorTarget(IColorTarget& rTarget)
-{
-    m_bNotifyParent = false;
-    SetTrackSelection(true);
-    IColorTarget::SetColorTarget(rTarget);
-}
+//void CColorButton::SetColorTarget(IColorTarget& rTarget)
+//{
+//    m_bNotifyParent = false;
+//    SetTrackSelection(true);
+//    IColorTarget::SetColorTarget(rTarget);
+//}
 
 //-----------------------------------------------------------------------------
 //
@@ -573,7 +575,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
         if (m_fTrackSelection) {
             if (clrOldColor != m_clrCurrent) {
                 m_clrCurrent = clrOldColor;
-                SyncTargets(m_pColorTarget);
+                m_clTarget.Update(*this);
                 m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
             }
         }
@@ -582,7 +584,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
     }
     else {
         if (clrOldColor != m_clrCurrent) {
-            SyncTargets(m_pColorTarget);
+            m_clTarget.Update(*this);
             m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
         }
         m_pPicker->SendNotification(CPN_CLOSEUP, m_clrCurrent, TRUE);
@@ -665,15 +667,12 @@ LRESULT CColorButton::OnMouseLeave(UINT, WPARAM, LPARAM, BOOL& bHandled)
 // @rdesc Routine results
 //
 //-----------------------------------------------------------------------------
-LRESULT CColorButton::OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CColorButton::OnDrawItem(UINT, WPARAM, LPARAM lParam, BOOL&)
 {
-    const auto lpItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
-    WTL::CDC dc(lpItem->hDC);
-    //
-    // Get data about the request
-    //
-    UINT uState = lpItem->itemState;
-    CRect rcDraw = lpItem->rcItem;
+    const auto lpItem{reinterpret_cast<LPDRAWITEMSTRUCT>(lParam)};
+    UINT const uState{lpItem->itemState};
+    CRect      rcDraw{lpItem->rcItem};
+    WTL::CDC       dc{lpItem->hDC};
     //
     // If we have a theme
     //
@@ -1006,28 +1005,28 @@ BOOL CColorButton::CPickerImpl::Picker()
         // Get messages until capture lost or cancelled/accepted
         //
         while (m_wndPicker.m_hWnd == GetCapture()) {
-            MSG msg;
-            if (!::GetMessage(&msg, nullptr, 0, 0)) {
-                ::PostQuitMessage(static_cast<int>(msg.wParam));
+            MSG innerMsg;
+            if (!::GetMessage(&innerMsg, nullptr, 0, 0)) {
+                ::PostQuitMessage(static_cast<int>(innerMsg.wParam));
                 break;
             }
-            sToolTip.RelayEvent(&msg);
-            switch (msg.message) {
+            sToolTip.RelayEvent(&innerMsg);
+            switch (innerMsg.message) {
             case WM_LBUTTONUP: {
                 BOOL bHandled = TRUE;
-                m_rMaster.OnPickerLButtonUp(msg.message, msg.wParam, msg.lParam, bHandled);
+                m_rMaster.OnPickerLButtonUp(innerMsg.message, innerMsg.wParam, innerMsg.lParam, bHandled);
             }
             break;
             case WM_MOUSEMOVE: {
                 BOOL bHandled = TRUE;
-                m_rMaster.OnPickerMouseMove(msg.message, msg.wParam, msg.lParam, bHandled);
+                m_rMaster.OnPickerMouseMove(innerMsg.message, innerMsg.wParam, innerMsg.lParam, bHandled);
             }
             break;
             case WM_KEYUP:
                 break;
             case WM_KEYDOWN: {
                 BOOL bHandled = TRUE;
-                m_rMaster.OnPickerKeyDown(msg.message, msg.wParam, msg.lParam, bHandled);
+                m_rMaster.OnPickerKeyDown(innerMsg.message, innerMsg.wParam, innerMsg.lParam, bHandled);
             }
             break;
             case WM_RBUTTONDOWN:
@@ -1036,7 +1035,7 @@ BOOL CColorButton::CPickerImpl::Picker()
                 break;
             // just dispatch rest of the messages
             default:
-                DispatchMessage(&msg);
+                DispatchMessage(&innerMsg);
                 break;
             }
         }
@@ -1054,7 +1053,7 @@ BOOL CColorButton::CPickerImpl::Picker()
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
                 CColorPickerDlg dlg;
                 //WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
-                dlg.SetColorTarget(m_rMaster);
+                //dlg.SetColorTarget(m_rMaster);
                 if (dlg.Show(m_rMaster.m_hWnd, true)) {
                     fOked = TRUE;
                 }
@@ -1427,7 +1426,7 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex, BOOL fTrackSel
     if (fTrackSelection) {
         if (fValid) {
             m_rMaster.m_clrCurrent = clr;
-            m_rMaster.SyncTargets(m_rMaster.m_pColorTarget);
+            m_rMaster.m_clTarget.Update(m_rMaster);
         }
         m_rMaster.InvalidateRect(nullptr);
         SendNotification(CPN_SELCHANGE, m_rMaster.m_clrCurrent, fValid);
@@ -1783,15 +1782,15 @@ LRESULT CColorButton::OnPickerMouseMove(UINT, WPARAM, LPARAM lParam, BOOL&)
 // @rdesc Routine results
 //
 //-----------------------------------------------------------------------------
-LRESULT CColorButton::OnPickerPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CColorButton::OnPickerPaint(UINT, WPARAM, LPARAM, BOOL&) const
 {
-    WTL::CPaintDC dc(m_pPicker->m_wndPicker);
+    WTL::CPaintDC dc{m_pPicker->m_wndPicker};
+    CRect       rect{dc.m_ps.rcPaint};
     //
     // Draw raised window edge (ex-window style WS_EX_WINDOWEDGE is sposed to do this,
     // but for some reason isn't
     //
-    CRect rect;
-    m_pPicker->m_wndPicker.GetClientRect(&rect);
+    //m_pPicker->m_wndPicker.GetClientRect(&rect);
     if (m_pPicker->m_fPickerFlat) {
         WTL::CPen pen;
         pen.CreatePen(PS_SOLID, 0, ::GetSysColor(COLOR_GRAYTEXT));

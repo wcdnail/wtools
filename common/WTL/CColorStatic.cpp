@@ -20,7 +20,7 @@ void CColorStatic::DoPaint(WTL::CDCHandle dc, CRect const& rc) const
         CRect const        rcColor{0, 0, 1, 1};
         WTL::CDC           dcColor{CreateCompatibleDC(dc)};
         WTL::CBitmap const bmColor{CreateCompatibleBitmap(dc, rcColor.Width(), rcColor.Height())};
-        int const            iSave{dcColor.SaveDC()};
+        int const           iSave2{dcColor.SaveDC()};
         BLENDFUNCTION const  blend{AC_SRC_OVER, 0, static_cast<BYTE>(m_nAlpha), 0};
         dc.SelectBrush(m_brBack);
         dc.PatBlt(rc.left, rc.top, rc.Width(), rc.Height(), PATCOPY);
@@ -28,7 +28,7 @@ void CColorStatic::DoPaint(WTL::CDCHandle dc, CRect const& rc) const
         dcColor.FillSolidRect(rc, m_crColor);
         dc.AlphaBlend(rc.left, rc.top, rc.Width(), rc.Height(),
                       dcColor, 0, 0, rcColor.Width(), rcColor.Height(), blend);
-        dcColor.RestoreDC(iSave);
+        dcColor.RestoreDC(iSave2);
     }
     else {
         dc.FillSolidRect(rc, m_crColor);

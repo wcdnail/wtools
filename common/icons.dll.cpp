@@ -32,11 +32,11 @@ bool CIconCollectionFile::Load(PCWSTR pathname, bool withSmall)
         return false;
     }
     {
-        ATL::CStringW tempStr = pathname;
-        int            bufLen = tempStr.GetLength() + MAX_PATH;
-        DWORD        envSubst = DoEnvironmentSubstW(tempStr.GetBufferSetLength(bufLen), bufLen);
-        DWORD        substLen = HIWORD(envSubst);
-        DWORD         pathLen = LOWORD(envSubst);
+        ATL::CStringW tempStr{pathname};
+        int const      bufLen{tempStr.GetLength() + MAX_PATH};
+        DWORD const  envSubst{DoEnvironmentSubstW(tempStr.GetBufferSetLength(bufLen), bufLen)};
+      //DWORD const  substLen{HIWORD(envSubst)};
+        DWORD const   pathLen{LOWORD(envSubst)};
         if (pathLen < 1) {
             return false;
         }
