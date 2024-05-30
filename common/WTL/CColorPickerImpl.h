@@ -38,7 +38,6 @@ private:
     CColorStatic          m_stColor;
     CMagnifierCtrl      m_Magnifier;
     ATL::CWindow        m_stHistory;
-    CColorTarget         m_clTarget;
 
     // DDX variables
     int             m_nSpectrumKind;

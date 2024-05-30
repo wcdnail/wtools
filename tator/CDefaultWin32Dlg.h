@@ -93,10 +93,8 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
         CenterWindow();
 
-        m_btnMyColor1.SetTrackSelection(true);
-
-        m_cpDlg.ColorTarget().SetTarget(m_btnMyColor1);
-        m_btnMyColor1.ColorTarget().SetTarget(m_crCell1);
+        m_cpDlg.GetMasterColor().SetTarget(m_btnMyColor1);
+        m_btnMyColor1.SetTarget(m_crCell1);
         m_crCell1.ColorTarget().SetTarget(m_cpDlg.GetMasterColor());
 
         m_cpDlg.Show(m_hWnd);

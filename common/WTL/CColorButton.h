@@ -204,8 +204,6 @@ public:
     // @cmember General constructor
     CColorButton();
 
-    CColorTarget& ColorTarget();
-
     // @cmember Subclass the window
     BOOL SubclassWindow(HWND hWnd);
 
@@ -218,8 +216,11 @@ public:
     // @cmember Set the current color
     void SetColor(COLORREF clrCurrent, int nAlpha = 255) override;
 
-    // @cmember Set the current color, update pMaster
+    // @cmember Set the current color
     void SetColor(IColor const* pColor) override;
+
+    // @cmember Set the tracking color target
+    void SetTarget(IColor& clTarget) override;
 
     // @cmember Get the default color
     COLORREF GetDefaultColor() const;
@@ -320,8 +321,6 @@ protected:
     struct CThemed;
     struct CPickerImpl;
 
-    CColorTarget m_clTarget;
-
     // @cmember Send WM_NOTIFY to parent enabler
     bool m_bNotifyParent;
 
@@ -352,11 +351,6 @@ protected:
     // @cmember The contained themed impl
     std::unique_ptr<CThemed> m_pThemed;
 };
-
-inline CColorTarget& CColorButton::ColorTarget()
-{
-    return m_clTarget;
-}
 
 inline COLORREF CColorButton::GetDefaultColor() const
 {

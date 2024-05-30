@@ -108,7 +108,6 @@ CColorPicker::Impl::Impl()
     ,       m_stColor{m_imSpectrum.GetMinColorRef(1, 1, 1)}
     ,     m_Magnifier{}
     ,     m_stHistory{nullptr}
-    ,      m_clTarget{}
     , m_nSpectrumKind{m_imSpectrum.GetSpectrumKind()}
 {
     UNREFERENCED_PARAMETER(CMagnifierInit::Instance());
@@ -357,7 +356,7 @@ void CColorPicker::Impl::UpdateColor()
                     m_imSpectrum.GetColor().m_A,
                     m_imSpectrum.GetBackBrush());
 
-    m_clTarget.Update(*this);
+    OnColorUpdate(*this);
 }
 
 LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX)

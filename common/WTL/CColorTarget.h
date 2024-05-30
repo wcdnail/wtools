@@ -8,17 +8,18 @@ struct CColorTarget
 {
     DELETE_COPY_MOVE_OF(CColorTarget);
 
-    WCDAFX_API ~CColorTarget();
+    WCDAFX_API virtual ~CColorTarget();
     WCDAFX_API CColorTarget();
 
-    WCDAFX_API void SetTarget(IColor& clTarget);
-    WCDAFX_API void Update(IColor const& clrSource) const;
+    WCDAFX_API virtual void SetTarget(IColor& clTarget);
+    WCDAFX_API virtual void OnColorUpdate(IColor const& clrSource) const;
 
 private:
     IColor* m_pTarget;
 };
 
 #if 0
+
 /**
  *
  * Linked targets example
@@ -39,8 +40,6 @@ private:
  *      ▼
  *   nullptr
  */
-
-
 class IColorTarget
 {
 protected:
@@ -65,4 +64,5 @@ public:
 
     DELETE_COPY_MOVE_OF(IColorTarget);
 };
+
 #endif

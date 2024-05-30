@@ -387,8 +387,7 @@ CColorButton::~CColorButton() = default;
 //
 //-----------------------------------------------------------------------------
 CColorButton::CColorButton()
-    :        m_clTarget{}
-    ,   m_bNotifyParent{true}
+    :   m_bNotifyParent{true}
     ,  m_pszDefaultText{_T("Automatic")}
     ,   m_pszCustomText{_T("More Colors...")}
     ,      m_clrCurrent{CLR_DEFAULT}
@@ -506,7 +505,7 @@ void CColorButton::SetColor(COLORREF clrCurrent, int nAlpha)
     m_clrCurrent = clrCurrent;
     UNREFERENCED_PARAMETER(nAlpha);
     SetColor(this);
-    m_clTarget.Update(*this);
+    OnColorUpdate(*this);
 }
 
 void CColorButton::SetColor(IColor const* pColor)
@@ -526,12 +525,13 @@ void CColorButton::SetColor(IColor const* pColor)
 // Setting up tracking color
 //
 //-----------------------------------------------------------------------------
-//void CColorButton::SetColorTarget(IColorTarget& rTarget)
-//{
-//    m_bNotifyParent = false;
-//    SetTrackSelection(true);
-//    IColorTarget::SetColorTarget(rTarget);
-//}
+void CColorButton::SetTarget(IColor& clTarget)
+{
+    CColorTarget::SetTarget(clTarget);
+    SetTrackSelection(true);
+    m_bNotifyParent = false;
+
+}
 
 //-----------------------------------------------------------------------------
 //
@@ -585,7 +585,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
         if (m_fTrackSelection) {
             if (clrOldColor != m_clrCurrent) {
                 m_clrCurrent = clrOldColor;
-                m_clTarget.Update(*this);
+                OnColorUpdate(*this);
                 m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
             }
         }
@@ -594,7 +594,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
     }
     else {
         if (clrOldColor != m_clrCurrent) {
-            m_clTarget.Update(*this);
+            OnColorUpdate(*this);
             m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
         }
         m_pPicker->SendNotification(CPN_CLOSEUP, m_clrCurrent, TRUE);
@@ -1063,7 +1063,7 @@ BOOL CColorButton::CPickerImpl::Picker()
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
                 CColorPickerDlg dlg;
                 //WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
-                dlg.ColorTarget().SetTarget(m_rMaster);
+                dlg.GetMasterColor().SetTarget(m_rMaster);
                 if (dlg.Show(m_rMaster.m_hWnd, true)) {
                     fOked = TRUE;
                 }
@@ -1436,7 +1436,7 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex, BOOL fTrackSel
     if (fTrackSelection) {
         if (fValid) {
             m_rMaster.m_clrCurrent = clr;
-            m_rMaster.m_clTarget.Update(m_rMaster);
+            m_rMaster.OnColorUpdate(m_rMaster);
         }
         m_rMaster.InvalidateRect(nullptr);
         SendNotification(CPN_SELCHANGE, m_rMaster.m_clrCurrent, fValid);

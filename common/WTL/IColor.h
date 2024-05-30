@@ -1,8 +1,9 @@
 ﻿#pragma once
 
+#include "CColorTarget.h"
 #include <wcdafx.api.h>
 
-class IColor
+class IColor: public CColorTarget
 {
 protected:
     WCDAFX_API virtual ~IColor();

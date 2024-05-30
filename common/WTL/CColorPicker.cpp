@@ -52,11 +52,6 @@ void CColorPicker::SetColor(COLORREF crColor, int nAlpha) const
     m_pImpl->SetColor(crColor, nAlpha, false);
 }
 
-CColorTarget& CColorPicker::ColorTarget() const
-{
-    return m_pImpl->m_clTarget;
-}
-
 IColor& CColorPicker::GetMasterColor() const
 {
     return *m_pImpl;
