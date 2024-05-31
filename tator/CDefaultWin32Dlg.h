@@ -93,8 +93,10 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
         CenterWindow();
 
-        m_cpDlg.GetMasterColor().SetObserver(m_btnMyColor1);
         m_btnMyColor1.SetObserver(m_crCell1);
+        m_btnMyColor2.SetObserver(m_crCell1);
+        m_btnMyColor3.SetObserver(m_crCell1);
+        m_cpDlg.GetMasterColor().SetObserver(m_btnMyColor1);
 
         m_cpDlg.Show(m_hWnd, Rc::Bottom | Rc::XCenter, false);
 

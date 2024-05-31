@@ -12,4 +12,6 @@ protected:
 
 public:
     WCDAFX_API virtual void OnColorUpdate(IColor const& clrSource) = 0;
+
+    DELETE_COPY_MOVE_OF(IColorObserver);
 };

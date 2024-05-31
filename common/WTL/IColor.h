@@ -24,4 +24,6 @@ public:
 
 private:
     IColorObserver* m_pObserver;
+
+    DELETE_COPY_MOVE_OF(IColor);
 };
