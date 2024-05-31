@@ -3,6 +3,7 @@
 #include <dh.tracing.h>
 
 IColorObserver::~IColorObserver() = default;
+
 IColorObserver::IColorObserver()
 {
 }

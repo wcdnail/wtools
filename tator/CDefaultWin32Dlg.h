@@ -20,7 +20,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
     CColorButton m_btnMyColor2{};
     CColorButton m_btnMyColor3{};
 
-    CColorCell       m_crCell1{0x000000, RGB_MAX_INT};
+    CColorCellEx     m_crCell1{0x000000, RGB_MAX_INT};
     CColorPickerDlg    m_cpDlg{};
 
     BOOL PreTranslateMessage(MSG* pMsg) override
@@ -93,10 +93,14 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
         CenterWindow();
 
-        m_btnMyColor1.SetObserver(m_crCell1);
-        m_btnMyColor2.SetObserver(m_crCell1);
-        m_btnMyColor3.SetObserver(m_crCell1);
-        m_cpDlg.GetMasterColor().SetObserver(m_btnMyColor1);
+        m_crCell1.AddObserver(m_cpDlg.GetMasterObserver());
+        m_crCell1.AddObserver(m_btnMyColor1);
+
+        m_btnMyColor1.AddObserver(m_crCell1);
+        m_btnMyColor1.AddObserver(m_cpDlg.GetMasterObserver());
+
+        m_cpDlg.GetMasterColor().AddObserver(m_crCell1);
+        m_cpDlg.GetMasterColor().AddObserver(m_btnMyColor1);
 
         m_cpDlg.Show(m_hWnd, Rc::Bottom | Rc::XCenter, false);
 

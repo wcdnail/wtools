@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <wcdafx.api.h>
+#include <list>
 
 class IColorObserver;
 
@@ -19,11 +20,15 @@ public:
     WCDAFX_API virtual void SetColor(COLORREF crColor, int nAlpha) = 0;
     WCDAFX_API virtual void SetColor(IColor const* pColor);
 
-    WCDAFX_API virtual void SetObserver(IColorObserver& rObserver);
-    WCDAFX_API virtual IColorObserver* GetObserver() const;
+    WCDAFX_API virtual void AddObserver(IColorObserver& rObserver);
+    WCDAFX_API virtual void AddObservers(IColor& rColor);
 
 private:
-    IColorObserver* m_pObserver;
+    using ObserverList = std::list<IColorObserver*>;
+
+    ObserverList m_lstObservers;
+
+    bool IsAlreadyObserved(IColorObserver const* pObserver) const;
 
     DELETE_COPY_MOVE_OF(IColor);
 };

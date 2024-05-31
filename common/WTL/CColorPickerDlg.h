@@ -19,6 +19,7 @@ struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
 
     COLORREF GetColor() const;
     IColor& GetMasterColor() const;
+    IColorObserver& GetMasterObserver() const;
 
 private:
     friend WTL::CIndirectDialogImpl<CColorPickerDlg>;
@@ -54,4 +55,9 @@ inline COLORREF CColorPickerDlg::GetColor() const
 inline IColor& CColorPickerDlg::GetMasterColor() const
 {
     return m_ColorPicker.GetMasterColor();
+}
+
+inline IColorObserver& CColorPickerDlg::GetMasterObserver() const
+{
+    return m_ColorPicker.GetMasterObserver();
 }

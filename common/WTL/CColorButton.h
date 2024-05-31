@@ -218,7 +218,10 @@ public:
     void SetColor(COLORREF clrCurrent, int nAlpha = 255) override;
 
     // @cmember Set the tracking color target
-    void SetObserver(IColorObserver& clTarget) override;
+    void AddObserver(IColorObserver& rObserver) override;
+
+    // @cmember Set the tracking color target
+    void AddObservers(IColor& rColor) override;
 
     // @cmember Get the default color
     COLORREF GetDefaultColor() const;

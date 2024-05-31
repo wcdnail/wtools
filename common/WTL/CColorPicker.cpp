@@ -57,6 +57,11 @@ IColor& CColorPicker::GetMasterColor() const
     return *m_pImpl;
 }
 
+IColorObserver& CColorPicker::GetMasterObserver() const
+{
+    return *m_pImpl;
+}
+
 int& CColorPicker::RasterCX()
 {
     return Impl::gs_nRasterCX;

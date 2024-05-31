@@ -5,6 +5,7 @@
 #include <atlapp.h>
 #include <memory>
 
+class IColorObserver;
 class IColor;
 
 struct CColorPicker: private CCustomControl,
@@ -33,6 +34,7 @@ struct CColorPicker: private CCustomControl,
     WCDAFX_API void SetColor(COLORREF crColor, int nAlpha = 255) const;
 
     WCDAFX_API IColor& GetMasterColor() const;
+    WCDAFX_API IColorObserver& GetMasterObserver() const;
 
     WCDAFX_API static int& RasterCX();
 

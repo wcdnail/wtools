@@ -74,23 +74,7 @@ void CColorCell::Draw(WTL::CDCHandle dc, CRect const& rc, HBRUSH brBack)
                   dcClr, 0, 0, rcColor.Width(), rcColor.Height(), blend);
 }
 
-COLORREF CColorCell::GetColorRef() const
-{
-    return m_crColor;
-}
-
-int CColorCell::GetAlpha() const
-{
-    return m_nAlpha;
-}
-
 void CColorCell::SetColor(COLORREF crColor, int nAlpha)
-{
-    _SetColor(crColor, nAlpha);
-    NotifyObservers();
-}
-
-void CColorCell::_SetColor(COLORREF crColor, int nAlpha)
 {
     m_crColor = crColor;
     m_nAlpha = nAlpha;
@@ -99,7 +83,30 @@ void CColorCell::_SetColor(COLORREF crColor, int nAlpha)
     }
 }
 
-void CColorCell::OnColorUpdate(IColor const& clrSource)
+CColorCellEx::~CColorCellEx() = default;
+
+CColorCellEx::CColorCellEx(COLORREF crColor, int nAlpha, HWND hHolder)
+    : m_clCell{crColor, nAlpha, hHolder}
 {
-    _SetColor(clrSource.GetColorRef(), clrSource.GetAlpha());
+}
+
+COLORREF CColorCellEx::GetColorRef() const
+{
+    return m_clCell.GetColorRef();
+}
+
+int CColorCellEx::GetAlpha() const
+{
+    return m_clCell.GetAlpha();
+}
+
+void CColorCellEx::SetColor(COLORREF crColor, int nAlpha)
+{
+    m_clCell.SetColor(crColor, nAlpha);
+    NotifyObservers();
+}
+
+void CColorCellEx::OnColorUpdate(IColor const& clrSource)
+{
+    m_clCell.SetColor(clrSource.GetColorRef(), clrSource.GetAlpha());
 }

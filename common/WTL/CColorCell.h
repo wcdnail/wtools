@@ -7,12 +7,11 @@
 
 class CRect;
 
-struct CColorCell: public IColor,
-                   public IColorObserver
+struct CColorCell
 {
     DELETE_COPY_OF(CColorCell);
 
-    ~CColorCell() override;
+    virtual ~CColorCell();
     CColorCell(COLORREF crColor, int nAlpha, HWND hHolder = nullptr);
 
     CColorCell(CColorCell&& rhs) noexcept;
@@ -23,26 +22,62 @@ struct CColorCell: public IColor,
     bool operator == (const CColorCell&) const;
 
     void Draw(WTL::CDCHandle dc, CRect const& rc, HBRUSH brBack);
+    COLORREF GetColorRef() const;
+    int GetAlpha() const;
+    void SetColor(COLORREF crColor, int nAlpha);
+    void SetHolder(HWND hHolder);
+
+protected:
+    COLORREF    m_crColor;
+    int          m_nAlpha;
+    HWND        m_hHolder;
+    HBITMAP       m_hPrev;
+    WTL::CDC         m_DC;
+    WTL::CBitmap m_Bitmap;
+};
+
+struct CColorCellEx: public  IColor,
+                     public  IColorObserver
+{
+    DELETE_COPY_MOVE_OF(CColorCellEx);
+
+    ~CColorCellEx() override;
+    CColorCellEx(COLORREF crColor, int nAlpha, HWND hHolder = nullptr);
 
     COLORREF GetColorRef() const override;
     int GetAlpha() const override;
     void SetColor(COLORREF crColor, int nAlpha) override;
 
+    void Draw(WTL::CDCHandle dc, CRect const& rc, HBRUSH brBack);
     void SetHolder(HWND hHolder);
 
 private:
-    COLORREF      m_crColor;
-    int            m_nAlpha;
-    HWND          m_hHolder;
-    HBITMAP         m_hPrev;
-    WTL::CDC           m_DC;
-    WTL::CBitmap   m_Bitmap;
+    CColorCell m_clCell;
 
-    void _SetColor(COLORREF crColor, int nAlpha);
     void OnColorUpdate(IColor const& clrSource) override;
 };
 
 inline void CColorCell::SetHolder(HWND hHolder)
 {
     m_hHolder = hHolder;
+}
+
+inline COLORREF CColorCell::GetColorRef() const
+{
+    return m_crColor;
+}
+
+inline int CColorCell::GetAlpha() const
+{
+    return m_nAlpha;
+}
+
+inline void CColorCellEx::Draw(WTL::CDCHandle dc, CRect const& rc, HBRUSH brBack)
+{
+    m_clCell.Draw(dc, rc, brBack);
+}
+
+inline void CColorCellEx::SetHolder(HWND hHolder)
+{
+    m_clCell.SetHolder(hHolder);
 }

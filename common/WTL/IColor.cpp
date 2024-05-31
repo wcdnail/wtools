@@ -6,7 +6,7 @@
 IColor::~IColor() = default;
 
 IColor::IColor()
-    : m_pObserver{nullptr}
+    : m_lstObservers{}
 {
 }
 
@@ -41,21 +41,36 @@ void IColor::SetColor(IColor const* pColor)
     NotifyObservers();
 }
 
-void IColor::SetObserver(IColorObserver& rObserver)
+void IColor::AddObserver(IColorObserver& rObserver)
 {
-    m_pObserver = &rObserver;
+    m_lstObservers.push_back(&rObserver);
 }
 
-IColorObserver* IColor::GetObserver() const
+void IColor::AddObservers(IColor& rColor)
 {
-    return m_pObserver;
+    ObserverList temp{};
+    for (auto& it: rColor.m_lstObservers) {
+        if (IsAlreadyObserved(it)) {
+            continue;
+        }
+        temp.push_back(it);
+    }
+    m_lstObservers.assign_range(temp);
+}
+
+bool IColor::IsAlreadyObserved(IColorObserver const* pObserver) const
+{
+    for (auto const& jt: m_lstObservers) {
+        if (pObserver == jt) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void IColor::NotifyObservers() const
 {
-    IColorObserver* pObserver = GetObserver();
-    while (pObserver) {
-        pObserver->OnColorUpdate(*this);
-        pObserver = nullptr; //pObserver->NextObserver();
+    for (const auto& it: m_lstObservers) {
+        it->OnColorUpdate(*this);
     }
 }

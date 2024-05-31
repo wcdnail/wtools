@@ -511,9 +511,16 @@ void CColorButton::SetColor(COLORREF clrCurrent, int nAlpha)
 // Setting up tracking color
 //
 //-----------------------------------------------------------------------------
-void CColorButton::SetObserver(IColorObserver& rObserver)
+void CColorButton::AddObserver(IColorObserver& rObserver)
 {
-    IColor::SetObserver(rObserver);
+    IColor::AddObserver(rObserver);
+    SetTrackSelection(true);
+    m_bNotifyParent = false;
+}
+
+void CColorButton::AddObservers(IColor& rColor)
+{
+    IColor::AddObservers(rColor);
     SetTrackSelection(true);
     m_bNotifyParent = false;
 }
@@ -1062,7 +1069,7 @@ BOOL CColorButton::CPickerImpl::Picker()
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
                 CColorPickerDlg dlg;
                 //WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
-                dlg.GetMasterColor().SetObserver(m_rMaster);
+                dlg.GetMasterColor().AddObservers(m_rMaster);
                 if (dlg.Show(m_rMaster.GetParent(), Rc::Right | Rc::YCenter, true)) {
                     fOked = TRUE;
                 }
