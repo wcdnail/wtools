@@ -139,6 +139,7 @@ void CDDCtrl::OnNcPaint(HRGN) const
 
 void CDDCtrl::OnSetFocus(HWND hOldFocus)
 {
+    UNREFERENCED_PARAMETER(hOldFocus);
     SendMessage(WM_NCPAINT);
     RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOFRAME);
 }

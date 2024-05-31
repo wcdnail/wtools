@@ -297,7 +297,7 @@ struct CColorButton::CPickerImpl
     void SetPickerWindowSize();
 
     // @cmember Create the picker tooltips
-    void CreatePickerToolTips(WTL::CToolTipCtrl& sToolTip);
+    void CreatePickerToolTips(WTL::CToolTipCtrl& sToolTip) const;
 
     // @cmember Get the rect of a given cell
     BOOL GetPickerCellRect(int nIndex, RECT* pRect) const;
@@ -487,7 +487,7 @@ BOOL CColorButton::SubclassWindow(HWND hWnd)
 
 //-----------------------------------------------------------------------------
 //
-// IColorTarget overrides
+// IColorObserver overrides
 //
 //-----------------------------------------------------------------------------
 COLORREF CColorButton::GetColorRef() const
@@ -502,22 +502,8 @@ int CColorButton::GetAlpha() const
 
 void CColorButton::SetColor(COLORREF clrCurrent, int nAlpha)
 {
-    m_clrCurrent = clrCurrent;
-    UNREFERENCED_PARAMETER(nAlpha);
-    SetColor(this);
-    OnColorUpdate(*this);
-}
-
-void CColorButton::SetColor(IColor const* pColor)
-{
-    if (!pColor) {
-        return ;
-    }
-    m_clrCurrent = pColor->GetColorRef();
-    UNREFERENCED_PARAMETER(pColor->GetAlpha());
-    if (IsWindow()) {
-        InvalidateRect(nullptr);
-    }
+    _SetColor(clrCurrent, nAlpha);
+    NotifyObservers();
 }
 
 //-----------------------------------------------------------------------------
@@ -525,12 +511,25 @@ void CColorButton::SetColor(IColor const* pColor)
 // Setting up tracking color
 //
 //-----------------------------------------------------------------------------
-void CColorButton::SetTarget(IColor& clTarget)
+void CColorButton::SetObserver(IColorObserver& rObserver)
 {
-    CColorTarget::SetTarget(clTarget);
+    IColor::SetObserver(rObserver);
     SetTrackSelection(true);
     m_bNotifyParent = false;
+}
 
+void CColorButton::_SetColor(COLORREF clrCurrent, int nAlpha)
+{
+    m_clrCurrent = clrCurrent;
+    UNREFERENCED_PARAMETER(nAlpha);
+    if (IsWindow()) {
+        InvalidateRect(nullptr);
+    }
+}
+
+void CColorButton::OnColorUpdate(IColor const& clrSource)
+{
+    _SetColor(clrSource.GetColorRef(), clrSource.GetAlpha());
 }
 
 //-----------------------------------------------------------------------------
@@ -585,7 +584,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
         if (m_fTrackSelection) {
             if (clrOldColor != m_clrCurrent) {
                 m_clrCurrent = clrOldColor;
-                OnColorUpdate(*this);
+                NotifyObservers();
                 m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
             }
         }
@@ -594,7 +593,7 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
     }
     else {
         if (clrOldColor != m_clrCurrent) {
-            OnColorUpdate(*this);
+            NotifyObservers();
             m_pPicker->SendNotification(CPN_SELCHANGE, m_clrCurrent, TRUE);
         }
         m_pPicker->SendNotification(CPN_CLOSEUP, m_clrCurrent, TRUE);
@@ -1063,7 +1062,7 @@ BOOL CColorButton::CPickerImpl::Picker()
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
                 CColorPickerDlg dlg;
                 //WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
-                dlg.GetMasterColor().SetTarget(m_rMaster);
+                dlg.GetMasterColor().SetObserver(m_rMaster);
                 if (dlg.Show(m_rMaster.GetParent(), Rc::Right | Rc::YCenter, true)) {
                     fOked = TRUE;
                 }
@@ -1156,7 +1155,7 @@ void CColorButton::CPickerImpl::SetPickerWindowSize()
     // Compute the min width
     //
 
-    int nBoxTotalWidth = m_nNumColumns * m_sizeBox.cx;
+    int const nBoxTotalWidth{m_nNumColumns * m_sizeBox.cx};
     int nMinWidth = nBoxTotalWidth;
     if (nMinWidth < szText.cx)
         nMinWidth = szText.cx;
@@ -1269,7 +1268,7 @@ void CColorButton::CPickerImpl::SetPickerWindowSize()
 //
 //-----------------------------------------------------------------------------
 
-void CColorButton::CPickerImpl::CreatePickerToolTips(WTL::CToolTipCtrl& sToolTip)
+void CColorButton::CPickerImpl::CreatePickerToolTips(WTL::CToolTipCtrl& sToolTip) const
 {
     //
     // Create the tool tip
@@ -1390,7 +1389,7 @@ void CColorButton::CPickerImpl::OnMouseHover(int nIndex)
     if ((m_nCurrentSel >= 0 && m_nCurrentSel < m_nNumColors) ||
         (m_nCurrentSel == CUSTOM_BOX_VALUE) || 
         (m_nCurrentSel == DEFAULT_BOX_VALUE)) {
-        int nOldSel = m_nCurrentSel;
+        int const nOldSel{m_nCurrentSel};
         m_nCurrentSel = INVALID_COLOR;
         DrawPickerCell(dc, nOldSel);
     }
@@ -1436,7 +1435,7 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex, BOOL fTrackSel
     if (fTrackSelection) {
         if (fValid) {
             m_rMaster.m_clrCurrent = clr;
-            m_rMaster.OnColorUpdate(m_rMaster);
+            m_rMaster.NotifyObservers();
         }
         m_rMaster.InvalidateRect(nullptr);
         SendNotification(CPN_SELCHANGE, m_rMaster.m_clrCurrent, fValid);

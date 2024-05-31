@@ -84,7 +84,7 @@ static bool ParseCmdLine(LPTSTR lpstrCmdLine)
     return true;
 }
 
-int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int nCmdShow)
+int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int)
 {
     CScopedAppRegistrator sAppReg{_Module};
     int                      nRes{0};

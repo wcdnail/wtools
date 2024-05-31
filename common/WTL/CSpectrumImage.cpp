@@ -152,6 +152,8 @@ void CSpectrumImage::DoNotifyMouseOver(CRect const& rc, CPoint pt)
 
 void CSpectrumImage::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
+    UNREFERENCED_PARAMETER(nRepCnt);
+    UNREFERENCED_PARAMETER(nFlags);
     //DBGTPrint(L"KEYDWN %p %d [%d '%c']\n", nFlags, nRepCnt, nChar, nChar);
     CRect      rc{};
     LONG const sx{1};
@@ -170,6 +172,7 @@ void CSpectrumImage::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CSpectrumImage::OnLButtonDblClk(UINT nFlags, CPoint pt)
 {
+    UNREFERENCED_PARAMETER(nFlags);
     CRect rc{};
     GetClientRect(rc);
     OnColorChangedByCoords(rc, pt);

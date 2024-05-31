@@ -152,7 +152,7 @@
 //-----------------------------------------------------------------------------
 
 #include "IColor.h"
-#include "CColorTarget.h"
+#include "IColorObserver.h"
 #include <color.stuff.h>
 #include <wcdafx.api.h>
 #include <atlwin.h>
@@ -190,7 +190,8 @@ struct NMCOLORBUTTON
 //
 //-----------------------------------------------------------------------------
 class CColorButton: public ATL::CWindowImpl<CColorButton>,
-                    public IColor
+                    public IColor,
+                    public IColorObserver
 {
     // @access Types and enumerations
 public:
@@ -216,11 +217,8 @@ public:
     // @cmember Set the current color
     void SetColor(COLORREF clrCurrent, int nAlpha = 255) override;
 
-    // @cmember Set the current color
-    void SetColor(IColor const* pColor) override;
-
     // @cmember Set the tracking color target
-    void SetTarget(IColor& clTarget) override;
+    void SetObserver(IColorObserver& clTarget) override;
 
     // @cmember Get the default color
     COLORREF GetDefaultColor() const;
@@ -274,6 +272,9 @@ private:
         MESSAGE_HANDLER(WM_QUERYNEWPALETTE, OnPickerQueryNewPalette);
         MESSAGE_HANDLER(WM_PALETTECHANGED, OnPickerPaletteChanged);
     END_MSG_MAP()
+
+    void _SetColor(COLORREF clrCurrent, int nAlpha);
+    void OnColorUpdate(IColor const& clrSource) override;
 
     // @access ATL Message handlers
 protected:

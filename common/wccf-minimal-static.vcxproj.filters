@@ -103,10 +103,10 @@
     <ClCompile Include="WTL\CColorCell.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
-    <ClCompile Include="WTL\CColorTarget.cpp">
+    <ClCompile Include="WTL\IColor.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
-    <ClCompile Include="WTL\IColor.cpp">
+    <ClCompile Include="WTL\IColorObserver.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
   </ItemGroup>
@@ -249,10 +249,10 @@
     <ClInclude Include="WTL\CColorCell.h">
       <Filter>WTL</Filter>
     </ClInclude>
-    <ClInclude Include="WTL\CColorTarget.h">
+    <ClInclude Include="WTL\IColor.h">
       <Filter>WTL</Filter>
     </ClInclude>
-    <ClInclude Include="WTL\IColor.h">
+    <ClInclude Include="WTL\IColorObserver.h">
       <Filter>WTL</Filter>
     </ClInclude>
   </ItemGroup>

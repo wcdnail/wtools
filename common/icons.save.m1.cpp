@@ -67,7 +67,7 @@ static UINT WriteIconHeader(HANDLE hFile, int nImages)
     // Setup the icon header
     iconheader.idReserved = 0; // Must be 0
     iconheader.idType = 1; // Type 1 = ICON (type 2 = CURSOR)
-    iconheader.idCount = nImages; // number of ICONDIRs
+    iconheader.idCount = static_cast<WORD>(nImages); // number of ICONDIRs
 
     // Write the header to disk
     WriteFile( hFile, &iconheader, sizeof(iconheader), &nWritten, 0);
@@ -79,28 +79,26 @@ static UINT WriteIconHeader(HANDLE hFile, int nImages)
 //
 // Return the number of BYTES the bitmap will take ON DISK
 //
-static UINT NumBitmapBytes(BITMAP *pBitmap)
+static UINT NumBitmapBytes(BITMAP const* pBitmap)
 {
     int nWidthBytes = pBitmap->bmWidthBytes;
-
     // bitmap scanlines MUST be a multiple of 4 bytes when stored
     // inside a bitmap resource, so round up if necessary
-    if(nWidthBytes & 3)
+    if(nWidthBytes & 3) {
         nWidthBytes = (nWidthBytes + 4) & ~3;
-
+    }
     return nWidthBytes * pBitmap->bmHeight;
 }
 
 //
 // Return number of bytes written
 //
-static UINT WriteIconImageHeader(HANDLE hFile, BITMAP *pbmpColor, BITMAP *pbmpMask)
+static UINT WriteIconImageHeader(HANDLE hFile, BITMAP const* pbmpColor, BITMAP const* pbmpMask)
 {
-    BITMAPINFOHEADER biHeader;
-    DWORD nWritten;
-    UINT nImageBytes;
+    BITMAPINFOHEADER biHeader{};
+    DWORD            nWritten{0};
     // calculate how much space the COLOR and MASK bitmaps take
-    nImageBytes = NumBitmapBytes(pbmpColor) + NumBitmapBytes(pbmpMask);
+    UINT const nImageBytes{NumBitmapBytes(pbmpColor) + NumBitmapBytes(pbmpMask)};
     // write the ICONIMAGE to disk (first the BITMAPINFOHEADER)
     ZeroMemory(&biHeader, sizeof(biHeader));
     // Fill in only those fields that are necessary
@@ -140,6 +138,7 @@ static BOOL GetIconBitmapInfo(HICON hIcon, ICONINFO *pIconInfo, BITMAP *pbmpColo
 //
 static UINT WriteIconDirectoryEntry(HANDLE hFile, int nIdx, HICON hIcon, UINT nImageOffset)
 {
+    UNREFERENCED_PARAMETER(nIdx);
     ICONINFO iconInfo;
     ICONDIR iconDir;
     BITMAP bmpColor;
@@ -156,9 +155,9 @@ static UINT WriteIconDirectoryEntry(HANDLE hFile, int nIdx, HICON hIcon, UINT nI
         nColorCount = 1 << (bmpColor.bmBitsPixel * bmpColor.bmPlanes);
     }
     // Create the ICONDIR structure
-    iconDir.bWidth = (BYTE)bmpColor.bmWidth;
-    iconDir.bHeight = (BYTE)bmpColor.bmHeight;
-    iconDir.bColorCount = nColorCount;
+    iconDir.bWidth = static_cast<BYTE>(bmpColor.bmWidth);
+    iconDir.bHeight = static_cast<BYTE>(bmpColor.bmHeight);
+    iconDir.bColorCount = static_cast<BYTE>(nColorCount);
     iconDir.bReserved = 0;
     iconDir.wPlanes = bmpColor.bmPlanes;
     iconDir.wBitCount = bmpColor.bmBitsPixel;

@@ -1,6 +1,14 @@
 #include "stdafx.h"
 #include "IColor.h"
+#include "IColorObserver.h"
 #include <dh.tracing.h>
+
+IColor::~IColor() = default;
+
+IColor::IColor()
+    : m_pObserver{nullptr}
+{
+}
 
 COLORREF IColor::GetColorRef() const
 {
@@ -30,4 +38,24 @@ void IColor::SetColor(IColor const* pColor)
         return ;
     }
     SetColor(pColor->GetColorRef(), pColor->GetAlpha());
+    NotifyObservers();
+}
+
+void IColor::SetObserver(IColorObserver& rObserver)
+{
+    m_pObserver = &rObserver;
+}
+
+IColorObserver* IColor::GetObserver() const
+{
+    return m_pObserver;
+}
+
+void IColor::NotifyObservers() const
+{
+    IColorObserver* pObserver = GetObserver();
+    while (pObserver) {
+        pObserver->OnColorUpdate(*this);
+        pObserver = nullptr; //pObserver->NextObserver();
+    }
 }

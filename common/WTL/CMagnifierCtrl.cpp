@@ -153,6 +153,8 @@ void CMagnifierCtrl::OnLButtonDown(UINT nFlags, CPoint) const
 
 BOOL CMagnifierCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) const
 {
+    UNREFERENCED_PARAMETER(nFlags);
+    UNREFERENCED_PARAMETER(pt);
     if (!m_ctlMag.m_hWnd) {
         return FALSE;
     }
@@ -174,6 +176,7 @@ BOOL CMagnifierCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) const
 
 void CMagnifierCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) const
 {
+    UNREFERENCED_PARAMETER(nRepCnt);
     if (VK_ESCAPE == nChar) {
         if (m_onClick) {
             m_onClick(nFlags, m_ptPos, false);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IColor.h"
+#include "IColorObserver.h"
 #include "CColorPicker.h"
 #include "CSpectrumImage.h"
 #include "CSpectrumSlider.h"
@@ -14,7 +15,8 @@
 struct CColorPicker::Impl: private WTL::CIndirectDialogImpl<Impl>,
                            private WTL::CDialogResize<Impl>,
                            private WTL::CWinDataExchange<Impl>,
-                           public  IColor
+                           public  IColor,
+                           public  IColorObserver
 {
     DELETE_COPY_MOVE_OF(Impl);
 
@@ -56,16 +58,20 @@ private:
     static const WTL::_AtlDlgResizeMap* GetDlgResizeMap();
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 
+    // IColor
     COLORREF GetColorRef() const override;
     int GetAlpha() const override;
     void SetColor(COLORREF crColor, int nAlpha) override;
 
+    // IColorObserver
+    void OnColorUpdate(IColor const& clrSource) override;
+
     void SpectruKindChanged();
-    LRESULT SliderChanged(bool bNotify);
+    LRESULT SliderChanged(bool bUpdateDDX);
     void UpdateHexStr();
     void UpdateHtmlStr();
     void UpdateDDX();
-    void UpdateColor();
+    void OnColorChanged();
     void DDXReloadEditsExcept(int nId);
     LRESULT ColorChanged(bool bUpdateDDX);
     void OnDDXLoading(UINT nID, BOOL bSaveAndValidate);
@@ -77,7 +83,7 @@ private:
     void ColorpickBegin();
     void HistoryStore();
     void HistoryPick();
-    void SetColor(COLORREF crColor, int nAlpha, bool bStoreToHistory);
+    void _SetColor(COLORREF crColor, int nAlpha, bool bStoreToHistory, bool bNotifyObservers);
     void GetColorFromWindowDC(CPoint const& pt, bool bStoreToHistory);
     void GetColorFromDesktopDC(CPoint const& pt, bool bStoreToHistory);
     void ColorpickEnd(UINT, CPoint const&, bool bSelect);

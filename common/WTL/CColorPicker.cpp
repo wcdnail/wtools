@@ -34,7 +34,7 @@ BOOL CColorPicker::PreTranslateMessage(MSG* pMsg)
 
 //-----------------------------------------------------------------------------
 //
-// IColorTarget overrides
+// IColorObserver overrides
 //
 //-----------------------------------------------------------------------------
 COLORREF CColorPicker::GetColorRef() const
@@ -49,7 +49,7 @@ int CColorPicker::GetAlpha() const
 
 void CColorPicker::SetColor(COLORREF crColor, int nAlpha) const
 {
-    m_pImpl->SetColor(crColor, nAlpha, false);
+    m_pImpl->_SetColor(crColor, nAlpha, false, true);
 }
 
 IColor& CColorPicker::GetMasterColor() const

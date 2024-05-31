@@ -86,10 +86,20 @@ int CColorCell::GetAlpha() const
 
 void CColorCell::SetColor(COLORREF crColor, int nAlpha)
 {
+    _SetColor(crColor, nAlpha);
+    NotifyObservers();
+}
+
+void CColorCell::_SetColor(COLORREF crColor, int nAlpha)
+{
     m_crColor = crColor;
     m_nAlpha = nAlpha;
     if (m_hHolder) {
         InvalidateRect(m_hHolder, nullptr, FALSE);
     }
-    OnColorUpdate(*this);
+}
+
+void CColorCell::OnColorUpdate(IColor const& clrSource)
+{
+    _SetColor(clrSource.GetColorRef(), clrSource.GetAlpha());
 }

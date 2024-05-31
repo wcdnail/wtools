@@ -51,7 +51,7 @@ BOOL MoveToMonitor::MoveAttempt(MONITORINFOEXW const& monInfo) const
             return TRUE; 
         }
         const int monNum = _wtoi(monNumStr.GetString());
-        if (monNum != dwDesiredNum) {
+        if (monNum != static_cast<int>(dwDesiredNum)) {
             return TRUE; 
         }
     }
@@ -83,7 +83,9 @@ BOOL MoveToMonitor::MoveAttempt(MONITORINFOEXW const& monInfo) const
 
 BOOL CALLBACK MoveToMonitor::EnumeratorProc(HMONITOR hMon, HDC hDC, LPRECT lpRect, MoveToMonitor const* self)
 {
-    MONITORINFOEXW monInfo;
+    UNREFERENCED_PARAMETER(hDC);
+    UNREFERENCED_PARAMETER(lpRect);
+    MONITORINFOEXW monInfo{};
     ZeroMemory(&monInfo, sizeof(monInfo));
     monInfo.cbSize = sizeof(monInfo);
     GetMonitorInfoW(hMon, &monInfo);

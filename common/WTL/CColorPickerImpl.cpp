@@ -322,7 +322,12 @@ int CColorPicker::Impl::GetAlpha() const
 
 void CColorPicker::Impl::SetColor(COLORREF crColor, int nAlpha)
 {
-    SetColor(crColor, nAlpha, false);
+    _SetColor(crColor, nAlpha, false, true);
+}
+
+void CColorPicker::Impl::OnColorUpdate(IColor const& clrSource)
+{
+    _SetColor(clrSource.GetColorRef(), clrSource.GetAlpha(), false, false);
 }
 
 void CColorPicker::Impl::SpectruKindChanged()
@@ -350,13 +355,12 @@ void CColorPicker::Impl::UpdateDDX()
     DoDataExchange(DDX_LOAD);
 }
 
-void CColorPicker::Impl::UpdateColor()
+void CColorPicker::Impl::OnColorChanged()
 {
     m_stColor.Reset(m_imSpectrum.GetMinColorRef(1, 1, 1),
                     m_imSpectrum.GetColor().m_A,
                     m_imSpectrum.GetBackBrush());
-
-    OnColorUpdate(*this);
+    NotifyObservers();
 }
 
 LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX)
@@ -373,18 +377,18 @@ LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX)
     }
     m_imSpectrum.InvalidateRect(nullptr, FALSE);
     m_imSlider.InvalidateRect(nullptr, FALSE);
-    UpdateColor();
+    OnColorChanged();
     return 0;
 }
 
-LRESULT CColorPicker::Impl::SliderChanged(bool bNotify)
+LRESULT CColorPicker::Impl::SliderChanged(bool bUpdateDDX)
 {
-    if (bNotify) {
+    if (bUpdateDDX) {
         CScopedBoolGuard bGuard{m_bSaveData};
         UpdateDDX();
     }
     m_imSpectrum.InvalidateRect(nullptr, FALSE);
-    UpdateColor();
+    OnColorChanged();
     return 0;
 }
 
@@ -442,10 +446,13 @@ void CColorPicker::Impl::DDXReloadEditsExcept(int nID)
     }
 }
 
-static void CEdit_CursorToEnd(WTL::CEdit& edCtrl)
+namespace 
 {
-    edCtrl.SetSel(0, -1);
-    edCtrl.SetSel(static_cast<DWORD>(-1));
+    void CEdit_CursorToEnd(WTL::CEdit& edCtrl)
+    {
+        edCtrl.SetSel(0, -1);
+        edCtrl.SetSel(static_cast<DWORD>(-1));
+    }
 }
 
 void CColorPicker::Impl::ValidateHexInput(WTL::CEdit& edCtrl)
@@ -490,7 +497,7 @@ void CColorPicker::Impl::OnEditUpdate(int nID)
     if (DoDataExchange(DDX_SAVE, nID)) {
         m_imSpectrum.InvalidateRect(nullptr, FALSE);
         m_imSlider.InvalidateRect(nullptr, FALSE);
-        UpdateColor();
+        OnColorChanged();
         if (CID_RGB_HEX_VAL != nID) {
             UpdateHexStr();
         }
@@ -591,10 +598,10 @@ void CColorPicker::Impl::HistoryStore()
 void CColorPicker::Impl::HistoryPick()
 {
     auto const& chPick{gs_History.Pick(m_stHistory)};
-    SetColor(chPick.GetColorRef(), chPick.GetAlpha(), false);
+    _SetColor(chPick.GetColorRef(), chPick.GetAlpha(), false, true);
 }
 
-void CColorPicker::Impl::SetColor(COLORREF crColor, int nAlpha, bool bStoreToHistory)
+void CColorPicker::Impl::_SetColor(COLORREF crColor, int nAlpha, bool bStoreToHistory, bool bNotifyObservers)
 {
     m_imSpectrum.GetColor().m_A = nAlpha;
     m_imSpectrum.GetColor().SetColorRef(crColor);
@@ -602,7 +609,9 @@ void CColorPicker::Impl::SetColor(COLORREF crColor, int nAlpha, bool bStoreToHis
     if (bStoreToHistory) {
         HistoryStore();
     }
-    //SyncHosts(m_pColorHost);
+    if (bNotifyObservers) {
+        NotifyObservers();
+    }
 }
 
 void CColorPicker::Impl::GetColorFromWindowDC(CPoint const& pt, bool bStoreToHistory)
@@ -612,7 +621,7 @@ void CColorPicker::Impl::GetColorFromWindowDC(CPoint const& pt, bool bStoreToHis
     CPoint            ptWin{pt};
     wnd.ScreenToClient(&ptWin);
     COLORREF const  crPixel{dc.GetPixel(ptWin)};
-    SetColor(crPixel, m_imSpectrum.GetColor().m_A, bStoreToHistory);
+    _SetColor(crPixel, m_imSpectrum.GetColor().m_A, bStoreToHistory, true);
     DBGTPrint(LTH_COLORPICKER L" [%p] {%d, %d} ==> 0x%08x\n", wnd.m_hWnd, pt.x, pt.y, crPixel);
 }
 
@@ -621,14 +630,12 @@ void CColorPicker::Impl::GetColorFromDesktopDC(CPoint const& pt, bool bStoreToHi
     WTL::CDCHandle const dc{::GetDC(nullptr)};
     COLORREF const  crPixel{dc.GetPixel(pt)};
     ::ReleaseDC(nullptr, dc);
-    SetColor(crPixel, m_imSpectrum.GetColor().m_A, bStoreToHistory);
+    _SetColor(crPixel, m_imSpectrum.GetColor().m_A, bStoreToHistory, true);
     DBGTPrint(LTH_COLORPICKER L" {%d, %d} ==> 0x%08x\n", pt.x, pt.y, crPixel);
 }
 
 void CColorPicker::Impl::ColorpickEnd(UINT, CPoint const& pt, bool bSelect)
 {
-    //WTL::CButton bnPick{GetDlgItem(CID_BTN_PICK_COLOR)};
-    //bnPick.EnableWindow(TRUE);
     m_Magnifier.Show(FALSE);
     KillTimer(TIMER_COLORPICK);
     if (bSelect) {

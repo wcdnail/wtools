@@ -1,12 +1,14 @@
 #pragma once
 
 #include "IColor.h"
+#include "IColorObserver.h"
 #include <wcdafx.api.h>
 #include <atlgdi.h>
 
 class CRect;
 
-struct CColorCell: public IColor
+struct CColorCell: public IColor,
+                   public IColorObserver
 {
     DELETE_COPY_OF(CColorCell);
 
@@ -35,6 +37,9 @@ private:
     HBITMAP         m_hPrev;
     WTL::CDC           m_DC;
     WTL::CBitmap   m_Bitmap;
+
+    void _SetColor(COLORREF crColor, int nAlpha);
+    void OnColorUpdate(IColor const& clrSource) override;
 };
 
 inline void CColorCell::SetHolder(HWND hHolder)
