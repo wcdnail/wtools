@@ -99,7 +99,7 @@ private:
 
     void FontSetFamily(LOGFONT const& logFont);
     void FontSetSizes(LOGFONT const& logFont);
-    bool ItemFontApplyChanges(int nItem, ItemDef rItemDef, int iFont, int iFontControl);
+    bool ItemFontApplyChanges(int iFont, int iFontControl);
     bool ItemFontChanged(int nItem, int iFontControl = IT_Invalid, bool bApply = false);
 
     void OnItemSelect(int nItem);

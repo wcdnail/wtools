@@ -11,6 +11,7 @@
 #include "resz/resource.h"
 #include <string.utils.format.h>
 #include <UT/debug.assistance.h>
+#include <dh.tracing.defs.h>
 #include <ranges>
 
 enum PageIndex: int
@@ -71,9 +72,9 @@ BOOL CMainView::PreTranslateMessage(MSG* pMsg)
 
 void CMainView::TabShift(int num)
 {
-    const int count = m_TabCtrl.GetItemCount() - 1;
-    const int  curr = m_TabCtrl.GetCurSel();
-    int next = curr + num;
+    const int count{m_TabCtrl.GetItemCount() - 1};
+    const int  curr{m_TabCtrl.GetCurSel()};
+    int        next{curr + num};
     if (next < 0) {
         next = count;
     }
@@ -99,7 +100,7 @@ void CMainView::SelectAll()
 
 void CMainView::NotifySchemesChanged() const
 {
-    auto* pAppearance = PagesGetT<CPageAppearance>(PageAppearance);
+    auto* pAppearance{PagesGetT<CPageAppearance>(PageAppearance)};
     if (!pAppearance) {
         return ;
     }
@@ -246,7 +247,7 @@ void CMainView::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     CPageImpl::OnCommand(uNotifyCode, nID, wndCtl);
 }
 
-LRESULT CMainView::OnNotify(int idCtrl, LPNMHDR pnmh)
+LRESULT CMainView::OnNotify(int, LPNMHDR pnmh)
 {
     switch (pnmh->code) {
     case TCN_SELCHANGE: {

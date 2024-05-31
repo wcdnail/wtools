@@ -6,6 +6,8 @@
 #include <string.utils.format.h>
 #include <dev.assistance/dev.assist.h>
 #include <UT/debug.assistance.h>
+#include <dh.tracing.defs.h>
+#include <dh.tracing.h>
 #include <atldlgs.h>
 
 CPageAppearance::~CPageAppearance() = default;
@@ -235,7 +237,7 @@ void CPageAppearance::FontSetSizes(LOGFONT const& logFont)
     m_cbFontSize.SetWindowTextW(szSize);
 }
 
-bool CPageAppearance::ItemFontApplyChanges(int nItem, ItemDef rItemDef, int iFont, int iFontControl)
+bool CPageAppearance::ItemFontApplyChanges(int iFont, int iFontControl)
 {
     WTL::CLogFont lfCopy = m_SchemeCopy.GetLogFont(m_sCurrentSize, iFont);
     switch (iFontControl) {
@@ -261,17 +263,17 @@ bool CPageAppearance::ItemFontApplyChanges(int nItem, ItemDef rItemDef, int iFon
         if (!CBGetCurData(m_cbFontSmooth, nSmooth) || IT_Invalid == nSmooth) {
             return false;
         }
-        lfCopy.lfQuality = nSmooth;
+        lfCopy.lfQuality = static_cast<BYTE>(nSmooth);
         break;
     }
     case IDC_APP_FONT_STYLE_BOLD:
         lfCopy.lfWeight = m_bnFontBold.GetCheck() ? FW_BOLD : FW_NORMAL;
         break;
     case IDC_APP_FONT_STYLE_ITALIC:
-        lfCopy.lfItalic = m_bnFontItalic.GetCheck();
+        lfCopy.lfItalic = static_cast<BYTE>(m_bnFontItalic.GetCheck());
         break;
     case IDC_APP_FONT_STYLE_UNDERLINE:
-        lfCopy.lfUnderline = m_bnFontUndrln.GetCheck();
+        lfCopy.lfUnderline = static_cast<BYTE>(m_bnFontUndrln.GetCheck());
         break;
     default:
         return false;
@@ -293,7 +295,7 @@ bool CPageAppearance::ItemFontChanged(int nItem, int iFontControl, bool bApply)
         return false;
     }
     if (bApply) {
-        return ItemFontApplyChanges(nItem, rItemDef, iFont, iFontControl);
+        return ItemFontApplyChanges(iFont, iFontControl);
     }
     WTL::CLogFont const& logFont = m_SchemeCopy.GetLogFont(m_sCurrentSize, iFont);
     FontEnable(TRUE);
@@ -314,7 +316,6 @@ bool CPageAppearance::ItemFontChanged(int nItem, int iFontControl, bool bApply)
 
 void CPageAppearance::OnItemSelect(int nItem)
 {
-    auto const& rItemDef = CScheme::ItemDef(nItem);
     m_stPreview.OnItemSelected(nItem);
     m_cbItem.SetCurSel(nItem);
     ItemEnable(TRUE);
@@ -413,14 +414,14 @@ int CPageAppearance::ItemGetSel() const
 
 void CPageAppearance::ItemColorTryChange(int nButton)
 {
-    const COLORREF  clrTryed = m_bnItemColor[nButton].GetColor();
-    const int nItem = ItemGetSel();
+    const COLORREF clrTryed{m_bnItemColor[nButton].GetColorRef()};
+    const int         nItem{ItemGetSel()};
     if (IT_Invalid == nItem) {
         DH::TPrintf(LTH_APPEARANCE L" <<FAILED>> '%s' (%d) ==> #%08x\n", _T(__FUNCTION__), nButton, clrTryed);
         return ;
     }
-    auto const& rItemDef = CScheme::ItemDef(nItem);
-    int           nWhich = IT_Invalid;
+    auto const& rItemDef{CScheme::ItemDef(nItem)};
+    int           nWhich{IT_Invalid};
     switch (nButton) {
     case IT_Color1:     nWhich = rItemDef.color1; break;
     case IT_Color2:     nWhich = rItemDef.color2; break;
@@ -469,7 +470,7 @@ void CPageAppearance::SchemeRenameShow(bool bShow)
     m_edSchemeName.SetSelAll(FALSE);
 }
 
-void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
+void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND)
 {
     // skip during controls initialization
     if (m_bLoadValues) {

@@ -2,13 +2,14 @@
 #include "luicPageDllIcons.h"
 #include "luicUtils.h"
 #include "luicMain.h"
-#include "icons.dll.h"
-#include "string.utils.format.h"
 #include "UT/debug.assistance.h"
-#include "windows.uses.gdi+.h"
-#include "resz/resource.h"
+#include <icons.dll.h>
+#include <windows.uses.gdi+.h>
+#include <string.utils.format.h>
+#include <string.utils.error.code.h>
 #include <gdiplus.h>
 #include <filesystem>
+#include "resz/resource.h"
 
 class CImageList;
 
@@ -148,19 +149,19 @@ void CPageDllIcons::PopulateViews()
 
 BOOL CPageDllIcons::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-    auto const* app = CLUIApp::App();
+    auto const* pApp{CLUIApp::App()};
 
     m_edPath.Attach(GetDlgItem(IDC_ED_OPEN_DLL_PATHNAME));
     m_bnBrowse.Attach(GetDlgItem(IDC_BN_OPEN_DLG));
     m_bnExport.Attach(GetDlgItem(IDC_BN_EXPORT_SEL));
     m_lvView.Attach(GetDlgItem(IDC_LV_VIEW));
     m_lvView.ModifyStyleEx(0, LVS_EX_DOUBLEBUFFER);
-    m_bnBrowse.SetIcon(app->GetIcon(IconFolderOpen));
-    m_bnExport.SetIcon(app->GetIcon(IconFloppy));
+    m_bnBrowse.SetIcon(pApp->GetIcon(IconFolderOpen));
+    m_bnExport.SetIcon(pApp->GetIcon(IconFloppy));
 
     m_CurrFilename = SHELL32_PATHNAME;
-    m_il16x16.Attach(app->GetImageList(IL_SHELL_16x16));
-    m_il32x32.Attach(app->GetImageList(IL_SHELL_32x32));
+    m_il16x16.Attach(pApp->GetImageList(IL_SHELL_16x16));
+    m_il32x32.Attach(pApp->GetImageList(IL_SHELL_32x32));
     m_bManagedIl = false;
     PopulateViews();
     DragAcceptFiles(m_hWnd, TRUE);
@@ -180,15 +181,18 @@ void CPageDllIcons::ExportMultiple(UINT count)
         SetMFStatus(STA_Warning, L"Export canceled");
         return ;
     }
-    std::wstring tempFilename = dlg.GetFolderPath();
+    std::wstring const tempFilename{dlg.GetFolderPath()};
     AttemptToSaveSelected(tempFilename, count);
 }
 
-static void AddExtIfItAbsent(std::wstring& filename, PCWSTR ext)
+namespace 
 {
-    auto n = filename.rfind(L'.');
-    if (std::wstring::npos == n) {
-        filename += ext;
+    void AddExtIfItAbsent(std::wstring& filename, PCWSTR ext)
+    {
+        auto n = filename.rfind(L'.');
+        if (std::wstring::npos == n) {
+            filename += ext;
+        }
     }
 }
 
