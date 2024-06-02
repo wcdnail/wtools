@@ -26,6 +26,9 @@ CColorHistory CColorPicker::Impl::gs_History{};
 
 namespace
 {
+    constexpr bool       Yes_UpdateDDX{true};
+    constexpr bool Yes_NotifyObservers{true};
+
     enum ControlIds: int
     {
         BEFORE_FIRST_CONTROL_ID = 1905,
@@ -355,15 +358,17 @@ void CColorPicker::Impl::UpdateDDX()
     DoDataExchange(DDX_LOAD);
 }
 
-void CColorPicker::Impl::OnColorChanged()
+void CColorPicker::Impl::OnColorChanged(bool bNotifyObservers)
 {
     m_stColor.Reset(m_imSpectrum.GetMinColorRef(1, 1, 1),
                     m_imSpectrum.GetColor().m_A,
                     m_imSpectrum.GetBackBrush());
-    NotifyObservers();
+    if (bNotifyObservers) {
+        NotifyObservers();
+    }
 }
 
-LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX)
+LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX, bool bNotifyObservers)
 {
     if (!m_hWnd) {
         return 0;
@@ -377,7 +382,7 @@ LRESULT CColorPicker::Impl::ColorChanged(bool bUpdateDDX)
     }
     m_imSpectrum.InvalidateRect(nullptr, FALSE);
     m_imSlider.InvalidateRect(nullptr, FALSE);
-    OnColorChanged();
+    OnColorChanged(bNotifyObservers);
     return 0;
 }
 
@@ -388,7 +393,7 @@ LRESULT CColorPicker::Impl::SliderChanged(bool bUpdateDDX)
         UpdateDDX();
     }
     m_imSpectrum.InvalidateRect(nullptr, FALSE);
-    OnColorChanged();
+    OnColorChanged(Yes_NotifyObservers);
     return 0;
 }
 
@@ -432,7 +437,7 @@ void CColorPicker::Impl::OnDDXLoading(UINT nID, BOOL bSaveAndValidate)
         break;
     }
     if (m_imSpectrum.GetColor().IsUpdated()) {
-        ColorChanged(false);
+        ColorChanged(false, false);
     }
 }
 
@@ -497,7 +502,7 @@ void CColorPicker::Impl::OnEditUpdate(int nID)
     if (DoDataExchange(DDX_SAVE, nID)) {
         m_imSpectrum.InvalidateRect(nullptr, FALSE);
         m_imSlider.InvalidateRect(nullptr, FALSE);
-        OnColorChanged();
+        OnColorChanged(Yes_NotifyObservers);
         if (CID_RGB_HEX_VAL != nID) {
             UpdateHexStr();
         }
@@ -524,8 +529,8 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
     case NM_SLIDER_CLR_SEL:
     case NM_SPECTRUM_CLR_SEL:
         switch (nID) {
-        case CID_SPECTRUM_PIC: return ColorChanged(true);
-        case CID_SPECTRUM_SLD: return SliderChanged(true);
+        case CID_SPECTRUM_PIC: return ColorChanged(Yes_UpdateDDX, Yes_NotifyObservers);
+        case CID_SPECTRUM_SLD: return SliderChanged(Yes_UpdateDDX);
         }
         break;
     }
@@ -605,7 +610,7 @@ void CColorPicker::Impl::_SetColor(COLORREF crColor, int nAlpha, bool bStoreToHi
 {
     m_imSpectrum.GetColor().m_A = nAlpha;
     m_imSpectrum.GetColor().SetColorRef(crColor);
-    ColorChanged(true);
+    ColorChanged(true, bNotifyObservers);
     if (bStoreToHistory) {
         HistoryStore();
     }

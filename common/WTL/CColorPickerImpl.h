@@ -71,9 +71,9 @@ private:
     void UpdateHexStr();
     void UpdateHtmlStr();
     void UpdateDDX();
-    void OnColorChanged();
+    void OnColorChanged(bool bNotifyObservers);
     void DDXReloadEditsExcept(int nId);
-    LRESULT ColorChanged(bool bUpdateDDX);
+    LRESULT ColorChanged(bool bUpdateDDX, bool bNotifyObservers);
     void OnDDXLoading(UINT nID, BOOL bSaveAndValidate);
     LRESULT OnNotify(int nID, LPNMHDR pnmh);
     void ValidateHexInput(WTL::CEdit& edCtrl);

@@ -43,6 +43,9 @@ void IColor::SetColor(IColor const* pColor)
 
 void IColor::AddObserver(IColorObserver& rObserver)
 {
+    if (IsAlreadyObserved(&rObserver)) {
+        return ;
+    }
     m_lstObservers.push_back(&rObserver);
 }
 

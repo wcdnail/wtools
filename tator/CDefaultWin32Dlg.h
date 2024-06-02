@@ -95,12 +95,14 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
         m_crCell1.AddObserver(m_cpDlg.GetMasterObserver());
         m_crCell1.AddObserver(m_btnMyColor1);
+        m_crCell1.AddObserver(m_btnMyColor2);
+        m_crCell1.AddObserver(m_btnMyColor3);
 
-        m_btnMyColor1.AddObserver(m_crCell1);
-        m_btnMyColor1.AddObserver(m_cpDlg.GetMasterObserver());
+        m_btnMyColor1.AddObservers(m_crCell1);
+        m_btnMyColor2.AddObservers(m_crCell1);
+        m_btnMyColor3.AddObservers(m_crCell1);
 
         m_cpDlg.GetMasterColor().AddObserver(m_crCell1);
-        m_cpDlg.GetMasterColor().AddObserver(m_btnMyColor1);
 
         m_cpDlg.Show(m_hWnd, Rc::Bottom | Rc::XCenter, false);
 
