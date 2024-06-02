@@ -66,7 +66,7 @@ void CThemePreviewer::OnItemSelected(int nItem)
     }
 }
 
-int CThemePreviewer::OnCreate(LPCREATESTRUCT pCS)
+int CThemePreviewer::OnCreate(LPCREATESTRUCT)
 {
     //DWORD dwStyle = GetWindowLongW(GWL_STYLE);
     //ModifyStyle(0xffffffff, WS_CHILD | WS_VISIBLE | WS_TABSTOP);
@@ -234,7 +234,7 @@ void CThemePreviewer::SetSelectedRect(int wr, int ri)
     NotifyParent();
 }
 
-void CThemePreviewer::OnLButton(UINT nFlags, CPoint point)
+void CThemePreviewer::OnLButton(UINT, CPoint point)
 {
     m_bLBtnDown = true;
     for (int j = 0; j < WND_Count; j++) {
@@ -317,7 +317,7 @@ void CThemePreviewer::NotifyParent() const
     }
     const int nElementId = RectIndexToElementId();
     if (CB_ERR != m_pcbItem->SetCurSel(nElementId)) {
-        const WORD id = m_pcbItem->GetDlgCtrlID();
+        auto const id{m_pcbItem->GetDlgCtrlID()};
         ::SendMessageW(GetParent(), WM_COMMAND, MAKEWPARAM(id, CBN_SELENDOK), reinterpret_cast<LPARAM>(m_pcbItem->m_hWnd));
     }
 }

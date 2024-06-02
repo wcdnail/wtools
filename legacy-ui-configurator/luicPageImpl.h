@@ -59,24 +59,10 @@ protected:
 private:
     ResizeVec m_ResiseMap;
 
-    BEGIN_MSG_MAP_EX(CColorsPage)
-        // TODO: temporary TURN OFF colorizing
-        //MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
-        //MSG_WM_ERASEBKGND(OnEraseBkgnd)
-        MSG_WM_INITDIALOG(OnInitDialog)
-        MSG_WM_DESTROY(OnDestroy)
-        MSG_WM_COMMAND(OnCommand)
-        MSG_WM_NOTIFY(OnNotify)
-        MSG_WM_DROPFILES(OnDropFiles)
-        MSG_WM_SETFOCUS(OnSetFocus)
-        REFLECT_NOTIFICATIONS_EX()
-        if (Resizer::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
-            OnResizeNotify();
-            return TRUE;
-        }
-    END_MSG_MAP()
-
     WTL::_AtlDlgResizeMap const* GetDlgResizeMap() const;
+
+    BOOL ProcessWindowMessage(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam,
+                              _Inout_ LRESULT& lResult, _In_ DWORD dwMsgMapID = 0) override;
 
     CPageImpl(CPageImpl const&) = delete;
     CPageImpl(CPageImpl&&) = delete;

@@ -106,7 +106,6 @@ private:
     void OnSchemeSizeChanged();
     void OnSchemeSelected(CSchemePtr& pSource);
 
-    void ColorPicker(int nButton);
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh) override;
     int ItemGetSel() const;

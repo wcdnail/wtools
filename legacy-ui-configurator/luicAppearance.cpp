@@ -364,17 +364,6 @@ void CPageAppearance::OnSchemeSelected(CSchemePtr& pSource)
     m_nPrevScheme = m_cbScheme.GetCurSel();
 }
 
-#if 0
-void CPageAppearance::ColorPicker(int nButton)
-{
-    UNREFERENCED_ARG(nButton);
-    // TODO: implement custom color picker dialog
-    constexpr COLORREF srcColor = 0x00ff00ff;
-    WTL::CColorDialog dlgColorPicker(srcColor, CC_FULLOPEN, m_hWnd);
-    dlgColorPicker.DoModal(m_hWnd);
-}
-#endif
-
 LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
 {
     if (CPN_SELENDOK == pnmh->code) {

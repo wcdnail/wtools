@@ -234,7 +234,7 @@ HRESULT CLUIApp::Run(HINSTANCE instHnd, int showCmd)
             ReportError(L"MessageLoop append failure!", code, true);
             return code;
         }
-        if (!m_MainFrame.CreateEx(GetActiveWindow())) {
+        if (!m_MainFrame.CreateEx(GetActiveWindow(), nullptr, WS_OVERLAPPEDWINDOW, WS_EX_APPWINDOW)) {
             code = static_cast<HRESULT>(GetLastError());
             ReportError(L"MainFrame creation failure!", code, true);
             return code;

@@ -212,6 +212,9 @@ void CMainView::OnResizeNotify()
 
 BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
+    UNREFERENCED_ARG(wndFocus);
+    UNREFERENCED_ARG(lInitParam);
+
 #ifdef _DEBUG_CONTROLS
     ShowWindow(SW_SHOW);
 #endif
@@ -232,6 +235,11 @@ BOOL CMainView::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     DlgResizeAdd(IDC_BN_OK, DLSZ_MOVE_X | DLSZ_MOVE_Y);
     DlgResizeAdd(IDC_BN_CANCEL, DLSZ_MOVE_X | DLSZ_MOVE_Y);
     DlgResizeAdd(IDC_BN_APPLY, DLSZ_MOVE_X | DLSZ_MOVE_Y);
+
+    WTL::CButton{GetDlgItem(IDC_BN_OK)}.EnableWindow(TRUE);
+    WTL::CButton{GetDlgItem(IDC_BN_CANCEL)}.EnableWindow(TRUE);
+    WTL::CButton{GetDlgItem(IDC_BN_APPLY)}.EnableWindow(TRUE);
+
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }
 

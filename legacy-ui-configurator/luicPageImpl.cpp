@@ -5,9 +5,7 @@
 #include "dh.tracing.defs.h"
 #include "dev.assistance/dev.assist.h"
 
-CPageImpl::~CPageImpl()
-{
-}
+CPageImpl::~CPageImpl() = default;
 
 CPageImpl::CPageImpl(UINT idd, std::wstring&& caption)
     :         IDD{idd}
@@ -72,6 +70,35 @@ void CPageImpl::SelectAll()
     // nothign to do
 }
 
+BOOL CPageImpl::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
+{
+    BOOL bHandled = TRUE;
+    UNREFERENCED_PARAMETER(hWnd);
+    DBG_DUMP_WMESSAGE(LTH_CONTROL, m_Caption.c_str(), (PMSG)GetCurrentMessage());
+    switch (dwMsgMapID) {
+    case 0:
+        // FIXME: temporary TURN OFF colorizing
+        //MSG_WM_CTLCOLORSTATIC(OnCtlColorStatic)
+        //MSG_WM_ERASEBKGND(OnEraseBkgnd)
+        MSG_WM_INITDIALOG(OnInitDialog)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_COMMAND(OnCommand)
+        MSG_WM_NOTIFY(OnNotify)
+        MSG_WM_DROPFILES(OnDropFiles)
+        MSG_WM_SETFOCUS(OnSetFocus)
+        REFLECT_NOTIFICATIONS_EX()
+        if (Resizer::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
+            OnResizeNotify();
+            return TRUE;
+        }
+        break;
+    default: ATLTRACE(static_cast<int>(ATL::atlTraceWindowing), 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
+        ATLASSERT(FALSE);
+        break;
+    }
+    return FALSE;
+}
+
 WTL::_AtlDlgResizeMap const* CPageImpl::GetDlgResizeMap() const
 {
     static const WTL::_AtlDlgResizeMap emptyMap[] = { { -1, 0 } };
@@ -80,8 +107,10 @@ WTL::_AtlDlgResizeMap const* CPageImpl::GetDlgResizeMap() const
 
 void CPageImpl::DlgResizeAdd(int nCtlID, DWORD dwResizeFlags)
 {
-    CWindow item = GetDlgItem(nCtlID);
-    _ASSERT_EXPR(item.Detach() != nullptr, _CRT_WIDE("Attempting to append not existing control to ResizeMap!"));
+    if (-1 != nCtlID) { // is terminator ?
+        CWindow item = GetDlgItem(nCtlID);
+        _ASSERT_EXPR(item.Detach() != nullptr, _CRT_WIDE("Attempting to append not existing control to ResizeMap!"));
+    }
     m_ResiseMap.emplace_back(WTL::_AtlDlgResizeMap{ nCtlID, dwResizeFlags });
 }
 
@@ -93,7 +122,7 @@ void CPageImpl::DlgResizeAdd(WTL::_AtlDlgResizeMap const* vec, size_t count)
     newItems.swap(m_ResiseMap);
 }
 
-HBRUSH CPageImpl::OnCtlColorStatic(WTL::CDCHandle dc, HWND wndStatic)
+HBRUSH CPageImpl::OnCtlColorStatic(WTL::CDCHandle dc, HWND)
 {
 #if 0
     dc.SetTextColor(m_pTheme->GetColor(COLOR_CAPTIONTEXT));
@@ -122,6 +151,9 @@ void CPageImpl::OnResizeNotify()
 
 BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
+    UNREFERENCED_ARG(wndFocus);
+    UNREFERENCED_ARG(lInitParam);
+
 #ifdef _DEBUG_CONTROLS
     ShowWindow(SW_SHOW);
 #endif
@@ -130,10 +162,7 @@ BOOL CPageImpl::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     ModifyStyle(WS_BORDER | DS_CONTROL, 0);
     ModifyStyleEx(WS_EX_CONTROLPARENT | WS_EX_CLIENTEDGE, 0);
 
-    UNREFERENCED_ARG(wndFocus);
-    UNREFERENCED_ARG(lInitParam);
-
-    m_ResiseMap.emplace_back(WTL::_AtlDlgResizeMap{ -1, 0 });
+    DlgResizeAdd(-1, 0);
     DlgResize_Init(false, false);
     return TRUE;
 }

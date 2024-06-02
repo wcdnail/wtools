@@ -99,7 +99,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT)
     m_StatusBar.SetPanes(arrParts, _countof(arrParts), false);
 
     if (!m_View.CreateDlg(m_hWnd)) {
-        const auto code = static_cast<HRESULT>(GetLastError());
+        code = static_cast<HRESULT>(GetLastError());
         ReportError(L"Creation of MainView failed!", code, true, MB_ICONSTOP);
         return -1;
     }
@@ -173,7 +173,7 @@ void CMainFrame::OnAccelerator(int nID)
     //DBGTPrint(LTH_MAINFRAME L" ACCELERATOR: %d %p\n", nID);
 }
 
-void CMainFrame::OnCommand(UINT uNotifyCode, int nID, HWND hWndCtl)
+void CMainFrame::OnCommand(UINT uNotifyCode, int nID, HWND)
 {
     //
     // https://learn.microsoft.com/en-us/windows/win32/menurc/wm-command

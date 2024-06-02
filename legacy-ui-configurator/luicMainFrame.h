@@ -7,10 +7,10 @@
 #include <atlframe.h>
 #include <atlctrlx.h>
 
-struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
-                   WTL::CDialogResize<CMainFrame>,
-                   WTL::CMessageFilter,
-                   WTL::CIdleHandler
+struct CMainFrame: private WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
+                   private WTL::CDialogResize<CMainFrame>,
+                   private WTL::CMessageFilter,
+                   private WTL::CIdleHandler
 {
     using   Super = WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>;
     using Resizer = WTL::CDialogResize<CMainFrame> ;
@@ -19,6 +19,10 @@ struct CMainFrame: WTL::CFrameWindowImpl<CMainFrame, ATL::CWindow>,
     CMainFrame(Conf::Section const& parentSettings);
 
     void SetStatus(int status, ATL::CStringW&& message);
+
+    using Super::m_hWnd;
+    using Super::CreateEx;
+    using Super::ShowWindow;
 
 private:
     CRect                      m_rcMainFrame;

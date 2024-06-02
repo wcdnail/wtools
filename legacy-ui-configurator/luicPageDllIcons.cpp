@@ -170,6 +170,7 @@ BOOL CPageDllIcons::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     DlgResizeAdd(IDC_BN_OPEN_DLG, DLSZ_MOVE_X);
     DlgResizeAdd(IDC_BN_EXPORT_SEL, DLSZ_MOVE_X);
     DlgResizeAdd(IDC_LV_VIEW, DLSZ_SIZE_X | DLSZ_SIZE_Y);
+
     return CPageImpl::OnInitDialog(wndFocus, lInitParam);
 }
 
