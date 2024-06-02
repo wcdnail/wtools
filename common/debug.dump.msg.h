@@ -1,11 +1,13 @@
 #pragma once
 
-#define _NEED_WMESSAGE_DUMP 0
+#ifndef _NEED_WMESSAGE_DUMP
+#  define _NEED_WMESSAGE_DUMP 0
+#endif
 
 #if defined(_DEBUG) && (_NEED_WMESSAGE_DUMP)
-#  include "dh.tracing.h"
-#  include "dh.tracing.defs.h"
-#  include "dev.assistance/dev.assist.h"
+#  include <dh.tracing.h>
+#  include <dh.tracing.defs.h>
+#  include <dev.assistance/dev.assist.h>
 #  define DBG_DUMP_WMESSAGE(HDR, CAPT, pMsg)                            \
     do {                                                                 \
         auto msgStr = DH::MessageToStrignW(pMsg);                         \

@@ -1,6 +1,13 @@
 #include "stdafx.h"
 #include "dev.assist.h"
 
+#define WM_UAHDESTROYWINDOW     0x0090
+#define WM_UAHDRAWMENU          0x0091
+#define WM_UAHDRAWMENUITEM      0x0092
+#define WM_UAHINITMENU          0x0093
+#define WM_UAHMEASUREMENUITEM   0x0094
+#define WM_UAHNCPAINTMENUPOPUP  0x0095
+
 namespace DH
 {
     uint64_t GetWindowType(HWND winHandle)

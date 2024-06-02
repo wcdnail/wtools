@@ -5,6 +5,9 @@
 #include <dh.tracing.defs.h>
 #include <dh.tracing.h>
 
+#define _NEED_WMESSAGE_DUMP 1
+#include <debug.dump.msg.h>
+
 CColorPickerDlg::~CColorPickerDlg() = default;
 
 CColorPickerDlg::CColorPickerDlg()
@@ -113,11 +116,11 @@ void CColorPickerDlg::DoInitControls()
 
 const WTL::_AtlDlgResizeMap* CColorPickerDlg::GetDlgResizeMap() const
 {
-    static const WTL::_AtlDlgResizeMap gs_Map[] = {
+    static constexpr WTL::_AtlDlgResizeMap gs_Map[] = {
         DLGRESIZE_CONTROL(IDC_COLORPICKER, DLSZ_SIZE_X | DLSZ_SIZE_Y)
         { -1, 0 },
     };
-    static const WTL::_AtlDlgResizeMap gs_ModalMap[] = {
+    static constexpr WTL::_AtlDlgResizeMap gs_ModalMap[] = {
         DLGRESIZE_CONTROL(IDC_COLORPICKER, DLSZ_SIZE_X | DLSZ_SIZE_Y)
         DLGRESIZE_CONTROL(IDCANCEL, DLSZ_MOVE_Y)
         DLGRESIZE_CONTROL(IDOK, DLSZ_MOVE_X | DLSZ_MOVE_Y)
@@ -128,6 +131,7 @@ const WTL::_AtlDlgResizeMap* CColorPickerDlg::GetDlgResizeMap() const
 
 BOOL CColorPickerDlg::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
+    DBG_DUMP_WMESSAGE_EXT(LTH_COLORPICKER, L"CPDLG", hWnd, uMsg, wParam, lParam);
     BOOL bHandled = TRUE;
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) {
@@ -142,6 +146,35 @@ BOOL CColorPickerDlg::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
         ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
         ATLASSERT(FALSE);
         break;
+    }
+    if (!m_bModalLoop && m_ColorPicker.m_hWnd) {
+        switch (uMsg) {
+        case WM_MOVE: // skip IsDialogMessageW recursives
+        case WM_GETICON:
+        case WM_SETICON:
+        case WM_ACTIVATEAPP:
+        case WM_NCACTIVATE:
+        case WM_ACTIVATE:
+        case WM_USER:
+        case WM_CHANGEUISTATE:
+        case WM_SHOWWINDOW:
+        case OCM_CTLCOLORDLG: // 0x2136
+        case WM_PAINT:
+        case WM_NCHITTEST:
+        case WM_SETCURSOR:
+        case WM_MOUSEACTIVATE:
+        case WM_NCMOUSEMOVE:
+        case WM_MOUSEMOVE:
+        case WM_NCMOUSELEAVE:
+        case WM_DESTROY:
+        case WM_UPDATEUISTATE:
+            return FALSE;
+        }
+        auto const pCurr{GetCurrentMessage()};
+        MSG          msg{hWnd, uMsg, wParam, lParam, pCurr->time, pCurr->pt};
+        if (::IsDialogMessageW(m_ColorPicker.m_hWnd, &msg)) {
+            return TRUE;
+        }
     }
     return FALSE;
 }
@@ -197,6 +230,7 @@ BOOL CColorPickerDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         MoveWindow(m_rcPlace, FALSE);
     }
     DlgResize_Init(m_bModalLoop, true, 0);
+    ATLTRACE(ATL::atlTraceControls, 0, _T("WM_INITDIALOG OK for hWnd:%p\n"), m_hWnd);
     return TRUE;
 }
 

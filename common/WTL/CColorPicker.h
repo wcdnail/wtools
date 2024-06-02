@@ -38,6 +38,7 @@ struct CColorPicker: private CCustomControl,
 
     WCDAFX_API static int& RasterCX();
 
+    using WndSuper::m_hWnd;
     using WndSuper::IsWindow;
     using WndSuper::InvalidateRect;
 
