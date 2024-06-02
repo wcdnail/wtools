@@ -109,6 +109,15 @@
     <ClCompile Include="WTL\IColorObserver.cpp">
       <Filter>WTL</Filter>
     </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\basic.debug.console.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\debug.console.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\debug.output.listener.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -255,6 +264,18 @@
     <ClInclude Include="WTL\IColorObserver.h">
       <Filter>WTL</Filter>
     </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\basic.debug.console.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\debug.console.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\debug.output.listener.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\ostream.listener.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">
@@ -271,6 +292,9 @@
     </Filter>
     <Filter Include="Unsorted">
       <UniqueIdentifier>{c4c54ce6-b441-4385-90c3-1cd0bc2ed81e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dev.assistance\debug.console">
+      <UniqueIdentifier>{7f67a414-4cb4-4678-96c3-8d12ffa73718}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

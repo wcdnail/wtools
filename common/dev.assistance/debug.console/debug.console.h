@@ -1,59 +1,53 @@
-#ifndef _DH_debug_console_h__
-#define _DH_debug_console_h__
+#pragma once
 
+#include <wcdafx.api.h>
 #include <memory>
 
-#pragma warning(disable: 4251) // stuff `xxx` needs to have dll-interface...
-
-#ifndef _PUBLIC
-#define _PUBLIC
-#endif
-
-namespace Dh
+namespace DH
 {
-	class DebugOutputListener;
-	class BasicDebugConsole;
+    class DebugOutputListener;
+    class BasicDebugConsole;
 
-    class _PUBLIC DebugConsole
+    class DebugConsole
     {
     public:
-        static DebugConsole& Instance(); /* throw (std::bad_alloc) */
+        DELETE_COPY_MOVE_OF(DebugConsole);
 
-        void ReceiveDebugOutput(bool on) const;
-        void ReceiveStdOutput(bool on) const;
+        WCDAFX_API static DebugConsole& Instance();
 
-		void SetParameters(int cx, int cy, int align, int fontSize, char const* fontName) const;
-        void SetAutoScroll(bool on);
+        WCDAFX_API HRESULT Initialize() const;
 
-        void Show() const;
-        void Hide() const;
-		void Clean() const;
+        WCDAFX_API void ReceiveDebugOutput(bool on) const;
+        WCDAFX_API void ReceiveStdOutput(bool on) const;
 
-        void SetTitleText(char const*) const;
-        void SetTitleText(wchar_t const*) const;
+        WCDAFX_API void SetParameters(int cx, int cy, int align, int fontSize, char const* fontName) const;
+        WCDAFX_API void SetAutoScroll(bool on) const;
 
-        void Puts(char const*) const;
-        void Puts(wchar_t const*) const;
+        WCDAFX_API void Show() const;
+        WCDAFX_API void Hide() const;
+        WCDAFX_API void Clean() const;
 
-        void AskPathAndSave() const;
-        void Save(char const* filePathName) const;
+        WCDAFX_API void SetTitleText(char const*) const;
+        WCDAFX_API void SetTitleText(wchar_t const*) const;
 
-        void Destroy() const;
+        WCDAFX_API void Puts(char const*) const;
+        WCDAFX_API void Puts(wchar_t const*) const;
 
-	protected:
-		DebugConsole(BasicDebugConsole*);
-		~DebugConsole();
+        WCDAFX_API void AskPathAndSave() const;
+        WCDAFX_API void Save(char const* filePathName) const;
 
-	private:
-        std::auto_ptr<BasicDebugConsole> impl_;
+        WCDAFX_API void Destroy() const;
 
-		DebugConsole(); /* throw (std::bad_alloc) */
-        DebugConsole(DebugConsole const&);
-        DebugConsole& operator = (DebugConsole const&);
+    protected:
+        DebugConsole(std::unique_ptr<BasicDebugConsole>&&);
+        ~DebugConsole();
 
-		friend class DebugOutputListener;
-		void* GetConsoleSystemHandle() const;
+    private:
+        std::unique_ptr<BasicDebugConsole> impl_;
+
+        DebugConsole();
+
+        friend class DebugOutputListener;
+        void* GetConsoleSystemHandle() const;
     };
 }
-
-#endif // _DH_debug_console_h__

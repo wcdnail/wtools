@@ -3,77 +3,70 @@
 #include "basic.debug.console.h"
 #include <fstream>
 
-namespace Dh
+namespace DH
 {
-	class DebugConsoleImpl: public BasicDebugConsole
-	{
-	public:
-		DebugConsoleImpl(DebugConsole const& owner);
-		virtual ~DebugConsoleImpl();
+    class DebugConsoleImpl: public BasicDebugConsole
+    {
+    public:
+        ~DebugConsoleImpl() override;
+        DebugConsoleImpl(DebugConsole const& owner);
 
-	private:
-		CEdit console_;
+    private:
+        WTL::CEdit console_;
 
-		virtual HWND CreateConsole();
-        virtual void PreWrite();
-        virtual void WriteString(char const* string);
-        virtual void WriteString(wchar_t const* string);
-        virtual void Save(char const* fileName) const;
-        virtual void OnDestroy();
-	};
+        HWND CreateConsole() override;
+        void PreWrite() override;
+        void WriteString(char const* string) override;
+        void WriteString(wchar_t const* string) override;
+        void Save(char const* fileName) const override;
+        void OnDestroy() override;
+    };
 
-	DebugConsoleImpl::DebugConsoleImpl(DebugConsole const& owner)
-		: BasicDebugConsole(owner)
-	{
-	}
+    DebugConsoleImpl::~DebugConsoleImpl() = default;
 
-	DebugConsoleImpl::~DebugConsoleImpl()
-	{
-	}
+    DebugConsoleImpl::DebugConsoleImpl(DebugConsole const& owner)
+        : BasicDebugConsole(owner)
+    {
+    }
 
-	HWND DebugConsoleImpl::CreateConsole()
-	{
-        CRect rc;
+    HWND DebugConsoleImpl::CreateConsole()
+    {
+        CRect rc{};
         GetClientRect(rc);
+        console_.Create(m_hWnd, rc, nullptr, 0
+            | WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL
+            | ES_READONLY
+            | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL 
+            | ES_SUNKEN | ES_WANTRETURN,
+            0,
+            ID_LOG_CTL);
+        console_.FmtLines(TRUE);
+        return console_.m_hWnd;
+    }
 
-		console_.Create(m_hWnd, rc, NULL
-			, WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL
-			| ES_READONLY
-			| ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL 
-			| ES_SUNKEN | ES_WANTRETURN
-			, 0
-			, ID_LOG_CTL);
-
-		console_.FmtLines(TRUE);
-
-		return console_.m_hWnd;
-	}
-
-	void DebugConsoleImpl::PreWrite()
-	{
-		int n = console_.GetWindowTextLength();
+    void DebugConsoleImpl::PreWrite()
+    {
+        int n = console_.GetWindowTextLength();
         console_.SetSel(n, n, GetParameters().autoScroll ? TRUE : FALSE);
-	}
+    }
 
-	void DebugConsoleImpl::WriteString(char const* string)
-	{
-		::SendMessageA(console_, EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)string);
-	}
+    void DebugConsoleImpl::WriteString(char const* string)
+    {
+        ::SendMessageA(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(string));
+    }
 
-	void DebugConsoleImpl::WriteString(wchar_t const* string)
-	{
-		::SendMessageW(console_, EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)string);
-	}
+    void DebugConsoleImpl::WriteString(wchar_t const* string)
+    {
+        ::SendMessageW(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(string));
+    }
 
     void DebugConsoleImpl::Save(char const* filePathName) const
     {
-        std::streamsize len = (std::streamsize)::GetWindowTextLengthA(console_);
-        if (len > 0)
-        {
-            std::string buffer((std::string::size_type)len+1, '\0');
-            int storedLen = ::GetWindowTextA(console_, &buffer[0], (int)len);
-            if ( storedLen > 0 )
-            {
+        std::streamsize const len = ::GetWindowTextLengthA(console_);
+        if (len > 0) {
+            std::string buffer(static_cast<std::string::size_type>(len) + 1, '\0');
+            int const storedLen = ::GetWindowTextA(console_, &buffer[0], static_cast<int>(len));
+            if (storedLen > 0) {
                 std::ofstream output(filePathName);
                 output << buffer.c_str() << std::flush;
             }
@@ -85,55 +78,58 @@ namespace Dh
         console_.DestroyWindow();
     }
 
-	DebugConsole& DebugConsole::Instance()
-	{
-		static DebugConsole instance;
-		return instance;
-	}
+    DebugConsole& DebugConsole::Instance()
+    {
+        static DebugConsole instance;
+        return instance;
+    }
+
+    DebugConsole::~DebugConsole() = default;
 
     DebugConsole::DebugConsole()
-        : impl_(new DebugConsoleImpl(*this))
+        : impl_{new DebugConsoleImpl(*this)}
     {
     }
 
-	DebugConsole::DebugConsole(BasicDebugConsole *otherImpl)
-		: impl_(otherImpl)
-	{
-	}
-
-    DebugConsole::~DebugConsole()
+    DebugConsole::DebugConsole(std::unique_ptr<BasicDebugConsole>&& otherImpl)
+        : impl_(std::move(otherImpl))
     {
     }
 
-	void* DebugConsole::GetConsoleSystemHandle() const
-	{
-		return impl_->m_hWnd;
-	}
+    HRESULT DebugConsole::Initialize() const
+    {
+        return impl_->PreCreateWindow();
+    }
+    
+    void* DebugConsole::GetConsoleSystemHandle() const
+    {
+        return impl_->m_hWnd;
+    }
 
-	void DebugConsole::ReceiveStdOutput(bool on) const
-	{
-		impl_->ReceiveStdOutput(on);
-	}
+    void DebugConsole::ReceiveStdOutput(bool on) const
+    {
+        impl_->ReceiveStdOutput(on);
+    }
 
-	void DebugConsole::ReceiveDebugOutput(bool on) const
-	{
-		impl_->ReceiveDebugOutput(on);
-	}
+    void DebugConsole::ReceiveDebugOutput(bool on) const
+    {
+        impl_->ReceiveDebugOutput(on);
+    }
 
-	void DebugConsole::SetParameters(int cx, int cy, int align, int fsize, char const* fname) const
-	{
-		impl_->CreateWindowIfNessesary();
-		impl_->SetParameters(cx, cy, align, fsize, fname);
-	}
+    void DebugConsole::SetParameters(int cx, int cy, int align, int fsize, char const* fname) const
+    {
+        impl_->CreateWindowIfNessesary();
+        impl_->SetParameters(cx, cy, align, fsize, fname);
+    }
 
-    void DebugConsole::SetAutoScroll(bool on)
+    void DebugConsole::SetAutoScroll(bool on) const
     {
         impl_->GetParameters().autoScroll = on;
     }
 
     void DebugConsole::Show() const
     {
-		impl_->CreateWindowIfNessesary();
+        impl_->CreateWindowIfNessesary();
         impl_->ShowWindow(SW_SHOW);
         impl_->UpdateWindow();
     }
@@ -143,10 +139,10 @@ namespace Dh
         impl_->ShowWindow(SW_HIDE);
     }
 
-	void DebugConsole::Clean() const
-	{
-		impl_->Clean();
-	}
+    void DebugConsole::Clean() const
+    {
+        impl_->Clean();
+    }
 
     void DebugConsole::SetTitleText(char const* string) const
     {
@@ -183,7 +179,7 @@ namespace Dh
         if (impl_->m_hWnd)
         {
             impl_->DestroyWindow();
-            impl_->m_hWnd = NULL;
+            impl_->m_hWnd = nullptr;
         }
     }
 }

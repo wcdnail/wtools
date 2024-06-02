@@ -129,9 +129,18 @@ const WTL::_AtlDlgResizeMap* CColorPickerDlg::GetDlgResizeMap() const
     return m_bModalLoop ? gs_ModalMap : gs_Map;
 }
 
+static UINT CCPD_OnGetDlgCode(LPMSG pMsg)
+{
+    UNREFERENCED_PARAMETER(pMsg);
+    if (pMsg) {
+        DBG_DUMP_WMESSAGE(LTH_COLORPICKER, L"WNDPROC", pMsg);
+    }
+    return DLGC_WANTALLKEYS | DLGC_WANTTAB;
+}
+
 BOOL CColorPickerDlg::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
-    DBG_DUMP_WMESSAGE_EXT(LTH_COLORPICKER, L"CPDLG", hWnd, uMsg, wParam, lParam);
+    //DBG_DUMP_WMESSAGE_EXT(LTH_COLORPICKER, L"WNDPROC", hWnd, uMsg, wParam, lParam);
     BOOL bHandled = TRUE;
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) {
@@ -139,6 +148,7 @@ BOOL CColorPickerDlg::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_COMMAND(OnCommand)
+        MSG_WM_GETDLGCODE(CCPD_OnGetDlgCode)
         REFLECT_NOTIFICATIONS()
         CHAIN_MSG_MAP(CDialogResize)
         break;
@@ -149,30 +159,37 @@ BOOL CColorPickerDlg::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
     }
     if (!m_bModalLoop && m_ColorPicker.m_hWnd) {
         switch (uMsg) {
-        case WM_MOVE: // skip IsDialogMessageW recursives
-        case WM_GETICON:
-        case WM_SETICON:
-        case WM_ACTIVATEAPP:
-        case WM_NCACTIVATE:
-        case WM_ACTIVATE:
-        case WM_USER:
-        case WM_CHANGEUISTATE:
-        case WM_SHOWWINDOW:
-        case OCM_CTLCOLORDLG: // 0x2136
-        case WM_PAINT:
-        case WM_NCHITTEST:
-        case WM_SETCURSOR:
-        case WM_MOUSEACTIVATE:
-        case WM_NCMOUSEMOVE:
-        case WM_MOUSEMOVE:
-        case WM_NCMOUSELEAVE:
-        case WM_DESTROY:
-        case WM_UPDATEUISTATE:
+        case WM_KEYUP:
+            break;
+        //case WM_MOVE: // skip IsDialogMessageW recursives
+        //case WM_GETICON:
+        //case WM_SETICON:
+        //case WM_ACTIVATEAPP:
+        //case WM_NCACTIVATE:
+        //case WM_ACTIVATE:
+        //case WM_USER:
+        //case WM_CHANGEUISTATE:
+        //case WM_SHOWWINDOW:
+        //case OCM_CTLCOLORDLG: // 0x2136
+        //case WM_PAINT:
+        //case WM_NCHITTEST:
+        //case WM_SETCURSOR:
+        //case WM_MOUSEACTIVATE:
+        //case WM_NCMOUSEMOVE:
+        //case WM_MOUSEMOVE:
+        //case WM_NCMOUSELEAVE:
+        //case WM_DESTROY:
+        //case WM_UPDATEUISTATE:
+        default:
             return FALSE;
         }
-        auto const pCurr{GetCurrentMessage()};
-        MSG          msg{hWnd, uMsg, wParam, lParam, pCurr->time, pCurr->pt};
+        //auto const pCurrMsg{GetCurrentMessage()};
+        //MSG      theMessage{hWnd, uMsg, wParam, lParam, pCurrMsg->time, pCurrMsg->pt};
+        MSG msg{*GetCurrentMessage()};
+        DBG_DUMP_WMESSAGE_EXT(LTH_CONTROL, L"WNDPROC", hWnd, uMsg, wParam, lParam);
+        DBG_DUMP_WMESSAGE(LTH_CONTROL, L"CURRMSG", &msg);
         if (::IsDialogMessageW(m_ColorPicker.m_hWnd, &msg)) {
+            //DBG_DUMP_WMESSAGE_EXT(LTH_COLORPICKER, L"CPDLG", hWnd, uMsg, wParam, lParam);
             return TRUE;
         }
     }

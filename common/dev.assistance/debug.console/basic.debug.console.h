@@ -1,105 +1,102 @@
-#ifndef _DH_basic_debug_console_h__
-#define _DH_basic_debug_console_h__
+Ôªø#pragma once
 
 #include "debug.output.listener.h"
 #include "ostream.listener.h"
-#include <boost/noncopyable.hpp>
-#include <boost/thread/mutex.hpp>
-#include <deque>
+#include <WTL/CCustomCtrl.h>
 #include <utility>
 #include <string>
+#include <mutex>
+#include <deque>
 
-namespace Dh
+namespace DH
 {
-	class DebugConsole;
+    class DebugConsole;
 
-	class BasicDebugConsole: public CWindowImpl<BasicDebugConsole>
-		                   , public CDialogResize<BasicDebugConsole>
-			               , boost::noncopyable
-	{
-    private:
+    class BasicDebugConsole: private CCustomControl,
+                             private WTL::CDialogResize<BasicDebugConsole>
+    {
+        friend WTL::CDialogResize<BasicDebugConsole>;
+
         enum { WM_SYNC_STRINGS = WM_USER + 1 };
 
-        typedef std::pair<std::string, std::wstring> StringPair;
-        typedef std::deque<StringPair> StringQue;
+        using StringPair = std::pair<std::string, std::wstring>;
+        using  StringQue = std::deque<StringPair>;
 
-	protected:
-		BasicDebugConsole(DebugConsole const& owner);
+    protected:
+        BasicDebugConsole(DebugConsole const& owner);
 
-	public:
-		struct Parameters
-		{
-			Parameters(char const* fn, int fs, int a, int w, int h)
-				: fname(fn)
-				, fsize(fs)
-				, align(a)
-				, cx(w)
-				, cy(h)
-                , autoScroll(true)
-			{
-			}
+    public:
+        using WndSuper::m_hWnd;
+        using WndSuper::GetClientRect;
+        using WndSuper::ShowWindow;
+        using WndSuper::UpdateWindow;
+        using WndSuper::DestroyWindow;
 
-			char const* fname;		// ¯ËÙÚ
-			int fsize;				// ‡ÁÏÂ ¯ËÙÚ‡
-			int align;				// ÔÓÁËˆËˇ ÓÍÌ‡ Ì‡ ˝Í‡ÌÂ
-			int cx;					// ¯ËËÌ‡
-			int cy;					// ‚˚ÒÓÚ‡
+        struct Parameters
+        {
+            ~Parameters();
+            Parameters(char const* fn, int fs, int a, int w, int h);
+
+            char const* fname; // —à—Ä–∏—Ñ—Ç
+            int fsize;         // —Ä–∞–∑–º–µ—Ä —à—Ä–∏—Ñ—Ç–∞
+            int align;         // –ø–æ–∑–∏—Ü–∏—è –æ–∫–Ω–∞ –Ω–∞ —ç–∫—Ä–∞–Ω–µ
+            int cx;            // —à–∏—Ä–∏–Ω–∞
+            int cy;            // –≤—ã—Å–æ—Ç–∞
             bool autoScroll;
-		};
+        };
 
-		DECLARE_WND_CLASS_EX(_T("WCD_DH_DEBUG_CONSOLE"), CS_VREDRAW | CS_HREDRAW, (COLOR_WINDOW-1))
+        DECLARE_WND_CLASS_EX(_T("WCD_DH_DEBUG_CONSOLE"), CS_VREDRAW | CS_HREDRAW, (COLOR_WINDOW-1))
 
-		enum
-		{
-			ID_LOG_CTL = 1000,
-		};
+        enum { ID_LOG_CTL = 87621 };
 
-		virtual ~BasicDebugConsole();
+        ~BasicDebugConsole() override;
 
-		void CreateWindowIfNessesary();
-		void PutWindow();
-		void SetupFont();
+        HRESULT PreCreateWindow() override;
+
+        void CreateWindowIfNessesary();
+        void PutWindow();
+        void SetupFont();
 
         Parameters& GetParameters();
-		void SetParameters(int cx, int cy, int align, int fsize, char const* fname);
+        void SetParameters(int cx, int cy, int align, int fsize, char const* fname);
 
-		void Puts(char const* string);
-		void Puts(wchar_t const* string);
-		virtual void Clean() const;
+        void Puts(char const* string);
+        void Puts(wchar_t const* string);
+        virtual void Clean() const;
 
-		void ReceiveStdOutput(bool on) const;
-		void ReceiveDebugOutput(bool on) const;
+        void ReceiveStdOutput(bool on) const;
+        void ReceiveDebugOutput(bool on) const;
 
         void AskPathAndSave() const;
         virtual void Save(char const* filePathName) const;
 
         static std::string GenerateLogFilename();
 
-		BEGIN_DLGRESIZE_MAP(BasicDebugConsole)
-			DLGRESIZE_CONTROL(ID_LOG_CTL, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		END_DLGRESIZE_MAP()
+        BEGIN_DLGRESIZE_MAP(BasicDebugConsole)
+            DLGRESIZE_CONTROL(ID_LOG_CTL, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+        END_DLGRESIZE_MAP()
 
-		BEGIN_MSG_MAP_EX(BasicDebugConsole)
-			MSG_WM_CREATE(OnCreate)
+        BEGIN_MSG_MAP(BasicDebugConsole)
+            MSG_WM_CREATE(OnCreate)
             MSG_WM_DESTROY(OnDestroyNative)
             MSG_WM_COMMAND(OnCommand)
-			MESSAGE_HANDLER_EX(WM_SYNC_STRINGS, OnSyncStrings)
-			CHAIN_MSG_MAP(CDialogResize<BasicDebugConsole>)
-		END_MSG_MAP()
+            MESSAGE_HANDLER_EX(WM_SYNC_STRINGS, OnSyncStrings)
+            CHAIN_MSG_MAP(CDialogResize<BasicDebugConsole>)
+        END_MSG_MAP()
 
-	private:
-		Parameters params_;
-		CFont consoleFont_;
-		HWND consoleHandle_;
-		std_ostream_listener<char> coutListener_;
-		std_ostream_listener<char> cerrListener_;
-		std_ostream_listener<wchar_t> wcoutListener_;
-		std_ostream_listener<wchar_t> wcerrListener_;
-		mutable DebugOutputListener debugOutputListener_;
+    private:
+        Parameters params_;
+        WTL::CFont consoleFont_;
+        HWND consoleHandle_;
+        std_ostream_listener<char> coutListener_;
+        std_ostream_listener<char> cerrListener_;
+        std_ostream_listener<wchar_t> wcoutListener_;
+        std_ostream_listener<wchar_t> wcerrListener_;
+        mutable DebugOutputListener debugOutputListener_;
         StringQue cache_;
-        boost::mutex cacheMx_;
+        std::mutex cacheMx_;
 
-		virtual HWND CreateConsole() = 0;
+        virtual HWND CreateConsole() = 0;
 
         virtual void PreWrite() = 0;
         virtual void WriteString(char const*) = 0;
@@ -109,11 +106,18 @@ namespace Dh
         virtual void OnCommand(UINT notifyCode, int id, HWND);
         virtual void OnDestroy();
 
-		int OnCreate(LPCREATESTRUCT);
+        int OnCreate(LPCREATESTRUCT);
         void OnDestroyNative();
         void LoadStringsFromCache();
         LRESULT OnSyncStrings(UINT = 0, WPARAM = 0, LPARAM = 0);
-	};
-}
+    };
 
-#endif // _DH_basic_debug_console_h__
+    inline BasicDebugConsole::Parameters::Parameters(char const* fn, int fs, int a, int w, int h): fname(fn)
+        , fsize(fs)
+        , align(a)
+        , cx(w)
+        , cy(h)
+        , autoScroll(true)
+    {
+    }
+}

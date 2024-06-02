@@ -30,6 +30,9 @@
     <ClCompile Include="color.stuff.cpp" />
     <ClCompile Include="DDraw.DGI\CeXDib.cpp" />
     <ClCompile Include="DDraw.DGI\DDGDIStuff.cpp" />
+    <ClCompile Include="dev.assistance\debug.console\basic.debug.console.cpp" />
+    <ClCompile Include="dev.assistance\debug.console\debug.console.cpp" />
+    <ClCompile Include="dev.assistance\debug.console\debug.output.listener.cpp" />
     <ClCompile Include="dev.assistance\dev.assist.cpp" />
     <ClCompile Include="dh.timer.cpp" />
     <ClCompile Include="dh.tracing.cpp" />
@@ -83,6 +86,10 @@
     <ClInclude Include="DDraw.DGI\CeXDib.h" />
     <ClInclude Include="DDraw.DGI\DDGDIStuff.h" />
     <ClInclude Include="debug.dump.msg.h" />
+    <ClInclude Include="dev.assistance\debug.console\basic.debug.console.h" />
+    <ClInclude Include="dev.assistance\debug.console\debug.console.h" />
+    <ClInclude Include="dev.assistance\debug.console\debug.output.listener.h" />
+    <ClInclude Include="dev.assistance\debug.console\ostream.listener.h" />
     <ClInclude Include="dev.assistance\dev.assist.h" />
     <ClInclude Include="dev.assistance\list.view.exstyles.h" />
     <ClInclude Include="dev.assistance\list.view.styles.h" />

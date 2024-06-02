@@ -224,6 +224,7 @@ void CSpectrumSlider::DoNotifyMouseOver(CRect const& /*rc*/, CPoint pt)
 
 void CSpectrumSlider::OnKeyDown(UINT nChar, UINT, UINT nFlags)
 {
+    UNREFERENCED_PARAMETER(nFlags);
     switch (nChar) {
     case VK_LEFT:
     case VK_UP:    OnMouseWheel(0,  1, {}); break;

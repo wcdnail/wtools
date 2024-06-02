@@ -5,123 +5,129 @@
 #include <string>
 #include <iostream>
 
-namespace Dh
+namespace DH
 {
-	BasicDebugConsole::BasicDebugConsole(DebugConsole const& owner)
-		: params_("Courier", 14, cf::put_at::right | cf::put_at::bottom, 600, 240)
-		, coutListener_(owner, std::cout)
-		, cerrListener_(owner, std::cerr)
-		, wcoutListener_(owner, std::wcout)
-		, wcerrListener_(owner, std::wcerr)
-		, debugOutputListener_(owner)
-	{
-	}
+    BasicDebugConsole::~BasicDebugConsole() = default;
+    BasicDebugConsole::Parameters::~Parameters() = default;
 
-	BasicDebugConsole::~BasicDebugConsole()
-	{
-        if (NULL != m_hWnd)
-        {
-            // HACK: Leak?
-            m_hWnd = NULL;
+    BasicDebugConsole::BasicDebugConsole(DebugConsole const& owner)
+        : params_("Courier", 14, cf::put_at::right | cf::put_at::bottom, 600, 240)
+        , consoleHandle_(nullptr)
+        , coutListener_(owner, std::cout)
+        , cerrListener_(owner, std::cerr)
+        , wcoutListener_(owner, std::wcout)
+        , wcerrListener_(owner, std::wcerr)
+        , debugOutputListener_(owner)
+    {
+    }
+
+    HRESULT BasicDebugConsole::PreCreateWindow()
+    {
+        static ATOM gs_bdcAtom{0};
+        return CCustomControl::PreCreateWindowImpl(gs_bdcAtom, GetWndClassInfo());
+    }
+    
+    void BasicDebugConsole::PutWindow()
+    {
+        typedef cf::rect<LONG> myRect;
+
+        myRect rcMy(0, 0, params_.cx, params_.cy);
+
+        myRect const rcDesktop(0, 0,
+            GetSystemMetrics(SM_CXMAXIMIZED) - GetSystemMetrics(SM_CXSIZEFRAME) * 2,
+            GetSystemMetrics(SM_CYMAXIMIZED) - GetSystemMetrics(SM_CYSIZEFRAME) * 2);
+
+        rcMy.put_into(rcDesktop, params_.align);
+
+        CRect rc(rcMy.left(), rcMy.top(), rcMy.right(), rcMy.bottom());
+        MoveWindow(rc);
+    }
+
+    void BasicDebugConsole::SetupFont()
+    {
+        HFONT const tempFont = ::CreateFontA(-params_.fsize, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, params_.fname);
+
+        consoleFont_.Attach(tempFont);
+        ::SendMessage(consoleHandle_, WM_SETFONT, reinterpret_cast<WPARAM>(consoleFont_.m_hFont), MAKELPARAM(TRUE, 0));
+    }
+
+    int BasicDebugConsole::OnCreate(LPCREATESTRUCT)
+    {
+        DWORD const dwStyle{GetStyle()};
+        bool const bIsChild{0 != (dwStyle & WS_CHILD)};
+        if (bIsChild) {
+            ModifyStyle(0, WS_BORDER, SWP_FRAMECHANGED);
         }
-	}
-
-	void BasicDebugConsole::PutWindow()
-	{
-		typedef cf::rect<LONG> myRect;
-
-		myRect rcMy(0, 0, params_.cx, params_.cy);
-
-		myRect rcDesktop(0, 0
-			, GetSystemMetrics(SM_CXMAXIMIZED) - GetSystemMetrics(SM_CXSIZEFRAME) * 2
-			, GetSystemMetrics(SM_CYMAXIMIZED) - GetSystemMetrics(SM_CYSIZEFRAME) * 2);
-
-		rcMy.put_into(rcDesktop, params_.align);
-
-		CRect rc(rcMy.left(), rcMy.top(), rcMy.right(), rcMy.bottom());
-		MoveWindow(rc);
-	}
-
-	void BasicDebugConsole::SetupFont()
-	{
-		HFONT tempFont = ::CreateFontA(-params_.fsize, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-			, 0, 0, params_.fname);
-
-		consoleFont_.Attach(tempFont);
-		::SendMessage(consoleHandle_, WM_SETFONT, (WPARAM)consoleFont_.m_hFont, MAKELPARAM(TRUE, 0));
-	}
-
-	int BasicDebugConsole::OnCreate(LPCREATESTRUCT)
-	{
-		PutWindow();
-	    consoleHandle_ = CreateConsole();
-		SetupFont();
-		DlgResize_Init(false, true);
-		return TRUE;
-	}
+        else {
+            PutWindow();
+        }
+        consoleHandle_ = CreateConsole();
+        SetupFont();
+        DlgResize_Init(false, bIsChild ? false : true);
+        return 0;
+    }
 
     void BasicDebugConsole::OnDestroyNative()
     {
         OnDestroy();
-        SetMsgHandled(FALSE); 
         consoleFont_.DeleteObject();
+        SetMsgHandled(FALSE); 
     }
 
     void BasicDebugConsole::OnDestroy()
     {
     }
 
-	void BasicDebugConsole::ReceiveStdOutput(bool on) const
-	{
-		coutListener_.toggle(on);
-		cerrListener_.toggle(on);
-		wcoutListener_.toggle(on);
-		wcerrListener_.toggle(on);
-	}
+    void BasicDebugConsole::ReceiveStdOutput(bool on) const
+    {
+        coutListener_.toggle(on);
+        cerrListener_.toggle(on);
+        wcoutListener_.toggle(on);
+        wcerrListener_.toggle(on);
+    }
 
-	void BasicDebugConsole::ReceiveDebugOutput(bool on) const
-	{
-		(on ? debugOutputListener_.Start() : debugOutputListener_.Stop());
-	}
+    void BasicDebugConsole::ReceiveDebugOutput(bool on) const
+    {
+        (on ? debugOutputListener_.Start() : debugOutputListener_.Stop());
+    }
 
-	void BasicDebugConsole::CreateWindowIfNessesary()
-	{
-		if (!m_hWnd)
-		{
-			Create(NULL, CWindow::rcDefault, ::GetCommandLine(), WS_OVERLAPPEDWINDOW, WS_EX_TOOLWINDOW);
-		}
-	}
+    void BasicDebugConsole::CreateWindowIfNessesary()
+    {
+        if (!m_hWnd) {
+            Create(nullptr, CWindow::rcDefault, ::GetCommandLine(), WS_OVERLAPPEDWINDOW, WS_EX_TOOLWINDOW);
+        }
+    }
 
     BasicDebugConsole::Parameters& BasicDebugConsole::GetParameters()
     {
         return params_;
     }
 
-	void BasicDebugConsole::SetParameters(int cx, int cy, int align, int fsize, char const* fname)
-	{
-		if ((cx != params_.cx) || (cy != params_.cy) || (align != params_.align))
-		{
-			params_.cx = cx;
-			params_.cy = cy;
-			params_.align = align;
-			PutWindow();
-		}
+    void BasicDebugConsole::SetParameters(int cx, int cy, int align, int fsize, char const* fname)
+    {
+        if ((cx != params_.cx) || (cy != params_.cy) || (align != params_.align))
+        {
+            params_.cx = cx;
+            params_.cy = cy;
+            params_.align = align;
+            PutWindow();
+        }
 
-		std::string newFontName(fname);
-		std::string oldFontName(params_.fname);
+        std::string const newFontName(fname);
+        std::string const oldFontName(params_.fname);
 
-		if ((newFontName != oldFontName) || (fsize != params_.fsize))
-		{
-			params_.fname = fname;
-			params_.fsize = fsize;
-			SetupFont();
-		}
-	}
+        if ((newFontName != oldFontName) || (fsize != params_.fsize)) {
+            params_.fname = fname;
+            params_.fsize = fsize;
+            SetupFont();
+        }
+    }
 
     void BasicDebugConsole::Puts(char const* string)
     {
         {
-            boost::mutex::scoped_lock lk(cacheMx_);
+            std::lock_guard<std::mutex> lk(cacheMx_);
             cache_.push_back(std::make_pair(string, L""));
         }
         ::PostMessage(m_hWnd, WM_SYNC_STRINGS, 0, 0);
@@ -130,7 +136,7 @@ namespace Dh
     void BasicDebugConsole::Puts(wchar_t const* string)
     {
         {
-            boost::mutex::scoped_lock lk(cacheMx_);
+            std::lock_guard<std::mutex> lk(cacheMx_);
             cache_.push_back(std::make_pair("", string));
         }
         ::PostMessage(m_hWnd, WM_SYNC_STRINGS, 0, 0);
@@ -169,21 +175,17 @@ namespace Dh
 
     void BasicDebugConsole::LoadStringsFromCache()
     {
-        boost::mutex::scoped_lock lk(cacheMx_);
-
-        while (!cache_.empty())
-        {
+        std::lock_guard<std::mutex> lk(cacheMx_);
+        while (!cache_.empty()) {
             StringPair const& sp = cache_.front();
-
             PreWrite();
-
-            if (sp.first.empty())
+            if (sp.first.empty()) {
                 WriteString(sp.second.c_str());
-            else
+            }
+            else {
                 WriteString(sp.first.c_str());
-
+            }
             PostWrite();
-
             cache_.pop_front();
         }
     }
@@ -191,7 +193,7 @@ namespace Dh
     std::string BasicDebugConsole::GenerateLogFilename()
     {
         char moduleName[2048] = {0};
-        ::GetModuleFileNameA(NULL, moduleName, _countof(moduleName)-1);
+        ::GetModuleFileNameA(nullptr, moduleName, _countof(moduleName)-1);
 
         std::string logFilename = moduleName;
         std::string::size_type l = logFilename.length();
@@ -214,7 +216,7 @@ namespace Dh
         if (0 == ::_localtime64_s(&localTime, &ts))
         {
             char timeStr[256] = {0};
-            size_t rv = ::strftime(timeStr, _countof(timeStr), "%d_%m_%Y__%H_%M_%S", &localTime);
+            const size_t rv = ::strftime(timeStr, _countof(timeStr), "%d_%m_%Y__%H_%M_%S", &localTime);
             if (rv > 0)
             {
                 logFilename += ".";
@@ -223,28 +225,25 @@ namespace Dh
         }
 
         char tickCountStr[256] = {0};
-        if (0 == ::_i64toa_s(::GetTickCount(), tickCountStr, _countof(tickCountStr), 10))
-        {
+        if (0 == ::_i64toa_s(::GetTickCount(), tickCountStr, _countof(tickCountStr), 10)) {
             logFilename += "_";
             logFilename += tickCountStr;
         }
 
         logFilename += ".txt";
-
         return logFilename;
     }
 
     void BasicDebugConsole::AskPathAndSave() const
     {
-        CFolderDialog dlg(m_hWnd, _T("Saving to file..."));
+        WTL::CFolderDialog dlg(m_hWnd, _T("Saving to file..."));
 
         TCHAR modulePath[2048] = {0};
-        ::GetModuleFileName(NULL, modulePath, _countof(modulePath)-1);
+        ::GetModuleFileName(nullptr, modulePath, _countof(modulePath)-1);
         dlg.SetInitialFolder(modulePath, true);
 
-        INT_PTR rv = dlg.DoModal(m_hWnd);
-        if ((IDOK == rv) && (NULL != dlg.m_pidlSelected))
-        {
+        const INT_PTR rv = dlg.DoModal(m_hWnd);
+        if ((IDOK == rv) && (nullptr != dlg.m_pidlSelected)) {
             char targetDir[MAX_PATH] = {0};
             ::SHGetPathFromIDListA(dlg.m_pidlSelected, targetDir);
 
