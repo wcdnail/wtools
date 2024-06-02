@@ -3,6 +3,7 @@
 #include <color.stuff.h>
 #include <atltypes.h>
 #include <atlmisc.h>
+#include <algorithm>
 
 struct CColorHistory::StaticInit
 {
@@ -68,7 +69,9 @@ bool CColorHistory::PutFront(COLORREF crColor, int nAlpha, ATL::CWindow stHistor
         return false;
     }
     m_deqHistory.emplace_front(std::move(it));
-    stHistory.InvalidateRect(nullptr, FALSE);
+    for (auto& jt: m_lstHostCtls) {
+        jt.InvalidateRect(nullptr, FALSE);
+    }
     DropTail(stHistory);
     return true;
 }
@@ -134,4 +137,28 @@ void CColorHistory::Draw(LPDRAWITEMSTRUCT pDI, HBRUSH brBack)
         }
     }
     dc.RestoreDC(iSave);
+}
+
+bool CColorHistory::IsAlreadyHosted(ATL::CWindow const& stHistory) const
+{
+    for (auto const& jt: m_lstHostCtls) {
+        if (stHistory.m_hWnd == jt.m_hWnd) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void CColorHistory::AddHostClt(ATL::CWindow const& stHistory)
+{
+    if (IsAlreadyHosted(stHistory)) {
+        return ;
+    }
+    m_lstHostCtls.push_back(stHistory);
+}
+
+void CColorHistory::RemoveHostClt(ATL::CWindow const& stHistory)
+{
+    auto it{std::ranges::remove(m_lstHostCtls, stHistory)};
+    m_lstHostCtls.erase(it.begin(), it.end());
 }

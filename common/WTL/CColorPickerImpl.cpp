@@ -734,11 +734,13 @@ BOOL CColorPicker::Impl::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     );
     DlgResize_Init(false, true, 0);
     m_bSaveData = false;
+    gs_History.AddHostClt(m_stHistory);
     return TRUE;
 }
 
 void CColorPicker::Impl::OnDestroy()
 {
+    gs_History.RemoveHostClt(m_stHistory);
     if (m_Magnifier.m_hWnd) {
         m_Magnifier.DestroyWindow();
     }
