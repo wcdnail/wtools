@@ -536,6 +536,9 @@ void CColorButton::_SetColor(COLORREF clrCurrent, int nAlpha)
 
 void CColorButton::OnColorUpdate(IColor const& clrSource)
 {
+    if (&clrSource == this) {
+        return ;
+    }
     _SetColor(clrSource.GetColorRef(), clrSource.GetAlpha());
 }
 

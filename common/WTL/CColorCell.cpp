@@ -108,5 +108,8 @@ void CColorCellEx::SetColor(COLORREF crColor, int nAlpha)
 
 void CColorCellEx::OnColorUpdate(IColor const& clrSource)
 {
+    if (&clrSource == this) {
+        return ;
+    }
     m_clCell.SetColor(clrSource.GetColorRef(), clrSource.GetAlpha());
 }

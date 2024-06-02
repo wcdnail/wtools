@@ -330,6 +330,9 @@ void CColorPicker::Impl::SetColor(COLORREF crColor, int nAlpha)
 
 void CColorPicker::Impl::OnColorUpdate(IColor const& clrSource)
 {
+    if (&clrSource == this) {
+        return ;
+    }
     _SetColor(clrSource.GetColorRef(), clrSource.GetAlpha(), false, false);
 }
 

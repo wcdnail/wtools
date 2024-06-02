@@ -79,7 +79,7 @@ void CColorPickerDlg::DoInitTemplate()
     short                    nHeight{DLG_CY};
     PCTSTR constexpr       szCaption{_T("Color Picker")};
     DWORD                    dwStyle{WS_POPUP | WS_BORDER};
-    DWORD                  dwExStyle{0};
+    DWORD                  dwExStyle{WS_EX_TOOLWINDOW};
     LPCTSTR constexpr     szFontName{CColorPicker::szDlgFont};
     WORD constexpr         wFontSize{CColorPicker::wDlgFontSize};
     WORD constexpr           wWeight{0};
@@ -89,11 +89,9 @@ void CColorPickerDlg::DoInitTemplate()
     ATL::_U_STRINGorID const    Menu{0U};
     ATL::_U_STRINGorID const szClass{0U};
     if (m_bModalLoop) {
-        nHeight += DLG_CY_BN;
-        dwStyle = WS_OVERLAPPEDWINDOW;
-    }
-    else {
-        dwExStyle = WS_EX_TOOLWINDOW | WS_EX_CONTROLPARENT;
+        nHeight  += DLG_CY_BN;
+        dwStyle   = WS_OVERLAPPEDWINDOW;
+        dwExStyle = 0;
     }
     m_Template.Create(bExTemplate, szCaption,
                       nX, nY, nWidth, nHeight,
@@ -188,7 +186,7 @@ BOOL CColorPickerDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     UNREFERENCED_PARAMETER(lInitParam);
     if (auto const* pAppModule = AppModulePtr()) {
         WTL::CMessageLoop* pLoop = pAppModule->GetMessageLoop();
-        ATLASSERT(pLoop != NULL);
+        ATLASSERT(pLoop != nullptr);
         pLoop->AddMessageFilter(this);
     }
     PrepareRect(m_wndMaster);
@@ -208,7 +206,7 @@ void CColorPickerDlg::OnDestroy()
     SetMsgHandled(FALSE);
     if (auto const* pAppModule = AppModulePtr()) {
         WTL::CMessageLoop* pLoop = pAppModule->GetMessageLoop();
-        ATLASSERT(pLoop != NULL);
+        ATLASSERT(pLoop != nullptr);
         pLoop->RemoveMessageFilter(this);
     }
 }
