@@ -30,6 +30,7 @@ namespace DH
         using WndSuper::GetClientRect;
         using WndSuper::ShowWindow;
         using WndSuper::UpdateWindow;
+        using WndSuper::Create;
         using WndSuper::DestroyWindow;
 
         struct Parameters
@@ -65,7 +66,7 @@ namespace DH
         virtual void Clean() const;
 
         void ReceiveStdOutput(bool on) const;
-        void ReceiveDebugOutput(bool on);
+        void ReceiveDebugOutput(bool on, PCSTR pszWindowName, bool bGlobal);
 
         void AskPathAndSave() const;
         virtual void Save(char const* filePathName) const;

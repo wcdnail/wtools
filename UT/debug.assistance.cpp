@@ -93,11 +93,11 @@ BOOL CALLBACK MoveToMonitor::EnumeratorProc(HMONITOR hMon, HDC hDC, LPRECT lpRec
     return self->MoveAttempt(monInfo);
 }
 
-bool MoveToMonitor::Move(HWND hWnd, DWORD dwDesiredNum, unsigned rcHowToPut)
+bool MoveToMonitor::Move(HWND hWndClient, DWORD dwNum, unsigned nPut)
 {
-    this->hWnd = hWnd;
-    this->dwDesiredNum = dwDesiredNum;
-    this->rcHowToPut = rcHowToPut;
+    hWnd = hWndClient;
+    dwDesiredNum = dwNum;
+    rcHowToPut = nPut;
     GetWindowRect(hWnd, rcWnd);
     const BOOL rv = EnumDisplayMonitors(nullptr, nullptr,
                                         reinterpret_cast<MONITORENUMPROC>(EnumeratorProc),

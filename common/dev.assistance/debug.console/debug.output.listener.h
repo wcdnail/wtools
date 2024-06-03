@@ -13,7 +13,7 @@ namespace DH
         ~DebugOutputListener();
         DebugOutputListener(DebugConsole const& owner);
 
-        bool Start();
+        bool Start(PCSTR pszWindowName, bool bGlobal);
         bool Stop();
 
     private:
@@ -30,7 +30,8 @@ namespace DH
         HandlePtr securityDescPtr_;
         std::thread  thrdListener_;
 
-        bool Init();
+        bool Init_BAD();
+        bool Init(PCSTR pszWindowName, bool bGlobal);
         void Listener() const;
     };
 }

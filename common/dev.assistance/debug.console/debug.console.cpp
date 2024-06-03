@@ -111,9 +111,9 @@ namespace DH
         impl_->ReceiveStdOutput(on);
     }
 
-    void DebugConsole::ReceiveDebugOutput(bool on) const
+    void DebugConsole::ReceiveDebugOutput(bool on, PCSTR pszWindowName, bool bGlobal) const
     {
-        impl_->ReceiveDebugOutput(on);
+        impl_->ReceiveDebugOutput(on, pszWindowName, bGlobal);
     }
 
     void DebugConsole::SetParameters(int cx, int cy, int align, int fsize, char const* fname) const

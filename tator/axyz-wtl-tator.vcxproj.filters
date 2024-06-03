@@ -6,6 +6,7 @@
     <ClCompile Include="..\UT\debug.assistance.cpp">
       <Filter>UT</Filter>
     </ClCompile>
+    <ClCompile Include="ViewDebug.MR.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ATator.MemDlg.h" />

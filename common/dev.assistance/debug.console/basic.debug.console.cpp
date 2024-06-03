@@ -11,7 +11,7 @@ namespace DH
     BasicDebugConsole::Parameters::~Parameters() = default;
 
     BasicDebugConsole::BasicDebugConsole(DebugConsole const& owner)
-        : params_("Courier", 14, cf::put_at::right | cf::put_at::bottom, 600, 240)
+        : params_("Courier", 12, cf::put_at::right | cf::put_at::bottom, 600, 240)
         , consoleHandle_(nullptr)
         , coutListener_(owner, std::cout)
         , cerrListener_(owner, std::cerr)
@@ -87,9 +87,9 @@ namespace DH
         wcerrListener_.toggle(on);
     }
 
-    void BasicDebugConsole::ReceiveDebugOutput(bool on)
+    void BasicDebugConsole::ReceiveDebugOutput(bool on, PCSTR pszWindowName, bool bGlobal)
     {
-        (on ? debugOutputListener_.Start() : debugOutputListener_.Stop());
+        (on ? debugOutputListener_.Start(pszWindowName, bGlobal) : debugOutputListener_.Stop());
     }
 
     void BasicDebugConsole::CreateWindowIfNessesary()

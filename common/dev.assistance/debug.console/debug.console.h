@@ -17,7 +17,7 @@ namespace DH
 
         WCDAFX_API HRESULT Initialize() const;
 
-        WCDAFX_API void ReceiveDebugOutput(bool on) const;
+        WCDAFX_API void ReceiveDebugOutput(bool on, PCSTR pszWindowName, bool bGlobal) const;
         WCDAFX_API void ReceiveStdOutput(bool on) const;
 
         WCDAFX_API void SetParameters(int cx, int cy, int align, int fontSize, char const* fontName) const;

@@ -5,6 +5,7 @@
 #include <dh.tracing.defs.h>
 #include <dh.tracing.h>
 #include <aclapi.h>
+#include <sddl.h>
 #include <string>
 
 namespace DH
@@ -161,17 +162,17 @@ namespace DH
         }
     }
 
-    bool DebugOutputListener::Init()
+    bool DebugOutputListener::Init_BAD()
     {
         HRESULT                     hCode{S_OK};
         ATL::CStringW               sFunc{L"NONE"};
         ATL::CStringW            sMessage{};
-        HANDLE                   mutexRaw{nullptr};
+      //HANDLE                   mutexRaw{nullptr};
         HANDLE                    buffRdy{nullptr};
         HANDLE                    dataRdy{nullptr};
         HANDLE                 mappingRaw{nullptr};
         PVOID                    shmemRaw{nullptr};
-        HandlePtr                mutexPtr{};
+      //HandlePtr                mutexPtr{};
         HandlePtr              buffRdyPtr{};
         HandlePtr              dataRdyPtr{};
         HandlePtr              mappingPtr{};
@@ -189,13 +190,13 @@ namespace DH
         }
         HandlePtr{new IntSecurityDesc{secDesq}, IntFreeSecDesc}.swap(secDescPtr);
 
-        mutexRaw = OpenMutex(MUTEX_MODIFY_STATE, FALSE, bsWinMutex);
-        if (!mutexRaw) {
-            hCode = static_cast<HRESULT>(GetLastError());
-            sFunc.Format(L"OpenMutex('%s')", bsWinMutex.m_str);
-            goto reportError;
-        }
-        HandlePtr{mutexRaw, CloseHandle}.swap(mutexPtr);
+        //mutexRaw = OpenMutex(MUTEX_MODIFY_STATE, FALSE, bsWinMutex);
+        //if (!mutexRaw) {
+        //    hCode = static_cast<HRESULT>(GetLastError());
+        //    sFunc.Format(L"OpenMutex('%s')", bsWinMutex.m_str);
+        //    goto reportError;
+        //}
+        //HandlePtr{mutexRaw, CloseHandle}.swap(mutexPtr);
 
         buffRdy = IntOpenEvent(EVENT_ALL_ACCESS, FALSE, bsWinBuffRdy, &secAttrs);
         if (!buffRdy) {
@@ -237,7 +238,7 @@ namespace DH
         mappingPtr.swap(mappingPtr_);
         dataRdyPtr.swap(dataReady_);
         buffRdyPtr.swap(buffReady_);
-        mutexPtr.swap(mutexPtr_);
+      //mutexPtr.swap(mutexPtr_);
         secDescPtr.swap(securityDescPtr_);
         return true;
 
@@ -247,15 +248,140 @@ namespace DH
         return false;
     }
 
-    bool DebugOutputListener::Start()
+    bool DebugOutputListener::Init(PCSTR pszWindowName, bool bGlobal)
+    {
+      //LPARAM constexpr lWindowName{0x4c00000000000000ui64};
+        DWORD constexpr   dwMapBytes{4096};
+        HRESULT                hCode{S_OK};
+        ATL::CStringW          sFunc{L"NONE"};
+        PCSTR              pszPrefix{pszWindowName};
+        PSECURITY_DESCRIPTOR     pSD{nullptr};
+        SECURITY_DESCRIPTOR   sdTemp{0};
+        SECURITY_ATTRIBUTES secAttrs{0};
+        HANDLE              mutexRaw{nullptr};
+        HANDLE            mappingRaw{nullptr};
+        PVOID               shmemRaw{nullptr};
+        HANDLE               buffRdy{nullptr};
+        HANDLE               dataRdy{nullptr};
+        HandlePtr           mutexPtr{};
+        HandlePtr         mappingPtr{};
+        ShmemPtr            shmemPtr{};
+        HandlePtr         buffRdyPtr{};
+        HandlePtr         dataRdyPtr{};
+        HandlePtr             pSDPtr{};
+        ATL::CStringA          sTemp{};
+
+        auto const bConv{ConvertStringSecurityDescriptorToSecurityDescriptorA(
+            "D:(A;;GRGWGX;;;WD)(A;;GA;;;SY)(A;;GA;;;BA)(A;;GRGWGX;;;AN)(A;;GRGWGX;;;RC)(A;;GRGWGX;;;S-1-15-2-1)S:(ML;;NW;;;LW)",
+            SECURITY_DESCRIPTOR_REVISION1,
+            &pSD, nullptr)};
+        if (!bConv) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc.Format(L"ConvertStringSecurityDescriptorToSecurityDescriptorA");
+            goto reportError;
+        }
+        if (pSD) {
+            HandlePtr{pSD, LocalFree}.swap(pSDPtr);
+        }
+        else {
+            pSD = &sdTemp;
+            InitializeSecurityDescriptor(pSD, SECURITY_DESCRIPTOR_REVISION1);
+        }
+        secAttrs.nLength = sizeof(secAttrs);
+        secAttrs.lpSecurityDescriptor = pSD;
+        secAttrs.bInheritHandle = TRUE;
+
+        if (bGlobal) {
+            pszPrefix = "Global\\";
+        }
+        sTemp.Format("%sDBWinMutex", pszPrefix);
+        mutexRaw = OpenMutexA(MUTEX_MODIFY_STATE, FALSE, sTemp.GetString());
+
+        if (mutexRaw) {
+            using SetSecurityInfoFn = void (__fastcall *)(HANDLE, SE_OBJECT_TYPE, SECURITY_INFORMATION);
+            auto const  hAdvapi{GetModuleHandleW(L"ADVAPI32")};
+            auto const pFarProc{GetProcAddress(hAdvapi, "SetSecurityInfo")};
+            reinterpret_cast<SetSecurityInfoFn>(pFarProc)(mutexRaw, SE_KERNEL_OBJECT, LUA_TOKEN);
+        }
+        else {
+            mutexRaw = CreateMutexA(&secAttrs, FALSE, sTemp.GetString());
+        }
+
+        if (!mutexRaw) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc.Format(L"OpenMutex('%S')", sTemp.GetString());
+            goto reportError;
+        }
+        HandlePtr{mutexRaw, CloseHandle}.swap(mutexPtr);
+
+        sTemp.Format("%sDBWIN_BUFFER", pszPrefix);
+        // FILE_MAP_READ
+        mappingRaw = CreateFileMappingA(INVALID_HANDLE_VALUE, &secAttrs, PAGE_READWRITE, 0, dwMapBytes, sTemp.GetString());
+        if (!mappingRaw) {
+            mappingRaw = CreateFileMappingA(INVALID_HANDLE_VALUE, &secAttrs, PAGE_READWRITE, 0, dwMapBytes, sTemp.GetString());
+        }
+        if (!mappingRaw) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc.Format(L"CreateFileMappingA('%S')", sTemp.GetString());
+            goto reportError;
+        }
+        HandlePtr{mappingRaw, CloseHandle}.swap(mappingPtr);
+
+        shmemRaw = MapViewOfFile(mappingRaw, SECTION_MAP_WRITE | SECTION_MAP_READ, 0, 0, dwMapBytes);
+        if (!shmemRaw) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc.Format(L"CreateFileMappingA('%S')", sTemp.GetString());
+            goto reportError;
+        }
+        HandlePtr{shmemRaw, UnmapViewOfFile}.swap(shmemPtr);
+
+        sTemp.Format("%sDBWIN_DATA_READY", pszPrefix);
+        dataRdy = CreateEventA(&secAttrs, FALSE, FALSE, sTemp.GetString());
+        if (INVALID_HANDLE_VALUE == dataRdy) {
+            dataRdy = CreateEventA(&secAttrs, FALSE, FALSE, sTemp.GetString());
+        }
+        if (INVALID_HANDLE_VALUE == dataRdy) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc.Format(L"CreateEventA('%S')", sTemp.GetString());
+            goto reportError;
+        }
+        HandlePtr{dataRdy, CloseHandle}.swap(dataRdyPtr);
+
+        sTemp.Format("%sDBWIN_BUFFER_READY", pszPrefix);
+        buffRdy = CreateEventA(&secAttrs, FALSE, FALSE, sTemp.GetString());
+        if (INVALID_HANDLE_VALUE == buffRdy) {
+            buffRdy = CreateEventA(&secAttrs, FALSE, FALSE, sTemp.GetString());
+        }
+        if (INVALID_HANDLE_VALUE == buffRdy) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc.Format(L"CreateEventA('%S')", sTemp.GetString());
+            goto reportError;
+        }
+        HandlePtr{buffRdy, CloseHandle}.swap(buffRdyPtr);
+
+        buffRdyPtr.swap(buffReady_);
+        dataRdyPtr.swap(dataReady_);
+        shmemPtr.swap(shmemPtr_);
+        mappingPtr.swap(mappingPtr_);
+        mutexPtr.swap(mutexPtr_);
+        return true;
+
+    reportError:
+        auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
+        DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
+        return false;
+    }
+
+    bool DebugOutputListener::Start(PCSTR pszWindowName, bool bGlobal)
     {
         if (thrdListener_.joinable()) {
             return true;
         }
-        if (!Init()) {
+        if (!Init(pszWindowName, bGlobal)) {
             return false;
         }
         std::thread{&DebugOutputListener::Listener, this}.swap(thrdListener_);
+        OutputDebugStringW(__FUNCTIONW__ L" OK\n");
         return thrdListener_.joinable();
     }
 
@@ -270,28 +396,30 @@ namespace DH
     }
 
     void DebugOutputListener::Listener() const
-    {   
-        HANDLE   events[]{ dataReady_.get(), thrdStop_.get() };
+    {
+        struct DataBuffer
+        {
+            DWORD    dwPid;
+            char szText[1];
+        };
+
+        HANDLE   events[]{ thrdStop_.get(), dataReady_.get() };
         DWORD const myPid{GetCurrentProcessId()};
         while (true) {
             SetEvent(buffReady_.get());
-            DWORD const dwSignal{WaitForMultipleObjects(_countof(events), events, FALSE, INFINITE)};
-            if (WAIT_OBJECT_0 == dwSignal) {   
-                struct DBUF_D 
-                {
-                    DWORD pid;
-                    char string[1];
-                };
-                auto const* pData = static_cast<DBUF_D const*>(shmemPtr_.get());
-                if (myPid == pData->pid) {
-                    owner_.Puts(pData->string);
+            switch (DWORD const dwSignal{WaitForMultipleObjects(_countof(events), events, FALSE, INFINITE)}) {
+            case WAIT_OBJECT_0:
+                return ;
+            case WAIT_OBJECT_0+1: {
+                auto const* pData = static_cast<DataBuffer const*>(shmemPtr_.get());
+                if (myPid == pData->dwPid) {
+                    owner_.Puts(pData->szText);
                 }
-            }
-            else if ((WAIT_OBJECT_0+1) == dwSignal) {
-                ::ResetEvent(thrdStop_.get());
+                ResetEvent(dataReady_.get());
+                ResetEvent(buffReady_.get());
                 break;
             }
+            }
         }
-        SetEvent(thrdStop_.get());
     }
 }
