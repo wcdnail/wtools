@@ -66,7 +66,7 @@ namespace DH
         virtual void Clean() const;
 
         void ReceiveStdOutput(bool on) const;
-        void ReceiveDebugOutput(bool on, PCSTR pszWindowName, bool bGlobal);
+        void ReceiveDebugOutput(bool on, PCWSTR pszWindowName, bool bGlobal);
 
         void AskPathAndSave() const;
         virtual void Save(char const* filePathName) const;

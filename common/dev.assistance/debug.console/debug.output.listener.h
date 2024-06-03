@@ -13,12 +13,14 @@ namespace DH
         ~DebugOutputListener();
         DebugOutputListener(DebugConsole const& owner);
 
-        bool Start(PCSTR pszWindowName, bool bGlobal);
+        bool Start(PCWSTR pszWindowName, bool bGlobal);
         bool Stop();
 
     private:
-        using   HandlePtr = std::shared_ptr<void>;
-        using    ShmemPtr = std::shared_ptr<void>;
+        using HandlePtr = std::shared_ptr<void>;
+        using  ShmemPtr = std::shared_ptr<void>;
+
+        struct StaticInit;
 
         DebugConsole const& owner_;
         HandlePtr        thrdStop_;
@@ -30,8 +32,7 @@ namespace DH
         HandlePtr securityDescPtr_;
         std::thread  thrdListener_;
 
-        bool Init_BAD();
-        bool Init(PCSTR pszWindowName, bool bGlobal);
+        bool Init(PCWSTR pszWindowName, bool bGlobal);
         void Listener() const;
     };
 }

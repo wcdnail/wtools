@@ -10,6 +10,80 @@
 
 namespace DH
 {
+    namespace
+    {
+        BOOL AdjustProcPrivileges(PCWSTR pszName)
+        {
+            BOOL             bResult{FALSE};
+            HANDLE            hToken{nullptr};
+            LUID                luid{0};
+            TOKEN_PRIVILEGES tokPriv{0};
+            HANDLE const       hProc{GetCurrentProcess()};
+            if (!OpenProcessToken(hProc, 0x28u, &hToken) || 
+                !LookupPrivilegeValueW(nullptr, pszName, &luid)) {
+                return FALSE;
+            }
+            tokPriv.PrivilegeCount = 1;
+            tokPriv.Privileges[0].Luid = luid;
+            tokPriv.Privileges[0].Attributes = 2;
+            bResult = AdjustTokenPrivileges(hToken, 0, &tokPriv, 0x10u, nullptr, nullptr);
+            if (bResult) {
+                if (auto const hCode = static_cast<HRESULT>(GetLastError())) {
+                    auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
+                    DH::TPrintf(LTH_DBG_ASSIST L" AdjustTokenPrivileges failed: 0x%08x %s\n", hCode, sMessage.GetString());
+                    bResult = FALSE;
+                }
+            }
+            CloseHandle(hToken);
+            return bResult;
+        }
+
+        HANDLE IntOpenEvent(DWORD dwAccess, BOOL bInheritHandle, ATL::CComBSTR const& bsName, LPSECURITY_ATTRIBUTES pSecAttrs)
+        {
+            HRESULT       hCode{S_OK};
+            ATL::CStringW sFunc{L"NONE"};
+            HANDLE        hTemp{INVALID_HANDLE_VALUE};
+            hTemp = OpenEvent(dwAccess, bInheritHandle, bsName);
+            if (!hTemp) {
+                hCode = static_cast<HRESULT>(GetLastError());
+                if (hCode != ERROR_FILE_NOT_FOUND) {
+                    sFunc.Format(L"OpenEvent('%s')", bsName.m_str);
+                    goto reportError;
+                }
+                hTemp = CreateEvent(pSecAttrs, FALSE, FALSE, bsName);
+                if (!hTemp) {
+                    hCode = static_cast<HRESULT>(GetLastError());
+                    sFunc.Format(L"CreateEvent('%s')", bsName.m_str);
+                    goto reportError;
+                }
+            }
+            return hTemp;
+        reportError:
+            auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
+            DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
+            return nullptr;
+        }
+    }
+
+    struct DebugOutputListener::StaticInit
+    {
+        static StaticInit& Instance()
+        {
+            static StaticInit staticInit;
+            return staticInit;
+        }
+
+    private:
+        ~StaticInit()
+        {
+        }
+
+        StaticInit()
+        {
+            AdjustProcPrivileges(L"SeDebugPrivilege");
+        }
+    };
+
     DebugOutputListener::~DebugOutputListener()
     {
         Stop();
@@ -26,8 +100,10 @@ namespace DH
         , securityDescPtr_{}
         ,    thrdListener_{}
     {
+        UNREFERENCED_PARAMETER(StaticInit::Instance());
     }
 
+#if 0
     namespace
     {
         struct IntSecurityDesc
@@ -134,32 +210,6 @@ namespace DH
             secDesq.Free();
             return false;
         }
-
-        HANDLE IntOpenEvent(DWORD dwAccess, BOOL bInheritHandle, ATL::CComBSTR const& bsName, LPSECURITY_ATTRIBUTES pSecAttrs)
-        {
-            HRESULT       hCode{S_OK};
-            ATL::CStringW sFunc{L"NONE"};
-            HANDLE        hTemp{INVALID_HANDLE_VALUE};
-            hTemp = OpenEvent(dwAccess, bInheritHandle, bsName);
-            if (!hTemp) {
-                hCode = static_cast<HRESULT>(GetLastError());
-                if (hCode != ERROR_FILE_NOT_FOUND) {
-                    sFunc.Format(L"OpenEvent('%s')", bsName.m_str);
-                    goto reportError;
-                }
-                hTemp = CreateEvent(pSecAttrs, FALSE, FALSE, bsName);
-                if (!hTemp) {
-                    hCode = static_cast<HRESULT>(GetLastError());
-                    sFunc.Format(L"CreateEvent('%s')", bsName.m_str);
-                    goto reportError;
-                }
-            }
-            return hTemp;
-        reportError:
-            auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
-            DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
-            return nullptr;
-        }
     }
 
     bool DebugOutputListener::Init_BAD()
@@ -247,14 +297,52 @@ namespace DH
         DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
         return false;
     }
+#endif // 0
 
-    bool DebugOutputListener::Init(PCSTR pszWindowName, bool bGlobal)
+    namespace
+    {
+        struct W32MutexLock
+        {
+            HANDLE m_hMutex;
+            DWORD   m_dwRes;
+
+            ~W32MutexLock();
+            W32MutexLock();
+            W32MutexLock(HANDLE hMutex, DWORD dwTimeout);
+        };
+
+        W32MutexLock::~W32MutexLock()
+        {
+            if (INVALID_HANDLE_VALUE != m_hMutex && WAIT_OBJECT_0 == m_dwRes) {
+                ReleaseMutex(m_hMutex);
+            }
+        }
+
+        W32MutexLock::W32MutexLock()
+            : m_hMutex{INVALID_HANDLE_VALUE}
+            ,  m_dwRes{static_cast<DWORD>(-1)}
+        {
+        }
+
+        W32MutexLock::W32MutexLock(HANDLE hMutex, DWORD dwTimeout)
+            : m_hMutex{hMutex}
+            ,  m_dwRes{WaitForSingleObject(m_hMutex, dwTimeout)}
+        {
+        }
+
+        W32MutexLock W32LockMx(HANDLE hMutex, DWORD dwTimeout)
+        {
+            return W32MutexLock{hMutex, dwTimeout};
+        }
+    }
+
+    bool DebugOutputListener::Init(PCWSTR pszWindowName, bool bGlobal)
     {
       //LPARAM constexpr lWindowName{0x4c00000000000000ui64};
         DWORD constexpr   dwMapBytes{4096};
         HRESULT                hCode{S_OK};
         ATL::CStringW          sFunc{L"NONE"};
-        PCSTR              pszPrefix{pszWindowName};
+        PCWSTR             pszPrefix{pszWindowName};
         PSECURITY_DESCRIPTOR     pSD{nullptr};
         SECURITY_DESCRIPTOR   sdTemp{0};
         SECURITY_ATTRIBUTES secAttrs{0};
@@ -269,10 +357,12 @@ namespace DH
         HandlePtr         buffRdyPtr{};
         HandlePtr         dataRdyPtr{};
         HandlePtr             pSDPtr{};
-        ATL::CStringA          sTemp{};
+        ATL::CStringW          sTemp{};
+      //W32MutexLock         mxGuard{};
+        DWORD                 dwTemp{static_cast<DWORD>(-1)};
 
-        auto const bConv{ConvertStringSecurityDescriptorToSecurityDescriptorA(
-            "D:(A;;GRGWGX;;;WD)(A;;GA;;;SY)(A;;GA;;;BA)(A;;GRGWGX;;;AN)(A;;GRGWGX;;;RC)(A;;GRGWGX;;;S-1-15-2-1)S:(ML;;NW;;;LW)",
+        auto const bConv{ConvertStringSecurityDescriptorToSecurityDescriptorW(
+            L"D:(A;;GRGWGX;;;WD)(A;;GA;;;SY)(A;;GA;;;BA)(A;;GRGWGX;;;AN)(A;;GRGWGX;;;RC)(A;;GRGWGX;;;S-1-15-2-1)S:(ML;;NW;;;LW)",
             SECURITY_DESCRIPTOR_REVISION1,
             &pSD, nullptr)};
         if (!bConv) {
@@ -290,13 +380,12 @@ namespace DH
         secAttrs.nLength = sizeof(secAttrs);
         secAttrs.lpSecurityDescriptor = pSD;
         secAttrs.bInheritHandle = TRUE;
-
         if (bGlobal) {
-            pszPrefix = "Global\\";
+            pszPrefix = L"Global\\";
         }
-        sTemp.Format("%sDBWinMutex", pszPrefix);
-        mutexRaw = OpenMutexA(MUTEX_MODIFY_STATE, FALSE, sTemp.GetString());
 
+        sTemp.Format(L"%sDBWinMutex", pszPrefix);
+        mutexRaw = OpenMutexW(SYNCHRONIZE | MUTEX_MODIFY_STATE, FALSE, sTemp.GetString());
         if (mutexRaw) {
             using SetSecurityInfoFn = void (__fastcall *)(HANDLE, SE_OBJECT_TYPE, SECURITY_INFORMATION);
             auto const  hAdvapi{GetModuleHandleW(L"ADVAPI32")};
@@ -304,25 +393,35 @@ namespace DH
             reinterpret_cast<SetSecurityInfoFn>(pFarProc)(mutexRaw, SE_KERNEL_OBJECT, LUA_TOKEN);
         }
         else {
-            mutexRaw = CreateMutexA(&secAttrs, FALSE, sTemp.GetString());
+            mutexRaw = CreateMutexW(&secAttrs, FALSE, sTemp.GetString());
         }
-
         if (!mutexRaw) {
             hCode = static_cast<HRESULT>(GetLastError());
-            sFunc.Format(L"OpenMutex('%S')", sTemp.GetString());
+            sFunc.Format(L"OpenMutex('%s')", sTemp.GetString());
             goto reportError;
         }
         HandlePtr{mutexRaw, CloseHandle}.swap(mutexPtr);
+      //dwTemp = WaitForSingleObject(mutexRaw, INFINITE);
+      //if (static_cast<DWORD>(-1) == dwTemp) {
+      //    hCode = static_cast<HRESULT>(GetLastError());
+      //    auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
+      //    DH::TPrintf(LTH_DBG_ASSIST L" WaitForSingleObject(%p) failed: 0x%08x %s\n", mutexRaw, hCode, sMessage.GetString());
+      //}
+      //if (!ReleaseMutex(mutexRaw)) {
+      //    hCode = static_cast<HRESULT>(GetLastError());
+      //    auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
+      //    DH::TPrintf(LTH_DBG_ASSIST L" ReleaseMutex(%p) failed: 0x%08x %s\n", mutexRaw, hCode, sMessage.GetString());
+      //}
 
-        sTemp.Format("%sDBWIN_BUFFER", pszPrefix);
+        sTemp.Format(L"%sDBWIN_BUFFER", pszPrefix);
         // FILE_MAP_READ
-        mappingRaw = CreateFileMappingA(INVALID_HANDLE_VALUE, &secAttrs, PAGE_READWRITE, 0, dwMapBytes, sTemp.GetString());
+        mappingRaw = CreateFileMappingW(INVALID_HANDLE_VALUE, &secAttrs, PAGE_READWRITE, 0, dwMapBytes, sTemp.GetString());
         if (!mappingRaw) {
-            mappingRaw = CreateFileMappingA(INVALID_HANDLE_VALUE, &secAttrs, PAGE_READWRITE, 0, dwMapBytes, sTemp.GetString());
+            mappingRaw = CreateFileMappingW(INVALID_HANDLE_VALUE, &secAttrs, PAGE_READWRITE, 0, dwMapBytes, sTemp.GetString());
         }
         if (!mappingRaw) {
             hCode = static_cast<HRESULT>(GetLastError());
-            sFunc.Format(L"CreateFileMappingA('%S')", sTemp.GetString());
+            sFunc.Format(L"CreateFileMapping('%s')", sTemp.GetString());
             goto reportError;
         }
         HandlePtr{mappingRaw, CloseHandle}.swap(mappingPtr);
@@ -330,31 +429,31 @@ namespace DH
         shmemRaw = MapViewOfFile(mappingRaw, SECTION_MAP_WRITE | SECTION_MAP_READ, 0, 0, dwMapBytes);
         if (!shmemRaw) {
             hCode = static_cast<HRESULT>(GetLastError());
-            sFunc.Format(L"CreateFileMappingA('%S')", sTemp.GetString());
+            sFunc.Format(L"CreateFileMapping('%s')", sTemp.GetString());
             goto reportError;
         }
         HandlePtr{shmemRaw, UnmapViewOfFile}.swap(shmemPtr);
 
-        sTemp.Format("%sDBWIN_DATA_READY", pszPrefix);
-        dataRdy = CreateEventA(&secAttrs, FALSE, FALSE, sTemp.GetString());
+        sTemp.Format(L"%sDBWIN_DATA_READY", pszPrefix);
+        dataRdy = CreateEventW(&secAttrs, FALSE, FALSE, sTemp.GetString());
         if (INVALID_HANDLE_VALUE == dataRdy) {
-            dataRdy = CreateEventA(&secAttrs, FALSE, FALSE, sTemp.GetString());
+            dataRdy = CreateEventW(&secAttrs, FALSE, FALSE, sTemp.GetString());
         }
         if (INVALID_HANDLE_VALUE == dataRdy) {
             hCode = static_cast<HRESULT>(GetLastError());
-            sFunc.Format(L"CreateEventA('%S')", sTemp.GetString());
+            sFunc.Format(L"CreateEvent('%s')", sTemp.GetString());
             goto reportError;
         }
         HandlePtr{dataRdy, CloseHandle}.swap(dataRdyPtr);
 
-        sTemp.Format("%sDBWIN_BUFFER_READY", pszPrefix);
-        buffRdy = CreateEventA(&secAttrs, FALSE, FALSE, sTemp.GetString());
+        sTemp.Format(L"%sDBWIN_BUFFER_READY", pszPrefix);
+        buffRdy = CreateEventW(&secAttrs, FALSE, FALSE, sTemp.GetString());
         if (INVALID_HANDLE_VALUE == buffRdy) {
-            buffRdy = CreateEventA(&secAttrs, FALSE, FALSE, sTemp.GetString());
+            buffRdy = CreateEventW(&secAttrs, FALSE, FALSE, sTemp.GetString());
         }
         if (INVALID_HANDLE_VALUE == buffRdy) {
             hCode = static_cast<HRESULT>(GetLastError());
-            sFunc.Format(L"CreateEventA('%S')", sTemp.GetString());
+            sFunc.Format(L"CreateEvent('%s')", sTemp.GetString());
             goto reportError;
         }
         HandlePtr{buffRdy, CloseHandle}.swap(buffRdyPtr);
@@ -372,7 +471,7 @@ namespace DH
         return false;
     }
 
-    bool DebugOutputListener::Start(PCSTR pszWindowName, bool bGlobal)
+    bool DebugOutputListener::Start(PCWSTR pszWindowName, bool bGlobal)
     {
         if (thrdListener_.joinable()) {
             return true;

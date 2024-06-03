@@ -86,7 +86,7 @@ namespace DH
         wcerrListener_.toggle(on);
     }
 
-    void BasicDebugConsole::ReceiveDebugOutput(bool on, PCSTR pszWindowName, bool bGlobal)
+    void BasicDebugConsole::ReceiveDebugOutput(bool on, PCWSTR pszWindowName, bool bGlobal)
     {
         (on ? debugOutputListener_.Start(pszWindowName, bGlobal) : debugOutputListener_.Stop());
     }

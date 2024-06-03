@@ -86,12 +86,12 @@ HWND __fastcall sub_14000A2C0(HWND hWnd, unsigned int a2);
 BOOL __fastcall sub_14000A410(HWND a1, UINT a2, HICON a3, const CHAR *a4);
 BOOL __fastcall sub_14000A4C0(HWND a1, UINT a2);
 BOOL __fastcall sub_14000A540(HWND a1, UINT a2, HICON a3);
-BOOL __fastcall sub_14000A5C0(unsigned __int8 a1);
+BOOL __fastcall DBGView_CloseListener(unsigned __int8 a1);
 void __fastcall sub_14000A640(HWND hWnd, unsigned __int64 a2, unsigned int a3, int a4);
 char sub_14000A930();
 int __fastcall sub_14000A960(unsigned __int8 a1);
 __int64 __fastcall sub_14000AC40(char *a1, __int64 a2, __int64 a3);
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
+int __stdcall DBGVIEW_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
 BOOL sub_14000B220();
 __int64 __fastcall sub_14000B4E0(HINSTANCE hInstance, char *Str, int a3);
 INT_PTR __fastcall sub_14000B7B0(HWND a1, UINT a2, WPARAM a3, LPARAM a4);
@@ -4231,12 +4231,12 @@ int __fastcall sub_140004E50(HWND hWnd)
 LABEL_7:
   if ( byte_1400921C9 )
   {
-    sub_14000A5C0(0);
+    DBGView_CloseListener(0);
     v3 = hDevice;
   }
   if ( byte_1400935A2 )
   {
-    sub_14000A5C0(1u);
+    DBGView_CloseListener(1u);
     v3 = hDevice;
   }
   if ( byte_1400935A3 && v3 != (HANDLE)-1i64 )
@@ -5441,7 +5441,7 @@ LABEL_139:
           }
           else
           {
-            sub_14000A5C0(0);
+            DBGView_CloseListener(0);
           }
         }
         CheckMenuItem(hMenu, 0x9C5Cu, byte_1400921C9 != 0 ? 8 : 0);
@@ -5721,7 +5721,7 @@ LABEL_118:
         byte_1400935A2 = byte_1400935A2 == 0;
         if ( !byte_1400935A2 )
         {
-          sub_14000A5C0(1u);
+          DBGView_CloseListener(1u);
 LABEL_162:
           v82 = byte_1400935A2;
           goto LABEL_163;
@@ -7470,7 +7470,7 @@ BOOL __fastcall sub_14000A540(HWND a1, UINT a2, HICON a3)
 }
 
 //----- (000000014000A5C0) ----------------------------------------------------
-BOOL __fastcall sub_14000A5C0(unsigned __int8 a1)
+BOOL __fastcall DBGView_CloseListener(unsigned __int8 a1)
 {
   unsigned __int64 v1; // rbx
   BOOL result; // eax
@@ -8881,9 +8881,9 @@ LABEL_68:
               goto LABEL_68;
             case 0x8305001C:
               byte_1400921C9 = 0;
-              sub_14000A5C0(0);
+              DBGView_CloseListener(0);
               if ( byte_1400935A2 )
-                sub_14000A5C0(1u);
+                DBGView_CloseListener(1u);
               sub_14000CAB0();
               goto LABEL_68;
             case 0x83050024:
@@ -8935,9 +8935,9 @@ LABEL_71:
           MessageBoxA(qword_14009DCA8, "The connection was terminated by the remote side.", "DebugView", 0x10u);
         if ( byte_1400921C9 )
         {
-          sub_14000A5C0(0);
+          DBGView_CloseListener(0);
           if ( byte_1400935A2 )
-            sub_14000A5C0(1u);
+            DBGView_CloseListener(1u);
           sub_14000CAB0();
           byte_1400921C9 = 0;
         }
