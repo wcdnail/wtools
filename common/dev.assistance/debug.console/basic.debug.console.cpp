@@ -87,7 +87,7 @@ namespace DH
         wcerrListener_.toggle(on);
     }
 
-    void BasicDebugConsole::ReceiveDebugOutput(bool on) const
+    void BasicDebugConsole::ReceiveDebugOutput(bool on)
     {
         (on ? debugOutputListener_.Start() : debugOutputListener_.Stop());
     }

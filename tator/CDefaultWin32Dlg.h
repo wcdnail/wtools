@@ -99,7 +99,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     {
-        DH::DebugConsole::Instance().ReceiveStdOutput(true);
+        DH::DebugConsole::Instance().ReceiveDebugOutput(true);
 
         m_btnMyColor1.SubclassWindow(GetDlgItem(IDC_BUTTON1));
         m_btnMyColor2.SubclassWindow(GetDlgItem(IDC_BUTTON2));

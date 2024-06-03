@@ -1,40 +1,36 @@
-#ifndef _DH_debug_output_listener_h__
-#define _DH_debug_output_listener_h__
+#pragma once
 
-#include <boost/noncopyable.hpp>
-#include <boost/thread/mutex.hpp>
-#include <deque>
+#include <thread>
+#include <memory>
 
 namespace DH
 {
     class DebugConsole;
 
-    class DebugOutputListener: boost::noncopyable
+    class DebugOutputListener
     {
     public:
-        DebugOutputListener(DebugConsole const& owner);
         ~DebugOutputListener();
+        DebugOutputListener(DebugConsole const& owner);
 
         bool Start();
         bool Stop();
 
     private:
+        using   HandlePtr = std::shared_ptr<void>;
+        using    ShmemPtr = std::shared_ptr<void>;
+
         DebugConsole const& owner_;
-        HRESULT rv_;
-        HANDLE ackEvent_;
-        HANDLE readyEvent_;
-        HANDLE sharedFile_;
-        PVOID sharedMem_;
-        HANDLE routine_;
-        unsigned routineId_;
-        HANDLE threadStarted_;
-        HANDLE threadStop_;
+        HandlePtr        thrdStop_;
+        HandlePtr        mutexPtr_;
+        HandlePtr       buffReady_;
+        HandlePtr       dataReady_;
+        HandlePtr      mappingPtr_;
+        ShmemPtr         shmemPtr_;
+        HandlePtr securityDescPtr_;
+        std::thread  thrdListener_;
 
         bool Init();
-        static void FreeResources(HANDLE& ackEvent, HANDLE& readyEvent, HANDLE& sharedFile, PVOID& sharedMem);
-        static unsigned __stdcall CaptureProc(void*);
-        void CaptureProc();
+        void Listener() const;
     };
 }
-
-#endif // _DH_debug_output_listener_h__

@@ -5,20 +5,20 @@
 
 namespace Dh
 {
-	class _PUBLIC DebugConsole2: private DebugConsole
+    class _PUBLIC DebugConsole2: private DebugConsole
     {
     public:
         static DebugConsole2& Instance(); /* throw (std::bad_alloc) */
 
-		using DebugConsole::ReceiveDebugOutput;
-		using DebugConsole::ReceiveStdOutput;
-		using DebugConsole::SetParameters;
+        using DebugConsole::ReceiveDebugOutput;
+        using DebugConsole::ReceiveStdOutput;
+        using DebugConsole::SetParameters;
         using DebugConsole::SetAutoScroll;
-		using DebugConsole::Show;
-		using DebugConsole::Hide;
-		using DebugConsole::Clean;
-		using DebugConsole::SetTitleText;
-		using DebugConsole::Puts;
+        using DebugConsole::Show;
+        using DebugConsole::Hide;
+        using DebugConsole::Clean;
+        using DebugConsole::SetTitleText;
+        using DebugConsole::Puts;
         using DebugConsole::AskPathAndSave;
         using DebugConsole::Save;
         using DebugConsole::Destroy;

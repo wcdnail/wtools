@@ -65,7 +65,7 @@ namespace DH
         virtual void Clean() const;
 
         void ReceiveStdOutput(bool on) const;
-        void ReceiveDebugOutput(bool on) const;
+        void ReceiveDebugOutput(bool on);
 
         void AskPathAndSave() const;
         virtual void Save(char const* filePathName) const;
@@ -92,7 +92,7 @@ namespace DH
         std_ostream_listener<char> cerrListener_;
         std_ostream_listener<wchar_t> wcoutListener_;
         std_ostream_listener<wchar_t> wcerrListener_;
-        mutable DebugOutputListener debugOutputListener_;
+        DebugOutputListener debugOutputListener_;
         StringQue cache_;
         std::mutex cacheMx_;
 
@@ -112,7 +112,8 @@ namespace DH
         LRESULT OnSyncStrings(UINT = 0, WPARAM = 0, LPARAM = 0);
     };
 
-    inline BasicDebugConsole::Parameters::Parameters(char const* fn, int fs, int a, int w, int h): fname(fn)
+    inline BasicDebugConsole::Parameters::Parameters(char const* fn, int fs, int a, int w, int h)
+        : fname(fn)
         , fsize(fs)
         , align(a)
         , cx(w)

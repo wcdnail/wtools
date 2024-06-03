@@ -49,3 +49,4 @@ There're a lot of legacy, to solve install boost, to do not care COMMENT code.
 - [Meacz's ChooseColor](https://github.com/meacz/ChooseColor.git)
 - [David Swigger's Photoshop's-like color pickers](https://www.codeproject.com/Articles/2577/Xguiplus-A-set-of-Photoshop-s-like-color-pickers)
 - [Jake Besworth's Simple Color Conversions](https://github.com/jakebesworth/Simple-Color-Conversions/blob/master/color.c)
+- [Ken Zhang's (zhangyuwu's) OutputDebugString listener](https://www.codeproject.com/Articles/23776/Mechanism-of-OutputDebugString)

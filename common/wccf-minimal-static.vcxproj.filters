@@ -118,6 +118,9 @@
     <ClCompile Include="dev.assistance\debug.console\debug.output.listener.cpp">
       <Filter>dev.assistance\debug.console</Filter>
     </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\WinDebugMonitor.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -274,6 +277,9 @@
       <Filter>dev.assistance\debug.console</Filter>
     </ClInclude>
     <ClInclude Include="dev.assistance\debug.console\ostream.listener.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\WinDebugMonitor.h">
       <Filter>dev.assistance\debug.console</Filter>
     </ClInclude>
   </ItemGroup>

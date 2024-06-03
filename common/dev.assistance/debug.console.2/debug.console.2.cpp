@@ -6,21 +6,21 @@
 
 namespace Dh
 {
-	class DCRichEditImpl: public BasicDebugConsole
-	{
-	public:
-		DCRichEditImpl(DebugConsole const& owner);
-		virtual ~DCRichEditImpl();
+    class DCRichEditImpl: public BasicDebugConsole
+    {
+    public:
+        DCRichEditImpl(DebugConsole const& owner);
+        virtual ~DCRichEditImpl();
 
-	private:
-		CRichEditCtrl console_;
+    private:
+        CRichEditCtrl console_;
         HINSTANCE richEditLib_;
         CToolBarCtrl toolBox_;
         int lastLineCount_;
 
         virtual void Save(char const* filePathName) const;
 
-		virtual HWND CreateConsole();
+        virtual HWND CreateConsole();
         virtual void PreWrite();
         virtual void WriteString(char const*);
         virtual void WriteString(wchar_t const*);
@@ -28,24 +28,24 @@ namespace Dh
         virtual void OnDestroy();
         
         virtual void OnCommand(UINT notifyCode, int id, HWND);
-	};
+    };
 
-	DCRichEditImpl::DCRichEditImpl(DebugConsole const& owner)
-		: BasicDebugConsole(owner)
-		, richEditLib_(NULL)
+    DCRichEditImpl::DCRichEditImpl(DebugConsole const& owner)
+        : BasicDebugConsole(owner)
+        , richEditLib_(NULL)
         , lastLineCount_(0)
-	{
-		InitCommonControls();
-		richEditLib_ = ::LoadLibrary(CRichEditCtrl::GetLibraryName());
-	}
+    {
+        InitCommonControls();
+        richEditLib_ = ::LoadLibrary(CRichEditCtrl::GetLibraryName());
+    }
 
-	DCRichEditImpl::~DCRichEditImpl()
-	{
-		FreeLibrary(richEditLib_);
-	}
+    DCRichEditImpl::~DCRichEditImpl()
+    {
+        FreeLibrary(richEditLib_);
+    }
 
-	HWND DCRichEditImpl::CreateConsole()
-	{
+    HWND DCRichEditImpl::CreateConsole()
+    {
         toolBox_ = CFrameWindowImplBase<>::CreateSimpleToolBarCtrl(m_hWnd, IDT_DH_DC2_TOOLBAR, FALSE
             , WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS 
             | RBS_VARHEIGHT | RBS_BANDBORDERS | RBS_AUTOSIZE
@@ -62,12 +62,12 @@ namespace Dh
             rc.top += rcToolBox.Height();
         }
 
-		console_.Create(m_hWnd, rc, NULL
-			, WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL 
-			| ES_MULTILINE | ES_READONLY | ES_AUTOHSCROLL | ES_AUTOVSCROLL
+        console_.Create(m_hWnd, rc, NULL
+            , WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL 
+            | ES_MULTILINE | ES_READONLY | ES_AUTOHSCROLL | ES_AUTOVSCROLL
             | ES_SUNKEN
-			, 0
-			, ID_LOG_CTL);
+            , 0
+            , ID_LOG_CTL);
 
         TEXTMODE tm = console_.GetTextMode();
         tm = (0 == (tm & TM_RICHTEXT)       ? (TEXTMODE)(tm | TM_RICHTEXT)        : tm);  
@@ -77,25 +77,25 @@ namespace Dh
         console_.SetTextMode(tm);
         console_.SetAutoURLDetect();
 
-		return console_.m_hWnd;
-	}
+        return console_.m_hWnd;
+    }
 
-	void DCRichEditImpl::PreWrite()
-	{
-		int n = console_.GetWindowTextLength();
-		console_.SetSel(n, n);
+    void DCRichEditImpl::PreWrite()
+    {
+        int n = console_.GetWindowTextLength();
+        console_.SetSel(n, n);
         lastLineCount_ = console_.GetLineCount();
-	}
+    }
 
-	void DCRichEditImpl::WriteString(char const* string)
-	{
-		::SendMessageA(console_, EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)string);
-	}
+    void DCRichEditImpl::WriteString(char const* string)
+    {
+        ::SendMessageA(console_, EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)string);
+    }
 
-	void DCRichEditImpl::WriteString(wchar_t const* string)
-	{
-		::SendMessageW(console_, EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)string);
-	}
+    void DCRichEditImpl::WriteString(wchar_t const* string)
+    {
+        ::SendMessageW(console_, EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)string);
+    }
 
     void DCRichEditImpl::PostWrite()
     {
@@ -144,18 +144,18 @@ namespace Dh
         }
     }
 
-	DebugConsole2& DebugConsole2::Instance()
-	{
-		static DebugConsole2 instance;
-		return instance;
-	}
+    DebugConsole2& DebugConsole2::Instance()
+    {
+        static DebugConsole2 instance;
+        return instance;
+    }
 
-	DebugConsole2::DebugConsole2()
-		: DebugConsole(new DCRichEditImpl(*this))
-	{
-	}
+    DebugConsole2::DebugConsole2()
+        : DebugConsole(new DCRichEditImpl(*this))
+    {
+    }
 
-	DebugConsole2::~DebugConsole2()
-	{
-	}
+    DebugConsole2::~DebugConsole2()
+    {
+    }
 }

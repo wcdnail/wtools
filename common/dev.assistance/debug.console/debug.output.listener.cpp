@@ -1,198 +1,297 @@
 #include "stdafx.h"
 #include "debug.output.listener.h"
 #include "debug.console.h"
+#include <string.utils.error.code.h>
+#include <dh.tracing.defs.h>
+#include <dh.tracing.h>
+#include <aclapi.h>
 #include <string>
 
 namespace DH
 {
-    DebugOutputListener::DebugOutputListener(DebugConsole const& owner)
-        : owner_(owner)
-        , rv_(ERROR_SUCCESS)
-        , ackEvent_(nullptr)
-        , readyEvent_(nullptr)
-        , sharedFile_(nullptr)
-        , sharedMem_(nullptr)
-        , routine_(nullptr)
-        , routineId_(0)
-        , threadStarted_(::CreateEvent(nullptr, FALSE, FALSE, nullptr))
-        , threadStop_(::CreateEvent(nullptr, FALSE, FALSE, nullptr))
-    {
-    }
-
     DebugOutputListener::~DebugOutputListener()
     {
         Stop();
-        ::CloseHandle(threadStarted_);
-        ::CloseHandle(threadStop_);
-        FreeResources(ackEvent_, readyEvent_, sharedFile_, sharedMem_);
     }
 
-    void DebugOutputListener::FreeResources(HANDLE& ackEvent, HANDLE& readyEvent, HANDLE& sharedFile, PVOID& sharedMem)
+    DebugOutputListener::DebugOutputListener(DebugConsole const& owner)
+        :           owner_{owner}
+        ,        thrdStop_{CreateEvent(nullptr, FALSE, FALSE, nullptr), CloseHandle}
+        ,        mutexPtr_{}
+        ,       buffReady_{}
+        ,       dataReady_{}
+        ,      mappingPtr_{}
+        ,        shmemPtr_{}
+        , securityDescPtr_{}
+        ,    thrdListener_{}
     {
-        if (ackEvent)
+    }
+
+    namespace
+    {
+        struct IntSecurityDesc
         {
-            ::CloseHandle(ackEvent);
-            ackEvent = nullptr;
+            PSID          pEveryoneSID{nullptr};
+            PSID             pAdminSID{nullptr};
+            PACL                  pACL{nullptr};
+            PSECURITY_DESCRIPTOR pDesc{nullptr};
+
+            void Free()
+            {
+                if (pEveryoneSID) {
+                    FreeSid(pEveryoneSID);
+                    pEveryoneSID = nullptr;
+                }
+                if (pAdminSID) {
+                    FreeSid(pAdminSID);
+                    pAdminSID = nullptr;
+                }
+                if (pACL) {
+                    LocalFree(pACL);
+                    pACL = nullptr;
+                }
+                if (pDesc) {
+                    LocalFree(pDesc);
+                    pDesc = nullptr;
+                }
+            }
+        };
+
+        void IntFreeSecDesc(IntSecurityDesc* pDesq)
+        {
+            if (pDesq) {
+                pDesq->Free();
+                delete pDesq;
+            }
         }
 
-        if (readyEvent)
+        bool IntInitSecAttrs(SECURITY_ATTRIBUTES& secAttrs, IntSecurityDesc& secDesq)
         {
-            ::CloseHandle(readyEvent);
-            readyEvent = nullptr;
+            HRESULT                         hCode{S_OK};
+            ATL::CStringW                   sFunc{L"NONE"};
+            SID_IDENTIFIER_AUTHORITY sidAuthWorld{SECURITY_WORLD_SID_AUTHORITY};
+            SID_IDENTIFIER_AUTHORITY    sidAuthNT{SECURITY_NT_AUTHORITY};
+            EXPLICIT_ACCESS              exAccess[2]{0};
+            
+            if (!AllocateAndInitializeSid(&sidAuthWorld, 1, SECURITY_WORLD_RID, 0, 0, 0, 0, 0, 0, 0, &secDesq.pEveryoneSID)) {
+                hCode = static_cast<HRESULT>(GetLastError());
+                sFunc = L"AllocateAndInitializeSid(SECURITY_WORLD_SID_AUTHORITY)";
+                goto reportError;
+            }
+            if (!AllocateAndInitializeSid(&sidAuthNT, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &secDesq.pAdminSID)) {
+                hCode = static_cast<HRESULT>(GetLastError());
+                sFunc = L"AllocateAndInitializeSid(SECURITY_NT_AUTHORITY)";
+                goto reportError;
+            }
+            // Everyone READ only
+            exAccess[0].grfAccessPermissions = KEY_READ;
+            exAccess[0].grfAccessMode = SET_ACCESS;
+            exAccess[0].grfInheritance = NO_INHERITANCE;
+            exAccess[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
+            exAccess[0].Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+            exAccess[0].Trustee.ptstrName  = static_cast<LPTSTR>(secDesq.pEveryoneSID);
+            // Admin FULL access
+            exAccess[1].grfAccessPermissions = KEY_ALL_ACCESS;
+            exAccess[1].grfAccessMode = SET_ACCESS;
+            exAccess[1].grfInheritance = NO_INHERITANCE;
+            exAccess[1].Trustee.TrusteeForm = TRUSTEE_IS_SID;
+            exAccess[1].Trustee.TrusteeType = TRUSTEE_IS_GROUP;
+            exAccess[1].Trustee.ptstrName = static_cast<LPTSTR>(secDesq.pAdminSID);
+
+            hCode = SetEntriesInAcl(_countof(exAccess), exAccess, nullptr, &secDesq.pACL);
+            if (ERROR_SUCCESS != hCode) {
+                sFunc = L"SetEntriesInAcl";
+                goto reportError;
+            }
+
+            secDesq.pDesc = (PSECURITY_DESCRIPTOR)LocalAlloc(LPTR, SECURITY_DESCRIPTOR_MIN_LENGTH);
+            if (!secDesq.pDesc) {
+                hCode = static_cast<HRESULT>(GetLastError());
+                sFunc = L"LocalAlloc";
+                goto reportError;
+            }
+
+            if (!InitializeSecurityDescriptor(secDesq.pDesc, SECURITY_DESCRIPTOR_REVISION)) {
+                hCode = static_cast<HRESULT>(GetLastError());
+                sFunc = L"InitializeSecurityDescriptor";
+                goto reportError;
+            }
+
+            if (!SetSecurityDescriptorDacl(secDesq.pDesc, TRUE, secDesq.pACL, FALSE)) {
+                hCode = static_cast<HRESULT>(GetLastError());
+                sFunc = L"SetSecurityDescriptorDacl";
+                goto reportError;
+            }
+
+            secAttrs.nLength = sizeof(secAttrs);
+            secAttrs.lpSecurityDescriptor = secDesq.pDesc;
+            secAttrs.bInheritHandle = TRUE;
+            return true;
+        reportError:
+            auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
+            DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
+            secDesq.Free();
+            return false;
         }
 
-        if (sharedFile)
+        HANDLE IntOpenEvent(DWORD dwAccess, BOOL bInheritHandle, ATL::CComBSTR const& bsName, LPSECURITY_ATTRIBUTES pSecAttrs)
         {
-            ::CloseHandle(sharedFile);
-            sharedFile = nullptr;
-        }
-
-        if (sharedMem)
-        {
-            ::UnmapViewOfFile(sharedMem);
-            sharedMem = nullptr;
+            HRESULT       hCode{S_OK};
+            ATL::CStringW sFunc{L"NONE"};
+            HANDLE        hTemp{INVALID_HANDLE_VALUE};
+            hTemp = OpenEvent(dwAccess, bInheritHandle, bsName);
+            if (!hTemp) {
+                hCode = static_cast<HRESULT>(GetLastError());
+                if (hCode != ERROR_FILE_NOT_FOUND) {
+                    sFunc.Format(L"OpenEvent('%s')", bsName.m_str);
+                    goto reportError;
+                }
+                hTemp = CreateEvent(pSecAttrs, FALSE, FALSE, bsName);
+                if (!hTemp) {
+                    hCode = static_cast<HRESULT>(GetLastError());
+                    sFunc.Format(L"CreateEvent('%s')", bsName.m_str);
+                    goto reportError;
+                }
+            }
+            return hTemp;
+        reportError:
+            auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
+            DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
+            return nullptr;
         }
     }
 
     bool DebugOutputListener::Init()
     {
-        HANDLE   ackEvent{nullptr};
-        HANDLE readyEvent{nullptr};
-        HANDLE sharedFile{nullptr};
-        PVOID   sharedMem{nullptr};
+        HRESULT                     hCode{S_OK};
+        ATL::CStringW               sFunc{L"NONE"};
+        ATL::CStringW            sMessage{};
+        HANDLE                   mutexRaw{nullptr};
+        HANDLE                    buffRdy{nullptr};
+        HANDLE                    dataRdy{nullptr};
+        HANDLE                 mappingRaw{nullptr};
+        PVOID                    shmemRaw{nullptr};
+        HandlePtr                mutexPtr{};
+        HandlePtr              buffRdyPtr{};
+        HandlePtr              dataRdyPtr{};
+        HandlePtr              mappingPtr{};
+        ShmemPtr                 shmemPtr{};
+        ATL::CComBSTR const    bsWinMutex{L"DBWinMutex"};
+        ATL::CComBSTR const  bsWinBuffRdy{L"DBWIN_BUFFER_READY"};
+        ATL::CComBSTR const  bsWinDataRdy{L"DBWIN_DATA_READY"};
+        ATL::CComBSTR const     bsWinFile{L"DBWIN_BUFFER"};
+        SECURITY_ATTRIBUTES      secAttrs{0};
+        IntSecurityDesc           secDesq{};
+        HandlePtr              secDescPtr{};
 
-        rv_ = ERROR_SUCCESS;
-        try {
-            SECURITY_DESCRIPTOR sd = {0};
-            if (!::InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION)) {
-                throw (HRESULT)::GetLastError();
-            }
-            if (!::SetSecurityDescriptorDacl(&sd, TRUE, nullptr, FALSE)) {
-                throw (HRESULT)::GetLastError();
-            }
-
-            SECURITY_ATTRIBUTES sa;
-            sa.nLength = sizeof(sa);
-            sa.lpSecurityDescriptor = &sd;
-            sa.bInheritHandle = TRUE;
-
-            ackEvent = ::OpenEvent(SYNCHRONIZE, TRUE, _T("DBWIN_BUFFER_READY"));
-            if (!ackEvent)
-            {
-                ackEvent = ::CreateEvent(&sa, FALSE, FALSE, _T("DBWIN_BUFFER_READY"));
-                if (!ackEvent) 
-                {
-                    throw (HRESULT)::GetLastError();
-                }
-            }
-
-            readyEvent = ::OpenEvent(EVENT_MODIFY_STATE, TRUE, _T("DBWIN_DATA_READY"));
-            if (!readyEvent)
-            {
-                readyEvent = ::CreateEvent(&sa, FALSE, FALSE, _T("DBWIN_DATA_READY"));
-                if (!readyEvent) 
-                {
-                    throw (HRESULT)::GetLastError();
-                }
-            }
-
-            sharedFile = ::OpenFileMapping(PAGE_READONLY, TRUE, _T("DBWIN_BUFFER"));
-            if (!sharedFile)
-            {
-                sharedFile = ::CreateFileMapping(INVALID_HANDLE_VALUE, &sa, PAGE_READWRITE, 0, 4096, _T("DBWIN_BUFFER"));
-                if (!sharedFile) 
-                {
-                    throw (HRESULT)::GetLastError();
-                }
-            }
-
-            sharedMem = ::MapViewOfFile(sharedFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-            if (!sharedMem)
-            {
-                throw (HRESULT)::GetLastError();
-            }
-
-            FreeResources(ackEvent_, readyEvent_, sharedFile_, sharedMem_);
-
-            ackEvent_ = ackEvent;
-            readyEvent_ = readyEvent;
-            sharedFile_ = sharedFile;
-            sharedMem_ = sharedMem;
+        if (!IntInitSecAttrs(secAttrs, secDesq)) {
+            return false;
         }
-        catch (HRESULT rv)
-        {
-            FreeResources(ackEvent, readyEvent, sharedFile, sharedMem);
-            rv_ = rv;
-        }
+        HandlePtr{new IntSecurityDesc{secDesq}, IntFreeSecDesc}.swap(secDescPtr);
 
-        return ERROR_SUCCESS == rv_;
+        mutexRaw = OpenMutex(MUTEX_MODIFY_STATE, FALSE, bsWinMutex);
+        if (!mutexRaw) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc.Format(L"OpenMutex('%s')", bsWinMutex.m_str);
+            goto reportError;
+        }
+        HandlePtr{mutexRaw, CloseHandle}.swap(mutexPtr);
+
+        buffRdy = IntOpenEvent(EVENT_ALL_ACCESS, FALSE, bsWinBuffRdy, &secAttrs);
+        if (!buffRdy) {
+            return false;
+        }
+        HandlePtr{buffRdy, CloseHandle}.swap(buffRdyPtr);
+
+        dataRdy = IntOpenEvent(SYNCHRONIZE, FALSE, bsWinDataRdy, &secAttrs);
+        if (!dataRdy) {
+            return false;
+        }
+        HandlePtr{dataRdy, CloseHandle}.swap(dataRdyPtr);
+
+        mappingRaw = OpenFileMapping(FILE_MAP_READ, FALSE, bsWinFile);
+        if (!mappingRaw) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            if (hCode != ERROR_FILE_NOT_FOUND) {
+                sFunc.Format(L"OpenFileMapping('%s')", bsWinFile.m_str);
+                goto reportError;
+            }
+            mappingRaw = CreateFileMapping(INVALID_HANDLE_VALUE, &secAttrs, PAGE_READWRITE, 0, 4096, bsWinFile);
+            if (!mappingRaw) {
+                hCode = static_cast<HRESULT>(GetLastError());
+                sFunc.Format(L"CreateFileMapping('%s')", bsWinFile.m_str);
+                goto reportError;
+            }
+        }
+        HandlePtr{mappingRaw, CloseHandle}.swap(mappingPtr);
+
+        shmemRaw = MapViewOfFile(mappingRaw, SECTION_MAP_READ, 0, 0, 0);
+        if (!shmemRaw) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc.Format(L"MapViewOfFile('%s')", bsWinFile.m_str);
+            goto reportError;
+        }
+        HandlePtr{shmemRaw, UnmapViewOfFile}.swap(shmemPtr);
+
+        shmemPtr.swap(shmemPtr_);
+        mappingPtr.swap(mappingPtr_);
+        dataRdyPtr.swap(dataReady_);
+        buffRdyPtr.swap(buffReady_);
+        mutexPtr.swap(mutexPtr_);
+        secDescPtr.swap(securityDescPtr_);
+        return true;
+
+    reportError:
+        sMessage = Str::ErrorCode<>::SystemMessage(hCode);
+        DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
+        return false;
     }
 
     bool DebugOutputListener::Start()
     {
-        if (nullptr != routine_) {
-            rv_ = ERROR_ALREADY_REGISTERED;
+        if (thrdListener_.joinable()) {
+            return true;
+        }
+        if (!Init()) {
             return false;
         }
-        if (!sharedMem_ && !Init()) {
-            return false;
-        }
-        unsigned id = 0;
-        auto const proc = reinterpret_cast<HANDLE>(::_beginthreadex(nullptr, 0, CaptureProc, this, 0, &id));
-        rv_ = ::GetLastError();
-        if (proc) {
-            routine_ = proc;
-            routineId_ = id;
-            ::ResumeThread(routine_);
-            ::WaitForSingleObject(threadStarted_, INFINITE);
-        }
-        return ERROR_SUCCESS == rv_;
+        std::thread{&DebugOutputListener::Listener, this}.swap(thrdListener_);
+        return thrdListener_.joinable();
     }
 
     bool DebugOutputListener::Stop()
     {
-        if (!routine_) {
-            rv_ = ERROR_SERVICE_NOT_FOUND;
+        if (!thrdListener_.joinable()) {
             return false;
         }
-        ::SetEvent(threadStop_);
-        ::WaitForSingleObject(threadStop_, 2000);
-        ::CloseHandle(routine_);
-        routine_ = nullptr;
-        routineId_ = 0;
+        ::SetEvent(thrdStop_.get());
+        thrdListener_.join();
         return true;
     }
 
-    unsigned __stdcall DebugOutputListener::CaptureProc(void* rawThis) 
-    {
-        static_cast<DebugOutputListener*>(rawThis)->CaptureProc();
-        return 0;
-    }
-
-    void DebugOutputListener::CaptureProc() 
+    void DebugOutputListener::Listener() const
     {   
-        ::SetEvent(threadStarted_);
-        HANDLE events[] = { readyEvent_, threadStop_ };
-        DWORD myPid = GetCurrentProcessId();
+        HANDLE   events[]{ dataReady_.get(), thrdStop_.get() };
+        DWORD const myPid{GetCurrentProcessId()};
         while (true) {
-            ::SetEvent(ackEvent_);
-            DWORD rv = ::WaitForMultipleObjects(_countof(events), events, FALSE, INFINITE);
-            if (WAIT_OBJECT_0 == rv) {   
+            SetEvent(buffReady_.get());
+            DWORD const dwSignal{WaitForMultipleObjects(_countof(events), events, FALSE, INFINITE)};
+            if (WAIT_OBJECT_0 == dwSignal) {   
                 struct DBUF_D 
                 {
                     DWORD pid;
-                    char string[4096-sizeof(DWORD)];
+                    char string[1];
                 };
-                DBUF_D *dbuf = (DBUF_D*)sharedMem_;
-                if (myPid == dbuf->pid) {
-                    owner_.Puts(dbuf->string);
+                auto const* pData = static_cast<DBUF_D const*>(shmemPtr_.get());
+                if (myPid == pData->pid) {
+                    owner_.Puts(pData->string);
                 }
             }
-            else if ((WAIT_OBJECT_0+1) == rv) {
-                ::ResetEvent(threadStop_);
+            else if ((WAIT_OBJECT_0+1) == dwSignal) {
+                ::ResetEvent(thrdStop_.get());
                 break;
             }
         }
-        ::SetEvent(threadStop_);
+        SetEvent(thrdStop_.get());
     }
 }
