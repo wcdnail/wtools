@@ -402,9 +402,8 @@ namespace DH
             DWORD    dwPid;
             char szText[1];
         };
-
         HANDLE   events[]{ thrdStop_.get(), dataReady_.get() };
-        DWORD const myPid{GetCurrentProcessId()};
+      //DWORD const myPid{GetCurrentProcessId()};
         while (true) {
             SetEvent(buffReady_.get());
             switch (DWORD const dwSignal{WaitForMultipleObjects(_countof(events), events, FALSE, INFINITE)}) {
@@ -412,9 +411,9 @@ namespace DH
                 return ;
             case WAIT_OBJECT_0+1: {
                 auto const* pData = static_cast<DataBuffer const*>(shmemPtr_.get());
-                if (myPid == pData->dwPid) {
+                //if (myPid == pData->dwPid) {
                     owner_.Puts(pData->szText);
-                }
+                //}
                 ResetEvent(dataReady_.get());
                 ResetEvent(buffReady_.get());
                 break;
