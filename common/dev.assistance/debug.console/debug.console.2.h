@@ -1,34 +1,33 @@
-#ifndef _DH_debug_console_2_h__
-#define _DH_debug_console_2_h__
+#pragma once
 
-#include "../debug.console/debug.console.h"
+#include "basic.debug.console.h"
 
-namespace Dh
+namespace DH
 {
-    class _PUBLIC DebugConsole2: private DebugConsole
+    class DCRichEditImpl: public BasicDebugConsole
     {
     public:
-        static DebugConsole2& Instance(); /* throw (std::bad_alloc) */
-
-        using DebugConsole::ReceiveDebugOutput;
-        using DebugConsole::ReceiveStdOutput;
-        using DebugConsole::SetParameters;
-        using DebugConsole::SetAutoScroll;
-        using DebugConsole::Show;
-        using DebugConsole::Hide;
-        using DebugConsole::Clean;
-        using DebugConsole::SetTitleText;
-        using DebugConsole::Puts;
-        using DebugConsole::AskPathAndSave;
-        using DebugConsole::Save;
-        using DebugConsole::Destroy;
+        ~DCRichEditImpl() override;
+        DCRichEditImpl(DebugConsole const& owner);
 
     private:
-        DebugConsole2(); /* throw (std::bad_alloc) */
-        ~DebugConsole2();
-        DebugConsole2(DebugConsole2 const&);
-        DebugConsole2& operator = (DebugConsole2 const&);
+        struct StaticInit;
+
+        WTL::CRichEditCtrl console_;
+        WTL::CToolBarCtrl  toolBox_;
+        int          lastLineCount_;
+
+        DECLARE_WND_CLASS_EX(_T("WCD_DH_DEBUG_CONSOLE2"), CS_VREDRAW | CS_HREDRAW, (COLOR_WINDOW-1))
+
+        HRESULT PreCreateWindow() override;
+        void Save(char const* filePathName) const override;
+        HWND CreateConsole() override;
+        void PreWrite() override;
+        void WriteString(char const*) override;
+        void WriteString(wchar_t const*) override;
+        void PostWrite() override;
+        void OnDestroy() override;
+
+        void OnCommand(UINT notifyCode, int id, HWND) override;
     };
 }
-
-#endif // _DH_debug_console_2_h__

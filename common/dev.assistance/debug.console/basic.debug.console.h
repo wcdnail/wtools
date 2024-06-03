@@ -12,8 +12,8 @@ namespace DH
 {
     class DebugConsole;
 
-    class BasicDebugConsole: private CCustomControl,
-                             private WTL::CDialogResize<BasicDebugConsole>
+    class BasicDebugConsole: protected CCustomControl,
+                             private   WTL::CDialogResize<BasicDebugConsole>
     {
         friend WTL::CDialogResize<BasicDebugConsole>;
 
@@ -85,17 +85,17 @@ namespace DH
             CHAIN_MSG_MAP(CDialogResize<BasicDebugConsole>)
         END_MSG_MAP()
 
-    private:
-        Parameters params_;
-        WTL::CFont consoleFont_;
-        HWND consoleHandle_;
-        std_ostream_listener<char> coutListener_;
-        std_ostream_listener<char> cerrListener_;
+    protected:
+        Parameters                           params_;
+        WTL::CFont                      consoleFont_;
+        HWND                          consoleHandle_;
+        std_ostream_listener<char>     coutListener_;
+        std_ostream_listener<char>     cerrListener_;
         std_ostream_listener<wchar_t> wcoutListener_;
         std_ostream_listener<wchar_t> wcerrListener_;
-        DebugOutputListener debugOutputListener_;
-        StringQue cache_;
-        std::mutex cacheMx_;
+        DebugOutputListener     debugOutputListener_;
+        StringQue                             cache_;
+        std::mutex                          cacheMx_;
 
         virtual HWND CreateConsole() = 0;
 

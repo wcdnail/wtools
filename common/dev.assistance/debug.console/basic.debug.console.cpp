@@ -49,7 +49,6 @@ namespace DH
             0, 0, params_.fname);
 
         consoleFont_.Attach(tempFont);
-        ::SendMessage(consoleHandle_, WM_SETFONT, reinterpret_cast<WPARAM>(consoleFont_.m_hFont), MAKELPARAM(TRUE, 0));
     }
 
     int BasicDebugConsole::OnCreate(LPCREATESTRUCT)
@@ -62,8 +61,8 @@ namespace DH
         else {
             PutWindow();
         }
-        consoleHandle_ = CreateConsole();
         SetupFont();
+        consoleHandle_ = CreateConsole();
         DlgResize_Init(false, bIsChild ? false : true);
         return 0;
     }

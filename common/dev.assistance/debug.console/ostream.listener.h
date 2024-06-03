@@ -1,5 +1,6 @@
 #pragma once
 
+#include "debug.console.h"
 #include <streambuf>
 
 namespace DH

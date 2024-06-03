@@ -1,81 +1,101 @@
 #include "stdafx.h"
 #include "debug.console.2.h"
-#include "../debug.console/basic.debug.console.h"
+#include "tator/resource.h"
 #include <fstream>
-#include "resources/resource.h"
 
-namespace Dh
+namespace DH
 {
-    class DCRichEditImpl: public BasicDebugConsole
+    struct DCRichEditImpl::StaticInit
     {
-    public:
-        DCRichEditImpl(DebugConsole const& owner);
-        virtual ~DCRichEditImpl();
+        static StaticInit& Instance()
+        {
+            static StaticInit staticInit;
+            return staticInit;
+        }
 
     private:
-        CRichEditCtrl console_;
         HINSTANCE richEditLib_;
-        CToolBarCtrl toolBox_;
-        int lastLineCount_;
 
-        virtual void Save(char const* filePathName) const;
+        ~StaticInit()
+        {
+            FreeLibrary(richEditLib_);
+        }
 
-        virtual HWND CreateConsole();
-        virtual void PreWrite();
-        virtual void WriteString(char const*);
-        virtual void WriteString(wchar_t const*);
-        virtual void PostWrite();
-        virtual void OnDestroy();
-        
-        virtual void OnCommand(UINT notifyCode, int id, HWND);
+        StaticInit()
+            : richEditLib_{nullptr}
+        {
+            InitCommonControls();
+            richEditLib_ = LoadLibrary(WTL::CRichEditCtrl::GetLibraryName());
+        }
     };
 
+    DCRichEditImpl::~DCRichEditImpl() = default;
+
     DCRichEditImpl::DCRichEditImpl(DebugConsole const& owner)
-        : BasicDebugConsole(owner)
-        , richEditLib_(NULL)
-        , lastLineCount_(0)
+        : BasicDebugConsole{owner}
+        ,    lastLineCount_{0}
     {
-        InitCommonControls();
-        richEditLib_ = ::LoadLibrary(CRichEditCtrl::GetLibraryName());
+        UNREFERENCED_PARAMETER(StaticInit::Instance());
     }
 
-    DCRichEditImpl::~DCRichEditImpl()
+    HRESULT DCRichEditImpl::PreCreateWindow()
     {
-        FreeLibrary(richEditLib_);
+        static ATOM gs_dc2Atom{0};
+        return CCustomControl::PreCreateWindowImpl(gs_dc2Atom, GetWndClassInfo());
     }
 
     HWND DCRichEditImpl::CreateConsole()
     {
-        toolBox_ = CFrameWindowImplBase<>::CreateSimpleToolBarCtrl(m_hWnd, IDT_DH_DC2_TOOLBAR, FALSE
-            , WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS 
-            | RBS_VARHEIGHT | RBS_BANDBORDERS | RBS_AUTOSIZE
-            | TBSTYLE_FLAT
-            );
+        toolBox_ = WTL::CFrameWindowImplBase<>::CreateSimpleToolBarCtrl(m_hWnd, IDT_DH_DC2_TOOLBAR, FALSE,
+            WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | 
+            RBS_VARHEIGHT | RBS_BANDBORDERS | RBS_AUTOSIZE | 
+            TBSTYLE_FLAT
+        );
 
-        CRect rc;
+        CRect rc{};
         GetClientRect(rc);
 
-        if (toolBox_.m_hWnd)
-        {
+        if (toolBox_.m_hWnd) {
             CRect rcToolBox;
             toolBox_.GetWindowRect(rcToolBox);
             rc.top += rcToolBox.Height();
         }
 
-        console_.Create(m_hWnd, rc, NULL
-            , WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL 
-            | ES_MULTILINE | ES_READONLY | ES_AUTOHSCROLL | ES_AUTOVSCROLL
-            | ES_SUNKEN
-            , 0
-            , ID_LOG_CTL);
+        console_.Create(m_hWnd, rc, nullptr, 
+            WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL |
+            ES_MULTILINE | ES_READONLY | ES_AUTOHSCROLL | ES_AUTOVSCROLL |
+            ES_SUNKEN,
+            0,
+            ID_LOG_CTL
+        );
 
         TEXTMODE tm = console_.GetTextMode();
-        tm = (0 == (tm & TM_RICHTEXT)       ? (TEXTMODE)(tm | TM_RICHTEXT)        : tm);  
-        tm = (0 != (tm & TM_MULTILEVELUNDO) ? (TEXTMODE)(tm & ~TM_MULTILEVELUNDO) : tm);  
+        tm = (0 == (tm & TM_RICHTEXT)       ? static_cast<TEXTMODE>(tm | TM_RICHTEXT)        : tm);
+        tm = (0 != (tm & TM_MULTILEVELUNDO) ? static_cast<TEXTMODE>(tm & ~TM_MULTILEVELUNDO) : tm);
 
         //console_.SetBackgroundColor(::GetSysColor(COLOR_WINDOW-1));
         console_.SetTextMode(tm);
         console_.SetAutoURLDetect();
+
+        CHARFORMAT2 charFmt{0};
+        console_.GetDefaultCharFormat(charFmt);
+        wcsncpy_s(charFmt.szFaceName, L"Courier New", _countof(L"Courier New"));
+        console_.SetDefaultCharFormat(charFmt);
+        
+
+        //ATL::CComPtr<IRichEditOle> const richOle{console_.GetOleInterface()};
+        //if (richOle) {
+        //    ATL::CComQIPtr<ABI::Windows::UI::Text::ITextDocument> const textDoc{richOle};
+        //    if (textDoc) {
+        //        ATL::CComQIPtr<ABI::Windows::UI::Text::ITextCharacterFormat> charFmt{};
+        //        textDoc->GetDefaultCharacterFormat(&charFmt);
+        //        if (charFmt) {
+        //            charFmt->put_Name(L"Courier New");
+        //        }
+        //
+        //    }
+        //}
+        //console_.SetFont(consoleFont_.m_hFont, FALSE);
 
         return console_.m_hWnd;
     }
@@ -89,45 +109,40 @@ namespace Dh
 
     void DCRichEditImpl::WriteString(char const* string)
     {
-        ::SendMessageA(console_, EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)string);
+        ::SendMessageA(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(string));
     }
 
     void DCRichEditImpl::WriteString(wchar_t const* string)
     {
-        ::SendMessageW(console_, EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)string);
+        ::SendMessageW(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(string));
     }
 
     void DCRichEditImpl::PostWrite()
     {
-        if (GetParameters().autoScroll)
-        {
-            int n = console_.GetLineCount() - lastLineCount_;
+        if (GetParameters().autoScroll) {
+            int const n{console_.GetLineCount() - lastLineCount_};
             console_.LineScroll(n);
         }
     }
 
     void DCRichEditImpl::OnCommand(UINT, int id, HWND)
     {
-        if (ID_DC_BN_CLEAN == id)
-        {
+        if (ID_DC_BN_CLEAN == id) {
             Clean();
         }
-        else if (ID_DC_BN_SAVE == id)
-        {
+        else if (ID_DC_BN_SAVE == id) {
             AskPathAndSave();
         }
     }
 
     void DCRichEditImpl::Save(char const* filePathName) const
     {
-        std::streamsize len = (std::streamsize)::GetWindowTextLengthA(console_);
-        if (len > 0)
-        {
+        std::streamsize const len{::GetWindowTextLengthA(console_)};
+        if (len > 0) {
             // TODO: save rich text (RTF)!
-            std::string buffer((std::string::size_type)len+1, '\0');
-            int storedLen = ::GetWindowTextA(console_, &buffer[0], (int)len);
-            if ( storedLen > 0 )
-            {
+            std::string buffer(static_cast<std::string::size_type>(len)+1, '\0');
+            int const storedLen{::GetWindowTextA(console_, &buffer[0], static_cast<int>(len))};
+            if (storedLen > 0) {
                 std::ofstream output(filePathName);
                 output << buffer.c_str() << std::flush;
             }
@@ -137,25 +152,8 @@ namespace Dh
     void DCRichEditImpl::OnDestroy()
     {
         console_.DestroyWindow();
-
-        if (toolBox_.m_hWnd)
-        {
+        if (toolBox_.m_hWnd) {
             toolBox_.DestroyWindow();
         }
-    }
-
-    DebugConsole2& DebugConsole2::Instance()
-    {
-        static DebugConsole2 instance;
-        return instance;
-    }
-
-    DebugConsole2::DebugConsole2()
-        : DebugConsole(new DCRichEditImpl(*this))
-    {
-    }
-
-    DebugConsole2::~DebugConsole2()
-    {
     }
 }

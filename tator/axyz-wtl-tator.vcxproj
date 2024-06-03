@@ -42,7 +42,10 @@
     <ResourceCompile Include="axyz-wtl-tator.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\common\dev.assistance\debug.console\resources\debug.console.2.def.tb.bmp" />
+    <Image Include="..\common\dev.assistance\debug.console\resources\toolbar1.bmp" />
     <Image Include="ATator.Main.ico" />
+    <Image Include="rez\debug.console.2.def.tb.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="ATator.exe.manifest" />

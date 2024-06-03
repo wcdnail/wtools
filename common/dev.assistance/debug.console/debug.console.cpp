@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "debug.console.h"
 #include "basic.debug.console.h"
+#include "debug.console.2.h"
 #include <fstream>
 
 namespace DH
@@ -41,6 +42,7 @@ namespace DH
             0,
             ID_LOG_CTL);
         console_.FmtLines(TRUE);
+        console_.SetFont(consoleFont_.m_hFont, FALSE);
         return console_.m_hWnd;
     }
 
@@ -87,7 +89,8 @@ namespace DH
     DebugConsole::~DebugConsole() = default;
 
     DebugConsole::DebugConsole()
-        : impl_{new DebugConsoleImpl(*this)}
+        //: impl_{new DebugConsoleImpl(*this)}
+        : impl_{new DCRichEditImpl(*this)}
     {
     }
 
