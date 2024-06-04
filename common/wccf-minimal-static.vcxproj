@@ -31,7 +31,6 @@
     <ClCompile Include="DDraw.DGI\CeXDib.cpp" />
     <ClCompile Include="DDraw.DGI\DDGDIStuff.cpp" />
     <ClCompile Include="dev.assistance\debug.console\basic.debug.console.cpp" />
-    <ClCompile Include="dev.assistance\debug.console\debug.console.2.cpp" />
     <ClCompile Include="dev.assistance\debug.console\debug.console.cpp" />
     <ClCompile Include="dev.assistance\debug.console\debug.output.listener.cpp" />
     <ClCompile Include="dev.assistance\debug.console\WinDebugMonitor.cpp" />
@@ -89,7 +88,6 @@
     <ClInclude Include="DDraw.DGI\DDGDIStuff.h" />
     <ClInclude Include="debug.dump.msg.h" />
     <ClInclude Include="dev.assistance\debug.console\basic.debug.console.h" />
-    <ClInclude Include="dev.assistance\debug.console\debug.console.2.h" />
     <ClInclude Include="dev.assistance\debug.console\debug.console.h" />
     <ClInclude Include="dev.assistance\debug.console\debug.output.listener.h" />
     <ClInclude Include="dev.assistance\debug.console\ostream.listener.h" />

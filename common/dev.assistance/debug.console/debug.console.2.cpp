@@ -73,16 +73,14 @@ namespace DH
         tm = (0 == (tm & TM_RICHTEXT)       ? static_cast<TEXTMODE>(tm | TM_RICHTEXT)        : tm);
         tm = (0 != (tm & TM_MULTILEVELUNDO) ? static_cast<TEXTMODE>(tm & ~TM_MULTILEVELUNDO) : tm);
 
-        //console_.SetBackgroundColor(::GetSysColor(COLOR_WINDOW-1));
         console_.SetTextMode(tm);
         console_.SetAutoURLDetect();
 
         CHARFORMAT2 charFmt{0};
         console_.GetDefaultCharFormat(charFmt);
-        wcsncpy_s(charFmt.szFaceName, L"Courier New", _countof(L"Courier New"));
+        wcsncpy_s(charFmt.szFaceName, L"Cascadia Mono Light", _countof("Cascadia Mono Light"));
         console_.SetDefaultCharFormat(charFmt);
         
-
         //ATL::CComPtr<IRichEditOle> const richOle{console_.GetOleInterface()};
         //if (richOle) {
         //    ATL::CComQIPtr<ABI::Windows::UI::Text::ITextDocument> const textDoc{richOle};
