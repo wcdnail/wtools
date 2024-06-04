@@ -5,6 +5,17 @@
 #include <dh.tracing.defs.h>
 #include <fstream>
 
+namespace 
+{
+    enum DCColimnIndex: int
+    {
+        DCCI_Numba = 0,
+        DCCI_TS,
+        DCCI_Text,
+        DCCI_COUNT
+    };
+}
+
 namespace DH
 {
     struct DCListViewImpl::StaticInit
@@ -24,7 +35,8 @@ namespace DH
 
     DCListViewImpl::DCListViewImpl(DebugConsole const& owner)
         : BasicDebugConsole{owner}
-        ,    lastLineCount_{0}
+        ,          console_{}
+        ,          toolBox_{}
     {
         UNREFERENCED_PARAMETER(StaticInit::Instance());
     }
@@ -35,7 +47,7 @@ namespace DH
         return CCustomControl::PreCreateWindowImpl(gs_dc2Atom, GetWndClassInfo());
     }
 
-    void DCListViewImpl::SetupHeader(CRect const& rc)
+    void DCListViewImpl::SetupHeader(CRect const& rc) const
     {
         struct HeaderText
         {
@@ -45,9 +57,9 @@ namespace DH
         };
 
         static TCHAR        hdrText0[]{_T("#")};
-        static TCHAR        hdrText1[]{_T("Time")};
-        static TCHAR        hdrText2[]{_T("Debug Print")};
-        static HeaderText hdrStrings[]{
+        static TCHAR        hdrText1[]{_T("TS")};
+        static TCHAR        hdrText2[]{_T("Debug")};
+        static HeaderText hdrStrings[DCCI_COUNT]{
             { 32, hdrText0, _countof(hdrText0)},
             {128, hdrText1, _countof(hdrText1)},
             {512, hdrText2, _countof(hdrText2)}
@@ -56,6 +68,11 @@ namespace DH
         WTL::CHeaderCtrl header{console_.GetHeader()};
         HDITEM          hdrItem{0};
         int              nIndex{0};
+        int const          nCCX{rc.Width()};
+
+        hdrStrings[DCCI_Numba].nWidth = nCCX / 16;
+        hdrStrings[DCCI_TS].nWidth = nCCX / 8;
+        hdrStrings[DCCI_Text].nWidth = nCCX - (hdrStrings[DCCI_Numba].nWidth + hdrStrings[DCCI_TS].nWidth);
 
         for (auto const& it: hdrStrings) {
             hdrItem.fmt = HDF_LEFT | HDF_STRING;
@@ -111,7 +128,7 @@ namespace DH
         sMessage.Format(L"%s failed: 0x%08x %s\r\n", sFunc.GetString(), hCode,
             Str::ErrorCode<>::SystemMessage(hCode).GetString());
         if (console_) {
-            Puts(sMessage.GetString());
+            PutsWide(sMessage.GetString());
         }
         else {
             DH::TPrintf(LTH_DBG_ASSIST L" %s", sMessage.GetString());
@@ -123,17 +140,26 @@ namespace DH
     {
         //int n = console_.GetWindowTextLength();
         //console_.SetSel(n, n);
-        //lastLineCount_ = console_.GetLineCount();
     }
 
-    void DCListViewImpl::WriteString(char const* string)
+    void DCListViewImpl::WriteNarrow(std::string& nrString)
     {
-        ::SendMessageA(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(string));
+        LVITEMA lvaItem{0};
+        lvaItem.mask = LVIF_COLUMNS | LVIF_TEXT;
+        lvaItem.cColumns = DCCI_Text;
+        lvaItem.cchTextMax = static_cast<int>(nrString.length());
+        lvaItem.pszText = nrString.data();
+        ::SendMessage(console_, LVM_INSERTITEMA, 0, reinterpret_cast<LPARAM>(&lvaItem));
     }
 
-    void DCListViewImpl::WriteString(wchar_t const* string)
+    void DCListViewImpl::WriteWide(std::wstring& wdString)
     {
-        ::SendMessageW(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(string));
+        LVITEMW lvwItem{0};
+        lvwItem.mask = LVIF_COLUMNS | LVIF_TEXT;
+        lvwItem.cColumns = DCCI_Text;
+        lvwItem.cchTextMax = static_cast<int>(wdString.length());
+        lvwItem.pszText = wdString.data();
+        ::SendMessage(console_, LVM_INSERTITEMA, 0, reinterpret_cast<LPARAM>(&lvwItem));
     }
 
     void DCListViewImpl::PostWrite()
@@ -157,23 +183,24 @@ namespace DH
 
     void DCListViewImpl::Save(char const* filePathName) const
     {
-        std::streamsize const len{::GetWindowTextLengthA(console_)};
-        if (len > 0) {
-            // TODO: save rich text (RTF)!
-            std::string buffer(static_cast<std::string::size_type>(len)+1, '\0');
-            int const storedLen{::GetWindowTextA(console_, &buffer[0], static_cast<int>(len))};
-            if (storedLen > 0) {
-                std::ofstream output(filePathName);
-                output << buffer.c_str() << std::flush;
-            }
-        }
+        UNREFERENCED_PARAMETER(filePathName);
+        //std::streamsize const len{::GetWindowTextLengthA(console_)};
+        //if (len > 0) {
+        //    // TODO: save rich text (RTF)!
+        //    std::string buffer(static_cast<std::string::size_type>(len)+1, '\0');
+        //    int const storedLen{::GetWindowTextA(console_, &buffer[0], static_cast<int>(len))};
+        //    if (storedLen > 0) {
+        //        std::ofstream output(filePathName);
+        //        output << buffer.c_str() << std::flush;
+        //    }
+        //}
     }
 
     void DCListViewImpl::OnDestroy()
     {
-        console_.DestroyWindow();
         if (toolBox_.m_hWnd) {
             toolBox_.DestroyWindow();
         }
+        console_.DestroyWindow();
     }
 }

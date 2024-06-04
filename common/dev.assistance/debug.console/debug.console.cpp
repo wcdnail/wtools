@@ -18,8 +18,8 @@ namespace DH
 
         HWND CreateConsole() override;
         void PreWrite() override;
-        void WriteString(char const* string) override;
-        void WriteString(wchar_t const* string) override;
+        void WriteNarrow(std::string& nrString) override;
+        void WriteWide(std::wstring& wdString) override;
         void Save(char const* fileName) const override;
         void OnDestroy() override;
     };
@@ -53,14 +53,14 @@ namespace DH
         console_.SetSel(n, n, GetParameters().autoScroll ? TRUE : FALSE);
     }
 
-    void DebugConsoleImpl::WriteString(char const* string)
+    void DebugConsoleImpl::WriteNarrow(std::string& nrString)
     {
-        ::SendMessageA(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(string));
+        ::SendMessageA(console_, EM_REPLACESEL, static_cast<WPARAM>(FALSE), reinterpret_cast<LPARAM>(nrString.c_str()));
     }
 
-    void DebugConsoleImpl::WriteString(wchar_t const* string)
+    void DebugConsoleImpl::WriteWide(std::wstring& wdString)
     {
-        ::SendMessageW(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(string));
+        ::SendMessageW(console_, EM_REPLACESEL, static_cast<WPARAM>(FALSE), reinterpret_cast<LPARAM>(wdString.c_str()));
     }
 
     void DebugConsoleImpl::Save(char const* filePathName) const
@@ -159,14 +159,14 @@ namespace DH
         ::SetWindowTextW(impl_->m_hWnd, string);
     }
 
-    void DebugConsole::Puts(char const* string) const
+    void DebugConsole::PutsNarrow(std::string_view nrString) const
     {
-        impl_->Puts(string);
+        impl_->PutsNarrow(nrString);
     }
 
-    void DebugConsole::Puts(wchar_t const* string) const
+    void DebugConsole::PutsWide(std::wstring_view wdString) const
     {
-        impl_->Puts(string);
+        impl_->PutsWide(wdString);
     }
 
     void DebugConsole::AskPathAndSave() const

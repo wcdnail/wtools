@@ -36,10 +36,6 @@
     <Image Include="ATator.Main.ico">
       <Filter>rez</Filter>
     </Image>
-    <Image Include="..\common\dev.assistance\debug.console\resources\toolbar1.bmp" />
-    <Image Include="..\common\dev.assistance\debug.console\resources\debug.console.2.def.tb.bmp">
-      <Filter>rez</Filter>
-    </Image>
     <Image Include="rez\debug.console.2.def.tb.bmp">
       <Filter>rez</Filter>
     </Image>

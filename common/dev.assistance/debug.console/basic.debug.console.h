@@ -19,9 +19,6 @@ namespace DH
 
         enum { WM_SYNC_STRINGS = WM_USER + 1 };
 
-        using StringPair = std::pair<std::string, std::wstring>;
-        using  StringQue = std::deque<StringPair>;
-
     protected:
         BasicDebugConsole(DebugConsole const& owner);
 
@@ -61,8 +58,8 @@ namespace DH
         Parameters& GetParameters();
         void SetParameters(int cx, int cy, int align, int fsize, char const* fname);
 
-        void Puts(char const* string);
-        void Puts(wchar_t const* string);
+        void PutsNarrow(std::string_view nrView);
+        void PutsWide(std::wstring_view wdView);
         virtual void Clean() const;
 
         void ReceiveStdOutput(bool on) const;
@@ -86,6 +83,9 @@ namespace DH
         END_MSG_MAP()
 
     protected:
+        using StringPair = std::pair<std::string, std::wstring>;
+        using  StringQue = std::deque<StringPair>;
+
         Parameters                           params_;
         WTL::CFont                      consoleFont_;
         HWND                          consoleHandle_;
@@ -100,8 +100,8 @@ namespace DH
         virtual HWND CreateConsole() = 0;
 
         virtual void PreWrite() = 0;
-        virtual void WriteString(char const*) = 0;
-        virtual void WriteString(wchar_t const*) = 0;
+        virtual void WriteNarrow(std::string&) = 0;
+        virtual void WriteWide(std::wstring&) = 0;
         virtual void PostWrite();
 
         virtual void OnCommand(UINT notifyCode, int id, HWND);

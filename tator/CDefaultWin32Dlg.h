@@ -37,10 +37,6 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         if (FAILED(hCode)) {
             return hCode;
         }
-        hCode = DH::DebugConsole::Instance().Initialize();
-        if (FAILED(hCode)) {
-            return hCode;
-        }
         return S_OK;
     }
 
@@ -99,8 +95,6 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     {
-        DH::DebugConsole::Instance().ReceiveDebugOutput(true, L"", false);
-
         m_btnMyColor1.SubclassWindow(GetDlgItem(IDC_BUTTON1));
         m_btnMyColor2.SubclassWindow(GetDlgItem(IDC_BUTTON2));
         m_btnMyColor3.SubclassWindow(GetDlgItem(IDC_BUTTON3));

@@ -30,13 +30,16 @@ namespace DH
         WCDAFX_API void SetTitleText(char const*) const;
         WCDAFX_API void SetTitleText(wchar_t const*) const;
 
-        WCDAFX_API void Puts(char const*) const;
-        WCDAFX_API void Puts(wchar_t const*) const;
+        WCDAFX_API void PutsNarrow(std::string_view) const;
+        WCDAFX_API void PutsWide(std::wstring_view) const;
 
         WCDAFX_API void AskPathAndSave() const;
         WCDAFX_API void Save(char const* filePathName) const;
 
         WCDAFX_API void Destroy() const;
+
+        template <class CT>
+        void Puts(std::basic_string_view<CT> tView) const;
 
     protected:
         DebugConsole(std::unique_ptr<BasicDebugConsole>&&);
@@ -50,4 +53,16 @@ namespace DH
         friend class DebugOutputListener;
         void* GetConsoleSystemHandle() const;
     };
+
+    template <>
+    inline void DebugConsole::Puts<char>(std::basic_string_view<char> nrView) const
+    {
+        this->PutsNarrow(nrView);
+    }
+
+    template <>
+    inline void DebugConsole::Puts<wchar_t>(std::basic_string_view<wchar_t> wdView) const
+    {
+        this->PutsWide(wdView);
+    }
 }

@@ -5,6 +5,8 @@
 #include <string>
 #include <iostream>
 
+#include "dh.tracing.h"
+
 namespace DH
 {
     BasicDebugConsole::~BasicDebugConsole() = default;
@@ -123,20 +125,24 @@ namespace DH
         }
     }
 
-    void BasicDebugConsole::Puts(char const* string)
+    void BasicDebugConsole::PutsNarrow(std::string_view nrView)
     {
         {
+            std::string  nrTemp{nrView.data(), nrView.length()};
+            std::wstring wdTemp{};
             std::lock_guard<std::mutex> lk(cacheMx_);
-            cache_.push_back(std::make_pair(string, L""));
+            cache_.emplace_back(std::make_pair(std::move(nrTemp), std::move(wdTemp)));
         }
         ::PostMessage(m_hWnd, WM_SYNC_STRINGS, 0, 0);
     }
 
-    void BasicDebugConsole::Puts(wchar_t const* string)
+    void BasicDebugConsole::PutsWide(std::wstring_view wdView)
     {
         {
+            std::string  nrTemp{};
+            std::wstring wdTemp{wdView.data(), wdView.length()};
             std::lock_guard<std::mutex> lk(cacheMx_);
-            cache_.push_back(std::make_pair("", string));
+            cache_.emplace_back(std::make_pair(std::move(nrTemp), std::move(wdTemp)));
         }
         ::PostMessage(m_hWnd, WM_SYNC_STRINGS, 0, 0);
     }
@@ -158,14 +164,20 @@ namespace DH
 
     void BasicDebugConsole::PreWrite()
     {
+        DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
+        ATLASSERT(false);
     }
 
-    void BasicDebugConsole::WriteString(char const*)
+    void BasicDebugConsole::WriteNarrow(std::string&)
     {
+        DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
+        ATLASSERT(false);
     }
 
-    void BasicDebugConsole::WriteString(wchar_t const*)
+    void BasicDebugConsole::WriteWide(std::wstring&)
     {
+        DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
+        ATLASSERT(false);
     }
 
     void BasicDebugConsole::PostWrite()
@@ -176,13 +188,13 @@ namespace DH
     {
         std::lock_guard<std::mutex> lk(cacheMx_);
         while (!cache_.empty()) {
-            StringPair const& sp = cache_.front();
+            StringPair& sp = cache_.front();
             PreWrite();
             if (sp.first.empty()) {
-                WriteString(sp.second.c_str());
+                WriteWide(sp.second);
             }
             else {
-                WriteString(sp.first.c_str());
+                WriteNarrow(sp.first);
             }
             PostWrite();
             cache_.pop_front();

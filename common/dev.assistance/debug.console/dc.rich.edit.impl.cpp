@@ -105,14 +105,14 @@ namespace DH
         lastLineCount_ = console_.GetLineCount();
     }
 
-    void DCRichEditImpl::WriteString(char const* string)
+    void DCRichEditImpl::WriteNarrow(std::string& nrString)
     {
-        ::SendMessageA(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(string));
+        ::SendMessageA(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(nrString.c_str()));
     }
 
-    void DCRichEditImpl::WriteString(wchar_t const* string)
+    void DCRichEditImpl::WriteWide(std::wstring& wdString)
     {
-        ::SendMessageW(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(string));
+        ::SendMessageW(console_, EM_REPLACESEL, (WPARAM)FALSE, reinterpret_cast<LPARAM>(wdString.c_str()));
     }
 
     void DCRichEditImpl::PostWrite()

@@ -134,29 +134,40 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
 {
     CScopedAppRegistrator sAppReg{_Module};
 
-    HRESULT code = S_OK;
+    HRESULT hCode = S_OK;
     SetErrorMode(SetErrorMode(0) | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
 
-    code = ::CoInitialize(nullptr);
+    hCode = ::CoInitialize(nullptr);
     // If you are running on NT 4.0 or higher you can use the following call instead to 
     // make the EXE free threaded. This means that calls come in on a random RPC thread.
     //     HRESULT hRes = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    ATLASSERT(SUCCEEDED(code));
+    ATLASSERT(SUCCEEDED(hCode));
     
     // this resolves ATL window thunking problem when Microsoft Layer for Unicode (MSLU) is used
     DefWindowProc(nullptr, 0, 0, 0L);
+
+    hCode = DH::DebugConsole::Instance().Initialize();
+    if (S_OK != hCode) {
+        hCode = GetErrorCode(hCode);
+        ATL::CString const codeMessage{Str::ErrorCode<TCHAR>::SystemMessage(hCode)};
+        ATL::CString        strMessage{};
+        strMessage.Format(_T("Ошибка инициализации DebugConsole.\r\n[%s]"), codeMessage.GetString());
+        MessageBox(GetActiveWindow(), strMessage.GetString(), _T("FATAL"), MB_ICONSTOP);
+        return static_cast<int>(hCode);
+    }
+    DH::DebugConsole::Instance().ReceiveDebugOutput(true, L"", false);
 
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
 
     WTL::AtlInitCommonControls(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
 
-    code = _Module.Init(nullptr, hInstance);
-    ATLASSERT(SUCCEEDED(code));
+    hCode = _Module.Init(nullptr, hInstance);
+    ATLASSERT(SUCCEEDED(hCode));
 
-    code = Run(lpstrCmdLine, nCmdShow);
+    hCode = Run(lpstrCmdLine, nCmdShow);
 
     _Module.Term();
     ::CoUninitialize();
 
-    return static_cast<int>(code);
+    return static_cast<int>(hCode);
 }

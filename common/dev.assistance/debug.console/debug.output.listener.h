@@ -32,7 +32,7 @@ namespace DH
         HandlePtr securityDescPtr_;
         std::thread  thrdListener_;
 
-        bool Init(PCWSTR pszWindowName, bool bGlobal);
+        bool Init(bool bGlobal, PCWSTR pszWindowName = nullptr);
         void Listener() const;
     };
 }

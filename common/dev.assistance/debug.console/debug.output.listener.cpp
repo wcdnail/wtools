@@ -211,100 +211,14 @@ namespace DH
             return false;
         }
     }
-
-    bool DebugOutputListener::Init_BAD()
-    {
-        HRESULT                     hCode{S_OK};
-        ATL::CStringW               sFunc{L"NONE"};
-        ATL::CStringW            sMessage{};
-      //HANDLE                   mutexRaw{nullptr};
-        HANDLE                    buffRdy{nullptr};
-        HANDLE                    dataRdy{nullptr};
-        HANDLE                 mappingRaw{nullptr};
-        PVOID                    shmemRaw{nullptr};
-      //HandlePtr                mutexPtr{};
-        HandlePtr              buffRdyPtr{};
-        HandlePtr              dataRdyPtr{};
-        HandlePtr              mappingPtr{};
-        ShmemPtr                 shmemPtr{};
-        ATL::CComBSTR const    bsWinMutex{L"DBWinMutex"};
-        ATL::CComBSTR const  bsWinBuffRdy{L"DBWIN_BUFFER_READY"};
-        ATL::CComBSTR const  bsWinDataRdy{L"DBWIN_DATA_READY"};
-        ATL::CComBSTR const     bsWinFile{L"DBWIN_BUFFER"};
-        SECURITY_ATTRIBUTES      secAttrs{0};
-        IntSecurityDesc           secDesq{};
-        HandlePtr              secDescPtr{};
-
-        if (!IntInitSecAttrs(secAttrs, secDesq)) {
-            return false;
-        }
-        HandlePtr{new IntSecurityDesc{secDesq}, IntFreeSecDesc}.swap(secDescPtr);
-
-        //mutexRaw = OpenMutex(MUTEX_MODIFY_STATE, FALSE, bsWinMutex);
-        //if (!mutexRaw) {
-        //    hCode = static_cast<HRESULT>(GetLastError());
-        //    sFunc.Format(L"OpenMutex('%s')", bsWinMutex.m_str);
-        //    goto reportError;
-        //}
-        //HandlePtr{mutexRaw, CloseHandle}.swap(mutexPtr);
-
-        buffRdy = IntOpenEvent(EVENT_ALL_ACCESS, FALSE, bsWinBuffRdy, &secAttrs);
-        if (!buffRdy) {
-            return false;
-        }
-        HandlePtr{buffRdy, CloseHandle}.swap(buffRdyPtr);
-
-        dataRdy = IntOpenEvent(SYNCHRONIZE, FALSE, bsWinDataRdy, &secAttrs);
-        if (!dataRdy) {
-            return false;
-        }
-        HandlePtr{dataRdy, CloseHandle}.swap(dataRdyPtr);
-
-        mappingRaw = OpenFileMapping(FILE_MAP_READ, FALSE, bsWinFile);
-        if (!mappingRaw) {
-            hCode = static_cast<HRESULT>(GetLastError());
-            if (hCode != ERROR_FILE_NOT_FOUND) {
-                sFunc.Format(L"OpenFileMapping('%s')", bsWinFile.m_str);
-                goto reportError;
-            }
-            mappingRaw = CreateFileMapping(INVALID_HANDLE_VALUE, &secAttrs, PAGE_READWRITE, 0, 4096, bsWinFile);
-            if (!mappingRaw) {
-                hCode = static_cast<HRESULT>(GetLastError());
-                sFunc.Format(L"CreateFileMapping('%s')", bsWinFile.m_str);
-                goto reportError;
-            }
-        }
-        HandlePtr{mappingRaw, CloseHandle}.swap(mappingPtr);
-
-        shmemRaw = MapViewOfFile(mappingRaw, SECTION_MAP_READ, 0, 0, 0);
-        if (!shmemRaw) {
-            hCode = static_cast<HRESULT>(GetLastError());
-            sFunc.Format(L"MapViewOfFile('%s')", bsWinFile.m_str);
-            goto reportError;
-        }
-        HandlePtr{shmemRaw, UnmapViewOfFile}.swap(shmemPtr);
-
-        shmemPtr.swap(shmemPtr_);
-        mappingPtr.swap(mappingPtr_);
-        dataRdyPtr.swap(dataReady_);
-        buffRdyPtr.swap(buffReady_);
-      //mutexPtr.swap(mutexPtr_);
-        secDescPtr.swap(securityDescPtr_);
-        return true;
-
-    reportError:
-        sMessage = Str::ErrorCode<>::SystemMessage(hCode);
-        DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
-        return false;
-    }
 #endif // 0
 
-    bool DebugOutputListener::Init(PCWSTR pszWindowName, bool bGlobal)
+    bool DebugOutputListener::Init(bool bGlobal, PCWSTR pszWindowName)
     {
         DWORD constexpr   dwMapBytes{4096};
         HRESULT                hCode{S_OK};
         ATL::CStringW          sFunc{L"NONE"};
-        PCWSTR             pszPrefix{pszWindowName};
+        PCWSTR             pszPrefix{pszWindowName ? pszWindowName : L""};
         PSECURITY_DESCRIPTOR     pSD{nullptr};
         SECURITY_DESCRIPTOR   sdTemp{0};
         SECURITY_ATTRIBUTES secAttrs{0};
@@ -415,13 +329,15 @@ namespace DH
         shmemPtr.swap(shmemPtr_);
         mappingPtr.swap(mappingPtr_);
         mutexPtr.swap(mutexPtr_);
+
+        SetEvent(buffReady_.get());
         return true;
 
     reportError:
         ATL::CStringW sMessage{};
         sMessage.Format(L"%s failed: 0x%08x %s\r\n", sFunc.GetString(), hCode, 
             Str::ErrorCode<>::SystemMessage(hCode).GetString());
-        owner_.Puts(sMessage.GetString());
+        owner_.PutsWide(sMessage.GetString());
         DH::TPrintf(LTH_DBG_ASSIST L" %s", sMessage.GetString());
         return false;
     }
@@ -431,7 +347,7 @@ namespace DH
         if (thrdListener_.joinable()) {
             return true;
         }
-        if (!Init(pszWindowName, bGlobal)) {
+        if (!Init(bGlobal, pszWindowName)) {
             return false;
         }
         std::thread{&DebugOutputListener::Listener, this}.swap(thrdListener_);
@@ -466,7 +382,7 @@ namespace DH
             case WAIT_OBJECT_0+1: {
                 auto const* pData = static_cast<DataBuffer const*>(shmemPtr_.get());
                 //if (myPid == pData->dwPid) {
-                    owner_.Puts(pData->szText);
+                    owner_.PutsNarrow(pData->szText);
                 //}
                 ResetEvent(dataReady_.get());
                 ResetEvent(buffReady_.get());
