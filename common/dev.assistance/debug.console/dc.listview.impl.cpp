@@ -149,6 +149,7 @@ namespace DH
         lvaItem.cColumns = DCCI_Text;
         lvaItem.cchTextMax = static_cast<int>(nrString.length());
         lvaItem.pszText = nrString.data();
+        lvaItem.iItem = -1;
         ::SendMessageA(console_, LVM_INSERTITEMA, 0, reinterpret_cast<LPARAM>(&lvaItem));
     }
 
@@ -159,6 +160,7 @@ namespace DH
         lvwItem.cColumns = DCCI_Text;
         lvwItem.cchTextMax = static_cast<int>(wdString.length());
         lvwItem.pszText = wdString.data();
+        lvwItem.iItem = -1;
         ::SendMessageW(console_, LVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&lvwItem));
     }
 

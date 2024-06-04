@@ -7,7 +7,6 @@
 #include "dh.tracing.h"
 #include <WTL/CAppModuleRef.h>
 #include <fstream>
-#pragma once
 
 /**
  * https://learn.microsoft.com/en-us/cpp/c-runtime-library/crt-library-features?view=msvc-170
@@ -137,12 +136,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
     HRESULT hCode = S_OK;
     SetErrorMode(SetErrorMode(0) | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
 
-    hCode = ::CoInitialize(nullptr);
-    // If you are running on NT 4.0 or higher you can use the following call instead to 
-    // make the EXE free threaded. This means that calls come in on a random RPC thread.
-    //     HRESULT hRes = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    ATLASSERT(SUCCEEDED(hCode));
-    
     // this resolves ATL window thunking problem when Microsoft Layer for Unicode (MSLU) is used
     DefWindowProc(nullptr, 0, 0, 0L);
 
@@ -157,8 +150,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
     //}
     DH::DebugConsole::Instance().ReceiveDebugOutput(true, L"", false);
 
+    hCode = OleInitialize(nullptr);
+    // If you are running on NT 4.0 or higher you can use the following call instead to 
+    // make the EXE free threaded. This means that calls come in on a random RPC thread.
+    //     HRESULT hRes = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    ATLASSERT(SUCCEEDED(hCode));
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
-
     WTL::AtlInitCommonControls(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
 
     hCode = _Module.Init(nullptr, hInstance);
@@ -167,7 +164,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
     hCode = Run(lpstrCmdLine, nCmdShow);
 
     _Module.Term();
-    ::CoUninitialize();
-
+    OleUninitialize();
     return static_cast<int>(hCode);
 }

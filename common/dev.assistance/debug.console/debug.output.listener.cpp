@@ -22,10 +22,10 @@ namespace DH
         static bool AdjustProcPrivileges();
 
         static HandlePtr CreateSecurityDesc(SECURITY_ATTRIBUTES& secAttrs);
-        static HandlePtr CreateDbgMutex(PCWSTR pszPrefix, SECURITY_ATTRIBUTES& secAttrs);
-        static HandlePtr CreateMapping(PCWSTR pszPrefix, DWORD dwSize);
+        static HandlePtr CreateDbgMutex(PCWSTR pszPrefix, PSECURITY_ATTRIBUTES pSecurity);
+        static HandlePtr CreateMapping(PCWSTR pszPrefix, DWORD dwSize, PSECURITY_ATTRIBUTES pSecurity);
         static HandlePtr MapSharedMemory(HANDLE hMapped, DWORD dwSize);
-        static HandlePtr CreateSignal(PCWSTR pszPrefix, PCWSTR pszName);
+        static HandlePtr CreateSignal(PCWSTR pszPrefix, PCWSTR pszName, PSECURITY_ATTRIBUTES pSecurity);
         static void AdjustObjectDACL(HANDLE hObject);
         static void DeleteObjectDACL(HANDLE hObject);
     };
@@ -128,7 +128,7 @@ namespace DH
         return {};
     }
 
-    DebugOutputListener::HandlePtr DebugOutputListener::StaticInit::CreateDbgMutex(PCWSTR pszPrefix, SECURITY_ATTRIBUTES& secAttrs)
+    DebugOutputListener::HandlePtr DebugOutputListener::StaticInit::CreateDbgMutex(PCWSTR pszPrefix, PSECURITY_ATTRIBUTES pSecurity)
     {
         ATL::CStringW sTemp{};
         sTemp.Format(L"%sDBWinMutex", pszPrefix);
@@ -143,7 +143,7 @@ namespace DH
             reinterpret_cast<SetSecurityInfoFn>(pFarProc)(hMutex, SE_KERNEL_OBJECT, LUA_TOKEN);
         }
         else {
-            hMutex = CreateMutexW(&secAttrs, FALSE, sTemp.GetString());
+            hMutex = CreateMutexW(pSecurity, FALSE, sTemp.GetString());
         }
         if (!hMutex) {
             auto const hCode = static_cast<HRESULT>(GetLastError());
@@ -154,11 +154,11 @@ namespace DH
         return HandlePtr{hMutex, CloseHandle};
     }
 
-    DebugOutputListener::HandlePtr DebugOutputListener::StaticInit::CreateMapping(PCWSTR pszPrefix, DWORD dwSize)
+    DebugOutputListener::HandlePtr DebugOutputListener::StaticInit::CreateMapping(PCWSTR pszPrefix, DWORD dwSize, PSECURITY_ATTRIBUTES pSecurity)
     {
         ATL::CStringW sTemp{};
         sTemp.Format(L"%sDBWIN_BUFFER", pszPrefix);
-        HANDLE const mappingRaw{CreateFileMappingW(nullptr, nullptr, PAGE_READWRITE, 0, dwSize, sTemp.GetString())};
+        HANDLE const mappingRaw{CreateFileMappingW(pSecurity, nullptr, PAGE_READWRITE, 0, dwSize, sTemp.GetString())};
         if (!mappingRaw) {
             auto const hCode = static_cast<HRESULT>(GetLastError());
             DH::TPrintf(LTH_DBG_ASSIST L" CreateFileMapping('%s') failed: 0x%08x %s\n", sTemp.GetString(),
@@ -180,14 +180,14 @@ namespace DH
         return HandlePtr{hMemory, UnmapViewOfFile};
     }
 
-    DebugOutputListener::HandlePtr DebugOutputListener::StaticInit::CreateSignal(PCWSTR pszPrefix, PCWSTR pszName)
+    DebugOutputListener::HandlePtr DebugOutputListener::StaticInit::CreateSignal(PCWSTR pszPrefix, PCWSTR pszName, PSECURITY_ATTRIBUTES pSecurity)
     {
         ATL::CStringW sTemp{};
         sTemp.Format(L"%s%s", pszPrefix, pszName);
-        HANDLE hEvent{CreateEventW(nullptr, FALSE, FALSE, sTemp.GetString())};
-        if (INVALID_HANDLE_VALUE == hEvent) {
-            hEvent = CreateEventW(nullptr, FALSE, FALSE, sTemp.GetString());
-        }
+        HANDLE const hEvent{CreateEventW(pSecurity, FALSE, FALSE, sTemp.GetString())};
+      //if (INVALID_HANDLE_VALUE == hEvent) {
+      //    hEvent = CreateEventW(nullptr, FALSE, FALSE, sTemp.GetString());
+      //}
         if (INVALID_HANDLE_VALUE == hEvent) {
             auto const hCode = static_cast<HRESULT>(GetLastError());
             DH::TPrintf(LTH_DBG_ASSIST L" CreateEvent failed: 0x%08x %s\n",
@@ -280,12 +280,12 @@ namespace DH
     {
         DWORD constexpr   dwMapBytes{4096};
         PCWSTR const       pszPrefix{bGlobal ? L"Global\\" : (pszWindowName ? pszWindowName : L"")};
-      //SECURITY_ATTRIBUTES secAttrs{0};
-      //HandlePtr         secDescPtr{StaticInit::CreateSecurityDesc(secAttrs)};
-      //HandlePtr           mutexPtr{StaticInit::CreateDbgMutex(pszPrefix, secAttrs)};
-        HandlePtr         mappingPtr{StaticInit::CreateMapping(pszPrefix, dwMapBytes)};
-        HandlePtr         dataRdyPtr{StaticInit::CreateSignal(pszPrefix, L"DBWIN_BUFFER_READY")};
-        HandlePtr         buffRdyPtr{StaticInit::CreateSignal(pszPrefix, L"DBWIN_DATA_READY")};
+        SECURITY_ATTRIBUTES secAttrs{0};
+        HandlePtr         secDescPtr{StaticInit::CreateSecurityDesc(secAttrs)};
+      //HandlePtr           mutexPtr{StaticInit::CreateDbgMutex(pszPrefix, &secAttrs)};
+        HandlePtr         mappingPtr{StaticInit::CreateMapping(pszPrefix, dwMapBytes, &secAttrs)};
+        HandlePtr         dataRdyPtr{StaticInit::CreateSignal(pszPrefix, L"DBWIN_BUFFER_READY", &secAttrs)};
+        HandlePtr         buffRdyPtr{StaticInit::CreateSignal(pszPrefix, L"DBWIN_DATA_READY", &secAttrs)};
         ShmemPtr            shmemPtr{StaticInit::MapSharedMemory(mappingPtr.get(), dwMapBytes)};
         if (!mappingPtr || !shmemPtr || !dataRdyPtr || !buffRdyPtr) {
             return false;
@@ -312,8 +312,7 @@ namespace DH
     bool DebugOutputListener::Start(PCWSTR pszWindowName, bool bGlobal)
     {
         if (IsDebuggerPresent()) {
-            owner_.PutsWide(L"WARNING: IsDebuggerPresent == TRUE ==> skip listening debug\n");
-            return false;
+            owner_.PutsWide(L"WARNING: IsDebuggerPresent == TRUE\n");
         }
         if (thrdListener_.joinable()) {
             return true;
