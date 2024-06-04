@@ -5,20 +5,22 @@
 
 namespace DH
 {
-    class DCRichEditImpl: public BasicDebugConsole
+    class DCListViewImpl: public BasicDebugConsole
     {
     public:
-        ~DCRichEditImpl() override;
-        DCRichEditImpl(DebugConsole const& owner);
+        ~DCListViewImpl() override;
+        DCListViewImpl(DebugConsole const& owner);
 
     private:
         struct StaticInit;
 
-        WTL::CRichEditCtrl console_;
-        WTL::CToolBarCtrl  toolBox_;
+        WTL::CListViewCtrl console_;
+        WTL::CReBarCtrl    toolBox_;
         int          lastLineCount_;
 
-        DECLARE_WND_CLASS_EX(_T("WCD_DH_DEBUG_CONSOLE2"), CS_VREDRAW | CS_HREDRAW, (COLOR_WINDOW-1))
+        DECLARE_WND_CLASS_EX(_T("WCD_DH_DEBUG_CONSOLE3"), CS_VREDRAW | CS_HREDRAW, (COLOR_WINDOW-1))
+
+        void SetupHeader(CRect const& rc);
 
         HRESULT PreCreateWindow() override;
         void Save(char const* filePathName) const override;
@@ -28,7 +30,6 @@ namespace DH
         void WriteString(wchar_t const*) override;
         void PostWrite() override;
         void OnDestroy() override;
-
         void OnCommand(UINT notifyCode, int id, HWND) override;
     };
 }

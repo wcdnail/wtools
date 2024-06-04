@@ -299,46 +299,8 @@ namespace DH
     }
 #endif // 0
 
-    namespace
-    {
-        struct W32MutexLock
-        {
-            HANDLE m_hMutex;
-            DWORD   m_dwRes;
-
-            ~W32MutexLock();
-            W32MutexLock();
-            W32MutexLock(HANDLE hMutex, DWORD dwTimeout);
-        };
-
-        W32MutexLock::~W32MutexLock()
-        {
-            if (INVALID_HANDLE_VALUE != m_hMutex && WAIT_OBJECT_0 == m_dwRes) {
-                ReleaseMutex(m_hMutex);
-            }
-        }
-
-        W32MutexLock::W32MutexLock()
-            : m_hMutex{INVALID_HANDLE_VALUE}
-            ,  m_dwRes{static_cast<DWORD>(-1)}
-        {
-        }
-
-        W32MutexLock::W32MutexLock(HANDLE hMutex, DWORD dwTimeout)
-            : m_hMutex{hMutex}
-            ,  m_dwRes{WaitForSingleObject(m_hMutex, dwTimeout)}
-        {
-        }
-
-        W32MutexLock W32LockMx(HANDLE hMutex, DWORD dwTimeout)
-        {
-            return W32MutexLock{hMutex, dwTimeout};
-        }
-    }
-
     bool DebugOutputListener::Init(PCWSTR pszWindowName, bool bGlobal)
     {
-      //LPARAM constexpr lWindowName{0x4c00000000000000ui64};
         DWORD constexpr   dwMapBytes{4096};
         HRESULT                hCode{S_OK};
         ATL::CStringW          sFunc{L"NONE"};
@@ -358,8 +320,6 @@ namespace DH
         HandlePtr         dataRdyPtr{};
         HandlePtr             pSDPtr{};
         ATL::CStringW          sTemp{};
-      //W32MutexLock         mxGuard{};
-        DWORD                 dwTemp{static_cast<DWORD>(-1)};
 
         auto const bConv{ConvertStringSecurityDescriptorToSecurityDescriptorW(
             L"D:(A;;GRGWGX;;;WD)(A;;GA;;;SY)(A;;GA;;;BA)(A;;GRGWGX;;;AN)(A;;GRGWGX;;;RC)(A;;GRGWGX;;;S-1-15-2-1)S:(ML;;NW;;;LW)",
@@ -385,7 +345,10 @@ namespace DH
         }
 
         sTemp.Format(L"%sDBWinMutex", pszPrefix);
-        mutexRaw = OpenMutexW(SYNCHRONIZE | MUTEX_MODIFY_STATE, FALSE, sTemp.GetString());
+        mutexRaw = OpenMutexW(GENERIC_ALL, FALSE, sTemp.GetString());
+        if (!mutexRaw && ERROR_ACCESS_DENIED == GetLastError()) {
+            mutexRaw = OpenMutexW(SYNCHRONIZE, FALSE, sTemp.GetString());
+        }
         if (mutexRaw) {
             using SetSecurityInfoFn = void (__fastcall *)(HANDLE, SE_OBJECT_TYPE, SECURITY_INFORMATION);
             auto const  hAdvapi{GetModuleHandleW(L"ADVAPI32")};
@@ -401,17 +364,6 @@ namespace DH
             goto reportError;
         }
         HandlePtr{mutexRaw, CloseHandle}.swap(mutexPtr);
-      //dwTemp = WaitForSingleObject(mutexRaw, INFINITE);
-      //if (static_cast<DWORD>(-1) == dwTemp) {
-      //    hCode = static_cast<HRESULT>(GetLastError());
-      //    auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
-      //    DH::TPrintf(LTH_DBG_ASSIST L" WaitForSingleObject(%p) failed: 0x%08x %s\n", mutexRaw, hCode, sMessage.GetString());
-      //}
-      //if (!ReleaseMutex(mutexRaw)) {
-      //    hCode = static_cast<HRESULT>(GetLastError());
-      //    auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
-      //    DH::TPrintf(LTH_DBG_ASSIST L" ReleaseMutex(%p) failed: 0x%08x %s\n", mutexRaw, hCode, sMessage.GetString());
-      //}
 
         sTemp.Format(L"%sDBWIN_BUFFER", pszPrefix);
         // FILE_MAP_READ
@@ -466,8 +418,11 @@ namespace DH
         return true;
 
     reportError:
-        auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
-        DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
+        ATL::CStringW sMessage{};
+        sMessage.Format(L"%s failed: 0x%08x %s\r\n", sFunc.GetString(), hCode, 
+            Str::ErrorCode<>::SystemMessage(hCode).GetString());
+        owner_.Puts(sMessage.GetString());
+        DH::TPrintf(LTH_DBG_ASSIST L" %s", sMessage.GetString());
         return false;
     }
 

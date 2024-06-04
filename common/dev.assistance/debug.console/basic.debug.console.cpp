@@ -11,7 +11,7 @@ namespace DH
     BasicDebugConsole::Parameters::~Parameters() = default;
 
     BasicDebugConsole::BasicDebugConsole(DebugConsole const& owner)
-        : params_("Courier", 12, cf::put_at::right | cf::put_at::bottom, 600, 240)
+        : params_("Cascadia Mono Light", 11, cf::put_at::right | cf::put_at::bottom, 600, 240)
         , consoleHandle_(nullptr)
         , coutListener_(owner, std::cout)
         , cerrListener_(owner, std::cerr)

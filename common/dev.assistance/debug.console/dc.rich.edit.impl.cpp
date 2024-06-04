@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "debug.console.2.h"
+#include "dc.rich.edit.impl.h"
 #include "tator/resource.h"
 #include <fstream>
 

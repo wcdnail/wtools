@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "debug.console.h"
 #include "basic.debug.console.h"
-#include "debug.console.2.h"
+#include "dc.rich.edit.impl.h"
+#include "dc.listview.impl.h"
 #include <fstream>
 
 namespace DH
@@ -89,8 +90,9 @@ namespace DH
     DebugConsole::~DebugConsole() = default;
 
     DebugConsole::DebugConsole()
-        //: impl_{new DebugConsoleImpl(*this)}
-        : impl_{new DCRichEditImpl(*this)}
+      //: impl_{new DebugConsoleImpl(*this)}
+      //: impl_{new DCRichEditImpl(*this)}
+        : impl_{new DCListViewImpl(*this)}
     {
     }
 

@@ -31,6 +31,8 @@
     <ClCompile Include="DDraw.DGI\CeXDib.cpp" />
     <ClCompile Include="DDraw.DGI\DDGDIStuff.cpp" />
     <ClCompile Include="dev.assistance\debug.console\basic.debug.console.cpp" />
+    <ClCompile Include="dev.assistance\debug.console\dc.listview.impl.cpp" />
+    <ClCompile Include="dev.assistance\debug.console\dc.rich.edit.impl.cpp" />
     <ClCompile Include="dev.assistance\debug.console\debug.console.cpp" />
     <ClCompile Include="dev.assistance\debug.console\debug.output.listener.cpp" />
     <ClCompile Include="dev.assistance\debug.console\WinDebugMonitor.cpp" />
@@ -88,8 +90,11 @@
     <ClInclude Include="DDraw.DGI\DDGDIStuff.h" />
     <ClInclude Include="debug.dump.msg.h" />
     <ClInclude Include="dev.assistance\debug.console\basic.debug.console.h" />
+    <ClInclude Include="dev.assistance\debug.console\dc.listview.impl.h" />
+    <ClInclude Include="dev.assistance\debug.console\dc.rich.edit.impl.h" />
     <ClInclude Include="dev.assistance\debug.console\debug.console.h" />
     <ClInclude Include="dev.assistance\debug.console\debug.output.listener.h" />
+    <ClInclude Include="dev.assistance\debug.console\IDA-defs.h" />
     <ClInclude Include="dev.assistance\debug.console\ostream.listener.h" />
     <ClInclude Include="dev.assistance\debug.console\WinDebugMonitor.h" />
     <ClInclude Include="dev.assistance\dev.assist.h" />
@@ -250,12 +255,12 @@
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</GenerateManifest>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='product|x64'">false</GenerateManifest>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='product-scrt|x64'">false</GenerateManifest>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">.;../../libs/WTL81_12085/Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product|Win32'">.;../../libs/WTL81_12085/Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product-scrt|Win32'">.;../../libs/WTL81_12085/Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='debug|x64'">.;../../libs/WTL81_12085/Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product|x64'">.;../../libs/WTL81_12085/Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product-scrt|x64'">.;../../libs/WTL81_12085/Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product|Win32'">$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product-scrt|Win32'">$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product|x64'">$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='product-scrt|x64'">$(IncludePath)</IncludePath>
     <SourcePath Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(SourcePath)</SourcePath>
     <SourcePath Condition="'$(Configuration)|$(Platform)'=='product|Win32'">$(SourcePath)</SourcePath>
     <SourcePath Condition="'$(Configuration)|$(Platform)'=='product-scrt|Win32'">$(SourcePath)</SourcePath>

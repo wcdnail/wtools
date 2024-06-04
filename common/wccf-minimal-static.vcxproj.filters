@@ -121,6 +121,12 @@
     <ClCompile Include="dev.assistance\debug.console\WinDebugMonitor.cpp">
       <Filter>dev.assistance\debug.console</Filter>
     </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\dc.rich.edit.impl.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\dc.listview.impl.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -280,6 +286,15 @@
       <Filter>dev.assistance\debug.console</Filter>
     </ClInclude>
     <ClInclude Include="dev.assistance\debug.console\WinDebugMonitor.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\dc.rich.edit.impl.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\dc.listview.impl.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\IDA-defs.h">
       <Filter>dev.assistance\debug.console</Filter>
     </ClInclude>
   </ItemGroup>

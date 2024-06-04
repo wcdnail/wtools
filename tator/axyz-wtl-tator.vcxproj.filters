@@ -6,7 +6,6 @@
     <ClCompile Include="..\UT\debug.assistance.cpp">
       <Filter>UT</Filter>
     </ClCompile>
-    <ClCompile Include="ViewDebug.MR.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ATator.MemDlg.h" />
@@ -37,9 +36,13 @@
     <Image Include="ATator.Main.ico">
       <Filter>rez</Filter>
     </Image>
-    <Image Include="..\common\dev.assistance\debug.console\resources\debug.console.2.def.tb.bmp" />
     <Image Include="..\common\dev.assistance\debug.console\resources\toolbar1.bmp" />
-    <Image Include="rez\debug.console.2.def.tb.bmp" />
+    <Image Include="..\common\dev.assistance\debug.console\resources\debug.console.2.def.tb.bmp">
+      <Filter>rez</Filter>
+    </Image>
+    <Image Include="rez\debug.console.2.def.tb.bmp">
+      <Filter>rez</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="ATator.exe.manifest">
