@@ -96,6 +96,11 @@ namespace DH
     {
     }
 
+    BOOL DebugConsole::SubclassWindow(HWND hWnd) const
+    {
+        return impl_->SubclassWindow(hWnd);
+    }
+
     DebugConsole::DebugConsole(std::unique_ptr<BasicDebugConsole>&& otherImpl)
         : impl_(std::move(otherImpl))
     {

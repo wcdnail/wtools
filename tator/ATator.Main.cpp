@@ -146,15 +146,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
     // this resolves ATL window thunking problem when Microsoft Layer for Unicode (MSLU) is used
     DefWindowProc(nullptr, 0, 0, 0L);
 
-    hCode = DH::DebugConsole::Instance().Initialize();
-    if (S_OK != hCode) {
-        hCode = GetErrorCode(hCode);
-        ATL::CString const codeMessage{Str::ErrorCode<TCHAR>::SystemMessage(hCode)};
-        ATL::CString        strMessage{};
-        strMessage.Format(_T("Ошибка инициализации DebugConsole.\r\n[%s]"), codeMessage.GetString());
-        MessageBox(GetActiveWindow(), strMessage.GetString(), _T("FATAL"), MB_ICONSTOP);
-        return static_cast<int>(hCode);
-    }
+    //hCode = DH::DebugConsole::Instance().Initialize();
+    //if (S_OK != hCode) {
+    //    hCode = GetErrorCode(hCode);
+    //    ATL::CString const codeMessage{Str::ErrorCode<TCHAR>::SystemMessage(hCode)};
+    //    ATL::CString        strMessage{};
+    //    strMessage.Format(_T("Ошибка инициализации DebugConsole.\r\n[%s]"), codeMessage.GetString());
+    //    MessageBox(GetActiveWindow(), strMessage.GetString(), _T("FATAL"), MB_ICONSTOP);
+    //    return static_cast<int>(hCode);
+    //}
     DH::DebugConsole::Instance().ReceiveDebugOutput(true, L"", false);
 
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);

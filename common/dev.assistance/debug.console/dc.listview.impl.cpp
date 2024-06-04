@@ -44,7 +44,7 @@ namespace DH
     HRESULT DCListViewImpl::PreCreateWindow()
     {
         static ATOM gs_dc2Atom{0};
-        return CCustomControl::PreCreateWindowImpl(gs_dc2Atom, GetWndClassInfo());
+        return PreCreateWindowImpl(gs_dc2Atom, GetWndClassInfo());
     }
 
     void DCListViewImpl::SetupHeader(CRect const& rc) const
@@ -149,7 +149,7 @@ namespace DH
         lvaItem.cColumns = DCCI_Text;
         lvaItem.cchTextMax = static_cast<int>(nrString.length());
         lvaItem.pszText = nrString.data();
-        ::SendMessage(console_, LVM_INSERTITEMA, 0, reinterpret_cast<LPARAM>(&lvaItem));
+        ::SendMessageA(console_, LVM_INSERTITEMA, 0, reinterpret_cast<LPARAM>(&lvaItem));
     }
 
     void DCListViewImpl::WriteWide(std::wstring& wdString)
@@ -159,7 +159,7 @@ namespace DH
         lvwItem.cColumns = DCCI_Text;
         lvwItem.cchTextMax = static_cast<int>(wdString.length());
         lvwItem.pszText = wdString.data();
-        ::SendMessage(console_, LVM_INSERTITEMA, 0, reinterpret_cast<LPARAM>(&lvwItem));
+        ::SendMessageW(console_, LVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&lvwItem));
     }
 
     void DCListViewImpl::PostWrite()

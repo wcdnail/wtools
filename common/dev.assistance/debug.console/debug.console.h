@@ -41,6 +41,8 @@ namespace DH
         template <class CT>
         void Puts(std::basic_string_view<CT> tView) const;
 
+        WCDAFX_API BOOL SubclassWindow(HWND hWnd) const;
+
     protected:
         DebugConsole(std::unique_ptr<BasicDebugConsole>&&);
         ~DebugConsole();

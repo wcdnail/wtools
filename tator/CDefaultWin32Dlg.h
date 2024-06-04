@@ -45,7 +45,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         DLGRESIZE_CONTROL(IDC_BUTTON2, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(IDC_BUTTON3, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(IDC_COLOR1, DLSZ_SIZE_X)
-        DLGRESIZE_CONTROL(IDC_CUSTOM1, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+        DLGRESIZE_CONTROL(IDC_DEBUG_CONSOLE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
         DLGRESIZE_CONTROL(IDOK, DLSZ_MOVE_X | DLSZ_MOVE_Y)
     END_DLGRESIZE_MAP()
 
@@ -95,6 +95,9 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     {
+
+        DH::DebugConsole::Instance().SubclassWindow(GetDlgItem(IDC_DEBUG_CONSOLE));
+
         m_btnMyColor1.SubclassWindow(GetDlgItem(IDC_BUTTON1));
         m_btnMyColor2.SubclassWindow(GetDlgItem(IDC_BUTTON2));
         m_btnMyColor3.SubclassWindow(GetDlgItem(IDC_BUTTON3));
@@ -127,7 +130,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         m_crCell1.SetColor(0x7f3a21, RGB_MAX_INT);
         m_crCell1.SetHolder(GetDlgItem(IDC_COLOR1));
 
-        DlgResize_Init(false, true);
+        DlgResize_Init(false, true, 0);
         return TRUE;
     }
 };

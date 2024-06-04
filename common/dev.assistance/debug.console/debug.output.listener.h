@@ -20,7 +20,7 @@ namespace DH
         using HandlePtr = std::shared_ptr<void>;
         using  ShmemPtr = std::shared_ptr<void>;
 
-        struct StaticInit;
+        class StaticInit;
 
         DebugConsole const& owner_;
         HandlePtr        thrdStop_;

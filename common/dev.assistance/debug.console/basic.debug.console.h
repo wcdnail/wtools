@@ -12,9 +12,11 @@ namespace DH
 {
     class DebugConsole;
 
-    class BasicDebugConsole: protected CCustomControl,
+    class BasicDebugConsole: protected CCustomControl<BasicDebugConsole>,
                              private   WTL::CDialogResize<BasicDebugConsole>
     {
+        friend WndSuper;
+        friend CCustomControl<BasicDebugConsole>;
         friend WTL::CDialogResize<BasicDebugConsole>;
 
         enum { WM_SYNC_STRINGS = WM_USER + 1 };
@@ -49,7 +51,7 @@ namespace DH
 
         ~BasicDebugConsole() override;
 
-        HRESULT PreCreateWindow() override;
+        virtual HRESULT PreCreateWindow() = 0;
 
         void CreateWindowIfNessesary();
         void PutWindow();
@@ -70,6 +72,9 @@ namespace DH
 
         static std::string GenerateLogFilename();
 
+        BOOL SubclassWindow(HWND hWnd);
+
+    private:
         BEGIN_DLGRESIZE_MAP(BasicDebugConsole)
             DLGRESIZE_CONTROL(ID_LOG_CTL, DLSZ_SIZE_X | DLSZ_SIZE_Y)
         END_DLGRESIZE_MAP()

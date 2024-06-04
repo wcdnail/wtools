@@ -15,7 +15,7 @@ struct CSpectrumSlider: CDDCtrl
     WCDAFX_API ~CSpectrumSlider() override;
     WCDAFX_API CSpectrumSlider(SpectrumKind const& nKind, CColorUnion& unColor);
 
-    WCDAFX_API HRESULT PreCreateWindow() override;
+    WCDAFX_API HRESULT PreCreateWindow();
     WCDAFX_API bool Initialize(long cx, HBRUSH brBackground, HCURSOR hCursor);
     WCDAFX_API void UpdateRaster();
 

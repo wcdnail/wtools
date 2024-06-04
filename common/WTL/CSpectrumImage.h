@@ -17,7 +17,7 @@ struct CSpectrumImage: CDDCtrl
     WCDAFX_API ~CSpectrumImage() override;
     WCDAFX_API CSpectrumImage(COLORREF crInit, SpectrumKind kind);
 
-    WCDAFX_API HRESULT PreCreateWindow() override;
+    WCDAFX_API HRESULT PreCreateWindow();
     WCDAFX_API bool Initialize(long cx, long cy, HBRUSH brBackground, HCURSOR hCursor);
     WCDAFX_API COLORREF GetColorRef() const;
     WCDAFX_API COLORREF GetMinColorRef(int mR, int mG, int mB) const;

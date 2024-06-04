@@ -10,7 +10,7 @@ enum EMagnifierPos: int
     MAGPOS_FOLLOW_MICE,
 };
 
-struct CMagnifierCtrl: private CCustomControl
+struct CMagnifierCtrl: private CCustomControl<CMagnifierCtrl>
 {
     using OnClickFn = std::function<void(UINT, CPoint const&, bool)>;
 
@@ -20,7 +20,7 @@ struct CMagnifierCtrl: private CCustomControl
     WCDAFX_API ~CMagnifierCtrl() override;
     WCDAFX_API CMagnifierCtrl();
     
-    WCDAFX_API HRESULT PreCreateWindow() override;
+    WCDAFX_API HRESULT PreCreateWindow();
 
     WCDAFX_API bool Initialize(HWND hWnd, float fFactor, HCURSOR hCursor, OnClickFn&& onClick);
 
@@ -35,6 +35,9 @@ struct CMagnifierCtrl: private CCustomControl
     void Show(BOOL bShow);
 
 protected:
+    friend CCustomControl<CMagnifierCtrl>;
+    friend WndSuper;
+
     CRect         m_rcMag;
     CPoint        m_ptPos;
     EMagnifierPos  m_ePos;

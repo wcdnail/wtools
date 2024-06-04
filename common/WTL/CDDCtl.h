@@ -10,7 +10,7 @@ constexpr int             CHECKERS_CX{18};
 constexpr COLORREF CLR_CHECKERS_WHITE{RGB(210, 210, 210)};
 constexpr COLORREF CLR_CHECKERS_BLACK{RGB( 92,  92,  92)};
 
-struct CDDCtrl: public  CCustomControl,
+struct CDDCtrl: public  CCustomControl<CDDCtrl>,
                 private WTL::CBufferedPaintImpl<CDDCtrl>
 {
     DELETE_COPY_MOVE_OF(CDDCtrl);

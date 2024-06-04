@@ -1,11 +1,14 @@
 #include "stdafx.h"
 #include "basic.debug.console.h"
+
+#include <dh.tracing.defs.h>
+
 #include "debug.console.h"
+#include <dh.tracing.h>
 #include <trect.h>
 #include <string>
 #include <iostream>
-
-#include "dh.tracing.h"
+#include <string.utils.error.code.h>
 
 namespace DH
 {
@@ -25,8 +28,9 @@ namespace DH
 
     HRESULT BasicDebugConsole::PreCreateWindow()
     {
-        static ATOM gs_bdcAtom{0};
-        return CCustomControl::PreCreateWindowImpl(gs_bdcAtom, GetWndClassInfo());
+        DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
+        ATLASSERT(false);
+        return ERROR_CALL_NOT_IMPLEMENTED;
     }
     
     void BasicDebugConsole::PutWindow()
@@ -133,7 +137,9 @@ namespace DH
             std::lock_guard<std::mutex> lk(cacheMx_);
             cache_.emplace_back(std::make_pair(std::move(nrTemp), std::move(wdTemp)));
         }
-        ::PostMessage(m_hWnd, WM_SYNC_STRINGS, 0, 0);
+        if (m_hWnd) {
+            PostMessageW(WM_SYNC_STRINGS);
+        }
     }
 
     void BasicDebugConsole::PutsWide(std::wstring_view wdView)
@@ -144,7 +150,9 @@ namespace DH
             std::lock_guard<std::mutex> lk(cacheMx_);
             cache_.emplace_back(std::make_pair(std::move(nrTemp), std::move(wdTemp)));
         }
-        ::PostMessage(m_hWnd, WM_SYNC_STRINGS, 0, 0);
+        if (m_hWnd) {
+            PostMessageW(WM_SYNC_STRINGS);
+        }
     }
 
     void BasicDebugConsole::Clean() const
@@ -268,5 +276,19 @@ namespace DH
 
     void BasicDebugConsole::Save(char const*) const
     {
+    }
+
+    BOOL BasicDebugConsole::SubclassWindow(HWND hWnd)
+    {
+        BOOL const bRes{WndSuper::SubclassWindow(hWnd)};
+        if (!bRes) {
+            auto const hCode = static_cast<HRESULT>(GetLastError());
+            DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", __FUNCTIONW__,
+                hCode , Str::ErrorCode<>::SystemMessage(hCode).GetString());
+            return bRes;
+        }
+        SendMessageW(WM_CREATE);
+        PostMessageW(WM_SYNC_STRINGS);
+        return bRes;
     }
 }
