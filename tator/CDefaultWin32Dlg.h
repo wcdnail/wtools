@@ -10,10 +10,12 @@
 #include <dev.assistance/dev.assist.h>
 #include <dev.assistance/debug.console/debug.console.h>
 #include <atlwin.h>
+#include <atlddx.h>
 #include <atlcrack.h>
 
 struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
                          WTL::CDialogResize<CDefaultWin32Dlg>,
+                         WTL::CWinDataExchange<CDefaultWin32Dlg>,
                          WTL::CMessageFilter
 {
     enum { IDD = IDD_DIALOG1 };
@@ -24,6 +26,31 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
     CColorCellEx     m_crCell1{0x000000, RGB_MAX_INT};
     CColorPickerDlg    m_cpDlg{0x1f2f3f};
+
+    BOOL              m_brLeft{TRUE};
+    BOOL           m_brXCenter{FALSE};
+    BOOL             m_brRight{FALSE};
+    BOOL               m_brTop{TRUE};
+    BOOL           m_brYCenter{FALSE};
+    BOOL            m_brBottom{FALSE};
+    ATL::CString    m_sMvFlags{};
+    UINT         m_cpMoveFlags{0};
+
+    void UpdateMoveFlags()
+    {
+        m_cpMoveFlags = 0;
+
+        if         (m_brLeft) { m_cpMoveFlags |= Rc::Left; }
+        else if   (m_brRight) { m_cpMoveFlags |= Rc::Right; }
+        else if (m_brXCenter) { m_cpMoveFlags |= Rc::XCenter; }
+
+        if          (m_brTop) { m_cpMoveFlags |= Rc::Top; }
+        else if  (m_brBottom) { m_cpMoveFlags |= Rc::Bottom; }
+        else if (m_brYCenter) { m_cpMoveFlags |= Rc::YCenter; }
+
+        m_sMvFlags.Format(_T("0x%04x"), m_cpMoveFlags);
+        DoDataExchange(DDX_LOAD, IDC_PICKER_MV_FLAGS);
+    }
 
     BOOL PreTranslateMessage(MSG* pMsg) override
     {
@@ -40,16 +67,28 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         return S_OK;
     }
 
+    BEGIN_DDX_MAP(CDefaultWin32Dlg)
+        DDX_CHECK(IDC_RADIO_LEFT, m_brLeft)
+        DDX_CHECK(IDC_RADIO_XCENTER, m_brXCenter)
+        DDX_CHECK(IDC_RADIO_RIGHT, m_brRight)
+        DDX_CHECK(IDC_RADIO_TOP, m_brTop)
+        DDX_CHECK(IDC_RADIO_YCENTER, m_brYCenter)
+        DDX_CHECK(IDC_RADIO_BOTTOM, m_brBottom)
+        if (!bSaveAndValidate) {
+            DDX_TEXT(IDC_PICKER_MV_FLAGS, m_sMvFlags)
+        }
+    END_DDX_MAP()
+
     BEGIN_DLGRESIZE_MAP(CDefaultWin32Dlg)
         DLGRESIZE_CONTROL(IDC_BUTTON1, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(IDC_BUTTON2, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(IDC_BUTTON3, DLSZ_MOVE_X)
-        DLGRESIZE_CONTROL(IDC_COLOR1, DLSZ_SIZE_X)
+        DLGRESIZE_CONTROL(IDC_COLOR1, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(IDC_DEBUG_CONSOLE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
         DLGRESIZE_CONTROL(IDOK, DLSZ_MOVE_X | DLSZ_MOVE_Y)
     END_DLGRESIZE_MAP()
 
-    BEGIN_MSG_MAP_EX(CDefaultWin32Dlg)
+    BEGIN_MSG_MAP(CDefaultWin32Dlg)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DRAWITEM(OnDrawItem)
         MSG_WM_NOTIFY(OnNotify)
@@ -60,7 +99,14 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
     LRESULT OnNotify(int nID, LPNMHDR pnmh)
     {
-        DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+        switch (pnmh->code) {
+        case BCN_HOTITEMCHANGE: //
+        case NM_CUSTOMDRAW:     //
+            break;              // -- skip
+        default:
+            DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+            break;
+        }
         SetMsgHandled(FALSE);
         return 0;
     }
@@ -69,7 +115,24 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
     {
         switch (nID) {
         case IDOK:
-        case IDCANCEL: OnEndDialog(nID); return ;
+        case IDCANCEL:
+            OnEndDialog(nID);
+            return ;
+        case IDC_PICKER_MV_FLAGS:
+            return ;
+        case IDC_BUTTON1:
+        case IDC_BUTTON2:
+        case IDC_BUTTON3:
+            break;
+        case IDC_RADIO_LEFT:
+        case IDC_RADIO_XCENTER:
+        case IDC_RADIO_RIGHT:
+        case IDC_RADIO_TOP:
+        case IDC_RADIO_YCENTER:
+        case IDC_RADIO_BOTTOM:
+            DoDataExchange(DDX_SAVE);
+            UpdateMoveFlags();
+            return ;
         default:
             DBGTPrint(LTH_WM_COMMAND L" id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
             break;
@@ -134,6 +197,8 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         m_crCell1.SetColor(0x7f3a21, RGB_MAX_INT);
         m_crCell1.SetHolder(GetDlgItem(IDC_COLOR1));
 
+        DoDataExchange(DDX_LOAD);
+        UpdateMoveFlags();
         DlgResize_Init(false, true, 0);
         return TRUE;
     }
