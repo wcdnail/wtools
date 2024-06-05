@@ -8,6 +8,8 @@
 #define _NEED_WMESSAGE_DUMP 1
 #include <debug.dump.msg.h>
 
+#include "IColor.h"
+
 CColorPickerDlg::~CColorPickerDlg() = default;
 
 CColorPickerDlg::CColorPickerDlg(COLORREF crColor)
@@ -59,8 +61,9 @@ namespace
 {
     enum Sizes: short
     {
-        DLG_CX    = CColorPicker::HOST_DLG_CX,
-        DLG_CY    = CColorPicker::HOST_DLG_CY,
+        DRGB_CX   = 14,
+        DLG_CX    = CColorPicker::HOST_DLG_CX + DRGB_CX + 1,
+        DLG_CY    = CColorPicker::HOST_DLG_CY + 1,
         BN_CX     = 48,
         BN_CY     = 12,
         DLG_CY_BN = BN_CY+6,
@@ -70,6 +73,7 @@ namespace
     {
         BEFORE_FIRST_CONTROL_ID = 71,
         IDC_COLORPICKER,
+        IDC_DRAGBAR,
     };
 }
 
@@ -105,19 +109,27 @@ void CColorPickerDlg::DoInitTemplate()
 
 void CColorPickerDlg::DoInitControls()
 {
-    short nPickerCY{DLG_CY-2};
+    short  nPickerX{2};
+    short nPickerCX{DLG_CX-4};
+    short nPickerCY{DLG_CY-4};
     if (m_bModalLoop) {
         nPickerCY -= (DLG_CY_BN-14);
         CONTROL_PUSHBUTTON(_T("Cancel"), IDCANCEL,                3, DLG_CY-2,   BN_CX, BN_CY, BS_PUSHBUTTON, 0)
         CONTROL_PUSHBUTTON(_T("OK"),         IDOK, DLG_CX-BN_CX*2-3, DLG_CY-2, BN_CX*2, BN_CY, BS_DEFPUSHBUTTON, 0)
     }
-    CONTROL_CONTROL(_T(""), IDC_COLORPICKER, _T("WCCF::CColorPicker"), 0, 2, 2, DLG_CX-2, nPickerCY, 0)
+    else {
+        nPickerX  += DRGB_CX + 2;
+        nPickerCX -= DRGB_CX + 2;
+        CONTROL_CTEXT(_T("Color Picker"), IDC_DRAGBAR, 3, 4, DRGB_CX, nPickerCY-6, SS_OWNERDRAW, 0)
+    }
+    CONTROL_CONTROL(_T(""), IDC_COLORPICKER, _T("WCCF::CColorPicker"), 0, nPickerX, 2, nPickerCX, nPickerCY, 0)
 }
 
 const WTL::_AtlDlgResizeMap* CColorPickerDlg::GetDlgResizeMap() const
 {
     static constexpr WTL::_AtlDlgResizeMap gs_Map[] = {
         DLGRESIZE_CONTROL(IDC_COLORPICKER, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+        DLGRESIZE_CONTROL(IDC_DRAGBAR, DLSZ_SIZE_Y)
         { -1, 0 },
     };
     static constexpr WTL::_AtlDlgResizeMap gs_ModalMap[] = {
@@ -127,6 +139,12 @@ const WTL::_AtlDlgResizeMap* CColorPickerDlg::GetDlgResizeMap() const
         { -1, 0 },
     };
     return m_bModalLoop ? gs_ModalMap : gs_Map;
+}
+
+void CColorPickerDlg::OnColorUpdate(IColor const& clrSource)
+{
+    UNREFERENCED_PARAMETER(clrSource);
+    GetDlgItem(IDC_DRAGBAR).InvalidateRect(nullptr, FALSE);
 }
 
 static UINT CCPD_OnGetDlgCode(LPMSG pMsg)
@@ -145,10 +163,14 @@ BOOL CColorPickerDlg::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) {
     case 0:
+        MSG_WM_GETDLGCODE(CCPD_OnGetDlgCode)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_COMMAND(OnCommand)
-        MSG_WM_GETDLGCODE(CCPD_OnGetDlgCode)
+        if (!m_bModalLoop) {
+            MSG_WM_DRAWITEM(OnDrawItem)
+            MSG_WM_NCHITTEST(OnNcHitTest)
+        }
         REFLECT_NOTIFICATIONS()
         CHAIN_MSG_MAP(CDialogResize)
         break;
@@ -246,6 +268,16 @@ BOOL CColorPickerDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     else {
         MoveWindow(m_rcPlace, FALSE);
     }
+    if (!m_bModalLoop) {
+        WTL::CFontHandle const hFont{GetFont()};
+        WTL::CLogFont       hLogFont{};
+        hFont.GetLogFont(hLogFont);
+        hLogFont.lfEscapement = 900;
+        hLogFont.lfWeight = FW_BLACK;
+        hLogFont.lfHeight -= 3;
+        m_vFont.Attach(hLogFont.CreateFontIndirectW());
+        m_ColorPicker.GetMasterColor().AddObserver(*this);
+    }
     DlgResize_Init(m_bModalLoop, true, 0);
     ATLTRACE(ATL::atlTraceControls, 0, _T("WM_INITDIALOG OK for hWnd:%p\n"), m_hWnd);
     return TRUE;
@@ -253,6 +285,7 @@ BOOL CColorPickerDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 
 void CColorPickerDlg::OnDestroy()
 {
+    m_ColorPicker.GetMasterColor().RemoveObserver(*this);
     m_wndMaster = nullptr;
     SetMsgHandled(FALSE);
     if (auto const* pAppModule = AppModulePtr()) {
@@ -274,4 +307,39 @@ void CColorPickerDlg::OnCommand(UINT uNotifyCode, int nID, HWND)
     default:
         break;
     }
+}
+
+void CColorPickerDlg::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI) const
+{
+    switch (nID) {
+    case IDC_DRAGBAR: {
+        WTL::CDCHandle   dc{pDI->hDC};
+        CRect        rcItem{pDI->rcItem};
+        ATL::CStringW sItem{};
+        dc.GradientFillRect(rcItem, 0x000000, m_ColorPicker.GetColorRef(), false);
+        if (GetDlgItem(IDC_DRAGBAR).GetWindowTextW(sItem) < 1) {
+            break;
+        }
+        int const iSave{dc.SaveDC()};
+        //CPoint pt{rcItem.BottomRight()};
+        dc.SetTextColor(0xffffff);
+        dc.SetBkMode(TRANSPARENT);
+        dc.SelectFont(m_vFont);
+        CRect rcText{rcItem};
+        //std::swap(rcText.left, rcText.right);
+        //std::swap(rcText.top, rcText.bottom);
+        //dc.DrawTextW(sItem.GetString(), sItem.GetLength(), rcText, DT_CALCRECT);
+        //dc.TextOutW(pt.x, pt.y, sItem.GetString(), sItem.GetLength());
+        dc.DrawTextW(sItem.GetString(), sItem.GetLength(), rcText, DT_BOTTOM | DT_SINGLELINE);
+        dc.RestoreDC(iSave);
+        break;
+    }
+    }
+}
+
+UINT CColorPickerDlg::OnNcHitTest(CPoint pt) const
+{
+    CRect rc{};
+    GetDlgItem(IDC_DRAGBAR).GetWindowRect(rc);
+    return rc.PtInRect(pt) ? HTCAPTION : HTCLIENT;
 }

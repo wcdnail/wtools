@@ -5,9 +5,12 @@
 #include <rect.putinto.h>
 #include <atltypes.h>
 
+#include "IColorObserver.h"
+
 struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
                         private WTL::CDialogResize<CColorPickerDlg>,
-                        private WTL::CMessageFilter
+                        private WTL::CMessageFilter,
+                        private IColorObserver
 {
     DELETE_COPY_MOVE_OF(CColorPickerDlg);
 
@@ -30,16 +33,20 @@ private:
     CRect              m_rcPlace;
     bool            m_bModalLoop;
     unsigned         m_nPosFlags;
+    WTL::CFont           m_vFont;
 
     const WTL::_AtlDlgResizeMap* GetDlgResizeMap() const;
     void PrepareRect(ATL::CWindow wndParent);
     void DoInitTemplate();
     void DoInitControls();
+    void OnColorUpdate(IColor const& clrSource) override;
     BOOL PreTranslateMessage(MSG* pMsg) override;
-    BOOL ProcessWindowMessage(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam, _Inout_ LRESULT& lResult, _In_ DWORD dwMsgMapID = 0) override;
+    BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, _Inout_ LRESULT& lResult, DWORD dwMsgMapID = 0) override;
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDestroy();
     void OnCommand(UINT uNotifyCode, int nID, HWND);
+    void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI) const;
+    UINT OnNcHitTest(CPoint point) const;
 };
 
 inline HRESULT CColorPickerDlg::Initialize()
