@@ -9,8 +9,8 @@
 
 CColorPicker::~CColorPicker() = default;
 
-CColorPicker::CColorPicker()
-    : m_pImpl{std::make_unique<Impl>()}
+CColorPicker::CColorPicker(COLORREF crColor)
+    : m_pImpl{std::make_unique<Impl>(crColor)}
 {
 }
 

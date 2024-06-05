@@ -23,7 +23,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
     CColorButton m_btnMyColor3{};
 
     CColorCellEx     m_crCell1{0x000000, RGB_MAX_INT};
-    CColorPickerDlg    m_cpDlg{};
+    CColorPickerDlg    m_cpDlg{0x1f2f3f};
 
     BOOL PreTranslateMessage(MSG* pMsg) override
     {

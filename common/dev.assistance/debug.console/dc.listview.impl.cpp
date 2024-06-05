@@ -129,8 +129,10 @@ namespace DH
             LVS_REPORT | LVS_NOSORTHEADER |
             LVS_SHOWSELALWAYS |
             LVS_SHAREIMAGELISTS,
-            LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP,
-            ID_LOG_CTL
+            LVS_EX_FULLROWSELECT |
+            //LVS_EX_INFOTIP | 
+            //LVS_EX_HEADERDRAGDROP |
+            0, ID_LOG_CTL
         );
         if (!console_) {
             hCode = static_cast<HRESULT>(GetLastError());

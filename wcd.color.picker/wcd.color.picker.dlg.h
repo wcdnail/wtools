@@ -17,7 +17,7 @@ struct CWCDColorPicker: ATL::CDialogImpl<CWCDColorPicker>,
     ~CWCDColorPicker() = default;
 
     CWCDColorPicker()
-        : m_ColorPicker{}
+        : m_ColorPicker{0xffffff}
     {
     }
 

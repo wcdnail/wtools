@@ -24,7 +24,7 @@ struct CColorPicker: private CCustomControl<CColorPicker>,
     DELETE_COPY_MOVE_OF(CColorPicker);
 
     WCDAFX_API ~CColorPicker() override;
-    WCDAFX_API CColorPicker();
+    WCDAFX_API CColorPicker(COLORREF crColor);
 
     WCDAFX_API HRESULT PreCreateWindow();
     WCDAFX_API BOOL PreTranslateMessage(MSG* pMsg) override;

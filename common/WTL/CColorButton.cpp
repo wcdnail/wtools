@@ -1070,8 +1070,8 @@ BOOL CColorButton::CPickerImpl::Picker()
         //
         if (fOked) {
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
-                CColorPickerDlg dlg;
-                //WTL::CColorDialog dlg(m_rMaster.m_clrCurrent, CC_FULLOPEN | CC_ANYCOLOR, m_rMaster.m_hWnd);
+                CColorPickerDlg dlg{m_rMaster.m_clrCurrent};
+                //dlg.GetMasterColor().SetColor(m_rMaster.m_clrCurrent, RGB_MAX_INT);
                 dlg.GetMasterColor().AddObservers(m_rMaster);
                 if (dlg.Show(m_rMaster.GetParent(), Rc::Right | Rc::YCenter, true)) {
                     fOked = TRUE;

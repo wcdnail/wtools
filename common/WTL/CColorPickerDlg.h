@@ -12,7 +12,7 @@ struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
     DELETE_COPY_MOVE_OF(CColorPickerDlg);
 
     WCDAFX_API ~CColorPickerDlg() override;
-    WCDAFX_API CColorPickerDlg();
+    WCDAFX_API CColorPickerDlg(COLORREF crColor);
 
     WCDAFX_API HRESULT Initialize();
     WCDAFX_API bool Show(HWND hWndMaster, unsigned nPosFlags, bool bModal = false);

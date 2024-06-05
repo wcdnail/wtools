@@ -104,9 +104,9 @@ namespace
 
 CColorPicker::Impl::~Impl() = default;
 
-CColorPicker::Impl::Impl()
+CColorPicker::Impl::Impl(COLORREF crColor)
     :     m_bSaveData{true}
-    ,    m_imSpectrum{0xffffff, SPEC_HSV_Hue}
+    ,    m_imSpectrum{crColor, SPEC_HSV_Hue}
     ,      m_imSlider{m_imSpectrum.GetSpectrumKindRef(), m_imSpectrum.GetColor()}
     ,       m_stColor{m_imSpectrum.GetMinColorRef(1, 1, 1)}
     ,     m_Magnifier{}

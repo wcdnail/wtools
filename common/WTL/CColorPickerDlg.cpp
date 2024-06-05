@@ -10,9 +10,9 @@
 
 CColorPickerDlg::~CColorPickerDlg() = default;
 
-CColorPickerDlg::CColorPickerDlg()
+CColorPickerDlg::CColorPickerDlg(COLORREF crColor)
     :   m_wndMaster{nullptr}
-    , m_ColorPicker{}
+    , m_ColorPicker{crColor}
     ,     m_rcPlace{0, 0, 0, 0}
     ,  m_bModalLoop{false}
     ,   m_nPosFlags{Rc::Right}

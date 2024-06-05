@@ -21,7 +21,7 @@ struct CColorPicker::Impl: private WTL::CIndirectDialogImpl<Impl>,
     DELETE_COPY_MOVE_OF(Impl);
 
     ~Impl() override;
-    Impl();
+    Impl(COLORREF crColor);
 
 private:
     friend CColorPicker;
