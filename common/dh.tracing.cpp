@@ -293,35 +293,49 @@ namespace DH
 #pragma endregion
 #pragma region Tracers
 
-    static void printString(ATL::CStringA&& text)
+    static inline void printString(ATL::CStringA&& sTS, ATL::CStringA&& sTID, ATL::CStringA&& sCategory, ATL::CStringA&& sText)
     {
-        auto logGuard = LogCtx::instance().ScopedLock();
+        ATL::CStringA sLine{};
+        if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT | LOG_ENABLED)) {
+            sLine = sTS + sTID + sCategory + sText;
+        }
+        auto logGuard{LogCtx::instance().ScopedLock()};
         if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT)) {
-            OutputDebugStringA(text.GetString());
+            OutputDebugStringA(sLine.GetString());
         }
         if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT)) {
-            DH::DebugConsole::Instance().PutsNarrow({text.GetString(), static_cast<size_t>(text.GetLength())});
+            sLine = sTID + sCategory + sText;
+            DH::DebugConsole::Instance().PutsNarrow({sLine.GetString(), static_cast<size_t>(sLine.GetLength())});
         }
-        LogCtx::instance().puts(std::move(text));
+        if (LogCtx::instance().isBitSet(LOG_ENABLED)) {
+            LogCtx::instance().puts(std::move(sLine));
+        }
     }
 
-    static void printString(ATL::CStringW&& text)
+    static inline void printString(ATL::CStringW&& sTS, ATL::CStringW&& sTID, ATL::CStringW&& sCategory, ATL::CStringW&& sText)
     {
-        auto logGuard = LogCtx::instance().ScopedLock();
+        ATL::CStringW sLine{};
+        if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT | LOG_ENABLED)) {
+            sLine = sTS + sTID + sCategory + sText;
+        }
+        auto logGuard{LogCtx::instance().ScopedLock()};
         if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT)) {
-            OutputDebugStringW(text.GetString());
+            OutputDebugStringW(sLine.GetString());
         }
         if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT)) {
-            DH::DebugConsole::Instance().PutsWide({text.GetString(), static_cast<size_t>(text.GetLength())});
+            sLine = sTID + sCategory + sText;
+            DH::DebugConsole::Instance().PutsWide({sLine.GetString(), static_cast<size_t>(sLine.GetLength())});
         }
-        LogCtx::instance().putws(std::move(text));
+        if (LogCtx::instance().isBitSet(LOG_ENABLED)) {
+            LogCtx::instance().putws(std::move(sLine));
+        }
     }
 
     void Printf(PCSTR format, ...)
     {
         va_list ap;
         va_start(ap, format);
-        printString(Str::Elipsis<char>::FormatV(format, ap));
+        printString({}, {}, {}, Str::Elipsis<char>::FormatV(format, ap));
         va_end(ap);
     }
 
@@ -329,30 +343,44 @@ namespace DH
     {
         va_list ap;
         va_start(ap, format);
-        printString(Str::Elipsis<wchar_t>::FormatV(format, ap));
+        printString({}, {}, {}, Str::Elipsis<wchar_t>::FormatV(format, ap));
         va_end(ap);
     }
 
     template <typename CharType>
-                struct TTTraits {};
-    template <> struct TTTraits<char>    { static inline const  PCSTR Header =  "%0*.8f [%06d] "; static inline const  PCSTR Category =  "%14s| "; };
-    template <> struct TTTraits<wchar_t> { static inline const PCWSTR Header = L"%0*.8f [%06d] "; static inline const PCWSTR Category = L"%14s| "; };
+    struct TTTraits {};
+
+    template <> struct TTTraits<char>
+    {
+        static inline const PCSTR  FmtTS{"%0*.8f "};
+        static inline const PCSTR FmtTID{"[%06d] "};
+        static inline const PCSTR FmtCat{ "%14s| "};
+    };
+
+    template <> struct TTTraits<wchar_t>
+    {
+        static inline const PCWSTR  FmtTS{L"%0*.8f "};
+        static inline const PCWSTR FmtTID{L"[%06d] "};
+        static inline const PCWSTR FmtCat{ L"%14s| "};
+    };
 
     template <typename CharType>
     static void ThreadPrintfT(CharType const* format, va_list ap)
     {
-        auto header = Str::Elipsis<CharType>::Format(TTTraits<CharType>::Header, LOG_UPTIME_PRECISS, LOG_Uptime.Seconds(), ::GetCurrentThreadId());
-        auto   text = Str::Elipsis<CharType>::FormatV(format, ap);
-        printString(header + text);
+        auto   sTS{Str::Elipsis<CharType>::Format(TTTraits<CharType>::FmtTS, LOG_UPTIME_PRECISS, LOG_Uptime.Seconds())};
+        auto  sTID{Str::Elipsis<CharType>::Format(TTTraits<CharType>::FmtTID, GetCurrentThreadId())};
+        auto sText{Str::Elipsis<CharType>::FormatV(format, ap)};
+        printString(std::move(sTS), std::move(sTID), {}, std::move(sText));
     }
 
     template <typename CharType>
     static void ThreadPrintfT(TraceCategory const& cat, CharType const* format, va_list ap)
     {
-        auto   header = Str::Elipsis<CharType>::Format(TTTraits<CharType>::Header, LOG_UPTIME_PRECISS, LOG_Uptime.Seconds(), ::GetCurrentThreadId());
-        auto category = Str::Elipsis<CharType>::Format(TTTraits<CharType>::Category, cat.GetName().c_str());
-        auto     text = Str::Elipsis<CharType>::FormatV(format, ap);
-        printString(header + category + text);
+        auto   sTS{Str::Elipsis<CharType>::Format(TTTraits<CharType>::FmtTS, LOG_UPTIME_PRECISS, LOG_Uptime.Seconds())};
+        auto  sTID{Str::Elipsis<CharType>::Format(TTTraits<CharType>::FmtTID, GetCurrentThreadId())};
+        auto  sCat{Str::Elipsis<CharType>::Format(TTTraits<CharType>::FmtCat, cat.GetName().c_str())};
+        auto sText{Str::Elipsis<CharType>::FormatV(format, ap)};
+        printString(std::move(sTS), std::move(sTID), std::move(sCat), std::move(sText));
     }
 
     void TPrintf(PCSTR format, ...)
