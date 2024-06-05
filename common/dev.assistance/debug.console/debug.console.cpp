@@ -3,10 +3,58 @@
 #include "basic.debug.console.h"
 #include "dc.rich.edit.impl.h"
 #include "dc.listview.impl.h"
+#include <string.utils.error.code.h>
 #include <fstream>
+
 
 namespace DH
 {
+    bool DebugConsole::SetPrivilege(HANDLE hToken, PCWSTR pszPrivilege, bool bEnable)
+    {
+        TOKEN_PRIVILEGES tp{0};
+        LUID           luid{0};
+        if (!LookupPrivilegeValueW(nullptr, pszPrivilege, &luid)) {
+            return false;
+        }
+        tp.PrivilegeCount = 1;
+        tp.Privileges[0].Luid = luid;
+        tp.Privileges[0].Attributes = bEnable ? SE_PRIVILEGE_ENABLED : 0;
+        if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(tp), nullptr, nullptr)) {
+            return false;
+        }
+        return true;
+    }
+
+    bool DebugConsole::AdjustPrivileges() const
+    {
+        HRESULT       hCode{S_OK};
+        ATL::CStringW sFunc{L"NONE"};
+        HANDLE       handle{nullptr};
+        HandlePtr    pToken{};
+        if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &handle)) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc.Format(L"OpenProcessToken");
+            goto reportError;
+        }
+        HandlePtr{handle, CloseHandle}.swap(pToken);
+
+        if (!SetPrivilege(pToken.get(), SE_DEBUG_NAME, true)) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc.Format(L"SetPrivilege('%s')", SE_DEBUG_NAME);
+            goto reportError;
+        }
+        if (!SetPrivilege(pToken.get(), SE_CREATE_GLOBAL_NAME, true)) {
+            hCode = static_cast<HRESULT>(GetLastError());
+            sFunc.Format(L"SetPrivilege('%s')", SE_CREATE_GLOBAL_NAME);
+            goto reportError;
+        }
+        return true;
+    reportError:
+        auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
+        FormatWide(dwCurrentPID, L"ERROR: %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
+        return false;
+    }
+
     class DebugConsoleImpl: public BasicDebugConsole
     {
     public:
@@ -101,6 +149,16 @@ namespace DH
         return impl_->SubclassWindow(hWnd);
     }
 
+    bool DebugConsole::Create(HWND hWndParent, CRect& rc, DWORD dwStyle, DWORD dwExStyle, UINT nID) const
+    {
+        HWND const hWnd{impl_->Create(hWndParent, rc, nullptr, dwStyle, dwExStyle, nID)};
+        if (hWnd) {
+            PostMessage(hWnd, BasicDebugConsole::WM_SYNC_STRINGS, 0, 0L);
+        }
+        return nullptr != hWnd;
+    }
+
+
     DebugConsole::DebugConsole(std::unique_ptr<BasicDebugConsole>&& otherImpl)
         : impl_(std::move(otherImpl))
     {
@@ -110,20 +168,15 @@ namespace DH
     {
         return impl_->PreCreateWindow();
     }
-    
-    void* DebugConsole::GetConsoleSystemHandle() const
-    {
-        return impl_->m_hWnd;
-    }
 
     void DebugConsole::ReceiveStdOutput(bool on) const
     {
         impl_->ReceiveStdOutput(on);
     }
 
-    void DebugConsole::ReceiveDebugOutput(bool on, PCWSTR pszWindowName, bool bGlobal) const
+    bool DebugConsole::ReceiveDebugOutput(PCWSTR pszWindowName, bool bGlobal) const
     {
-        impl_->ReceiveDebugOutput(on, pszWindowName, bGlobal);
+        return impl_->ReceiveDebugOutput(pszWindowName, bGlobal);
     }
 
     void DebugConsole::SetParameters(int cx, int cy, int align, int fsize, char const* fname) const
@@ -172,6 +225,46 @@ namespace DH
     void DebugConsole::PutsWide(std::wstring_view wdString, DWORD dwPID) const
     {
         impl_->PutsWide(wdString, dwPID);
+    }
+
+    void DebugConsole::FormatVNarrow(DWORD dwPID, std::string_view nrFormat, va_list vaList) const
+    {
+        impl_->FormatVNarrow(dwPID, nrFormat, vaList);
+    }
+
+    void DebugConsole::FormatVWide(DWORD dwPID, std::wstring_view wdFormat, va_list vaList) const
+    {
+        impl_->FormatVWide(dwPID, wdFormat, vaList);
+    }
+
+    void DebugConsole::FormatNarrow(DWORD dwPID, std::string_view nrFormat, ...) const
+    {
+        va_list vaList;
+        va_start(vaList, nrFormat);
+        impl_->FormatVNarrow(dwPID, nrFormat, vaList);
+        va_end(vaList);
+    }
+
+    void DebugConsole::FormatWide(DWORD dwPID, std::wstring_view wdFormat, ...) const
+    {
+        va_list vaList;
+        va_start(vaList, wdFormat);
+        impl_->FormatVWide(dwPID, wdFormat, vaList);
+        va_end(vaList);
+    }
+
+    std::wstring DebugConsole::GetStrings(std::wstring_view svSeparator) const
+    {
+        int count{0};
+        std::wostringstream stm{};
+        for (auto const& it: impl_->GetCache()) {
+            if (!svSeparator.empty() && count > 0) {
+                stm << svSeparator;
+            }
+            stm << it.GetText();
+            ++count;
+        }
+        return stm.str();
     }
 
     void DebugConsole::AskPathAndSave() const

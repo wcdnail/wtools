@@ -68,11 +68,12 @@ namespace DH
             {512, hdrText3, _countof(hdrText2)}
         };
         int const nCCX{rc.Width()};
+        int constexpr nScrollSpace{32};
         colItems[DCCI_Num].nWidth = nCCX / 16;
         colItems[DCCI_TS].nWidth = nCCX / 8;
         colItems[DCCI_PID].nWidth = nCCX / 12;
         colItems[DCCI_Text].nWidth = nCCX - 
-            (colItems[DCCI_Num].nWidth + colItems[DCCI_TS].nWidth + colItems[DCCI_PID].nWidth);
+            (colItems[DCCI_Num].nWidth + colItems[DCCI_TS].nWidth + colItems[DCCI_PID].nWidth + nScrollSpace);
 
         LVCOLUMNW lvColumn{0};
         for (int i = 0; i < DCCI_COUNT; i++) {
@@ -123,11 +124,12 @@ namespace DH
         }
         console_.Create(m_hWnd, rc, nullptr,
             WS_CHILD | WS_VISIBLE |
-            LVS_REPORT |
-            LVS_NOSORTHEADER |
+            // LVS_OWNERDRAWFIXED |
+            // LVS_OWNERDATA |
+            LVS_REPORT | LVS_NOSORTHEADER |
             LVS_SHOWSELALWAYS |
             LVS_SHAREIMAGELISTS,
-            LVS_EX_FULLROWSELECT,
+            LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP,
             ID_LOG_CTL
         );
         if (!console_) {
@@ -135,8 +137,9 @@ namespace DH
             sFunc.Format(L"CreateWindowEx('%s')", WTL::CListViewCtrl::GetWndClassName());
             goto reportError;
         }
+        ::DefWindowProc(console_.m_hWnd, WM_CREATE, 0, 0L);
+        
         console_.SetView(LV_VIEW_DETAILS);
-        //console_.SetUnicodeFormat(TRUE);
         console_.SetFont(consoleFont_, FALSE);
         SetupColumns(rc);
 
@@ -156,8 +159,6 @@ namespace DH
 
     void DCListViewImpl::PreWrite()
     {
-        //int n = console_.GetWindowTextLength();
-        //console_.SetSel(n, n);
     }
 
     template <typename Char>
@@ -267,12 +268,47 @@ namespace DH
         InsertLVItem<wchar_t>(console_, nPos, std::to_wstring(nPos), std::to_wstring(dTs), std::to_wstring(dwPID), wdString);
     }
 
+    void DCListViewImpl::ClearSelection()
+    {
+        int nItem{-1};
+        for (;;) {
+            nItem = console_.GetNextItem(nItem, LVNI_SELECTED);
+            if (nItem < 0) {
+                break;
+            }
+            console_.SetItemState(nItem, 0, LVIS_SELECTED);
+        }
+    }
+
+    bool DCListViewImpl::ScrollTo(int nPos, bool bCentered)
+    {
+        int const nIndexMax{console_.GetItemCount()};
+        if (nPos < 0 || nPos >= nIndexMax) {
+            return true;
+        }
+        ClearSelection();
+        console_.SetItemState(nPos, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
+        int const nPaddingLines{console_.GetCountPerPage() / 2};
+        int const  nMinTopIndex{std::max<int>(0, nPos - nPaddingLines)};
+        console_.EnsureVisible(nMinTopIndex, 0);
+        console_.EnsureVisible(nPos, 0);
+        if (nPos > nPaddingLines) {
+            if (bCentered) {
+                int const nMaxBottomIndex{std::min<int>(nIndexMax - 1, nPos + nPaddingLines)};
+                console_.EnsureVisible(nMaxBottomIndex, 0);
+                return (nMaxBottomIndex == (nPos + nPaddingLines));
+            }
+        }
+        return true;
+    }
+
     void DCListViewImpl::PostWrite()
     {
-        if (GetParameters().autoScroll) {
-            //int const n{console_.GetLineCount() - lastLineCount_};
-            //console_.LineScroll(n);
+        if (!GetParameters().autoScroll) {
+            return ;
         }
+        int const nIndexMax{console_.GetItemCount()};
+        ScrollTo(nIndexMax, false);
     }
 
     void DCListViewImpl::OnCommand(UINT, int nID, HWND)

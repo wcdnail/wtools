@@ -27,6 +27,8 @@ namespace DH
         void PreWrite() override;
         void WriteNarrow(std::string& nrString, double, DWORD) override;
         void WriteWide(std::wstring& wdString, double, DWORD) override;
+        void ClearSelection();
+        bool ScrollTo(int nPos, bool bCentered);
         void PostWrite() override;
         void OnDestroy() override;
         void OnCommand(UINT notifyCode, int id, HWND) override;

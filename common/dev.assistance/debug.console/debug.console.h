@@ -11,15 +11,19 @@ namespace DH
     class DebugConsole
     {
     public:
+        using HandlePtr = std::shared_ptr<void>;
+
         static constexpr DWORD dwCurrentPID{static_cast<DWORD>(-1)};
 
         DELETE_COPY_MOVE_OF(DebugConsole);
 
         WCDAFX_API static DebugConsole& Instance();
 
+        WCDAFX_API bool AdjustPrivileges() const;
+        WCDAFX_API bool Create(HWND hWndParent, CRect& rc, DWORD dwStyle, DWORD dwExStyle, UINT nID) const;
         WCDAFX_API HRESULT Initialize() const;
 
-        WCDAFX_API void ReceiveDebugOutput(bool on, PCWSTR pszWindowName, bool bGlobal) const;
+        WCDAFX_API bool ReceiveDebugOutput(PCWSTR pszWindowName, bool bGlobal) const;
         WCDAFX_API void ReceiveStdOutput(bool on) const;
 
         WCDAFX_API void SetParameters(int cx, int cy, int align, int fontSize, char const* fontName) const;
@@ -34,6 +38,11 @@ namespace DH
 
         WCDAFX_API void PutsNarrow(std::string_view, DWORD dwPID = dwCurrentPID) const;
         WCDAFX_API void PutsWide(std::wstring_view, DWORD dwPID = dwCurrentPID) const;
+        WCDAFX_API void FormatVNarrow(DWORD dwPID, std::string_view nrFormat, va_list vaList) const;
+        WCDAFX_API void FormatVWide(DWORD dwPID, std::wstring_view wdFormat, va_list vaList) const;
+        WCDAFX_API void FormatNarrow(DWORD dwPID, std::string_view nrFormat, ...) const;
+        WCDAFX_API void FormatWide(DWORD dwPID, std::wstring_view wdFormat, ...) const;
+        WCDAFX_API std::wstring GetStrings(std::wstring_view svSeparator) const;
 
         WCDAFX_API void AskPathAndSave() const;
         WCDAFX_API void Save(char const* filePathName) const;
@@ -54,8 +63,7 @@ namespace DH
 
         DebugConsole();
 
-        friend class DebugOutputListener;
-        void* GetConsoleSystemHandle() const;
+        static bool SetPrivilege(HANDLE hToken, PCWSTR pszPrivilege, bool bEnable);
     };
 
     template <>

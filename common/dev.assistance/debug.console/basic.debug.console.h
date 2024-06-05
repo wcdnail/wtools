@@ -19,13 +19,13 @@ namespace DH
         friend CCustomControl<BasicDebugConsole>;
         friend WTL::CDialogResize<BasicDebugConsole>;
 
-        enum { WM_SYNC_STRINGS = WM_USER + 1 };
-
     protected:
         BasicDebugConsole(DebugConsole const& owner);
 
     public:
         static constexpr DWORD dwCurrentPID{static_cast<DWORD>(-1)};
+
+        enum { WM_SYNC_STRINGS = WM_USER + 1 };
 
         using WndSuper::m_hWnd;
         using WndSuper::GetClientRect;
@@ -33,6 +33,24 @@ namespace DH
         using WndSuper::UpdateWindow;
         using WndSuper::Create;
         using WndSuper::DestroyWindow;
+
+        using StringPair = std::pair<std::string, std::wstring>;
+
+        struct StringItem
+        {
+            StringPair pair_;
+            DWORD       pid_;
+            double       ts_;
+
+            ~StringItem();
+            StringItem(StringPair&& pair, DWORD dwPID);
+            StringItem(std::string_view nrView, DWORD dwPID);
+            StringItem(std::wstring_view wdView, DWORD dwPID);
+
+            std::wstring GetText() const;
+        };
+
+        using StringQue = std::deque<StringItem>;
 
         struct Parameters
         {
@@ -46,8 +64,6 @@ namespace DH
             int cy;            // высота
             bool autoScroll;
         };
-
-        DECLARE_WND_CLASS_EX(_T("WCD_DH_DEBUG_CONSOLE"), CS_VREDRAW | CS_HREDRAW, (COLOR_WINDOW-1))
 
         enum { ID_LOG_CTL = 87621 };
 
@@ -64,10 +80,13 @@ namespace DH
 
         void PutsNarrow(std::string_view nrView, DWORD dwPID);
         void PutsWide(std::wstring_view wdView, DWORD dwPID);
+        void FormatVNarrow(DWORD dwPID, std::string_view nrFormat, va_list vaList);
+        void FormatVWide(DWORD dwPID, std::wstring_view nrFormat, va_list vaList);
+        StringQue const& GetCache() const;
         virtual void Clean() const;
 
         void ReceiveStdOutput(bool on) const;
-        void ReceiveDebugOutput(bool on, PCWSTR pszWindowName, bool bGlobal);
+        bool ReceiveDebugOutput(PCWSTR pszWindowName, bool bGlobal);
 
         void AskPathAndSave() const;
         virtual void Save(char const* filePathName) const;
@@ -90,22 +109,6 @@ namespace DH
         END_MSG_MAP()
 
     protected:
-        using StringPair = std::pair<std::string, std::wstring>;
-
-        struct StringItem
-        {
-            StringPair pair_;
-            DWORD       pid_;
-            double       ts_;
-
-            ~StringItem();
-            StringItem(StringPair&& pair, DWORD dwPID);
-            StringItem(std::string_view nrView, DWORD dwPID);
-            StringItem(std::wstring_view wdView, DWORD dwPID);
-        };
-
-        using StringQue = std::deque<StringItem>;
-
         Parameters                           params_;
         WTL::CFont                      consoleFont_;
         HWND                          consoleHandle_;
@@ -141,5 +144,10 @@ namespace DH
         , cy(h)
         , autoScroll(true)
     {
+    }
+
+    inline BasicDebugConsole::StringQue const& BasicDebugConsole::GetCache() const
+    {
+        return cache_;
     }
 }

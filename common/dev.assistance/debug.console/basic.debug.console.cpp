@@ -30,7 +30,7 @@ namespace DH
         ATLASSERT(false);
         return ERROR_CALL_NOT_IMPLEMENTED;
     }
-    
+
     void BasicDebugConsole::PutWindow()
     {
         typedef cf::rect<LONG> myRect;
@@ -50,8 +50,7 @@ namespace DH
     void BasicDebugConsole::SetupFont()
     {
         HFONT const tempFont = ::CreateFontA(-params_.fsize, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, params_.fname);
-
+            CLEARTYPE_NATURAL_QUALITY, 0, params_.fname);
         consoleFont_.Attach(tempFont);
     }
 
@@ -90,9 +89,9 @@ namespace DH
         wcerrListener_.toggle(on);
     }
 
-    void BasicDebugConsole::ReceiveDebugOutput(bool on, PCWSTR pszWindowName, bool bGlobal)
+    bool BasicDebugConsole::ReceiveDebugOutput(PCWSTR pszWindowName, bool bGlobal)
     {
-        (on ? debugOutputListener_.Start(pszWindowName, bGlobal) : debugOutputListener_.Stop());
+        return debugOutputListener_.Start(pszWindowName, bGlobal);
     }
 
     void BasicDebugConsole::CreateWindowIfNessesary()
@@ -134,6 +133,9 @@ namespace DH
         ,  pid_{dwPID}
         ,   ts_{DH::LogUpTime()}
     {
+        if (dwCurrentPID == pid_) {
+            pid_ = GetCurrentProcessId();
+        }
     }
 
     BasicDebugConsole::StringItem::StringItem(std::string_view nrView, DWORD dwPID)
@@ -144,6 +146,18 @@ namespace DH
     BasicDebugConsole::StringItem::StringItem(std::wstring_view wdView, DWORD dwPID)
         : StringItem(std::make_pair(std::string{}, std::wstring{wdView.data(), wdView.length()}), dwPID)
     {
+    }
+
+    std::wstring BasicDebugConsole::StringItem::GetText() const
+    {
+        if (!pair_.second.empty()) {
+            return pair_.second;
+        }
+        if (pair_.first.empty()) {
+            return {};
+        }
+        ATL::CStringW const sTemp{pair_.first.c_str(), static_cast<int>(pair_.first.length())};
+        return {sTemp.GetString(), static_cast<size_t>(sTemp.GetLength())};
     }
 
     void BasicDebugConsole::PutsNarrow(std::string_view nrView, DWORD dwPID)
@@ -168,6 +182,20 @@ namespace DH
         if (m_hWnd) {
             PostMessageW(WM_SYNC_STRINGS);
         }
+    }
+
+    void BasicDebugConsole::FormatVNarrow(DWORD dwPID, std::string_view nrFormat, va_list vaList)
+    {
+        ATL::CStringA sTemp;
+        sTemp.FormatV(nrFormat.data(), vaList);
+        PutsNarrow(std::string_view{sTemp.GetString(), static_cast<size_t>(sTemp.GetLength())}, dwPID);
+    }
+
+    void BasicDebugConsole::FormatVWide(DWORD dwPID, std::wstring_view nrFormat, va_list vaList)
+    {
+        ATL::CStringW sTemp;
+        sTemp.FormatV(nrFormat.data(), vaList);
+        PutsWide(std::wstring_view{sTemp.GetString(), static_cast<size_t>(sTemp.GetLength())}, dwPID);
     }
 
     void BasicDebugConsole::Clean() const
@@ -304,6 +332,7 @@ namespace DH
         }
         SendMessageW(WM_CREATE);
         PostMessageW(WM_SYNC_STRINGS);
+        ShowWindow(SW_SHOW);
         return bRes;
     }
 }

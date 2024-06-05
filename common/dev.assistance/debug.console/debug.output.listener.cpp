@@ -2,94 +2,18 @@
 #include "debug.output.listener.h"
 #include "debug.console.h"
 #include <string.utils.error.code.h>
-#include <dh.tracing.defs.h>
-#include <dh.tracing.h>
 #include <aclapi.h>
 #include <sddl.h>
 #include <string>
 
 namespace DH
 {
-    class DebugOutputListener::StaticInit
-    {
-        ~StaticInit();
-        StaticInit();
+    using HandlePtr = std::shared_ptr<void>;
 
-    public:
-        static StaticInit& Instance();
+    static constexpr DWORD dwCurrentPID{static_cast<DWORD>(-1)};
 
-        static bool SetPrivilege(HANDLE hToken, PCWSTR pszPrivilege, bool bEnable);
-        static bool AdjustProcPrivileges();
-
-        static HandlePtr CreateSecurityDesc(SECURITY_ATTRIBUTES& secAttrs);
-        static HandlePtr CreateDbgMutex(PCWSTR pszPrefix, PSECURITY_ATTRIBUTES pSecurity);
-        static HandlePtr CreateMapping(PCWSTR pszPrefix, DWORD dwSize, PSECURITY_ATTRIBUTES pSecurity);
-        static HandlePtr MapSharedMemory(HANDLE hMapped, DWORD dwSize);
-        static HandlePtr CreateSignal(PCWSTR pszPrefix, PCWSTR pszName, PSECURITY_ATTRIBUTES pSecurity);
-        static void AdjustObjectDACL(HANDLE hObject);
-        static void DeleteObjectDACL(HANDLE hObject);
-    };
-
-    DebugOutputListener::StaticInit::~StaticInit() = default;
-
-    DebugOutputListener::StaticInit::StaticInit()
-    {
-        AdjustProcPrivileges();
-    }
-
-    DebugOutputListener::StaticInit& DebugOutputListener::StaticInit::Instance()
-    {
-        static StaticInit staticInit;
-        return staticInit;
-    }
-
-    bool DebugOutputListener::StaticInit::SetPrivilege(HANDLE hToken, PCWSTR pszPrivilege, bool bEnable)
-    {
-        TOKEN_PRIVILEGES tp{0};
-        LUID           luid{0};
-        if (!LookupPrivilegeValueW(nullptr, pszPrivilege, &luid)) {
-            return false;
-        }
-        tp.PrivilegeCount = 1;
-        tp.Privileges[0].Luid = luid;
-        tp.Privileges[0].Attributes = bEnable ? SE_PRIVILEGE_ENABLED : 0;
-        if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(tp), nullptr, nullptr)) {
-            return false;
-        }
-        return true;
-    }
-
-    bool DebugOutputListener::StaticInit::AdjustProcPrivileges()
-    {
-        HRESULT       hCode{S_OK};
-        ATL::CStringW sFunc{L"NONE"};
-        HANDLE       handle{nullptr};
-        HandlePtr    pToken{};
-        if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &handle)) {
-            hCode = static_cast<HRESULT>(GetLastError());
-            sFunc.Format(L"OpenProcessToken");
-            goto reportError;
-        }
-        HandlePtr{handle, CloseHandle}.swap(pToken);
-
-        if (!SetPrivilege(pToken.get(), SE_DEBUG_NAME, true)) {
-            hCode = static_cast<HRESULT>(GetLastError());
-            sFunc.Format(L"SetPrivilege('%s')", SE_DEBUG_NAME);
-            goto reportError;
-        }
-        if (!SetPrivilege(pToken.get(), SE_CREATE_GLOBAL_NAME, true)) {
-            hCode = static_cast<HRESULT>(GetLastError());
-            sFunc.Format(L"SetPrivilege('%s')", SE_CREATE_GLOBAL_NAME);
-            goto reportError;
-        }
-        return true;
-    reportError:
-        auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
-        DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
-        return false;
-    }
-
-    DebugOutputListener::HandlePtr DebugOutputListener::StaticInit::CreateSecurityDesc(SECURITY_ATTRIBUTES& secAttrs)
+#if 0
+    static HandlePtr CreateSecurityDesc(DebugConsole const& rMaster, SECURITY_ATTRIBUTES& secAttrs)
     {
         HRESULT            hCode{S_OK};
         ATL::CStringW      sFunc{L"NONE"};
@@ -120,15 +44,16 @@ namespace DH
         secAttrs.nLength = sizeof(secAttrs);
         secAttrs.lpSecurityDescriptor = pSD;
         secAttrs.bInheritHandle = TRUE;
+        rMaster.FormatWide(dwCurrentPID, L"%s OK\n", __FUNCTIONW__);
         return HandlePtr{pSD, LocalFree};
 
     reportError:
         auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
-        DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
+        rMaster.FormatWide(dwCurrentPID, L"ERROR: %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
         return {};
     }
 
-    DebugOutputListener::HandlePtr DebugOutputListener::StaticInit::CreateDbgMutex(PCWSTR pszPrefix, PSECURITY_ATTRIBUTES pSecurity)
+    static HandlePtr CreateDbgMutex(DebugConsole const& rMaster, PCWSTR pszPrefix, PSECURITY_ATTRIBUTES pSecurity)
     {
         ATL::CStringW sTemp{};
         sTemp.Format(L"%sDBWinMutex", pszPrefix);
@@ -147,54 +72,70 @@ namespace DH
         }
         if (!hMutex) {
             auto const hCode = static_cast<HRESULT>(GetLastError());
-            DH::TPrintf(LTH_DBG_ASSIST L" CreateDbgMutex('%s') failed: 0x%08x %s\n", sTemp.GetString(),
+            rMaster.FormatWide(dwCurrentPID, L"ERROR: CreateDbgMutex['%s'] failed: 0x%08x %s\n", sTemp.GetString(),
                 hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
             return {};
         }
+        rMaster.FormatWide(dwCurrentPID, L"%s['%s'] OK\n", __FUNCTIONW__, sTemp.GetString());
         return HandlePtr{hMutex, CloseHandle};
     }
+#endif
 
-    DebugOutputListener::HandlePtr DebugOutputListener::StaticInit::CreateMapping(PCWSTR pszPrefix, DWORD dwSize, PSECURITY_ATTRIBUTES pSecurity)
+    static HandlePtr CreateDbgMapping(DebugConsole const& rMaster, PCWSTR pszPrefix, DWORD dwSize, PSECURITY_ATTRIBUTES pSecurity)
     {
         ATL::CStringW sTemp{};
         sTemp.Format(L"%sDBWIN_BUFFER", pszPrefix);
-        HANDLE const mappingRaw{CreateFileMappingW(pSecurity, nullptr, PAGE_READWRITE, 0, dwSize, sTemp.GetString())};
+        HANDLE mappingRaw{CreateFileMappingW(pSecurity, nullptr, PAGE_READWRITE, 0, dwSize, sTemp.GetString())};
+        auto hCode{static_cast<HRESULT>(GetLastError())};
+        if (ERROR_ALREADY_EXISTS == hCode) {
+            CloseHandle(mappingRaw);
+            mappingRaw = nullptr;
+            SetLastError(static_cast<DWORD>(hCode));
+        }
         if (!mappingRaw) {
-            auto const hCode = static_cast<HRESULT>(GetLastError());
-            DH::TPrintf(LTH_DBG_ASSIST L" CreateFileMapping('%s') failed: 0x%08x %s\n", sTemp.GetString(),
+            hCode = static_cast<HRESULT>(GetLastError());
+            rMaster.FormatWide(dwCurrentPID, L"ERROR: CreateFileMapping['%s'] failed: 0x%08x %s\n", sTemp.GetString(),
                 hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
             return {};
         }
+        rMaster.FormatWide(dwCurrentPID, L"%s['%s'] OK\n", __FUNCTIONW__, sTemp.GetString());
         return HandlePtr{mappingRaw, CloseHandle};
     }
 
-    DebugOutputListener::HandlePtr DebugOutputListener::StaticInit::MapSharedMemory(HANDLE hMapped, DWORD dwSize)
+    static HandlePtr MapDbgShared(DebugConsole const& rMaster, HANDLE hMapped, DWORD dwSize)
     {
         HANDLE const hMemory{MapViewOfFile(hMapped, PAGE_READONLY, 0, 0, dwSize)};
         if (!hMemory) {
             auto const hCode = static_cast<HRESULT>(GetLastError());
-            DH::TPrintf(LTH_DBG_ASSIST L" MapViewOfFile failed: 0x%08x %s\n",
+            rMaster.FormatWide(dwCurrentPID, L"ERROR: MapViewOfFile failed: 0x%08x %s\n",
                 hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
             return {};
         }
+        rMaster.FormatWide(dwCurrentPID, L"%s OK\n", __FUNCTIONW__);
         return HandlePtr{hMemory, UnmapViewOfFile};
     }
 
-    DebugOutputListener::HandlePtr DebugOutputListener::StaticInit::CreateSignal(PCWSTR pszPrefix, PCWSTR pszName, PSECURITY_ATTRIBUTES pSecurity)
+    static HandlePtr CreateDbgSignal(DebugConsole const&    rMaster,
+                                     bool              bManualReset,
+                                     bool                  bInitial,
+                                     PCWSTR               pszPrefix,
+                                     PCWSTR                 pszName,
+                                     PSECURITY_ATTRIBUTES pSecurity)
     {
         ATL::CStringW sTemp{};
         sTemp.Format(L"%s%s", pszPrefix, pszName);
-        HANDLE const hEvent{CreateEventW(pSecurity, FALSE, FALSE, sTemp.GetString())};
-        if (INVALID_HANDLE_VALUE == hEvent) {
+        HANDLE const hEvent{CreateEventW(pSecurity, static_cast<BOOL>(bManualReset), static_cast<BOOL>(bInitial), sTemp.GetString())};
+        if (!hEvent) {
             auto const hCode = static_cast<HRESULT>(GetLastError());
-            DH::TPrintf(LTH_DBG_ASSIST L" CreateEvent failed: 0x%08x %s\n",
+            rMaster.FormatWide(dwCurrentPID, L"ERROR: CreateEvent failed: 0x%08x %s\n",
                 hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
             return {};
         }
+        rMaster.FormatWide(dwCurrentPID, L"%s['%s'][%d, %d] OK\n", __FUNCTIONW__, sTemp.GetString(), bManualReset, bInitial);
         return HandlePtr{hEvent, CloseHandle};
     }
 
-    void DebugOutputListener::StaticInit::AdjustObjectDACL(HANDLE hObject)
+    static void AdjustObjectDACL(DebugConsole const& rMaster, HANDLE hObject)
     {
         HRESULT                   hCode{S_OK};
         ATL::CStringW             sFunc{L"NONE"};
@@ -239,18 +180,23 @@ namespace DH
             goto reportError;
         }
 
+        rMaster.FormatWide(dwCurrentPID, L"%s OK\n", __FUNCTIONW__);
         return ;
     reportError:
         auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
-        DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
+        rMaster.FormatWide(dwCurrentPID, L"ERROR: %s[%s] failed: 0x%08x %s\n", __FUNCTIONW__,
+            sFunc.GetString(), hCode, sMessage.GetString());
     }
 
-    void DebugOutputListener::StaticInit::DeleteObjectDACL(HANDLE hObject)
+    static void DeleteObjectDACL(DebugConsole const& rMaster, HANDLE hObject)
     {
         DWORD const dwCode{SetSecurityInfo(hObject, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, nullptr, nullptr)};
         if (ERROR_SUCCESS != dwCode) {
-            DH::TPrintf(LTH_DBG_ASSIST L" SetSecurityInfo failed: 0x%08x %s\n",
+            rMaster.FormatWide(dwCurrentPID, L"ERROR: %s[SetSecurityInfo[%p]] failed: 0x%08x %s\n", __FUNCTIONW__, hObject,
                 dwCode, Str::ErrorCode<>::SystemMessage(dwCode).GetString());
+        }
+        else {
+            rMaster.FormatWide(dwCurrentPID, L"%s[%p] OK\n", __FUNCTIONW__, hObject);
         }
     }
 
@@ -259,48 +205,50 @@ namespace DH
         Stop();
     }
 
-    DebugOutputListener::DebugOutputListener(DebugConsole const& owner)
-        :           owner_{owner}
+    DebugOutputListener::DebugOutputListener(DebugConsole const& rMaster)
+        :          master_{rMaster}
         ,        thrdStop_{CreateEvent(nullptr, FALSE, FALSE, nullptr), CloseHandle}
-        ,        mutexPtr_{}
+        ,      mappingPtr_{}
         ,       buffReady_{}
         ,       dataReady_{}
-        ,      mappingPtr_{}
         ,        shmemPtr_{}
-        , securityDescPtr_{}
         ,    thrdListener_{}
     {
-        UNREFERENCED_PARAMETER(StaticInit::Instance());
     }
 
     bool DebugOutputListener::Init(bool bGlobal, PCWSTR pszWindowName)
     {
         DWORD constexpr   dwMapBytes{4096};
         PCWSTR const       pszPrefix{bGlobal ? L"Global\\" : (pszWindowName ? pszWindowName : L"")};
-        SECURITY_ATTRIBUTES secAttrs{0};
-        HandlePtr         secDescPtr{StaticInit::CreateSecurityDesc(secAttrs)};
-      //HandlePtr           mutexPtr{StaticInit::CreateDbgMutex(pszPrefix, &secAttrs)};
-        HandlePtr         mappingPtr{StaticInit::CreateMapping(pszPrefix, dwMapBytes, &secAttrs)};
-        HandlePtr         dataRdyPtr{StaticInit::CreateSignal(pszPrefix, L"DBWIN_BUFFER_READY", &secAttrs)};
-        HandlePtr         buffRdyPtr{StaticInit::CreateSignal(pszPrefix, L"DBWIN_DATA_READY", &secAttrs)};
-        ShmemPtr            shmemPtr{StaticInit::MapSharedMemory(mappingPtr.get(), dwMapBytes)};
-        if (!mappingPtr || !shmemPtr || !dataRdyPtr || !buffRdyPtr) {
+        HandlePtr mappingPtr{CreateDbgMapping(master_, pszPrefix, dwMapBytes, nullptr)};
+        if (!mappingPtr) {
+            return false;
+        }
+        HandlePtr buffRdyPtr{CreateDbgSignal(master_, false, true, pszPrefix, L"DBWIN_BUFFER_READY", nullptr)};
+        if (!buffRdyPtr) {
+            return false;
+        }
+        HandlePtr dataRdyPtr{CreateDbgSignal(master_, false, false, pszPrefix, L"DBWIN_DATA_READY", nullptr)};
+        if (!dataRdyPtr) {
+            return false;
+        }
+        HandlePtr shmemPtr{MapDbgShared(master_, mappingPtr.get(), dwMapBytes)};
+        if (!shmemPtr) {
             return false;
         }
         shmemPtr.swap(shmemPtr_);
-        buffRdyPtr.swap(buffReady_);
         dataRdyPtr.swap(dataReady_);
+        buffRdyPtr.swap(buffReady_);
         mappingPtr.swap(mappingPtr_);
-      //mutexPtr.swap(mutexPtr_);
-        if constexpr (true) {
-            StaticInit::AdjustObjectDACL(shmemPtr_.get());
-            StaticInit::AdjustObjectDACL(buffReady_.get());
-            StaticInit::AdjustObjectDACL(dataReady_.get());
+        if constexpr (false) {
+            DeleteObjectDACL(master_, shmemPtr_.get());
+            DeleteObjectDACL(master_, buffReady_.get());
+            DeleteObjectDACL(master_, dataReady_.get());
         }
         else {
-            StaticInit::DeleteObjectDACL(shmemPtr_.get());
-            StaticInit::DeleteObjectDACL(buffReady_.get());
-            StaticInit::DeleteObjectDACL(dataReady_.get());
+            AdjustObjectDACL(master_, shmemPtr_.get());
+            AdjustObjectDACL(master_, buffReady_.get());
+            AdjustObjectDACL(master_, dataReady_.get());
         }
         SetEvent(buffReady_.get());
         return true;
@@ -309,7 +257,7 @@ namespace DH
     bool DebugOutputListener::Start(PCWSTR pszWindowName, bool bGlobal)
     {
         if (IsDebuggerPresent()) {
-            owner_.PutsWide(L"WARNING: IsDebuggerPresent == TRUE\n");
+            master_.PutsWide(L"WARNING: IsDebuggerPresent == TRUE\n");
         }
         if (thrdListener_.joinable()) {
             return true;
@@ -339,8 +287,7 @@ namespace DH
             DWORD    dwPid;
             char szText[1];
         };
-        HANDLE   events[]{ thrdStop_.get(), dataReady_.get() };
-      //DWORD const myPid{GetCurrentProcessId()};
+        HANDLE const events[]{ thrdStop_.get(), dataReady_.get() };
         while (true) {
             SetEvent(buffReady_.get());
             switch (DWORD const dwSignal{WaitForMultipleObjects(_countof(events), events, FALSE, INFINITE)}) {
@@ -348,7 +295,7 @@ namespace DH
                 return ;
             case WAIT_OBJECT_0+1: {
                 auto const* pData = static_cast<DataBuffer const*>(shmemPtr_.get());
-                owner_.PutsNarrow(pData->szText, pData->dwPid);
+                master_.PutsNarrow(pData->szText, pData->dwPid);
                 ResetEvent(dataReady_.get());
                 ResetEvent(buffReady_.get());
                 break;

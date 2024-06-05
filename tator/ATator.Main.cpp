@@ -139,27 +139,31 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
     // this resolves ATL window thunking problem when Microsoft Layer for Unicode (MSLU) is used
     DefWindowProc(nullptr, 0, 0, 0L);
 
-    //hCode = DH::DebugConsole::Instance().Initialize();
-    //if (S_OK != hCode) {
-    //    hCode = GetErrorCode(hCode);
-    //    ATL::CString const codeMessage{Str::ErrorCode<TCHAR>::SystemMessage(hCode)};
-    //    ATL::CString        strMessage{};
-    //    strMessage.Format(_T("Ошибка инициализации DebugConsole.\r\n[%s]"), codeMessage.GetString());
-    //    MessageBox(GetActiveWindow(), strMessage.GetString(), _T("FATAL"), MB_ICONSTOP);
-    //    return static_cast<int>(hCode);
-    //}
-    DH::DebugConsole::Instance().ReceiveDebugOutput(true, L"", false);
-
     hCode = OleInitialize(nullptr);
     // If you are running on NT 4.0 or higher you can use the following call instead to 
     // make the EXE free threaded. This means that calls come in on a random RPC thread.
     //     HRESULT hRes = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
     ATLASSERT(SUCCEEDED(hCode));
-    DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
     WTL::AtlInitCommonControls(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
 
     hCode = _Module.Init(nullptr, hInstance);
     ATLASSERT(SUCCEEDED(hCode));
+
+    if (!DH::DebugConsole::Instance().AdjustPrivileges()) {
+        ATL::CString strMessage{};
+        strMessage.Format(_T("Ошибка утсановки отладочных привилегий DebugConsole:\r\n\r\n%s"),
+            DH::DebugConsole::Instance().GetStrings({}).c_str());
+        MessageBox(GetActiveWindow(), strMessage.GetString(), _T("WARNING"), MB_ICONWARNING);
+    }
+
+    if (!DH::DebugConsole::Instance().ReceiveDebugOutput(L"", false)) {
+        ATL::CString strMessage{};
+        strMessage.Format(_T("Ошибка запуска загрузчика отладочных сообщений DebugConsole:\r\n\r\n%s"),
+            DH::DebugConsole::Instance().GetStrings({}).c_str());
+        MessageBox(GetActiveWindow(), strMessage.GetString(), _T("WARNING"), MB_ICONWARNING);
+    }
+
+    DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
 
     hCode = Run(lpstrCmdLine, nCmdShow);
 

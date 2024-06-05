@@ -95,8 +95,12 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     {
-
-        DH::DebugConsole::Instance().SubclassWindow(GetDlgItem(IDC_DEBUG_CONSOLE));
+        CRect         rcLog{};
+        ATL::CWindow wndLog{GetDlgItem(IDC_DEBUG_CONSOLE)};
+        wndLog.GetWindowRect(rcLog);
+        wndLog.DestroyWindow();
+        ScreenToClient(rcLog);
+        DH::DebugConsole::Instance().Create(m_hWnd, rcLog, WS_CHILD | WS_VISIBLE, 0, IDC_DEBUG_CONSOLE);
 
         m_btnMyColor1.SubclassWindow(GetDlgItem(IDC_BUTTON1));
         m_btnMyColor2.SubclassWindow(GetDlgItem(IDC_BUTTON2));

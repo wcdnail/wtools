@@ -6,31 +6,27 @@
 namespace DH
 {
     class DebugConsole;
+    class BasicDebugConsole;
 
     class DebugOutputListener
     {
-    public:
+        friend class BasicDebugConsole;
+
         ~DebugOutputListener();
-        DebugOutputListener(DebugConsole const& owner);
+        DebugOutputListener(DebugConsole const& rMaster);
 
         bool Start(PCWSTR pszWindowName, bool bGlobal);
         bool Stop();
 
-    private:
         using HandlePtr = std::shared_ptr<void>;
-        using  ShmemPtr = std::shared_ptr<void>;
 
-        class StaticInit;
-
-        DebugConsole const& owner_;
-        HandlePtr        thrdStop_;
-        HandlePtr        mutexPtr_;
-        HandlePtr       buffReady_;
-        HandlePtr       dataReady_;
-        HandlePtr      mappingPtr_;
-        ShmemPtr         shmemPtr_;
-        HandlePtr securityDescPtr_;
-        std::thread  thrdListener_;
+        DebugConsole const& master_;
+        HandlePtr         thrdStop_;
+        HandlePtr       mappingPtr_;
+        HandlePtr        buffReady_;
+        HandlePtr        dataReady_;
+        HandlePtr         shmemPtr_;
+        std::thread   thrdListener_;
 
         bool Init(bool bGlobal, PCWSTR pszWindowName = nullptr);
         void Listener() const;
