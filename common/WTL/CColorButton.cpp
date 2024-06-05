@@ -940,9 +940,9 @@ BOOL CColorButton::CPickerImpl::Picker()
     pLogPalette->palVersion = 0x300;
     pLogPalette->palNumEntries = static_cast<WORD>(m_nNumColors);
     for (int i = 0; i < m_nNumColors; i++) {
-        pLogPalette->palPalEntry[i].peRed = GetRValue(gm_sColors [i] .clrColor);
-        pLogPalette->palPalEntry[i].peGreen = GetGValue(gm_sColors [i] .clrColor);
-        pLogPalette->palPalEntry[i].peBlue = GetBValue(gm_sColors [i] .clrColor);
+        pLogPalette->palPalEntry[i].peRed = GetRValue(gm_sColors[i].clrColor);
+        pLogPalette->palPalEntry[i].peGreen = GetGValue(gm_sColors[i].clrColor);
+        pLogPalette->palPalEntry[i].peBlue = GetBValue(gm_sColors[i].clrColor);
         pLogPalette->palPalEntry[i].peFlags = 0;
     }
     m_palette.CreatePalette(pLogPalette);
@@ -1071,7 +1071,7 @@ BOOL CColorButton::CPickerImpl::Picker()
         if (fOked) {
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
                 CColorPickerDlg dlg{m_rMaster.m_clrCurrent};
-                //m_rMaster.IColor::AddObserver(dlg.GetMasterObserver()); // TODO: buggy
+                dlg.GetMasterColor().SetID(m_rMaster.GetID());
                 dlg.GetMasterColor().AddObservers(m_rMaster);
                 if (dlg.Show(m_rMaster.GetParent(), Rc::Right | Rc::YCenter, true)) {
                     fOked = TRUE;
@@ -1079,7 +1079,6 @@ BOOL CColorButton::CPickerImpl::Picker()
                 else {
                     fOked = FALSE;
                 }
-                //m_rMaster.RemoveObserver(dlg.GetMasterObserver());
             }
             else if (DEFAULT_BOX_VALUE == m_nCurrentSel) {
                 m_rMaster.m_clrCurrent = m_rMaster.m_clrDefault;

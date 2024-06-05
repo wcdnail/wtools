@@ -23,7 +23,7 @@ namespace
             if (IniString::npos == end) {
                 end = len;
             }
-            const BYTE value = std::stoi(str.substr(begin, end - begin));
+            const BYTE value{static_cast<BYTE>(std::stoi(str.substr(begin, end - begin)))};
             data[count] = value;
             ++count;
             begin = end + 1;

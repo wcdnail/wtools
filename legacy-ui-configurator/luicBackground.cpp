@@ -43,8 +43,8 @@ BOOL CPageBackground::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 HRESULT CPageBackground::WallpaperInit()
 {
     using   COMStrPtr = std::shared_ptr<void>;
-    HRESULT      code = S_OK;
-    uint32_t mdpCount = 0;
+    HRESULT      code{S_OK};
+    uint32_t mdpCount{1};
     code = m_pWallpaper->GetMonitorDevicePathCount(&mdpCount);
     if (FAILED(code)) {
         SetMFStatus(code, L"GetMonitorDevicePathCount failure");

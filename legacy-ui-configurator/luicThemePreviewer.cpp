@@ -185,9 +185,6 @@ void CThemePreviewer::DrawDesktop(WTL::CDCHandle dc, CRect const& rcClient)
         { m_WndRect[WND_MsgBox],   rcMsg },
     };
     dc.FillSolidRect(rcClient, scheme.GetColor(COLOR_BACKGROUND));
-
-    // TODO: borrow wallpaper drawer from CPageBackground
-
     CDrawings drawings{scheme, *m_pSizePair};
     drawings.DrawDesktopIcon(dc, rcIcon, L"Icon Text", true);
     for (int i = 0; i < WND_Count; i++) {

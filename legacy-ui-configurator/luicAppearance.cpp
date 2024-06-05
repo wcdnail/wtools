@@ -373,7 +373,7 @@ LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
         case IDC_APP_ITEM_COLOR2_SEL: nButton = IT_Color2; goto TryChange;
         case IDC_APP_FONT_COLOR_SEL:  nButton = IT_FontColor1;
      TryChange:
-            ItemColorTryChange(nButton);
+            ItemColorTryChange(nButton, m_bnItemColor[nButton].GetColorRef());
             break;
         default:
             break;
@@ -401,10 +401,9 @@ int CPageAppearance::ItemGetSel() const
     return nItem;
 }
 
-void CPageAppearance::ItemColorTryChange(int nButton)
+void CPageAppearance::ItemColorTryChange(int nButton, COLORREF clrTryed)
 {
-    const COLORREF clrTryed{m_bnItemColor[nButton].GetColorRef()};
-    const int         nItem{ItemGetSel()};
+    const int nItem{ItemGetSel()};
     if (IT_Invalid == nItem) {
         DH::TPrintf(LTH_APPEARANCE L" <<FAILED>> '%s' (%d) ==> #%08x\n", _T(__FUNCTION__), nButton, clrTryed);
         return ;
@@ -417,13 +416,15 @@ void CPageAppearance::ItemColorTryChange(int nButton)
     case IT_FontColor1: nWhich = rItemDef.fontColor; break;
     }
     const bool bSuccess = m_SchemeCopy.GetColorPair(nWhich).Reset(clrTryed);
-    DH::TPrintf(LTH_APPEARANCE L" Item: '%s' SetColor '%s'[%d] ==> #%08x == %s\n", 
-        rItemDef.name,
-        CColors::Title(nWhich),
-        nWhich,
-        clrTryed,
-        bSuccess ? L"OK" : L"FAIL"
-    );
+    if constexpr (false) {
+        DH::TPrintf(LTH_APPEARANCE L" Item: '%s' SetColor '%s'[%d] ==> #%08x == %s\n", 
+            rItemDef.name,
+            CColors::Title(nWhich),
+            nWhich,
+            clrTryed,
+            bSuccess ? L"OK" : L"FAIL"
+        );
+    }
     if (bSuccess) {
         m_stPreview.InvalidateRect(nullptr, FALSE);
     }
@@ -685,4 +686,13 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND)
         DBGTPrint(LTH_WM_NOTIFY L" APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
             nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
     }
+}
+
+void CPageAppearance::OnColorUpdate(IColor const& clrSource)
+{
+    int const nButton{clrSource.GetID()};
+    if (IColor::nInvalidID == nButton) {
+        return ;
+    }
+    ItemColorTryChange(nButton, clrSource.GetColorRef());
 }

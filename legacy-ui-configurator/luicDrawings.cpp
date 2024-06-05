@@ -176,7 +176,7 @@ struct CDrawings::CStaticRes
     CStaticRes();
 
     HRESULT Init(HWND hWnd);
-    HICON const* GetIcons();
+    HICON const* GetIcons() const;
 
 private:
     template <typename T>
@@ -226,16 +226,18 @@ HRESULT CDrawings::CStaticRes::Init(HWND hWnd)
     auto const& ilBig = CLUIApp::App()->GetImageList(IL_OwnBig);
     m_hIcon[ICON_Desktop1] = ilBig.GetIcon(IconMyComp); // IconMatreshka
     m_hIcon[ICON_Cursor1] = (HICON)LoadCursorW(nullptr, IDC_APPSTARTING);
-    return m_InTheme.Init(hWnd);
-}
 
-HICON const* CDrawings::CStaticRes::GetIcons()
-{
     srand(static_cast<int>(time(nullptr)));
     auto const& ilSmall = CLUIApp::App()->GetImageList(IL_SHELL_16x16);
     const int  maxCount = ilSmall.GetImageCount() - 1;
     m_hIcon[ICON_ActiveWnd]   = ilSmall.GetIcon(rand() % maxCount);
     m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
+
+    return m_InTheme.Init(hWnd);
+}
+
+HICON const* CDrawings::CStaticRes::GetIcons() const
+{
     return m_hIcon;
 }
 

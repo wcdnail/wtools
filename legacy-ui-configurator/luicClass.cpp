@@ -10,6 +10,7 @@ Class::Class()
 template <typename ReturnType, typename SelfRef>
 ReturnType& Class::getRefByIndex(SelfRef& thiz, int index)
 {
+    UNREFERENCED_PARAMETER(thiz);
     switch (index) {
     case CLASS_Invalid: 
     default:

@@ -4,7 +4,11 @@
 #include <dh.tracing.h>
 
 IColor::~IColor() = default;
-IColor::IColor() = default;
+IColor::IColor()
+    : m_nID{nInvalidID}
+    , m_lstObservers{}
+{
+}
 
 COLORREF IColor::GetColorRef() const
 {

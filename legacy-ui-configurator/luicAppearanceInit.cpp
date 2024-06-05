@@ -198,6 +198,8 @@ BOOL CPageAppearance::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
     for (int i = 0; i < IT_ColorCount; i++) {
         m_bnItemColor[i].SetDefaultText(_T("Revert"));
         m_bnItemColor[i].SetCustomText(_T("Customize"));
+        m_bnItemColor[i].SetID(i);
+        m_bnItemColor[i].AddObserver(*this);
     }
 #ifdef _DEBUG_CONTROLS
     DoForEach(CtlShow);

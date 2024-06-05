@@ -65,7 +65,7 @@ static size_t WinXPRegStrToBinary(IniStringW const& str, LPBYTE data, size_t siz
         if (IniString::npos == end) {
             end = len;
         }
-        const BYTE value = std::stoi(str.substr(begin, end - begin), nullptr, 16);
+        const BYTE value{static_cast<BYTE>(std::stoi(str.substr(begin, end - begin), nullptr, 16))};
         data[count] = value;
         ++count;
         begin = end + 1;

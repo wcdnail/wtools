@@ -5,14 +5,15 @@
 #include "luicPageImpl.h"
 #include "luicThemePreviewer.h"
 #include "luicSchemeManager.h"
-#include "WTL/CColorButton.h"
+#include <WTL/CColorButton.h>
 #include <wcdafx.api.h>
 #include <atlctrls.h>
 #include <atlstr.h>
 
 class CLUIApp;
 
-struct CPageAppearance: CPageImpl
+struct CPageAppearance: public  CPageImpl,
+                        private IColorObserver
 {
     DELETE_COPY_MOVE_OF(CPageAppearance);
 
@@ -109,7 +110,9 @@ private:
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl) override;
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh) override;
     int ItemGetSel() const;
-    void ItemColorTryChange(int nButton);
+    void ItemColorTryChange(int nButton, COLORREF clrTryed);
     void ApplyPendingChanges() const;
     void SchemeRenameShow(bool bShow);
+
+    void OnColorUpdate(IColor const& clrSource) override;
 };
