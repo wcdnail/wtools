@@ -1071,7 +1071,7 @@ BOOL CColorButton::CPickerImpl::Picker()
         if (fOked) {
             if (CUSTOM_BOX_VALUE == m_nCurrentSel) {
                 CColorPickerDlg dlg{m_rMaster.m_clrCurrent};
-                //dlg.GetMasterColor().SetColor(m_rMaster.m_clrCurrent, RGB_MAX_INT);
+                //m_rMaster.IColor::AddObserver(dlg.GetMasterObserver()); // TODO: buggy
                 dlg.GetMasterColor().AddObservers(m_rMaster);
                 if (dlg.Show(m_rMaster.GetParent(), Rc::Right | Rc::YCenter, true)) {
                     fOked = TRUE;
@@ -1079,6 +1079,7 @@ BOOL CColorButton::CPickerImpl::Picker()
                 else {
                     fOked = FALSE;
                 }
+                //m_rMaster.RemoveObserver(dlg.GetMasterObserver());
             }
             else if (DEFAULT_BOX_VALUE == m_nCurrentSel) {
                 m_rMaster.m_clrCurrent = m_rMaster.m_clrDefault;

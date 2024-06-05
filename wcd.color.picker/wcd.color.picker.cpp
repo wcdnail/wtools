@@ -4,8 +4,10 @@
 #include <string.utils.format.h>
 #include <string.utils.error.code.h>
 #include <dh.tracing.h>
+#include <color.stuff.h>
 #include <WTL/CAppModuleRef.h>
 #include <clipp.h>
+#include <iostream>
 
 WTL::CAppModule _Module{};
 
@@ -37,6 +39,14 @@ static int Run(HINSTANCE hInstance)
     if (-1 == nRet) {
         hCode = static_cast<HRESULT>(GetLastError());
         goto reportError;
+    }
+    if (IDOK == nRet) {
+        int const nAlpha{dlg.m_ColorPicker.GetAlpha()};
+        std::wcout << L"0x" << std::hex << dlg.m_ColorPicker.GetColorRef() << std::endl;
+        if (nAlpha < RGB_MAX_INT) {
+            std::wcout << L"A: 0x" << std::hex << nAlpha << std::endl;
+        }
+        std::wcout << std::flush;
     }
     _Module.RemoveMessageLoop();
     return nRet;

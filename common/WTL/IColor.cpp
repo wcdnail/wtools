@@ -4,11 +4,7 @@
 #include <dh.tracing.h>
 
 IColor::~IColor() = default;
-
-IColor::IColor()
-    : m_lstObservers{}
-{
-}
+IColor::IColor() = default;
 
 COLORREF IColor::GetColorRef() const
 {
@@ -61,14 +57,19 @@ void IColor::AddObservers(IColor& rColor)
     m_lstObservers.assign_range(temp);
 }
 
+void IColor::RemoveObserver(IColorObserver& rObserver)
+{
+    auto const it = std::ranges::find(m_lstObservers, &rObserver);
+    if (it == m_lstObservers.end()) {
+        return ;
+    }
+    m_lstObservers.erase(it);
+}
+
 bool IColor::IsAlreadyObserved(IColorObserver const* pObserver) const
 {
-    for (auto const& jt: m_lstObservers) {
-        if (pObserver == jt) {
-            return true;
-        }
-    }
-    return false;
+    auto const it = std::ranges::find(m_lstObservers, pObserver);
+    return it != m_lstObservers.end();
 }
 
 void IColor::NotifyObservers() const

@@ -22,6 +22,7 @@ public:
 
     WCDAFX_API virtual void AddObserver(IColorObserver& rObserver);
     WCDAFX_API virtual void AddObservers(IColor& rColor);
+    WCDAFX_API virtual void RemoveObserver(IColorObserver& rObserver);
 
 private:
     using ObserverList = std::list<IColorObserver*>;
