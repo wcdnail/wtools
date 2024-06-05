@@ -25,6 +25,7 @@ namespace DH
 
     WCDAFX_API void InitDebugHelpers(uint64_t flags = DEFAULT_FLAGS);
     WCDAFX_API void PrintLogHeader();
+    WCDAFX_API double LogUpTime();
 
     class TraceCategory
     {

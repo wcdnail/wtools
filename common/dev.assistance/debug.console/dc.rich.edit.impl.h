@@ -24,8 +24,8 @@ namespace DH
         void Save(char const* filePathName) const override;
         HWND CreateConsole() override;
         void PreWrite() override;
-        void WriteNarrow(std::string& nrString) override;
-        void WriteWide(std::wstring& wdString) override;
+        void WriteNarrow(std::string& nrString, double, DWORD) override;
+        void WriteWide(std::wstring& wdString, double, DWORD) override;
         void PostWrite() override;
         void OnDestroy() override;
 

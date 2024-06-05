@@ -1,14 +1,12 @@
 #include "stdafx.h"
 #include "basic.debug.console.h"
-
-#include <dh.tracing.defs.h>
-
 #include "debug.console.h"
+#include <string.utils.error.code.h>
+#include <dh.tracing.defs.h>
 #include <dh.tracing.h>
 #include <trect.h>
 #include <string>
 #include <iostream>
-#include <string.utils.error.code.h>
 
 namespace DH
 {
@@ -129,26 +127,43 @@ namespace DH
         }
     }
 
-    void BasicDebugConsole::PutsNarrow(std::string_view nrView)
+    BasicDebugConsole::StringItem::~StringItem() = default;
+
+    BasicDebugConsole::StringItem::StringItem(StringPair&& pair, DWORD dwPID)
+        : pair_{std::move(pair)}
+        ,  pid_{dwPID}
+        ,   ts_{DH::LogUpTime()}
+    {
+    }
+
+    BasicDebugConsole::StringItem::StringItem(std::string_view nrView, DWORD dwPID)
+        : StringItem(std::make_pair(std::string{nrView.data(), nrView.length()}, std::wstring{}), dwPID)
+    {
+    }
+
+    BasicDebugConsole::StringItem::StringItem(std::wstring_view wdView, DWORD dwPID)
+        : StringItem(std::make_pair(std::string{}, std::wstring{wdView.data(), wdView.length()}), dwPID)
+    {
+    }
+
+    void BasicDebugConsole::PutsNarrow(std::string_view nrView, DWORD dwPID)
     {
         {
-            std::string  nrTemp{nrView.data(), nrView.length()};
-            std::wstring wdTemp{};
+            StringItem sItem{nrView, dwPID};
             std::lock_guard<std::mutex> lk(cacheMx_);
-            cache_.emplace_back(std::make_pair(std::move(nrTemp), std::move(wdTemp)));
+            cache_.emplace_back(std::move(sItem));
         }
         if (m_hWnd) {
             PostMessageW(WM_SYNC_STRINGS);
         }
     }
 
-    void BasicDebugConsole::PutsWide(std::wstring_view wdView)
+    void BasicDebugConsole::PutsWide(std::wstring_view wdView, DWORD dwPID)
     {
         {
-            std::string  nrTemp{};
-            std::wstring wdTemp{wdView.data(), wdView.length()};
+            StringItem sItem{wdView, dwPID};
             std::lock_guard<std::mutex> lk(cacheMx_);
-            cache_.emplace_back(std::make_pair(std::move(nrTemp), std::move(wdTemp)));
+            cache_.emplace_back(std::move(sItem));
         }
         if (m_hWnd) {
             PostMessageW(WM_SYNC_STRINGS);
@@ -176,13 +191,13 @@ namespace DH
         ATLASSERT(false);
     }
 
-    void BasicDebugConsole::WriteNarrow(std::string&)
+    void BasicDebugConsole::WriteNarrow(std::string&, double, DWORD)
     {
         DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
         ATLASSERT(false);
     }
 
-    void BasicDebugConsole::WriteWide(std::wstring&)
+    void BasicDebugConsole::WriteWide(std::wstring&, double, DWORD)
     {
         DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
         ATLASSERT(false);
@@ -196,13 +211,13 @@ namespace DH
     {
         std::lock_guard<std::mutex> lk(cacheMx_);
         while (!cache_.empty()) {
-            StringPair& sp = cache_.front();
+            StringItem& sp = cache_.front();
             PreWrite();
-            if (sp.first.empty()) {
-                WriteWide(sp.second);
+            if (sp.pair_.first.empty()) {
+                WriteWide(sp.pair_.second, sp.ts_, sp.pid_);
             }
             else {
-                WriteNarrow(sp.first);
+                WriteNarrow(sp.pair_.first, sp.ts_, sp.pid_);
             }
             PostWrite();
             cache_.pop_front();

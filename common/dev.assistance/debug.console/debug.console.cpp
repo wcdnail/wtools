@@ -18,8 +18,8 @@ namespace DH
 
         HWND CreateConsole() override;
         void PreWrite() override;
-        void WriteNarrow(std::string& nrString) override;
-        void WriteWide(std::wstring& wdString) override;
+        void WriteNarrow(std::string& nrString, double, DWORD) override;
+        void WriteWide(std::wstring& wdString, double, DWORD) override;
         void Save(char const* fileName) const override;
         void OnDestroy() override;
     };
@@ -53,12 +53,12 @@ namespace DH
         console_.SetSel(n, n, GetParameters().autoScroll ? TRUE : FALSE);
     }
 
-    void DebugConsoleImpl::WriteNarrow(std::string& nrString)
+    void DebugConsoleImpl::WriteNarrow(std::string& nrString, double, DWORD)
     {
         ::SendMessageA(console_, EM_REPLACESEL, static_cast<WPARAM>(FALSE), reinterpret_cast<LPARAM>(nrString.c_str()));
     }
 
-    void DebugConsoleImpl::WriteWide(std::wstring& wdString)
+    void DebugConsoleImpl::WriteWide(std::wstring& wdString, double, DWORD)
     {
         ::SendMessageW(console_, EM_REPLACESEL, static_cast<WPARAM>(FALSE), reinterpret_cast<LPARAM>(wdString.c_str()));
     }
@@ -164,14 +164,14 @@ namespace DH
         ::SetWindowTextW(impl_->m_hWnd, string);
     }
 
-    void DebugConsole::PutsNarrow(std::string_view nrString) const
+    void DebugConsole::PutsNarrow(std::string_view nrString, DWORD dwPID) const
     {
-        impl_->PutsNarrow(nrString);
+        impl_->PutsNarrow(nrString, dwPID);
     }
 
-    void DebugConsole::PutsWide(std::wstring_view wdString) const
+    void DebugConsole::PutsWide(std::wstring_view wdString, DWORD dwPID) const
     {
-        impl_->PutsWide(wdString);
+        impl_->PutsWide(wdString, dwPID);
     }
 
     void DebugConsole::AskPathAndSave() const

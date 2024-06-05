@@ -185,9 +185,6 @@ namespace DH
         ATL::CStringW sTemp{};
         sTemp.Format(L"%s%s", pszPrefix, pszName);
         HANDLE const hEvent{CreateEventW(pSecurity, FALSE, FALSE, sTemp.GetString())};
-      //if (INVALID_HANDLE_VALUE == hEvent) {
-      //    hEvent = CreateEventW(nullptr, FALSE, FALSE, sTemp.GetString());
-      //}
         if (INVALID_HANDLE_VALUE == hEvent) {
             auto const hCode = static_cast<HRESULT>(GetLastError());
             DH::TPrintf(LTH_DBG_ASSIST L" CreateEvent failed: 0x%08x %s\n",
@@ -351,9 +348,7 @@ namespace DH
                 return ;
             case WAIT_OBJECT_0+1: {
                 auto const* pData = static_cast<DataBuffer const*>(shmemPtr_.get());
-                //if (myPid == pData->dwPid) {
-                    owner_.PutsNarrow(pData->szText);
-                //}
+                owner_.PutsNarrow(pData->szText, pData->dwPid);
                 ResetEvent(dataReady_.get());
                 ResetEvent(buffReady_.get());
                 break;

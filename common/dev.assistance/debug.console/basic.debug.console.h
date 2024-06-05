@@ -25,6 +25,8 @@ namespace DH
         BasicDebugConsole(DebugConsole const& owner);
 
     public:
+        static constexpr DWORD dwCurrentPID{static_cast<DWORD>(-1)};
+
         using WndSuper::m_hWnd;
         using WndSuper::GetClientRect;
         using WndSuper::ShowWindow;
@@ -60,8 +62,8 @@ namespace DH
         Parameters& GetParameters();
         void SetParameters(int cx, int cy, int align, int fsize, char const* fname);
 
-        void PutsNarrow(std::string_view nrView);
-        void PutsWide(std::wstring_view wdView);
+        void PutsNarrow(std::string_view nrView, DWORD dwPID);
+        void PutsWide(std::wstring_view wdView, DWORD dwPID);
         virtual void Clean() const;
 
         void ReceiveStdOutput(bool on) const;
@@ -89,7 +91,20 @@ namespace DH
 
     protected:
         using StringPair = std::pair<std::string, std::wstring>;
-        using  StringQue = std::deque<StringPair>;
+
+        struct StringItem
+        {
+            StringPair pair_;
+            DWORD       pid_;
+            double       ts_;
+
+            ~StringItem();
+            StringItem(StringPair&& pair, DWORD dwPID);
+            StringItem(std::string_view nrView, DWORD dwPID);
+            StringItem(std::wstring_view wdView, DWORD dwPID);
+        };
+
+        using StringQue = std::deque<StringItem>;
 
         Parameters                           params_;
         WTL::CFont                      consoleFont_;
@@ -105,8 +120,8 @@ namespace DH
         virtual HWND CreateConsole() = 0;
 
         virtual void PreWrite() = 0;
-        virtual void WriteNarrow(std::string&) = 0;
-        virtual void WriteWide(std::wstring&) = 0;
+        virtual void WriteNarrow(std::string&, double, DWORD) = 0;
+        virtual void WriteWide(std::wstring&, double, DWORD) = 0;
         virtual void PostWrite();
 
         virtual void OnCommand(UINT notifyCode, int id, HWND);

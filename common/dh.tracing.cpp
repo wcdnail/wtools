@@ -234,10 +234,10 @@ namespace DH
         if (!text || !(*text)) {
             return ;
         }
-        ATL::CStringA temp;
-        int     len = text.GetLength() + 1;
-        PSTR buffer = temp.GetBufferSetLength(len);
-        int    clen = WideCharToMultiByte(LOG_DEF_CODEPAGE, 0, text, len, buffer, len, nullptr, nullptr);
+        ATL::CStringA temp{};
+        int  const     len{text.GetLength() + 1};
+        PSTR const  buffer{temp.GetBufferSetLength(len)};
+        int  const    clen{WideCharToMultiByte(LOG_DEF_CODEPAGE, 0, text, len, buffer, len, nullptr, nullptr)};
         temp.ReleaseBufferSetLength(clen);
         putsMBStr(std::move(temp));
     }
@@ -447,5 +447,10 @@ namespace DH
         auto& logCtx = LogCtx::instance();
         logCtx.setBits(flags);
         PrintLogHeader();
+    }
+
+    double LogUpTime()
+    {
+        return LOG_Uptime.Seconds();
     }
 }

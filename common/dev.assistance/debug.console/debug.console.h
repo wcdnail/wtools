@@ -11,6 +11,8 @@ namespace DH
     class DebugConsole
     {
     public:
+        static constexpr DWORD dwCurrentPID{static_cast<DWORD>(-1)};
+
         DELETE_COPY_MOVE_OF(DebugConsole);
 
         WCDAFX_API static DebugConsole& Instance();
@@ -30,8 +32,8 @@ namespace DH
         WCDAFX_API void SetTitleText(char const*) const;
         WCDAFX_API void SetTitleText(wchar_t const*) const;
 
-        WCDAFX_API void PutsNarrow(std::string_view) const;
-        WCDAFX_API void PutsWide(std::wstring_view) const;
+        WCDAFX_API void PutsNarrow(std::string_view, DWORD dwPID = dwCurrentPID) const;
+        WCDAFX_API void PutsWide(std::wstring_view, DWORD dwPID = dwCurrentPID) const;
 
         WCDAFX_API void AskPathAndSave() const;
         WCDAFX_API void Save(char const* filePathName) const;
