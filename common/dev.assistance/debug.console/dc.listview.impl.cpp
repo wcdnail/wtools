@@ -307,7 +307,7 @@ namespace DH
         if (!GetParameters().autoScroll) {
             return ;
         }
-        int const nIndexMax{console_.GetItemCount()};
+        int const nIndexMax{console_.GetItemCount()-1};
         ScrollTo(nIndexMax, false);
     }
 

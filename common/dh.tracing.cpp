@@ -3,6 +3,7 @@
 #include "dh.timer.h"
 #include "string.utils.format.h"
 #include "info/runtime.information.h"
+#include "dev.assistance/debug.console/debug.console.h"
 #include <atlstr.h>
 #include <filesystem>
 #include <algorithm>
@@ -298,6 +299,9 @@ namespace DH
         if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT)) {
             OutputDebugStringA(text.GetString());
         }
+        if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT)) {
+            DH::DebugConsole::Instance().PutsNarrow({text.GetString(), static_cast<size_t>(text.GetLength())});
+        }
         LogCtx::instance().puts(std::move(text));
     }
 
@@ -306,6 +310,9 @@ namespace DH
         auto logGuard = LogCtx::instance().ScopedLock();
         if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT)) {
             OutputDebugStringW(text.GetString());
+        }
+        if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT)) {
+            DH::DebugConsole::Instance().PutsWide({text.GetString(), static_cast<size_t>(text.GetLength())});
         }
         LogCtx::instance().putws(std::move(text));
     }

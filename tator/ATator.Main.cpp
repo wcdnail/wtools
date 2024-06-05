@@ -156,17 +156,17 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
         MessageBox(GetActiveWindow(), strMessage.GetString(), _T("WARNING"), MB_ICONWARNING);
     }
 
-    if (!DH::DebugConsole::Instance().ReceiveDebugOutput(L"", false)) {
-        ATL::CString strMessage{};
-        strMessage.Format(_T("Ошибка запуска загрузчика отладочных сообщений DebugConsole:\r\n\r\n%s"),
-            DH::DebugConsole::Instance().GetStrings({}).c_str());
-        MessageBox(GetActiveWindow(), strMessage.GetString(), _T("WARNING"), MB_ICONWARNING);
+    if constexpr (false) {
+        if (!DH::DebugConsole::Instance().ReceiveDebugOutput(L"", false)) {
+            ATL::CString strMessage{};
+            strMessage.Format(_T("Ошибка запуска загрузчика отладочных сообщений DebugConsole:\r\n\r\n%s"),
+                DH::DebugConsole::Instance().GetStrings({}).c_str());
+            MessageBox(GetActiveWindow(), strMessage.GetString(), _T("WARNING"), MB_ICONWARNING);
+        }
     }
 
-    DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
-
+    DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT | DH::DEBUG_DEVCON_OUT);
     hCode = Run(lpstrCmdLine, nCmdShow);
-
     _Module.Term();
     OleUninitialize();
     return static_cast<int>(hCode);
