@@ -7,6 +7,7 @@
 #include <rect.putinto.h>
 #include <atltheme.h>
 #include <utility>
+#include <random>
 
 //
 // https://stackoverflow.com/questions/14994012/how-draw-caption-in-alttab-switcher-when-paint-custom-captionframe
@@ -169,6 +170,7 @@ struct CDrawings::CStaticRes
 
     CInTheme        m_InTheme;
     HICON m_hIcon[ICON_Count];
+    HICON        m_defIcon[2];
 
     static WTL::CFontHandle CreateMarlettFont(LONG height);
 
@@ -176,7 +178,7 @@ struct CDrawings::CStaticRes
     CStaticRes();
 
     HRESULT Init(HWND hWnd);
-    HICON const* GetIcons() const;
+    HICON const* GetIcons(bool bRandomize);
 
 private:
     template <typename T>
@@ -221,23 +223,50 @@ WTL::CFontHandle CDrawings::CStaticRes::CreateMarlettFont(LONG height)
     return {CreateFontIndirect(&lf)};
 }
 
+static int IconIndex(std::mt19937& randGenerator, std::uniform_int_distribution<int>& randDistrib, int nMax)
+{
+    int nIndex{randDistrib(randGenerator)};
+    if (nIndex < 0) {
+        nIndex = 0;
+    }
+    else if (nIndex > nMax) {
+        nIndex = nMax;
+    }
+    return nIndex;
+}
+
 HRESULT CDrawings::CStaticRes::Init(HWND hWnd)
 {
-    auto const& ilBig = CLUIApp::App()->GetImageList(IL_OwnBig);
+    auto const& ilSmall{CLUIApp::App()->GetImageList(IL_Own)};
+    auto const&   ilBig{CLUIApp::App()->GetImageList(IL_OwnBig)};
     m_hIcon[ICON_Desktop1] = ilBig.GetIcon(IconMyComp); // IconMatreshka
     m_hIcon[ICON_Cursor1] = (HICON)LoadCursorW(nullptr, IDC_APPSTARTING);
-
-    srand(static_cast<int>(time(nullptr)));
-    auto const& ilSmall = CLUIApp::App()->GetImageList(IL_SHELL_16x16);
-    const int  maxCount = ilSmall.GetImageCount() - 1;
-    m_hIcon[ICON_ActiveWnd]   = ilSmall.GetIcon(rand() % maxCount);
-    m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(rand() % maxCount);
-
+    m_defIcon[0] = ilSmall.GetIcon(Icon98Themes);
+    m_defIcon[1] = ilSmall.GetIcon(IconAppearance);
+    m_hIcon[ICON_ActiveWnd]   = m_defIcon[0];
+    m_hIcon[ICON_InactiveWnd] = m_defIcon[1];
     return m_InTheme.Init(hWnd);
 }
 
-HICON const* CDrawings::CStaticRes::GetIcons() const
+HICON const* CDrawings::CStaticRes::GetIcons(bool bRandomize)
 {
+    if (!bRandomize) {
+        return m_hIcon;
+    }
+    // TODO: bRandomize ==> UB
+    auto const& ilSmall{CLUIApp::App()->GetImageList(IL_SHELL_16x16)};
+    const int  nIconMax{ilSmall.GetImageCount() - 1};
+    if (nIconMax > 0) {
+        std::random_device                  randDevice{};
+        std::mt19937                     randGenerator{randDevice()}; 
+        std::uniform_int_distribution<int> randDistrib{0, nIconMax};
+        m_hIcon[ICON_ActiveWnd]   = ilSmall.GetIcon(IconIndex(randGenerator, randDistrib, nIconMax));
+        m_hIcon[ICON_InactiveWnd] = ilSmall.GetIcon(IconIndex(randGenerator, randDistrib, nIconMax));
+    }
+    else {
+        m_hIcon[ICON_ActiveWnd]   = m_defIcon[0];
+        m_hIcon[ICON_InactiveWnd] = m_defIcon[1];
+    }
     return m_hIcon;
 }
 
@@ -984,15 +1013,16 @@ void CDrawings::DrawWindow(WTL::CDCHandle dc, DrawWindowArgs const& params, Wind
 {
     ATLASSERT(m_pStaticRes.get() != nullptr);
 
-    HICON const*      icons = m_pStaticRes->GetIcons();
-    const HFONT    menuFont = m_SizePair.GetFont(FONT_Menu);
-    const HFONT    captFont = m_SizePair.GetFont(FONT_Caption);
-    HICON          captIcon = nullptr;
-    UINT          captFlags = params.captFlags | DC_TEXT;
-    int workspaceColorIndex = COLOR_APPWORKSPACE;
-    int    borderColorIndex = COLOR_INACTIVEBORDER;
-    const bool    isToolWnd = (0 != (DC_SMALLCAP & params.captFlags));
-    const bool     isActive = (0 != (DC_ACTIVE & params.captFlags));
+  //bool const bRandomIcons{true}; //{0 == (GetTickCount() % 5000)}; // random icon get UB
+    HICON const*      icons{m_pStaticRes->GetIcons(false)};
+    const HFONT    menuFont{m_SizePair.GetFont(FONT_Menu)};
+    const HFONT    captFont{m_SizePair.GetFont(FONT_Caption)};
+    HICON          captIcon{nullptr};
+    UINT          captFlags{params.captFlags | DC_TEXT};
+    int workspaceColorIndex{COLOR_APPWORKSPACE};
+    int    borderColorIndex{COLOR_INACTIVEBORDER};
+    const bool    isToolWnd{(0 != (DC_SMALLCAP & params.captFlags))};
+    const bool     isActive{(0 != (DC_ACTIVE & params.captFlags))};
 
     m_ftMarlett.Attach(nullptr);
 

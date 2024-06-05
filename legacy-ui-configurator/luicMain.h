@@ -30,6 +30,7 @@ enum IconIndex : int
     IconFolderOpen,
     IconFontBold,
     IconMatreshka,
+    Icon98Themes,
     IconCount
 };
 
@@ -46,7 +47,7 @@ public:
     Conf::Section& GetSettings();
     HICON GetIcon(int icon) const;
     WTL::CMenuHandle GetTestMenu() const;
-    WTL::CImageListManaged const& GetImageList(int index) const;
+    WTL::CImageList GetImageList(int index) const;
     FontMap const& GetFontMap() const;
     CSchemeManager const& SchemeManager() const;
     CSchemeManager& SchemeManager();

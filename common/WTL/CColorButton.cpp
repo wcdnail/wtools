@@ -1073,8 +1073,9 @@ BOOL CColorButton::CPickerImpl::Picker()
                 CColorPickerDlg dlg{m_rMaster.m_clrCurrent};
                 dlg.GetMasterColor().SetID(m_rMaster.GetID());
                 dlg.GetMasterColor().AddObservers(m_rMaster);
-                if (dlg.Show(m_rMaster.GetParent(), Rc::Right | Rc::YCenter, true)) {
+                if (dlg.Show(m_rMaster.GetParent(), Rc::Right | Rc::Bottom, true)) {
                     fOked = TRUE;
+                    m_rMaster.m_clrCurrent = dlg.GetMasterColor().GetColorRef();
                 }
                 else {
                     fOked = FALSE;

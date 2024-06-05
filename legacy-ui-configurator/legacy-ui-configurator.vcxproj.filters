@@ -230,6 +230,12 @@
     <Image Include="rom-7-matreshka.ico">
       <Filter>resz\iconz</Filter>
     </Image>
+    <Image Include="rom-themes.ico">
+      <Filter>resz</Filter>
+    </Image>
+    <Image Include="resz\rom-themes.ico">
+      <Filter>resz</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="idl\legacy-ui-configurator.idl">

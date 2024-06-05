@@ -173,13 +173,12 @@ CLUIApp* CLUIApp::App()
     return g_pApp;
 }
 
-WTL::CImageListManaged const& CLUIApp::GetImageList(int index) const
+WTL::CImageList CLUIApp::GetImageList(int index) const
 {
     if (index < 0 || index >= IL_Count) {
-        static const WTL::CImageListManaged dmy;
-        return dmy;
+        return {};
     }
-    return m_ImList[index];
+    return {m_ImList[index].m_hImageList};
 }
 
 HRESULT CLUIApp::ImListCreate(int index, int cx, int cy)
@@ -195,6 +194,7 @@ HRESULT CLUIApp::ImListCreate(int index, int cx, int cy)
         IDI_FOLDER_OPEN,
         IDI_FNT_BOLD,
         IDI_MATRESHKA,
+        IDI_98THEMES,
     };
     static_assert(std::size(iconsIDs) == IconCount, "iconsIDs COUNT is NOT match IconCount!");
     //

@@ -350,6 +350,7 @@
     <Image Include="resz\rom-open.ico" />
     <Image Include="resz\rom-rename.ico" />
     <Image Include="resz\rom-save.ico" />
+    <Image Include="resz\rom-themes.ico" />
     <Image Include="rom-1.ico" />
     <Image Include="rom-2.ico" />
     <Image Include="rom-7-matreshka.ico" />
@@ -358,6 +359,7 @@
     <Image Include="rom-open.ico" />
     <Image Include="rom-rename.ico" />
     <Image Include="rom-save.ico" />
+    <Image Include="rom-themes.ico" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="resz\legacy-ui-configurator.exe.manifest" />

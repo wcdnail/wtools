@@ -49,6 +49,8 @@
 #define IDI_MATRESHKA                   220
 #define IDC_RADIO3                      221
 #define IDC_RADIO4                      222
+#define IDI_ICON3                       222
+#define IDI_98THEMES                    222
 #define IDC_RADIO5                      223
 #define IDC_APP_DLG_APPEARANCE_START    3000
 #define IDC_APP_THEME_CAP               3001
@@ -104,7 +106,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        222
+#define _APS_NEXT_RESOURCE_VALUE        223
 #define _APS_NEXT_COMMAND_VALUE         32778
 #define _APS_NEXT_CONTROL_VALUE         222
 #define _APS_NEXT_SYMED_VALUE           106

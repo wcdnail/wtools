@@ -223,30 +223,35 @@ void CColorPickerDlg::PrepareRect(ATL::CWindow wndParent)
     if (!wndParent.m_hWnd) {
         return ;
     }
-    CRect     rcMy{};
-    CRect rcParent{};
-    wndParent.GetWindowRect(rcParent);
+    CRect      rcMy{};
+    CRect  rcMaster{};
+    HWND   hWndLoop{nullptr};
+    HWND hWndMaster{wndParent.m_hWnd};
+    while (nullptr != (hWndLoop = ::GetParent(hWndMaster))) {
+        hWndMaster = hWndLoop;
+    }
+    ::GetWindowRect(hWndMaster, rcMaster);
     GetWindowRect(rcMy);
     LONG const    nCX{rcMy.Width()};
     LONG const    nCY{rcMy.Height()};
     CPoint       ptLT{0, 0};
     if (m_nPosFlags & Rc::Left) {
-        ptLT.x = rcParent.left - 2 - nCX;
+        ptLT.x = rcMaster.left - 2 - nCX;
     }
     else if (m_nPosFlags & Rc::Right) {
-        ptLT.x = rcParent.right + 2;
+        ptLT.x = rcMaster.right + 2;
     }
     else if (m_nPosFlags & Rc::XCenter) {
-        ptLT.x = rcParent.left + (rcParent.Width() - nCX) / 2;
+        ptLT.x = rcMaster.left + (rcMaster.Width() - nCX) / 2;
     }
     if (m_nPosFlags & Rc::Top) {
-        ptLT.y = rcParent.top;
+        ptLT.y = rcMaster.top;
     }
     else if (m_nPosFlags & Rc::Bottom) {
-        ptLT.y = rcParent.bottom;
+        ptLT.y = rcMaster.bottom - nCY;
     }
     else if (m_nPosFlags & Rc::YCenter) {
-        ptLT.y = rcParent.top + (rcParent.Height() - nCY) / 2;
+        ptLT.y = rcMaster.top + (rcMaster.Height() - nCY) / 2;
     }
     CPoint const ptRB{ptLT.x + nCX, ptLT.y + nCY};
     m_rcPlace.SetRect(ptLT, ptRB);
