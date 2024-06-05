@@ -19,7 +19,7 @@ namespace DH
 
         DECLARE_WND_CLASS_EX(_T("WCD_DH_DEBUG_CONSOLE3"), CS_VREDRAW | CS_HREDRAW, (COLOR_WINDOW-1))
 
-        void SetupHeader(CRect const& rc) const;
+        void SetupColumns(CRect const& rc);
 
         HRESULT PreCreateWindow() override;
         void Save(char const* filePathName) const override;

@@ -9,7 +9,7 @@ namespace
 {
     enum DCColimnIndex: int
     {
-        DCCI_Numba = 0,
+        DCCI_Num = 0,
         DCCI_TS,
         DCCI_PID,
         DCCI_Text,
@@ -48,46 +48,53 @@ namespace DH
         return PreCreateWindowImpl(gs_dc2Atom, GetWndClassInfo());
     }
 
-    void DCListViewImpl::SetupHeader(CRect const& rc) const
+    void DCListViewImpl::SetupColumns(CRect const& rc)
     {
-        struct HeaderText
+        struct ColumnItem
         {
             int        nWidth;
             TCHAR* pszCaption;
             int          nLen;
         };
 
-        static TCHAR        hdrText0[]{_T("#")};
-        static TCHAR        hdrText1[]{_T("TS")};
-        static TCHAR        hdrText2[]{_T("PID")};
-        static TCHAR        hdrText3[]{_T("Debug")};
-        static HeaderText hdrStrings[DCCI_COUNT]{
+        static TCHAR hdrText0[]{_T("#")};
+        static TCHAR hdrText1[]{_T("TS")};
+        static TCHAR hdrText2[]{_T("PID")};
+        static TCHAR hdrText3[]{_T("Debug")};
+        static ColumnItem colItems[DCCI_COUNT]{
             { 32, hdrText0, _countof(hdrText0)},
             {128, hdrText1, _countof(hdrText1)},
             { 64, hdrText2, _countof(hdrText1)},
             {512, hdrText3, _countof(hdrText2)}
         };
+        int const nCCX{rc.Width()};
+        colItems[DCCI_Num].nWidth = nCCX / 16;
+        colItems[DCCI_TS].nWidth = nCCX / 8;
+        colItems[DCCI_PID].nWidth = nCCX / 12;
+        colItems[DCCI_Text].nWidth = nCCX - 
+            (colItems[DCCI_Num].nWidth + colItems[DCCI_TS].nWidth + colItems[DCCI_PID].nWidth);
 
-        WTL::CHeaderCtrl header{console_.GetHeader()};
-        HDITEM          hdrItem{0};
-        int              nIndex{0};
-        int const          nCCX{rc.Width()};
-
-        hdrStrings[DCCI_Numba].nWidth = nCCX / 16;
-        hdrStrings[DCCI_TS].nWidth = nCCX / 8;
-        hdrStrings[DCCI_PID].nWidth = nCCX / 12;
-        hdrStrings[DCCI_Text].nWidth = nCCX - 
-            (hdrStrings[DCCI_Numba].nWidth + hdrStrings[DCCI_TS].nWidth + hdrStrings[DCCI_PID].nWidth);
-
-        for (auto const& it: hdrStrings) {
-            hdrItem.fmt = HDF_LEFT | HDF_STRING;
-            hdrItem.cxy = it.nWidth;
-            hdrItem.pszText = it.pszCaption;
-            hdrItem.cchTextMax = it.nLen;
-            hdrItem.mask = HDI_TEXT | HDI_WIDTH | HDI_FORMAT;
-            header.InsertItem(nIndex, &hdrItem);
-            ++nIndex;
+        LVCOLUMNW lvColumn{0};
+        for (int i = 0; i < DCCI_COUNT; i++) {
+            lvColumn.fmt = LVCFMT_LEFT;
+            lvColumn.cx = colItems[i].nWidth;
+            lvColumn.pszText = colItems[i].pszCaption;
+            lvColumn.cchTextMax = colItems[i].nLen;
+            lvColumn.iOrder = i;
+            lvColumn.iSubItem = i;
+            lvColumn.mask = LVCF_SUBITEM | LVCF_ORDER | LVCF_TEXT | LVCF_FMT | LVCF_WIDTH;
+            console_.InsertColumn(i, &lvColumn);
         }
+    }
+
+    static void LV_CheckResult(int nRes, PCWSTR pszCaption)
+    {
+        if (-1 != nRes) {
+            return ;
+        }
+        auto const hCode = static_cast<HRESULT>(GetLastError());
+        DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\r\n", pszCaption,
+            hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
     }
 
     HWND DCListViewImpl::CreateConsole()
@@ -117,7 +124,9 @@ namespace DH
         console_.Create(m_hWnd, rc, nullptr,
             WS_CHILD | WS_VISIBLE |
             LVS_REPORT |
-            LVS_NOSORTHEADER,
+            LVS_NOSORTHEADER |
+            LVS_SHOWSELALWAYS |
+            LVS_SHAREIMAGELISTS,
             LVS_EX_FULLROWSELECT,
             ID_LOG_CTL
         );
@@ -127,8 +136,9 @@ namespace DH
             goto reportError;
         }
         console_.SetView(LV_VIEW_DETAILS);
+        //console_.SetUnicodeFormat(TRUE);
         console_.SetFont(consoleFont_, FALSE);
-        SetupHeader(rc);
+        SetupColumns(rc);
 
         return console_;
     reportError:
@@ -169,16 +179,6 @@ namespace DH
         static int InsertItem(WTL::CListViewCtrl const& ctlConsole, ItemStruct const& lvItem);
         static int SetItem(WTL::CListViewCtrl const& ctlConsole, ItemStruct const& lvItem);
     };
-
-    static void LV_CheckResult(int nRes, PCWSTR pszCaption)
-    {
-        if (-1 != nRes) {
-            return ;
-        }
-        auto const hCode = static_cast<HRESULT>(GetLastError());
-        DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\r\n", pszCaption,
-            hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
-    }
 
     int ListViewItemTraits<char>::InsertItem(WTL::CListViewCtrl const& ctlConsole, ItemStruct const& lvItem)
     {
@@ -230,7 +230,7 @@ namespace DH
         lvItem.cchTextMax = static_cast<int>(sNum.length()) + 1;
         lvItem.pszText = sNum.data();
         lvItem.iItem = nPos;
-        lvItem.iSubItem = DCCI_Numba;
+        lvItem.iSubItem = DCCI_Num;
         if (-1 == ListViewItemTraits<Char>::InsertItem(ctlConsole, lvItem)) {
             return false;
         }
