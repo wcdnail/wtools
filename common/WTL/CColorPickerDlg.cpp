@@ -84,7 +84,7 @@ void CColorPickerDlg::DoInitTemplate()
     short                    nHeight{DLG_CY};
     PCTSTR constexpr       szCaption{_T("Color Picker")};
     DWORD                    dwStyle{WS_POPUP | WS_THICKFRAME | DS_CONTROL};
-    DWORD                  dwExStyle{WS_EX_TOOLWINDOW | WS_EX_CONTROLPARENT};
+    DWORD                  dwExStyle{WS_EX_TOOLWINDOW | WS_EX_CONTROLPARENT | WS_EX_WINDOWEDGE};
     LPCTSTR constexpr     szFontName{CColorPicker::szDlgFont};
     WORD constexpr         wFontSize{CColorPicker::wDlgFontSize};
     WORD constexpr           wWeight{0};
