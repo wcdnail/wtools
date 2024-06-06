@@ -1,5 +1,6 @@
 #pragma once
 
+#include <wcdafx.api.h>
 #include <rectz.h>
 #include <atluser.h>
 
@@ -17,7 +18,7 @@ struct NormWindow
     DWORD            dwStyle = DefaultStyle;
     DWORD          dwExStyle = DefaultExStyle;
 
-    void MakeItNorm(HWND hWnd);
+    WCDAFX_API void MakeItNorm(HWND hWnd, LPCWSTR lpIconName);
 };
 
 struct MoveToMonitor
@@ -29,7 +30,7 @@ struct MoveToMonitor
     unsigned rcHowToPut = PutAt::YCenter | PutAt::Right;
     CRect         rcWnd;
 
-    bool Move(HWND hWnd, DWORD dwDesiredNum = FirstNotPrimary, unsigned rcHowToPut = PutAt::Center);
+    WCDAFX_API bool Move(HWND hWnd, DWORD dwDesiredNum = FirstNotPrimary, unsigned rcHowToPut = PutAt::Center);
 
 private:
     BOOL MoveAttempt(MONITORINFOEXW const& monInfo) const;

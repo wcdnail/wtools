@@ -30,6 +30,7 @@
     <ClCompile Include="color.stuff.cpp" />
     <ClCompile Include="DDraw.DGI\CeXDib.cpp" />
     <ClCompile Include="DDraw.DGI\DDGDIStuff.cpp" />
+    <ClCompile Include="dev.assistance\debug.assistance.cpp" />
     <ClCompile Include="dev.assistance\debug.console\basic.debug.console.cpp" />
     <ClCompile Include="dev.assistance\debug.console\dc.listview.impl.cpp" />
     <ClCompile Include="dev.assistance\debug.console\dc.rich.edit.impl.cpp" />
@@ -38,6 +39,7 @@
     <ClCompile Include="dev.assistance\debug.console\WinDebugMonitor.cpp" />
     <ClCompile Include="dev.assistance\dev.assist.cpp" />
     <ClCompile Include="dh.timer.cpp" />
+    <ClCompile Include="dh.trace.level.cpp" />
     <ClCompile Include="dh.tracing.cpp" />
     <ClCompile Include="icons.dll.cpp" />
     <ClCompile Include="icons.save.m1.cpp" />
@@ -90,6 +92,7 @@
     <ClInclude Include="DDraw.DGI\CeXDib.h" />
     <ClInclude Include="DDraw.DGI\DDGDIStuff.h" />
     <ClInclude Include="debug.dump.msg.h" />
+    <ClInclude Include="dev.assistance\debug.assistance.h" />
     <ClInclude Include="dev.assistance\debug.console\basic.debug.console.h" />
     <ClInclude Include="dev.assistance\debug.console\dc.listview.impl.h" />
     <ClInclude Include="dev.assistance\debug.console\dc.rich.edit.impl.h" />
@@ -99,12 +102,15 @@
     <ClInclude Include="dev.assistance\debug.console\ostream.listener.h" />
     <ClInclude Include="dev.assistance\debug.console\WinDebugMonitor.h" />
     <ClInclude Include="dev.assistance\dev.assist.h" />
+    <ClInclude Include="dev.assistance\err.printer.h" />
     <ClInclude Include="dev.assistance\list.view.exstyles.h" />
     <ClInclude Include="dev.assistance\list.view.styles.h" />
     <ClInclude Include="dev.assistance\notify.codes.h" />
     <ClInclude Include="dev.assistance\virtual.keys.consts.h" />
     <ClInclude Include="dev.assistance\window.messages.consts.h" />
     <ClInclude Include="dh.timer.h" />
+    <ClInclude Include="dh.trace.level.h" />
+    <ClInclude Include="dh.tracing.defs.h" />
     <ClInclude Include="dh.tracing.h" />
     <ClInclude Include="icons.dll.h" />
     <ClInclude Include="info\runtime.information.h" />

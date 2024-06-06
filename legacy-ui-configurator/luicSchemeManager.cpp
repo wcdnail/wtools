@@ -19,7 +19,7 @@ ReturnType& CSchemeManager::getSchemeRef(SelfRef& thiz, int index)
 {
     if (index < 0 || index > static_cast<int>(thiz.m_Schemes.size()) - 1) {
         static ReturnType dummy{};
-        DH::TPrintf(L"ERROR", L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
+        DH::TPrintf(TL_Error, L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
         return dummy;
     }
     return thiz.m_Schemes[index];
@@ -80,8 +80,8 @@ int CSchemeManager::LoadRegistry()
     if (CRegistry::ResultFail == nCount) {
         code = static_cast<HRESULT>(GetLastError());
         const auto codeText = Str::ErrorCode<>::SystemMessage(code);
-        DH::TPrintf(L"%s: WARNING: CRegistry::ForEachValue failed: %d '%s'\n", __FUNCTIONW__,
-            code, codeText.GetString());
+        DH::TPrintf(TL_Warning, L"%s: CRegistry::ForEachValue failed: %d '%s'\n",
+            __FUNCTIONW__, code, codeText.GetString());
     }
     tempSchemes.append_range(m_Schemes);
     tempSchemes.swap(m_Schemes);

@@ -15,18 +15,12 @@
       <Filter>infrastructure</Filter>
     </ClCompile>
     <ClCompile Include="UT.entry.cxx" />
-    <ClCompile Include="debug.assistance.cpp">
-      <Filter>infrastructure</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rez\resource.h">
       <Filter>res</Filter>
     </ClInclude>
     <ClInclude Include="pch.hxx">
-      <Filter>infrastructure</Filter>
-    </ClInclude>
-    <ClInclude Include="err.printer.h">
       <Filter>infrastructure</Filter>
     </ClInclude>
     <ClInclude Include="wtl.aero.h">
@@ -36,9 +30,6 @@
       <Filter>infrastructure</Filter>
     </ClInclude>
     <ClInclude Include="desktop.composition.window.h">
-      <Filter>infrastructure</Filter>
-    </ClInclude>
-    <ClInclude Include="debug.assistance.h">
       <Filter>infrastructure</Filter>
     </ClInclude>
     <ClInclude Include="clr.dracula.h" />

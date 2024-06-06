@@ -5,13 +5,13 @@
 namespace Ui
 {
     ImagePtr::ImagePtr()
-        : image_(NULL)
+        : image_(nullptr)
         , data_()
         , guid_()
     {}
 
-    ImagePtr::ImagePtr(PCTSTR name, PCTSTR type, HMODULE module/* = NULL*/)
-        : image_(NULL)
+    ImagePtr::ImagePtr(PCTSTR name, PCTSTR type, HMODULE module/* = nullptr*/)
+        : image_(nullptr)
         , data_()
         , guid_()
     {
@@ -19,7 +19,7 @@ namespace Ui
     }
 
     ImagePtr::ImagePtr(PCWSTR fileName)
-        : image_(NULL)
+        : image_(nullptr)
         , data_()
         , guid_()
     {
@@ -38,10 +38,10 @@ namespace Ui
 
     void ImagePtr::Free()
     {
-        if (NULL != image_)
+        if (nullptr != image_)
         {
             delete image_;
-            image_ = NULL;
+            image_ = nullptr;
         }
     }
 
@@ -53,15 +53,15 @@ namespace Ui
 
     int ImagePtr::GetWidth() const
     {
-        return NULL == image_ ? -1 : (int)image_->GetWidth();
+        return nullptr == image_ ? -1 : (int)image_->GetWidth();
     }
 
     int ImagePtr::GetHeight() const
     {
-        return NULL == image_ ? -1 : (int)image_->GetHeight();
+        return nullptr == image_ ? -1 : (int)image_->GetHeight();
     }
     
-    void ImagePtr::Load(PCTSTR name, PCTSTR type, HMODULE module/* = NULL*/)
+    void ImagePtr::Load(PCTSTR name, PCTSTR type, HMODULE module/* = nullptr*/)
     {
         Res::Custom resource(name, type, module);
         Res::Data data(resource);
@@ -105,12 +105,12 @@ namespace Ui
 
     UINT ImagePtr::GetFrameCount() const
     {
-        return (NULL == image_ ? 0 : (NULL == guid_.get() ? 0 : image_->GetFrameCount(&guid_[0])));
+        return (nullptr == image_ ? 0 : (nullptr == guid_.get() ? 0 : image_->GetFrameCount(&guid_[0])));
     }
 
     bool ImagePtr::SetFrame(int n)
     {
-        return NULL == image_ ? false : (NULL == guid_.get() ? false : (Gdiplus::Ok == image_->SelectActiveFrame(&guid_[0], (UINT)n)));
+        return nullptr == image_ ? false : (nullptr == guid_.get() ? false : (Gdiplus::Ok == image_->SelectActiveFrame(&guid_[0], (UINT)n)));
     }
 
     void ImagePtr::FromDc(HDC sourceDc)

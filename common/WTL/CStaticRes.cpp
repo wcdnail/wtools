@@ -75,7 +75,7 @@ static bool StaticLoadIcon(BYTE const* pBytes, size_t nSize, WTL::CIcon& icoTarg
     }
 reportError:
     auto const  message{Str::ErrorCode<>::SystemMessage(hCode)};
-    DH::TPrintf(LTH_GLOBALS L" %s failed: 0x%08x %s\n", sFunc.c_str(), hCode, message.GetString());
+    DH::TPrintf(TL_Error, L"%s failed: 0x%08x %s\n", sFunc.c_str(), hCode, message.GetString());
     return false;
 }
 

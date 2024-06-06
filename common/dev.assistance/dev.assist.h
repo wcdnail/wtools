@@ -1,7 +1,7 @@
 #pragma once
 
-#include "wcdafx.api.h"
-#include "strint.h"
+#include <wcdafx.api.h>
+#include <strint.h>
 #include <cstdint>
 
 namespace DH

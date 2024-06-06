@@ -11,10 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\UT\debug.assistance.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="ATator.Main.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">Create</PrecompiledHeader>
@@ -22,7 +18,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\UT\debug.assistance.h" />
     <ClInclude Include="ATator.MemDlg.h" />
     <ClInclude Include="CDefaultWin32Dlg.h" />
     <ClInclude Include="resource.h" />

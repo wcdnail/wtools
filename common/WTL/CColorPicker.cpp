@@ -80,7 +80,7 @@ BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         REFLECT_NOTIFICATIONS()
         if constexpr (false) {
             auto const msgStr = DH::MessageToStrignW((MSG*)GetCurrentMessage());
-            DBGTPrint(LTH_CONTROL L" -WM- [[ %s ]]\n", msgStr.c_str());
+            DBGTPrint(0, L"-WM- [[ %s ]]\n", msgStr.c_str());
         }
         break;
     default:
@@ -103,7 +103,7 @@ int CColorPicker::OnCreate(LPCREATESTRUCT lpCreateStruct)
         ATLASSERT(pLoop != NULL);
         pLoop->AddMessageFilter(this);
     }
-    ATLTRACE(ATL::atlTraceControls, 0, _T("WM_CREATE OK for %p\n"), this);
+    DH::TPrintf(0, _T("%s OK for %p\n"), __FUNCTIONW__, this);
     return 0;
 }
 

@@ -13,7 +13,7 @@ namespace Ui
         , frameDelay_()
     {}
 
-    Animation::Animation(PCTSTR name, PCTSTR type, UINT start/* = 0*/, UINT step/* = 1*/, bool loop/* = true*/, HMODULE module/* = NULL*/)
+    Animation::Animation(PCTSTR name, PCTSTR type, UINT start/* = 0*/, UINT step/* = 1*/, bool loop/* = true*/, HMODULE module/* = nullptr*/)
         : image_(name, type, module)
         , frame_(InFrameRange(start))
         , step_(step)
@@ -45,7 +45,7 @@ namespace Ui
         return image_;
     }
 
-    void Animation::Load(PCTSTR name, PCTSTR type, HMODULE module/* = NULL*/)
+    void Animation::Load(PCTSTR name, PCTSTR type, HMODULE module/* = nullptr*/)
     {
         image_.Load(name, type, module);
         InitFramesDelay();
@@ -60,7 +60,7 @@ namespace Ui
     void Animation::Start(HWND owner, UINT defaultFrameDelay/* = 100*/)
     {
         defaultFrameDelay_ = defaultFrameDelay;
-        ::InvalidateRect(owner, NULL, FALSE);
+        ::InvalidateRect(owner, nullptr, FALSE);
         ::SetTimer(owner, (UINT_PTR)this, GetFrameDelay(frame_), ChangeFrame);
     }
 
@@ -72,7 +72,7 @@ namespace Ui
     void CALLBACK Animation::ChangeFrame(HWND owner, UINT message, UINT_PTR id, DWORD elapsed)
     {
         Animation* self = (Animation*)id;
-        if (NULL != self)
+        if (nullptr != self)
             self->OnChangeFrame(owner);
     }
 
@@ -102,32 +102,27 @@ namespace Ui
     void Animation::InitFramesDelay()
     {
         Gdiplus::Image *image = image_.Get();
-        if (NULL == image)
+        if (nullptr == image) {
             return ;
-
+        }
         UINT frameCount = image_.GetFrameCount();
-        if (frameCount < 1)
+        if (frameCount < 1) {
             return ;
-
+        }
         UIntArray tempFrameDelay(new UINT[frameCount]);
-        for (UINT i=0; i<frameCount; i++)
+        for (UINT i=0; i<frameCount; i++) {
             tempFrameDelay[i] = defaultFrameDelay_;
-
+        }
         UINT len = image->GetPropertyItemSize(PropertyTagFrameDelay);
-        if (len > 0)
-        {
+        if (len > 0) {
             Gdiplus::PropertyItem *delay = (Gdiplus::PropertyItem*)::calloc(1, len);
-            if (NULL != delay)
-            {
-                if (Gdiplus::Ok == image->GetPropertyItem(PropertyTagFrameDelay, len, delay))
-                {
-                    for (UINT i=0; i<frameCount; i++)
-                    {
+            if (nullptr != delay) {
+                if (Gdiplus::Ok == image->GetPropertyItem(PropertyTagFrameDelay, len, delay)) {
+                    for (UINT i=0; i<frameCount; i++) {
                         tempFrameDelay[i] = ((UINT*)delay[0].value)[i] * 10;
                     }
                 }
-
-                ::free((void*)delay);
+                free((void*)delay);
             }
         }
 
@@ -136,7 +131,7 @@ namespace Ui
 
     UINT Animation::GetFrameDelay(int frame) const
     {
-        return NULL != frameDelay_.get() ? frameDelay_[frame] : defaultFrameDelay_;
+        return nullptr != frameDelay_.get() ? frameDelay_[frame] : defaultFrameDelay_;
     }
 
     void Animation::OnPaint(CDC& dc, CRect const& rc) const

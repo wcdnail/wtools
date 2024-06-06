@@ -9,10 +9,15 @@
 int APIENTRY _tWinMain(HINSTANCE baseAddress, HINSTANCE, LPTSTR, int showCmd)
 {
     SetErrorMode(SetErrorMode(0) | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
-    DefWindowProc(NULL, 0, 0, 0L);
-
+    DefWindowProc(nullptr, 0, 0, 0L);
     DH::PrintLogHeader();
 
-    HRESULT rv = Twins::App().Run(baseAddress, showCmd);
-    return static_cast<int>(rv);
+    try {
+        HRESULT rv = Twins::App().Run(baseAddress, showCmd);
+        return static_cast<int>(rv);
+    }
+    catch (std::exception const& ex) {
+        MessageBoxA(nullptr, ex.what(), "Fail", MB_ICONHAND);
+    }
+    return -1;
 }

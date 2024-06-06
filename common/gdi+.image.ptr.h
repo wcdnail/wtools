@@ -1,21 +1,20 @@
 #pragma once
 
 #include "windows.resource.data.h"
-#include <boost/noncopyable.hpp>
-#include <boost/scoped_array.hpp>
 #include <gdiplus.h>
 #include <atltypes.h>
+#include <memory>
 
 namespace Ui
 {
     class ImagePtr: boost::noncopyable
     {
     private:
-        typedef boost::scoped_array<GUID> GUIDs;
+        typedef std::unique_ptr<GUID[]> GUIDs;
 
     public:
         ImagePtr();
-        ImagePtr(PCTSTR name, PCTSTR type, HMODULE module = NULL);
+        ImagePtr(PCTSTR name, PCTSTR type, HMODULE module = nullptr);
         ImagePtr(PCWSTR fileName);
         ~ImagePtr();
 
@@ -24,7 +23,7 @@ namespace Ui
         void Free();
         void Reset(Gdiplus::Image *image);
 
-        void Load(PCTSTR name, PCTSTR type, HMODULE module = NULL);
+        void Load(PCTSTR name, PCTSTR type, HMODULE module = nullptr);
         void Load(PCWSTR fileName);
 
         void FromDc(HDC sourceDc);

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "luicEffects.h"
-#include "UT/debug.assistance.h"
 #include "resz/resource.h"
+#include <dev.assistance/debug.assistance.h>
 
 CPageEffects::~CPageEffects()
 {

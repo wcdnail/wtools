@@ -4,9 +4,6 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
-#include <boost/noncopyable.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/date_time.hpp>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN

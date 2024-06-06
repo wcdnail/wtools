@@ -94,7 +94,7 @@ namespace DH
             return ;
         }
         auto const hCode = static_cast<HRESULT>(GetLastError());
-        DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\r\n", pszCaption,
+        DH::TPrintf(TL_Error, L"%s failed: 0x%08x %s\r\n", pszCaption,
             hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
     }
 
@@ -120,7 +120,7 @@ namespace DH
             hCode = static_cast<HRESULT>(GetLastError());
             sFunc.Format(L"CreateSimpleReBarCtrl failed: 0x%08x %s\r\n", hCode,
                 Str::ErrorCode<>::SystemMessage(hCode).GetString());
-            DH::TPrintf(LTH_DBG_ASSIST L" %s", sFunc.GetString());
+            DH::TPrintf(TL_Error, L"%s", sFunc.GetString());
         }
         console_.Create(m_hWnd, rc, nullptr,
             WS_CHILD | WS_VISIBLE |
@@ -154,7 +154,7 @@ namespace DH
             PutsWide(sMessage.GetString(), dwCurrentPID);
         }
         else {
-            DH::TPrintf(LTH_DBG_ASSIST L" %s", sMessage.GetString());
+            DH::TPrintf(TL_Error, L"%s", sMessage.GetString());
         }
         return nullptr;
     }

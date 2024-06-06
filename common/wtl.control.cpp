@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "wtl.control.h"
-#include "dh.tracing.defs.h"
+#include "dh.tracing.h"
 #include "dev.assistance/dev.assist.h"
 
 namespace CF
@@ -54,7 +54,7 @@ namespace CF
         else {
             caption.Format(L"%d", id);
         }
-        DBGTPrint(LTH_CONTROL, format, hWnd, caption.GetString(), prevClass.GetString(), thisClass);
+        DBGTPrint(0, format, hWnd, caption.GetString(), prevClass.GetString(), thisClass);
     }
 #else
 #  define traceCtrl(...)
@@ -86,7 +86,7 @@ namespace CF
             msg.wParam = wParam;
             msg.lParam = lParam;
             auto msgStr = DH::MessageToStrignW(&msg);
-            DBGTPrint(LTH_CONTROL, L"-WM- [[ %s ]]\n", msgStr.c_str());
+            DBGTPrint(0, L"ControlBase: -WM- [[ %s ]]\n", msgStr.c_str());
         }
 #endif
         SetMsgHandled(FALSE);

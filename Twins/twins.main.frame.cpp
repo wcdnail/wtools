@@ -150,7 +150,7 @@ namespace Twins
         UpdateBarsPosition(rc, TRUE); 
 
         static const int ButtonsHeight = 20; 
-// ##TODO: Configure main bottombar buttons height"))
+        // ##TODO: Configure main bottombar buttons height"))
 
         CRect rcButtons(rc.left, rc.bottom - ButtonsHeight - 1, rc.right, rc.bottom);
         rc.bottom -= ButtonsHeight + 1;
@@ -158,7 +158,7 @@ namespace Twins
         ButtonBar.Create(m_hWnd, rcButtons, NULL, 0, 0, ID_BUTTONS);
 
         static const int CommandLineHeight = 24; 
-// ##TODO: Configure commandline height"))
+        // ##TODO: Configure commandline height"))
 
         CRect rcCLine(rc.left, rcButtons.top - CommandLineHeight - 1, rc.right, rcButtons.top);
         rc.bottom -= CommandLineHeight;
@@ -172,7 +172,7 @@ namespace Twins
 
         vSplitter.ModifyStyleEx(WS_EX_CLIENTEDGE, 0);
 
-// ##TODO: Configure splitter"))
+        // ##TODO: Configure splitter"))
         vSplitter.m_cxySplitBar = 3; // Thickness
         vSplitter.m_bFullDrag = false;
         //vSplitter.m_bEraseBk = FALSE;
@@ -213,7 +213,7 @@ namespace Twins
 
     int MainFrame::OnButtonCommand(TabBar& buttons, int id, PCTSTR text)
     {
-        DH::TPrintf(L"PnButton", L"%2d `%s`\n", id, text);
+        DH::TPrintf(0, L"PnButton", L"%2d '%s'\n", id, text);
         buttons.ClearHot();
         Commands().GetCommand(id).Callback();
         return id;
@@ -221,10 +221,8 @@ namespace Twins
 
     void MainFrame::OnCommand(UINT code, int id, CWindow)
     {
-        if (0 == code)
-        {
-            DH::TPrintf(L"Mainframe", L"OnCommand %d %d\n", code, id);
-
+        if (0 == code) {
+            DH::TPrintf(0, L"Mainframe: OnCommand %d %d\n", code, id);
             Command::Definition const& def = Command::Manager::Instance().GetCommand(id);
             def.Callback();
         }
@@ -233,7 +231,8 @@ namespace Twins
     void MainFrame::SplitterCtrl::DrawSplitterBar(CDCHandle dc)
     {
         CRect rc;
-        if (GetSplitterBarRect(&rc))
+        if (GetSplitterBarRect(&rc)) {
             dc.FillSolidRect(rc, 0x404040);
+        }
     }
 }

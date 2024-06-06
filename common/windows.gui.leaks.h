@@ -42,7 +42,7 @@ namespace CF
     inline void GUILeaks::StartCount()
     {
         Load(gdiCount_, usrCount_);
-        DH::TPrintf(DH::ModuleName(), L"GuiLeaks: At beg - GDI %4d, USER %4d\n", gdiCount_, usrCount_);
+        DH::TPrintf(TL_Module, L"GuiLeaks: At beg - GDI %4d, USER %4d\n", gdiCount_, usrCount_);
     }
 
     inline void GUILeaks::PrintCurrentState()
@@ -51,8 +51,8 @@ namespace CF
         DWORD usrCount = 0;
         Load(gdiCount, usrCount);
 
-        DH::TPrintf(DH::ModuleName(), L"GuiLeaks: At end - GDI %4d, USER %4d\n", gdiCount, usrCount);
-        DH::TPrintf(DH::ModuleName(), L"GuiLeaks: Leaks  - GDI %4d, USER %4d\n", gdiCount - gdiCount_, usrCount - usrCount_);
+        DH::TPrintf(TL_Module, L"GuiLeaks: At end - GDI %4d, USER %4d\n", gdiCount, usrCount);
+        DH::TPrintf(TL_Module, L"GuiLeaks: Leaks  - GDI %4d, USER %4d\n", gdiCount - gdiCount_, usrCount - usrCount_);
     }
 }
 

@@ -9,7 +9,6 @@
 #include <string.utils.env.vars.h>
 #include <rect.putinto.h>
 #include <rect.screen.h>
-#include <windows.uses.ole.h>
 #include <windows.uses.commoncontrols.h>
 #include <windows.uses.richedit.h>
 #include <dialogz.messagebox.h>
@@ -74,13 +73,10 @@ namespace Twins
 
     HRESULT Application::Run(HINSTANCE baseAddress, int showCmd)
     {
-        HRESULT rv = 0;
-
-        ScopedInitOLE           cole{};
         ScopedInitControls ccontrols{ICC_COOL_CLASSES | ICC_BAR_CLASSES};
         ScopedInitRichEdit  richedit{};
 
-        rv = AtlModule.Init(nullptr, baseAddress);
+        HRESULT rv{AtlModule.Init(nullptr, baseAddress)};
         if (FAILED(rv))
             throw std::runtime_error("CAppModule::Init failed!");
 
@@ -90,12 +86,9 @@ namespace Twins
             throw std::runtime_error("Main window creation failed!");
         }
         AppFrame.ShowWindow(showCmd);
-
         rv = MessageLoop.Run();
-
         AtlModule.RemoveMessageLoop();
         AtlModule.Term();
-
         return rv;
     }
 

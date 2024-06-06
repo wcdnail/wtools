@@ -18,7 +18,7 @@ namespace Twins
         , Views()
         , BlockSize(1024 * 1024)
         , MyRect(rc)
-        , LoopPtr(NULL)
+        , LoopPtr(nullptr)
         , IsStandAlone(standAlone)
     {}
 
@@ -35,7 +35,7 @@ namespace Twins
         return FALSE;
     }
 
-    void FileViewer::Show(Fl::List const& files, CMessageLoop& loop, HWND parent /*= NULL*/)
+    void FileViewer::Show(Fl::List const& files, CMessageLoop& loop, HWND parent /*= nullptr*/)
     {
         LoopPtr = &loop;
 
@@ -44,7 +44,7 @@ namespace Twins
             Super::SetReflectNotifications(true);
             Super::SetTabStyles(CTCS_TOOLTIPS | CTCS_SCROLL | CTCS_CLOSEBUTTON | CTCS_HOTTRACK | CTCS_FLATEDGE | CTCS_BOLDSELECTEDTAB);
 
-            Super::Create(parent, MyRect, NULL
+            Super::Create(parent, MyRect, nullptr
                 , WS_OVERLAPPEDWINDOW 
                 | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
                 , WS_EX_APPWINDOW
@@ -57,7 +57,7 @@ namespace Twins
 
     FileViewer::ErrorCode FileViewer::Add(Fl::Entry const& entry)
     {
-        Fv::Viewer* view = NULL;
+        Fv::Viewer* view = nullptr;
         ErrorCode error;
 
         try
@@ -67,7 +67,7 @@ namespace Twins
             error = temp->Create(m_hWnd, rcTemp);
             if (error)
             {
-                DH::TPrintf("FileView", "create view failed - %s (%d)\n"
+                DH::TPrintf(0, "FileView: create view failed - %s (%d)\n"
                     , error.value(), error.message().c_str());
 
                 return error;
@@ -85,12 +85,12 @@ namespace Twins
 
             int n = AddTabWithIcon(*view, entry.GetFilename().c_str(), view->GetSmallIcon());
             ItemType* item = GetTabCtrl().GetItem(n);
-            if (NULL != item) {
+            if (nullptr != item) {
                 item->SetToolTip(entry.GetPath().c_str());
             }
         }
         catch (...) {
-            if (NULL != view)
+            if (nullptr != view)
                 view->DestroyWindow();
 
             if (!error)
@@ -129,11 +129,11 @@ namespace Twins
     int FileViewer::OnCreate(LPCREATESTRUCT cs)
     {
         BOOL handled = FALSE;
-        LRESULT lr = Super::OnCreate(WM_CREATE, 0, (LPARAM)cs, handled);
-        if (0 != lr)
-            return (int)lr;
-
-        BOOST_ASSERT(0 == Views.size());
+        LRESULT lr = Super::OnCreate(WM_CREATE, 0, reinterpret_cast<LPARAM>(cs), handled);
+        if (0 != lr) {
+            return static_cast<int>(lr);
+        }
+        ATLASSERT(0 == Views.size());
 
         if (!InitTabs((Fl::List const*)cs->lpCreateParams))
             return -1;
@@ -143,7 +143,7 @@ namespace Twins
 
         //OnCompositionChanged();
 
-        if (NULL != LoopPtr)
+        if (nullptr != LoopPtr)
             LoopPtr->AddMessageFilter(this);
         
         int index = GetTabCtrl().GetCurSel();
@@ -178,7 +178,7 @@ namespace Twins
             dc.FillSolidRect(rc, 0);
         }
 
-        ::InvalidateRect(m_hWndActive, NULL, FALSE);
+        ::InvalidateRect(m_hWndActive, nullptr, FALSE);
         return TRUE; 
     }
 
@@ -193,7 +193,7 @@ namespace Twins
             }
 
             OnCompositionChanged();
-            ::InvalidateRect(m_hWndActive, NULL, FALSE);
+            ::InvalidateRect(m_hWndActive, nullptr, FALSE);
         }
 
         SetMsgHandled(FALSE);
@@ -244,8 +244,8 @@ namespace Twins
     {
         Super::OnSettingChange(uMsg, wParam, lParam, bHandled);
 
-        ::InvalidateRect(GetTabCtrl(), NULL, FALSE);
-        ::InvalidateRect(m_hWndActive, NULL, FALSE);
+        ::InvalidateRect(GetTabCtrl(), nullptr, FALSE);
+        ::InvalidateRect(m_hWndActive, nullptr, FALSE);
 
         SetMsgHandled(TRUE);
         bHandled = m_bMsgHandled;
@@ -331,7 +331,7 @@ namespace Twins
         if (LoopPtr)
             LoopPtr->RemoveMessageFilter(this);
 
-        LoopPtr = NULL;
+        LoopPtr = nullptr;
 
         SetMsgHandled(FALSE);
 
@@ -343,7 +343,7 @@ namespace Twins
     {
         if (pnmh && (pnmh->hwndFrom == GetTabCtrl())) {
             NMCTCITEM const* nmh{reinterpret_cast<NMCTCITEM*>(pnmh)};
-            DH::TPrintf(L"FileView", L"OnClosePage %d\n", nmh->iItem);
+            DH::TPrintf(0, L"FileView: OnClosePage %d\n", nmh->iItem);
             CloseTab(nmh->iItem);
             ExitIfEmpty();
         }

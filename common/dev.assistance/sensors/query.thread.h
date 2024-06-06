@@ -1,7 +1,5 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
-#include <boost/thread.hpp>
 #include <wtypes.h>
 
 namespace Assist
@@ -9,7 +7,7 @@ namespace Assist
     namespace Sensors
     {
         template <class QT>
-        class QueryThread: boost::noncopyable
+        class QueryThread
         {
         public:
             QueryThread(QT& queryRef, DWORD queryTimeout = 10);

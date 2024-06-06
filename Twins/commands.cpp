@@ -30,7 +30,7 @@ namespace Twins
         {
             CommandMap::const_iterator it = map_.find(id);
             if (it != map_.end()) {
-                DH::TPrintf("ECommand", "%04d(%s) already present.\n", id, name.c_str());
+                DH::TPrintf(TL_Warning, "ECommand: %04d(%s) already present.\n", id, name.c_str());
             }
             map_[id] = Definition(id, keyId, name, callback);
         }

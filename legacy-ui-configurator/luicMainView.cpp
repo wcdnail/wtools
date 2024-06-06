@@ -10,9 +10,10 @@
 #include "luicUtils.h"
 #include "resz/resource.h"
 #include <string.utils.format.h>
-#include <UT/debug.assistance.h>
-#include <dh.tracing.defs.h>
+#include <dev.assistance/debug.assistance.h>
 #include <ranges>
+
+#include "dh.tracing.h"
 
 enum PageIndex: int
 {
@@ -112,7 +113,7 @@ PageType* CMainView::PagesGetT(int numba) const
 {
     const auto& it = m_PagesMap.find(numba);
     if (it == m_PagesMap.cend()) {
-        DBGTPrint(LTH_CONTROL, L"Page #%d does not EXIST!\n", numba);
+        DBGTPrint(0, L"Page #%d does not EXIST!\n", numba);
         return nullptr;
     }
     return static_cast<PageType*>(it->second.get());

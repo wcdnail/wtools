@@ -9,8 +9,6 @@
 #include <crash.report/exception.h>
 #include <crash.report/run.context.h>
 #include <crash.report/run.context.info.h>
-#include <boost/exception/current_exception_cast.hpp>
-#include <boost/exception/all.hpp>
 #include <stdexcept>
 
 namespace CF

@@ -3,11 +3,10 @@
 
 #include "trace.accumulator.h"
 #include "trace.uptime.n.threadid.h"
-#include <boost/tokenizer.hpp>
 
 namespace Trace
 {
-    class BasicLog: boost::noncopyable
+    class BasicLog
     {
     public:
         typedef Accumulator::String String;

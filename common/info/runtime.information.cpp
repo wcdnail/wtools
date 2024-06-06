@@ -235,7 +235,7 @@ namespace Runtime
                 DWORD size = _countof(buffer);
                 BOOL rv = ::GetComputerNameEx((COMPUTER_NAME_FORMAT)cnf, buffer, &size);
 
-                DH::TPrintf(_T("CompName: `%s` (%s)\n")
+                DH::TPrintf(L"CompName", L"'%s' (%s)\n")
                     , (!rv ? (PCTSTR)Str::ErrorCode<>::SystemMessage(GetLastError()) : buffer)
                     , cmDescription[cnf]
                    );

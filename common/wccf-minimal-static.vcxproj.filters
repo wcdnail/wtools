@@ -130,6 +130,12 @@
     <ClCompile Include="win32.registry.cpp">
       <Filter>Unsorted</Filter>
     </ClCompile>
+    <ClCompile Include="dh.trace.level.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\debug.assistance.cpp">
+      <Filter>dev.assistance</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -302,6 +308,18 @@
     </ClInclude>
     <ClInclude Include="win32.registry.h">
       <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="dh.trace.level.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="dh.tracing.defs.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.assistance.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\err.printer.h">
+      <Filter>dev.assistance</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -140,7 +140,7 @@ namespace Twins
                         default:
                             continue;
                         }
-                        DH::TPrintf(L"DRIVENUM", L"%d %s [%s] (0x%08x %s(%d) 0x%08x)\n",
+                        DH::TPrintf(0, L"DRIVENUM: %d %s [%s] (0x%08x %s(%d) 0x%08x)\n",
                             type, path, label, serial, fs, length, flags);
                         Item info;
                         info.num = count++;
@@ -168,38 +168,37 @@ namespace Twins
                 return true;
             }
             catch (std::exception const& ex) {
-                DH::TPrintf("DRIVENUM", "ERROR <%s>\n", ex.what());
+                DH::TPrintf(TL_Error, "DRIVENUM: <%s>\n", ex.what());
             }
             catch (...) {
-                DH::TPrintf(L"DRIVENUM", L"UNKNOWN ERROR\n");
+                DH::TPrintf(TL_Error, L"DRIVENUM: UNKNOWN ERROR\n");
             }
             return false;
         }
 
         bool Enumerator::IsIndexValid(int driveId) const
         {
-            return (driveId >= 0) && (driveId <= (int)items_.size()-1);
+            return (driveId >= 0) && (driveId <= static_cast<int>(items_.size())-1);
         }
 
         void Enumerator::CheckIndex(int& driveId) const
         {
-            if (!IsIndexValid(driveId))
-            {
-                if (driveId < 0)
+            if (!IsIndexValid(driveId)) {
+                if (driveId < 0) {
                     driveId = 0;
-
-                int count = (int)items_.size()-1;
-
-                if (driveId > count)
+                }
+                int const count = static_cast<int>(items_.size())-1;
+                if (driveId > count) {
                     driveId = count;
+                }
             }
         }
 
         Enumerator::Item const& Enumerator::Get(int driveId) const /* throw(std::out_of_range) */
         {
-            if (IsIndexValid(driveId))
+            if (IsIndexValid(driveId)) {
                 return items_[driveId];
-
+            }
             static Enumerator::Item dummy;
             return dummy;
         }
@@ -213,8 +212,8 @@ namespace Twins
         {
             SHFILEINFO info = {0};
 
-            ::SHGetFileInfo(item.path.c_str(), FILE_ATTRIBUTE_DIRECTORY, &info, sizeof(info), SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON);
-// ##TODO: handle `NULL == info.hIcon`"))
+            SHGetFileInfo(item.path.c_str(), FILE_ATTRIBUTE_DIRECTORY, &info, sizeof(info), SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON);
+            // ##TODO: handle `NULL == info.hIcon`"))
             item.iconIndex = list.AddIcon(info.hIcon);
             item.icon.Attach(info.hIcon);
         }

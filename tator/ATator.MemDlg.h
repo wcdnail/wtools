@@ -4,7 +4,7 @@
 #include <WTL/CAppModuleRef.h>
 #include <WTL/CColorButton.h>
 #include <WTL/CColorPicker.h>
-#include <UT/debug.assistance.h>
+#include <dev.assistance/debug.assistance.h>
 #include <atlframe.h>
 #include <atlcrack.h>
 #include <atldlgs.h>

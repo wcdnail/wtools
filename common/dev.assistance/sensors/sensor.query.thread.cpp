@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "sensor.query.thread.h"
-#include <boost/thread/mutex.hpp>
 
 namespace Assist
 {

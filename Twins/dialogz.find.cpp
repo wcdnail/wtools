@@ -672,7 +672,7 @@ namespace Twins
         {
             ATL::CTime const minTime{GetTimeFrom(BegDate, BegTime)};
             ATL::CTime const maxTime{GetTimeFrom(EndDate, EndTime)};
-            DH::TPrintf(L"Searching", L"Datetime range in [%s .. %s]\n",
+            DH::TPrintf(0, L"Searching: Datetime range in [%s .. %s]\n",
                 minTime.Format(L"%d.%m.%Y %H:%M:%S"),
                 maxTime.Format(L"%d.%m.%Y %H:%M:%S"));
             MinDatetime = minTime;
@@ -696,7 +696,7 @@ namespace Twins
             case NotOlderSeconds: span = CTimeSpan(0, 0, 0, value); break;
             }
             NotOlderTime = CTime::GetCurrentTime() - span;
-            DH::TPrintf(L"Searching", L"NotOlderTime %s\n", NotOlderTime.Format(L"%d.%m.%Y %H:%M:%S"));
+            DH::TPrintf(0, L"Searching: NotOlderTime %s\n", NotOlderTime.Format(L"%d.%m.%Y %H:%M:%S"));
         }
     }
 
@@ -812,7 +812,7 @@ namespace Twins
         }
           
         if (error) {
-            DH::TPrintf(L"Searching", L"%d -> `%s` (%S)\n", error.value(), path.c_str(), error.message().c_str());
+            DH::TPrintf(0, L"Searching: %d -> `%s` (%S)\n", error.value(), path.c_str(), error.message().c_str());
         }
     }
 

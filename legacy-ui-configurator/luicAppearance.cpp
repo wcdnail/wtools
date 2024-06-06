@@ -5,7 +5,7 @@
 #include "resz/resource.h"
 #include <string.utils.format.h>
 #include <dev.assistance/dev.assist.h>
-#include <UT/debug.assistance.h>
+#include <dev.assistance/debug.assistance.h>
 #include <dh.tracing.defs.h>
 #include <dh.tracing.h>
 #include <atldlgs.h>
@@ -383,7 +383,7 @@ LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
     }
     SetMsgHandled(FALSE);
     if constexpr (false) {
-        DBGTPrint(LTH_WM_NOTIFY, L"APPRNCE NTY: id:%-4d nc:%-4d %s\n", 
+        DBGTPrint(0, L"APPRNCE NTY: id:%-4d nc:%-4d %s\n", 
             idCtrl, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
     }
     return 0;
@@ -405,7 +405,7 @@ void CPageAppearance::ItemColorTryChange(int nButton, COLORREF clrTryed)
 {
     const int nItem{ItemGetSel()};
     if (IT_Invalid == nItem) {
-        DH::TPrintf(LTH_APPEARANCE L" <<FAILED>> '%s' (%d) ==> #%08x\n", _T(__FUNCTION__), nButton, clrTryed);
+        DH::TPrintf(TL_Error, L"%s invalid item [btn:%d #%08x]\n", __FUNCTIONW__, nButton, clrTryed);
         return ;
     }
     auto const& rItemDef{CScheme::ItemDef(nItem)};
@@ -417,7 +417,7 @@ void CPageAppearance::ItemColorTryChange(int nButton, COLORREF clrTryed)
     }
     const bool bSuccess = m_SchemeCopy.GetColorPair(nWhich).Reset(clrTryed);
     if constexpr (false) {
-        DH::TPrintf(LTH_APPEARANCE L" Item: '%s' SetColor '%s'[%d] ==> #%08x == %s\n", 
+        DH::TPrintf(0, L"Item: '%s' SetColor '%s'[%d] ==> #%08x == %s\n", 
             rItemDef.name,
             CColors::Title(nWhich),
             nWhich,
@@ -683,7 +683,7 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND)
     }
     SetMsgHandled(FALSE);
     if constexpr (true) {
-        DBGTPrint(LTH_WM_NOTIFY, L"APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
+        DBGTPrint(0, L"APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
             nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
     }
 }

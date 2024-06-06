@@ -47,7 +47,7 @@ void SetMFStatus(int status, PCWSTR format, ...)
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
 {
     ATL::CStringA msg = Str::ErrorCode<char>::SystemMessage(code);
-    DH::TPrintf(DH::ModuleName(), L"%S %S\n", caption.GetString(), msg.GetString());
+    DH::TPrintf(TL_Module, L"%S %S\n", caption.GetString(), msg.GetString());
 
     if (showMBox) {
         ATL::CStringA userMsg;
@@ -59,7 +59,7 @@ void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox/* = false*
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
 {
     ATL::CStringW msg = Str::ErrorCode<wchar_t>::SystemMessage(code);
-    DH::TPrintf(DH::ModuleName(), L"%s %s\n", caption.GetString(), msg.GetString());
+    DH::TPrintf(TL_Module, L"%s %s\n", caption.GetString(), msg.GetString());
 
     if (showMBox) {
         ATL::CStringW userMsg;

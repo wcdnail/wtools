@@ -24,7 +24,7 @@ CMainFrame::CMainFrame(Conf::Section const& parentSettings)
 
 void CMainFrame::SetStatus(int status, ATL::CStringW&& message)
 {
-    DH::TPrintf(LTH_STATUS, L"[s:%d] %s\n", status, message.GetString());
+    DH::TPrintf(TL_Notify, L"[s:%d] %s\n", status, message.GetString());
     if (!m_StatusBar.m_hWnd) {
         return;
     }

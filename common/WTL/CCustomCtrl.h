@@ -1,6 +1,7 @@
 #pragma once
 
 #include <wcdafx.api.h>
+#include <dh.tracing.h>
 #include <atlwin.h>
 #include <atlapp.h>
 
@@ -36,7 +37,7 @@ inline HRESULT CCustomControl<Customer>::PreCreateWindowImpl(ATOM& rAtom, ATL::C
     WTL::CStaticDataInitCriticalSectionLock lock{};
     HRESULT code = lock.Lock();
     if (FAILED(code)) {
-        ATLTRACE2(ATL::atlTraceRegistrar, 0, _T("ERROR : Unable to lock critical section in CCustomControl::PreCreateWindowImpl.\n"));
+        DH::TPrintf(TL_Error, L"Unable to lock critical section in %s\n", __FUNCTIONW__);
         ATLASSERT(FALSE);
         return code;
     }
@@ -48,8 +49,7 @@ inline HRESULT CCustomControl<Customer>::PreCreateWindowImpl(ATOM& rAtom, ATL::C
             return code;
         }
         rAtom = atom;
-        ATLTRACE(ATL::atlTraceRegistrar, 0, _T("ATOM: %d '%s' for %p\n"),
-            rAtom, clsInfo.m_wc.lpszClassName, pThis);
+        DH::TPrintf(TL_Notify, L"ATOM: %d '%s' for %p\n", rAtom, clsInfo.m_wc.lpszClassName, pThis);
     }
     lock.Unlock();
     if (!pThis->m_thunk.Init(nullptr, nullptr)) {

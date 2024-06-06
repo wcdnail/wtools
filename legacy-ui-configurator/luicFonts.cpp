@@ -28,7 +28,7 @@ PCWSTR CFonts::Title(int index)
         L"Hyperlink Font",
     };
     if (index < 0 || index > FONT_Count - 1) {
-        DH::TPrintf(L"ERROR", L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
+        DH::TPrintf(TL_Error, L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
         return L"INVALID FONT";
     }
     return gs_name[index];
@@ -110,7 +110,7 @@ ReturnType& CFonts::getRefByIndex(SelfRef& thiz, int index)
 {
     if (index < 0 || index > FONT_Count - 1) {
         static ReturnType dummy{};
-        DH::TPrintf(L"ERROR", L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
+        DH::TPrintf(TL_Error, L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
         return dummy;
     }
     return thiz.m_Pair[index];
@@ -149,7 +149,7 @@ bool CFontPair::Reset(WTL::CFont& hFont)
     if (!hFont.GetLogFont(temp)) {
         const auto code = static_cast<HRESULT>(GetLastError());
         const auto codeText = Str::ErrorCode<wchar_t>::SystemMessage(code);
-        DH::TPrintf(L"ERROR", L"%s: GetLogFont failed: %d '%s'\n", __FUNCTIONW__, code, codeText.GetString());
+        DH::TPrintf(TL_Error, L"%s: GetLogFont failed: %d '%s'\n", __FUNCTIONW__, code, codeText.GetString());
         return false;
     }
     m_logFont = temp;

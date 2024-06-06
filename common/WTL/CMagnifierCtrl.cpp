@@ -90,7 +90,7 @@ bool CMagnifierCtrl::Initialize(HWND hWnd, float fFactor, HCURSOR hCursor, OnCli
     }
     if (!SetMagnification(fFactor, fFactor)) {
         hCode = static_cast<HRESULT>(GetLastError());
-        DH::TPrintf(LTH_CONTROL L" SetMagnification failed: 0x%08x\n", sFunc.c_str(), hCode);
+        DH::TPrintf(TL_Error, L"SetMagnification failed: 0x%08x\n", sFunc.c_str(), hCode);
     }
     m_onClick = std::move(onClick);
     if (!hCursor) {
@@ -103,7 +103,7 @@ bool CMagnifierCtrl::Initialize(HWND hWnd, float fFactor, HCURSOR hCursor, OnCli
     return true;
 raiseError:
     auto const msg{Str::ErrorCode<>::SystemMessage(hCode)};
-    DH::TPrintf(LTH_CONTROL L" %s failed: 0x%08x %s\n", sFunc.c_str(), hCode, msg.GetString());
+    DH::TPrintf(TL_Error, L"%s failed: 0x%08x %s\n", sFunc.c_str(), hCode, msg.GetString());
     return false;
 }
 
@@ -122,11 +122,11 @@ int CMagnifierCtrl::OnCreate(LPCREATESTRUCT pCS)
         sFunc = L"CreateWindowEx('" + std::wstring{WC_MAGNIFIERW} + L"')";
         goto raiseError;
     }
-    ATLTRACE(ATL::atlTraceControls, 0, _T("WM_CREATE OK for %p\n"), this);
+    DH::TPrintf(0, _T("%s OK for %p\n"), __FUNCTIONW__, this);
     return 0;
 raiseError:
     auto const msg{Str::ErrorCode<>::SystemMessage(hCode)};
-    DH::TPrintf(LTH_CONTROL L" %s failed: 0x%08x %s\n", sFunc.c_str(), hCode, msg.GetString());
+    DH::TPrintf(TL_Error, L"%s failed: 0x%08x %s\n", sFunc.c_str(), hCode, msg.GetString());
     return -1;
 }
 

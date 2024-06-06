@@ -2,13 +2,12 @@
 #define _assistance_trace_stream_h__
 
 #include "trace.flags.h"
-#include <boost/noncopyable.hpp>
 #include <sstream>
 
 namespace Trace
 {
     template <class Logger>
-    class Stream: boost::noncopyable
+    class Stream
     {
     public:
         Stream();

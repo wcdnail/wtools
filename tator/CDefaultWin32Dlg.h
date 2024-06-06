@@ -108,7 +108,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         case NM_CUSTOMDRAW:     //
             break;              // -- skip
         default:
-            DBGTPrint(LTH_WM_NOTIFY, L" id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+            DBGTPrint(0, L"WM_NOTIFY id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
             break;
         }
         SetMsgHandled(FALSE);
@@ -140,7 +140,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
             m_cpDlg.MoveWindow(m_cpMoveFlags);
             return ;
         default:
-            DBGTPrint(LTH_WM_COMMAND, L" id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+            DBGTPrint(0, L"WM_COMMAND id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
             break;
         }
         SetMsgHandled(FALSE);
@@ -197,7 +197,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         PCWSTR   pszClasses{L"BUTTON;EDIT;MENU;SCROLLBAR"};
         HRESULT const hCode{ThemedInit(pszClasses)};
         if (FAILED(hCode)) {
-            DH::TPrintf(LTH_CONTROL L" ThemedInit['%s'] failed: 0x%08x %s\n", pszClasses,
+            DH::TPrintf(TL_Warning, L"ThemedInit['%s'] failed: 0x%08x %s\n", pszClasses,
                 hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
         }
 

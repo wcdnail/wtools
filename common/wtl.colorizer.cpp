@@ -7,6 +7,7 @@
 #include "win-5-6-7.features.h"
 #include "windows.gdi.rects.h"
 #include "dh.tracing.defs.h"
+#include "dh.tracing.h"
 #include "rect.putinto.h"
 
 #ifdef _MSC_VER
@@ -92,7 +93,7 @@ namespace CF::Colorized
         CStringW _class = T::GetWndClassName();
         _class.MakeUpper();
         CtrlFactory()[_class] = &Colorizer_Creator<Control<T>>;
-        DBGTPrint(L"  ClrzrFactory| << '%s'\n", _class.GetString());
+        DBGTPrint(0, L"ColorizerFactory: ClrzrFactory| << '%s'\n", _class.GetString());
     }
 
     void Colorizer::PerformInitStatix()
@@ -178,7 +179,7 @@ namespace CF::Colorized
 #ifdef _DEBUG
         CStringW text;
         GetWindowTextW(text);
-        DBGTPrint(LTH_COLORIZER, L"- %p %s...\n", m_hWnd, text.GetString());
+        DBGTPrint(0, L"Colorizer: - %p %s...\n", m_hWnd, text.GetString());
 #endif
         SetMsgHandled(FALSE);
     }
@@ -188,7 +189,7 @@ namespace CF::Colorized
 #ifdef _DEBUG
         CStringW text;
         GetWindowTextW(text);
-        DBGTPrint(LTH_COLORIZER, L"+ %p %s...\n", hwnd, text.GetString());
+        DBGTPrint(0, L"Colorizer: + %p %s...\n", hwnd, text.GetString());
 #endif
         EnumChildWindows(hwnd, reinterpret_cast<WNDENUMPROC>(InitItem), reinterpret_cast<LPARAM>(this));
     }
@@ -206,7 +207,7 @@ namespace CF::Colorized
         const auto fact = CtrlFactory().find(_class);
         bool      exist = fact != CtrlFactory().end();
         if (!exist) {
-            DBGTPrint(LTH_COLORIZER, L">> %p '%s' not EXIST <<\n", hwnd, _class.GetString());
+            DBGTPrint(0, L"Colorizer: >> %p '%s' not EXIST <<\n", hwnd, _class.GetString());
         }
         if (exist && !already) {
             ::ShowWindow(hwnd, SW_HIDE);

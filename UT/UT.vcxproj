@@ -25,7 +25,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='product|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="debug.assistance.cpp" />
     <ClCompile Include="generic.cpp" />
     <ClCompile Include="pch.cxx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|Win32'">Create</PrecompiledHeader>
@@ -46,9 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clr.dracula.h" />
-    <ClInclude Include="debug.assistance.h" />
     <ClInclude Include="desktop.composition.window.h" />
-    <ClInclude Include="err.printer.h" />
     <ClInclude Include="pch.hxx" />
     <ClInclude Include="rez\resource.h" />
     <ClInclude Include="winui.composition.h" />

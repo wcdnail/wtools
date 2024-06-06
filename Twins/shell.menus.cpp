@@ -8,8 +8,8 @@ namespace Twins
     unsigned TrackShellContextMenu(CWindow owner, CPoint point, Fl::List const& files)
     {
         ShellImpl::ContextMenu menu;
-        unsigned rv = (SUCCEEDED(menu.SetObjects(files)) ? menu.ShowContextMenu(owner, point) : (unsigned)-1);
-        DH::TPrintf("ShellMnu", "return value = %d\n", rv);
+        unsigned rv = (SUCCEEDED(menu.SetObjects(files)) ? menu.ShowContextMenu(owner, point) : static_cast<unsigned>(-1));
+        DH::TPrintf(0, "ShellMnu: return value = %d\n", rv);
         return rv;
     }
 }

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "wcdafx.api.h"
-#include "dh.timer.h"
-#include "strint.h"
+#include <wcdafx.api.h>
+#include <dh.timer.h>
+#include <dh.trace.level.h>
+#include <strint.h>
 #include <sal.h>
 #include <utility>
 #include <string>
@@ -38,11 +39,11 @@ namespace DH
         wchar_t Message[1024];
     };
 
-    WCDAFX_API void Printf(std::string_view svLevel, _Printf_format_string_ std::string_view svFormat, ...);
-    WCDAFX_API void Printf(std::wstring_view svLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
+    WCDAFX_API void Printf(int nLevel, _Printf_format_string_ std::string_view svFormat, ...);
+    WCDAFX_API void Printf(int nLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
     
-    WCDAFX_API void TPrintf(std::string_view svLevel, _Printf_format_string_ std::string_view svFormat, ...);
-    WCDAFX_API void TPrintf(std::wstring_view svLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
+    WCDAFX_API void TPrintf(int nLevel, _Printf_format_string_ std::string_view svFormat, ...);
+    WCDAFX_API void TPrintf(int nLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
 
     namespace Impl
     {
@@ -78,9 +79,6 @@ namespace DH
         //::memset(dest, 0, CountValue * sizeof(CharType));
         Impl::CopyCharsForPrinting(dest, CountValue - 1, source, sl);
     }
-
-    WCDAFX_API WString const& ModuleName();
-    WCDAFX_API WString const& ModuleDir();
 }
 
 #ifdef _DEBUG

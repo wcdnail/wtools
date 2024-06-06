@@ -23,10 +23,10 @@ namespace Twins
 
             HRESULT hr = !dirSet ? GetLastError() : 0;
             if (!hr) {
-                DH::TPrintf(_T("DRIVERDY: %s\n"), info.path.c_str());
+                DH::TPrintf(0, _T("DRIVERDY: %s\n"), info.path.c_str());
             }
             else {
-                DH::TPrintf(_T("DRIVERDY: %s - %d %s\n"), info.path.c_str(), 
+                DH::TPrintf(TL_Error, _T("DRIVERDY: %s - %d %s\n"), info.path.c_str(), 
                     hr, Str::ErrorCode<>::SystemMessage(hr).GetString());
             }
             ::SetCurrentDirectoryW(prev.GetString());

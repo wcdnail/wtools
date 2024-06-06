@@ -6,10 +6,6 @@
 #include <sstream>
 #include <string>
 
-#ifndef _WIN32
-#include <boost/thread/thread.hpp>
-#endif
-
 namespace Trace
 {
     template <class C>

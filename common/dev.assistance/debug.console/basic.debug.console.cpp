@@ -26,7 +26,7 @@ namespace DH
 
     HRESULT BasicDebugConsole::PreCreateWindow()
     {
-        DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
+        DH::Printf(0, L"ERROR", L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
         ATLASSERT(false);
         return ERROR_CALL_NOT_IMPLEMENTED;
     }
@@ -215,19 +215,19 @@ namespace DH
 
     void BasicDebugConsole::PreWrite()
     {
-        DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
+        DH::Printf(0, L"ERROR", L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
         ATLASSERT(false);
     }
 
     void BasicDebugConsole::WriteNarrow(std::string&, double, DWORD)
     {
-        DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
+        DH::Printf(0, L"ERROR", L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
         ATLASSERT(false);
     }
 
     void BasicDebugConsole::WriteWide(std::wstring&, double, DWORD)
     {
-        DH::Printf(L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
+        DH::Printf(0, L"ERROR", L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
         ATLASSERT(false);
     }
 
@@ -326,7 +326,7 @@ namespace DH
         BOOL const bRes{WndSuper::SubclassWindow(hWnd)};
         if (!bRes) {
             auto const hCode = static_cast<HRESULT>(GetLastError());
-            DH::TPrintf(LTH_DBG_ASSIST L" %s failed: 0x%08x %s\n", __FUNCTIONW__,
+            DH::TPrintf(TL_Error, L"%s failed: 0x%08x %s\n", __FUNCTIONW__,
                 hCode , Str::ErrorCode<>::SystemMessage(hCode).GetString());
             return bRes;
         }

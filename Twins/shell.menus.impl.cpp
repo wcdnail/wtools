@@ -23,7 +23,7 @@ namespace Twins
                 va_end(ap);
 
                 message.AppendFormat(L" %08x (%s)", hr, Str::ErrorCode<>::SystemMessage(hr));
-                DH::TPrintf(L"ERROR", L"%s\n", message);
+                DH::TPrintf(TL_Error, L"%s\n", message);
 
                 throw _com_error(hr);
             }

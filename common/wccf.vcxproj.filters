@@ -161,6 +161,12 @@
       <Filter>dev.assistance\debug.console</Filter>
     </ClCompile>
     <ClCompile Include="win32.registry.cpp" />
+    <ClCompile Include="dh.trace.level.cpp">
+      <Filter>__</Filter>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\debug.assistance.cpp">
+      <Filter>dev.assistance</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -498,6 +504,15 @@
       <Filter>dev.assistance\debug.console\resources</Filter>
     </ClInclude>
     <ClInclude Include="win32.registry.h" />
+    <ClInclude Include="dh.trace.level.h">
+      <Filter>__</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.assistance.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\err.printer.h">
+      <Filter>dev.assistance</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

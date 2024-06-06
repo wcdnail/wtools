@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
 #include <atlgdi.h>
 #include <atltypes.h>
 
@@ -8,7 +7,7 @@ namespace Assist
 {
     namespace Sensors
     {
-        class FloatGrid: boost::noncopyable
+        class FloatGrid
         {
         public:
             FloatGrid(int xstep, int ystep, int xinc, int yinc);

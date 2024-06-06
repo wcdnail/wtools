@@ -1,14 +1,13 @@
 #ifndef _assistance_trace_accumulator_h__
 #define _assistance_trace_accumulator_h__
 
-#include <boost/noncopyable.hpp>
 #include <sstream>
 #include <xutility>
 #include <iterator>
 
 namespace Trace
 {
-    class Accumulator: boost::noncopyable
+    class Accumulator
     {
     public:
         typedef std::wstring String;

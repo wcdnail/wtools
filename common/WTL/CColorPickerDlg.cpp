@@ -53,7 +53,7 @@ bool CColorPickerDlg::Show(HWND hWndMaster, unsigned nPosFlags, bool bModal)
     return true;
 reportError:
     auto const msg{Str::ErrorCode<>::SystemMessage(hCode)};
-    DH::TPrintf(LTH_CONTROL L" %s failed: 0x%08x %s\n", sFunc.c_str(), hCode, msg.GetString());
+    DH::TPrintf(0, L"%s failed: 0x%08x %s\n", sFunc.c_str(), hCode, msg.GetString());
     return false;
 }
 
@@ -151,7 +151,7 @@ static UINT CCPD_OnGetDlgCode(LPMSG pMsg)
 {
     UNREFERENCED_PARAMETER(pMsg);
     if (pMsg) {
-        DBG_DUMP_WMESSAGE(LTH_COLORPICKER, L"WNDPROC", pMsg);
+        DBG_DUMP_WMESSAGE(0, L"WNDPROC", pMsg);
     }
     return DLGC_WANTALLKEYS | DLGC_WANTTAB;
 }
@@ -208,8 +208,8 @@ BOOL CColorPickerDlg::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
         //auto const pCurrMsg{GetCurrentMessage()};
         //MSG      theMessage{hWnd, uMsg, wParam, lParam, pCurrMsg->time, pCurrMsg->pt};
         MSG msg{*GetCurrentMessage()};
-        DBG_DUMP_WMESSAGE_EXT(LTH_CONTROL, L"WNDPROC", hWnd, uMsg, wParam, lParam);
-        DBG_DUMP_WMESSAGE(LTH_CONTROL, L"CURRMSG", &msg);
+        DBG_DUMP_WMESSAGE_EXT(0, L"WNDPROC", hWnd, uMsg, wParam, lParam);
+        DBG_DUMP_WMESSAGE(0, L"CURRMSG", &msg);
         if (::IsDialogMessageW(m_ColorPicker.m_hWnd, &msg)) {
             //DBG_DUMP_WMESSAGE_EXT(LTH_COLORPICKER, L"CPDLG", hWnd, uMsg, wParam, lParam);
             return TRUE;
@@ -236,7 +236,7 @@ BOOL CColorPickerDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
     if (!m_bModalLoop) {
         HRESULT const hCode{ThemedInit()};
         if (FAILED(hCode)) {
-            DH::TPrintf(LTH_COLORPICKER, L" ThemedInit failed: 0x%08x %s\n",
+            DH::TPrintf(TL_Error, L"ThemedInit failed: 0x%08x %s\n",
                 hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
         }
         // nHeight = -MulDiv(PointSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
@@ -247,7 +247,7 @@ BOOL CColorPickerDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         m_ColorPicker.GetMasterColor().AddObserver(*this);
     }
     DlgResize_Init(m_bModalLoop, true, 0);
-    ATLTRACE(ATL::atlTraceControls, 0, _T("WM_INITDIALOG OK for hWnd:%p\n"), m_hWnd);
+    DH::TPrintf(0, _T("%s OK for %p\n"), __FUNCTIONW__, this);
     return TRUE;
 }
 

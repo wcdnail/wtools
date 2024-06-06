@@ -420,6 +420,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="dev.assistance\debug.assistance.cpp" />
     <ClCompile Include="dev.assistance\debug.console\basic.debug.console.cpp" />
     <ClCompile Include="dev.assistance\debug.console\dc.listview.impl.cpp" />
     <ClCompile Include="dev.assistance\debug.console\dc.rich.edit.impl.cpp" />
@@ -428,6 +429,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClCompile Include="dev.assistance\debug.console\WinDebugMonitor.cpp" />
     <ClCompile Include="dev.assistance\dev.assist.cpp" />
     <ClCompile Include="dh.timer.cpp" />
+    <ClCompile Include="dh.trace.level.cpp" />
     <ClCompile Include="dh.tracing.cpp" />
     <ClCompile Include="dialogz.basic.cpp" />
     <ClCompile Include="dialogz.messagebox.cpp" />
@@ -488,6 +490,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClInclude Include="crash.report\run.context.info.h" />
     <ClInclude Include="crash.report\stack.walker.h" />
     <ClInclude Include="crash.report\string.buffer.h" />
+    <ClInclude Include="dev.assistance\debug.assistance.h" />
     <ClInclude Include="dev.assistance\debug.console\basic.debug.console.h" />
     <ClInclude Include="dev.assistance\debug.console\dc.listview.impl.h" />
     <ClInclude Include="dev.assistance\debug.console\dc.rich.edit.impl.h" />
@@ -497,12 +500,14 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClInclude Include="dev.assistance\debug.console\resources\resource.h" />
     <ClInclude Include="dev.assistance\debug.console\WinDebugMonitor.h" />
     <ClInclude Include="dev.assistance\dev.assist.h" />
+    <ClInclude Include="dev.assistance\err.printer.h" />
     <ClInclude Include="dev.assistance\list.view.exstyles.h" />
     <ClInclude Include="dev.assistance\list.view.styles.h" />
     <ClInclude Include="dev.assistance\notify.codes.h" />
     <ClInclude Include="dev.assistance\virtual.keys.consts.h" />
     <ClInclude Include="dev.assistance\window.messages.consts.h" />
     <ClInclude Include="dh.timer.h" />
+    <ClInclude Include="dh.trace.level.h" />
     <ClInclude Include="dh.tracing.defs.h" />
     <ClInclude Include="dh.tracing.h" />
     <ClInclude Include="dialogz.basic.h" />

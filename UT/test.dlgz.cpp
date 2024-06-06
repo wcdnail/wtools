@@ -1,10 +1,10 @@
 #include "pch.hxx"
 #include "dh.tracing.h"
-#include "err.printer.h"
 #include "clr.dracula.h"
 #include "wtl.control.h"
 #include "rez/resource.h"
-#include "dev.assistance/dev.assist.h"
+#include <dev.assistance/err.printer.h>
+#include <dev.assistance/dev.assist.h>
 #include <gtest/gtest.h>
 #include <memory>
 #include <map>
@@ -98,7 +98,7 @@ void WinDebugDump(HWND hWnd, PCWSTR prefix)
     id.Format(L"%04d", temp.GetDlgCtrlID());
     temp.Detach();
     RealGetWindowClassW(hWnd, _class, _countof(_class) - 1);
-    DH::TPrintf(L"WTL", L"%s %p::'%s'(%d) [%s:%s]\n", prefix, hWnd, 
+    DH::TPrintf(0, L"WTL: %s %p::'%s'(%d) [%s:%s]\n", prefix, hWnd, 
         _class, DetermineWndClass(hWnd),
         text.GetString(), id.GetString()
     );

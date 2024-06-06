@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "CMagnifierInit.h"
-#include <dev.assistance/dev.assist.h>
 #include <string.utils.error.code.h>
 #include <dh.tracing.defs.h>
 #include <dh.tracing.h>
@@ -17,21 +16,21 @@ CMagnifierInit& CMagnifierInit::Instance()
 CMagnifierInit::CMagnifierInit()
 {
     if (MagInitialize()) {
-        DH::TPrintf(LTH_GLOBALS, L" MagInitialize OK\n");
+        DH::TPrintf(0, L"MagInitialize OK\n");
         return ;
     }
     auto const hCode{static_cast<HRESULT>(GetLastError())};
     auto const  sMsg{Str::ErrorCode<>::SystemMessage(hCode)};
-    DH::TPrintf(LTH_GLOBALS, L" MagInitialize failed: 0x%08x %s\n", hCode, sMsg.GetString());
+    DH::TPrintf(TL_Error, L"MagInitialize failed: 0x%08x %s\n", hCode, sMsg.GetString());
 }
 
 CMagnifierInit::~CMagnifierInit()
 {
     if (MagUninitialize()) {
-        DH::TPrintf(LTH_GLOBALS, L" MagUninitialize OK\n");
+        DH::TPrintf(0, L"MagUninitialize OK\n");
         return ;
     }
     auto const hCode{static_cast<HRESULT>(GetLastError())};
     auto const  sMsg{Str::ErrorCode<>::SystemMessage(hCode)};
-    DH::TPrintf(LTH_GLOBALS, L" MagUninitialize failed: 0x%08x %s\n", hCode, sMsg.GetString());
+    DH::TPrintf(TL_Error, L"MagUninitialize failed: 0x%08x %s\n", hCode, sMsg.GetString());
 }

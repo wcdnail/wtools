@@ -241,32 +241,6 @@ namespace DH
     }
 
 #pragma endregion
-#pragma region Level
-
-    WString const& ModuleName()
-    {
-        static WString sModuleName;
-        if (sModuleName.empty()) {
-            auto const* pName{&Runtime::Info().Executable.Version.ProductName};
-            if (pName->empty()) {
-                pName = &Runtime::Info().Executable.Filename;
-            }
-            std::filesystem::path const tempath{*pName};
-            sModuleName = tempath.filename().replace_extension().wstring();
-        }
-        return sModuleName;
-    }
-
-    WString const& ModuleDir()
-    {
-        static WString sModuleDir;
-        if (sModuleDir.empty()) {
-            std::filesystem::path const modPath{Runtime::Info().Executable.Directory};
-            sModuleDir = modPath.native();
-        }
-        return sModuleDir;
-    }
-#pragma endregion
 #pragma region Tracers
 
     static inline void printString(ATL::CStringA&& sTS, ATL::CStringA&& sTID, ATL::CStringA&& sCategory, ATL::CStringA&& sText)
@@ -307,20 +281,20 @@ namespace DH
         }
     }
 
-    #define TRACE_LEVEL_LEN         14
+    #define TRACE_LEVEL_LEN         16
     #define TRACE__STRINGIZE(V)     #V
     #define TRACE_STRINGIZE(V)      TRACE__STRINGIZE(V)
     #define TRACE__WSTRINGIZE(V)    L#V
     #define TRACE_WSTRINGIZE(V)     TRACE__WSTRINGIZE(V)
 
-    template <typename CharType>
+    template <typename Char>
     struct TTTraits {};
 
     template <> struct TTTraits<char>
     {
         static inline const PCSTR  FmtTS{"%0*.8f "};
         static inline const PCSTR FmtTID{"[%06d] "};
-        static inline const PCSTR FmtCat{"%" TRACE_STRINGIZE(TRACE_LEVEL_LEN) "s| "};
+        static inline const PCSTR FmtCat{"%-" TRACE_STRINGIZE(TRACE_LEVEL_LEN) "s "};
 
         static BOOL StrTruncate(char* szBuffer, UINT nLen, std::string_view svText, DWORD dwFlags)
         {
@@ -332,7 +306,7 @@ namespace DH
     {
         static inline const PCWSTR  FmtTS{L"%0*.8f "};
         static inline const PCWSTR FmtTID{L"[%06d] "};
-        static inline const PCWSTR FmtCat{L"%" TRACE_WSTRINGIZE(TRACE_LEVEL_LEN) L"s| "};
+        static inline const PCWSTR FmtCat{L"%-" TRACE_WSTRINGIZE(TRACE_LEVEL_LEN) L"s "};
 
         static BOOL StrTruncate(wchar_t* szBuffer, UINT nLen, std::wstring_view svText, DWORD dwFlags)
         {
@@ -340,62 +314,74 @@ namespace DH
         }
     };
 
-    template <typename CharType>
-    static std::basic_string<CharType> strTruncateLevel(std::basic_string_view<CharType> svLevel)
+    template <typename Char>
+    static std::basic_string<Char> strTruncateLevel(std::basic_string<Char>&& szLevel)
     {
-        if (svLevel.empty()) {
+        if (szLevel.empty()) {
             return {};
         }
-        if (svLevel.length() < (TRACE_LEVEL_LEN-1)) {
-            return {svLevel.data(), svLevel.length()};
+        if (szLevel.length() < (TRACE_LEVEL_LEN-1)) {
+            return std::move(szLevel);
         }
-        CharType szBuffer[TRACE_LEVEL_LEN]{0};
-        if (!TTTraits<CharType>::StrTruncate(szBuffer, _countof(szBuffer), svLevel, 0)) {
-            return {svLevel.data(), std::min<size_t>(TRACE_LEVEL_LEN-1, svLevel.length())};
+        Char szBuffer[TRACE_LEVEL_LEN]{0};
+        if (!TTTraits<Char>::StrTruncate(szBuffer, _countof(szBuffer), szLevel, DT_WORD_ELLIPSIS)) {
+            return {szLevel.c_str(), std::min<size_t>(TRACE_LEVEL_LEN-1, szLevel.length())};
         }
         return {szBuffer};
     }
 
-    template <typename CharType>
-    static void printStringT(std::basic_string_view<CharType>  svLevel,
-       _Printf_format_string_ std::basic_string_view<CharType> svFormat,
+    template <typename Char>
+    static std::basic_string<Char> strLevel(int nLevel)
+    {
+        std::basic_string<Char> szLevel;
+        StrTraceLevel(nLevel, szLevel);
+        return strTruncateLevel(std::move(szLevel));
+    }
+
+    template <typename Char>
+    static void printStringT(int nLevel,
+       _Printf_format_string_ std::basic_string_view<Char> svFormat,
         va_list ap)
     {
-        auto   sTS{Str::Elipsis<CharType>::Format(TTTraits<CharType>::FmtTS, LOG_UPTIME_PRECISS, LOG_Uptime.Seconds())};
-        auto  sTID{Str::Elipsis<CharType>::Format(TTTraits<CharType>::FmtTID, GetCurrentThreadId())};
-        auto  sLev{Str::Elipsis<CharType>::Format(TTTraits<CharType>::FmtCat, strTruncateLevel<CharType>(svLevel).c_str())};
-        auto sText{Str::Elipsis<CharType>::FormatV(svFormat.data(), ap)};
+        auto   sTS{Str::Elipsis<Char>::Format(TTTraits<Char>::FmtTS, LOG_UPTIME_PRECISS, LOG_Uptime.Seconds())};
+        auto  sTID{Str::Elipsis<Char>::Format(TTTraits<Char>::FmtTID, GetCurrentThreadId())};
+        auto  sLev{Str::Elipsis<Char>::Format(TTTraits<Char>::FmtCat, strLevel<Char>(nLevel).c_str())};
+        auto sText{Str::Elipsis<Char>::FormatV(svFormat.data(), ap)};
         printString(std::move(sTS), std::move(sTID), std::move(sLev), std::move(sText));
     }
 
-    void TPrintf(std::string_view svLevel, _Printf_format_string_ std::string_view svFormat, ...)
+    void TPrintf(int nLevel, _Printf_format_string_ std::string_view svFormat, ...)
     {
+        UNREFERENCED_PARAMETER(nLevel);
         va_list ap;
         va_start(ap, svFormat);
-        printStringT<char>(svLevel, svFormat, ap);
+        printStringT<char>(nLevel, svFormat, ap);
         va_end(ap);
     }
 
-    void TPrintf(std::wstring_view svLevel, _Printf_format_string_ std::wstring_view svFormat, ...)
+    void TPrintf(int nLevel, _Printf_format_string_ std::wstring_view svFormat, ...)
     {
+        UNREFERENCED_PARAMETER(nLevel);
         va_list ap;
         va_start(ap, svFormat);
-        printStringT<wchar_t>(svLevel, svFormat, ap);
+        printStringT<wchar_t>(nLevel, svFormat, ap);
         va_end(ap);
     }
 
-    void Printf(std::string_view svLevel, _Printf_format_string_ std::string_view svFormat, ...)
+    void Printf(int nLevel, _Printf_format_string_ std::string_view svFormat, ...)
     {
-        auto sLev{Str::Elipsis<char>::Format(TTTraits<char>::FmtCat, strTruncateLevel<char>(svLevel).c_str())};
+        UNREFERENCED_PARAMETER(nLevel);
+        auto sLev{Str::Elipsis<char>::Format(TTTraits<char>::FmtCat, strLevel<char>(nLevel).c_str())};
         va_list ap;
         va_start(ap, svFormat);
         printString({}, {}, std::move(sLev), Str::Elipsis<char>::FormatV(svFormat.data(), ap));
         va_end(ap);
     }
 
-    void Printf(std::wstring_view svLevel, _Printf_format_string_ std::wstring_view svFormat, ...)
+    void Printf(int nLevel, _Printf_format_string_ std::wstring_view svFormat, ...)
     {
-        auto sLev{Str::Elipsis<wchar_t>::Format(TTTraits<wchar_t>::FmtCat, strTruncateLevel<wchar_t>(svLevel).c_str())};
+        UNREFERENCED_PARAMETER(nLevel);
+        auto sLev{Str::Elipsis<wchar_t>::Format(TTTraits<wchar_t>::FmtCat, strLevel<wchar_t>(nLevel).c_str())};
         va_list ap;
         va_start(ap, svFormat);
         printString({}, {}, std::move(sLev), Str::Elipsis<wchar_t>::FormatV(svFormat.data(), ap));
@@ -407,20 +393,20 @@ namespace DH
 
     static inline void _Start_ScopedThreadLog(PCWSTR message) 
     {
-        TPrintf(ModuleName(), L"%s thread started...\n", message);
+        TPrintf(TL_Module, L"%s thread started...\n", message);
     }
 
     static inline void _Stop_ScopedThreadLog(PCWSTR message, DH::Timer const& liveTime)
     {
-        TPrintf(ModuleName(), L"%s thread stopped %f seconds (%f hours)\n", message,
+        TPrintf(TL_Module, L"%s thread stopped %f seconds (%f hours)\n", message,
             liveTime.Seconds(), liveTime.Seconds() / 3600.); 
     }
 
-    ScopedThreadLog::ScopedThreadLog(std::wstring_view svLevel)
+    ScopedThreadLog::ScopedThreadLog(std::wstring_view nLevel)
         : Time()
     {
         memset(Message, 0, std::size(Message));
-        wcsncpy_s(Message, svLevel.data(), std::min<size_t>(svLevel.length(), std::size(Message)));
+        wcsncpy_s(Message, nLevel.data(), std::min<size_t>(nLevel.length(), std::size(Message)));
 
         _Start_ScopedThreadLog(Message);
     }
@@ -451,10 +437,10 @@ namespace DH
             std::wostringstream temp;
             Runtime::Info().SimpleReport(temp);
             std::wstring const report{temp.str()};
-            TPrintf(ModuleName(), L"System info:\n%s", report.c_str());
+            TPrintf(TL_Module, L"System info:\n%s", report.c_str());
         }
         else {
-            TPrintf(ModuleName(), L"Launched on %s [%s @'%s']\n",
+            TPrintf(TL_Module, L"Launched on %s [%s @'%s']\n",
                 Runtime::Info().Host.Name.c_str(),
                 Runtime::Info().System.Version.DisplayName.c_str(),
                 ModuleDir().c_str()

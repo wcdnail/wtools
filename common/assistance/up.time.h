@@ -1,7 +1,7 @@
 #ifndef _assistance_up_time_h__
 #define _assistance_up_time_h__
 
-#include <boost/date_time/posix_time/ptime.hpp>
+#include <chrono>
 
 namespace Process
 {

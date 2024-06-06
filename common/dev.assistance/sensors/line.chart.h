@@ -3,7 +3,6 @@
 #include "sensor.h"
 #include "float.grid.h"
 #include <windows.gdi.rects.h>
-#include <boost/thread/mutex.hpp>
 #include <atltypes.h>
 #include <atlstr.h>
 #include <atlgdi.h>

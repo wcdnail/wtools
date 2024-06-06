@@ -1078,6 +1078,7 @@ BOOL CColorButton::CPickerImpl::Picker()
                     m_rMaster.m_clrCurrent = dlg.GetMasterColor().GetColorRef();
                 }
                 else {
+                    dlg.GetMasterColor().SetColor(m_rMaster.m_clrDefault, RGB_MAX_INT);
                     fOked = FALSE;
                 }
             }

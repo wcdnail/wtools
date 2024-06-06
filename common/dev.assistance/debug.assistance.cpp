@@ -1,17 +1,16 @@
-#include "pch.hxx"
+#include "stdafx.h"
 #include "debug.assistance.h"
-#include "rez/resource.h"
 #include "err.printer.h"
 #include <dh.tracing.h>
 #include <dh.tracing.defs.h>
 
-void NormWindow::MakeItNorm(HWND hWnd)
+void NormWindow::MakeItNorm(HWND hWnd, LPCWSTR lpIconName)
 {
     if (!hResInst) {
         hResInst = GetModuleHandleW(nullptr);
     }
     if (!hIcon) {
-        hIcon = LoadIconW(hResInst, MAKEINTRESOURCEW(IDI_WTL_APP));
+        hIcon = LoadIconW(hResInst, lpIconName);
     }
     if (hIcon) {
            hPrevIcon = reinterpret_cast<HICON>(SendMessageW(hWnd, WM_SETICON, FALSE, reinterpret_cast<LPARAM>(hIcon.m_hIcon)));
@@ -74,10 +73,10 @@ BOOL MoveToMonitor::MoveAttempt(MONITORINFOEXW const& monInfo) const
         CRect rcNew;
         GetWindowRect(hWnd, rcNew);
         if (rcWin != FromCRect<LONG>(rcNew)) {
-            DBGTPrint(LTH_DBG_ASSIST, L" WARNING: window rect changed!\n");
+            DBGTPrint(TL_Warning, L"Window rect changed!\n");
         }
     }
-    DBGTPrint(LTH_DBG_ASSIST, L" w:%08x moved to '%s'\n", hWnd, monInfo.szDevice);
+    DBGTPrint(0, L"w:%08x moved to '%s'\n", hWnd, monInfo.szDevice);
     return FALSE;
 }
 
@@ -103,7 +102,7 @@ bool MoveToMonitor::Move(HWND hWndClient, DWORD dwNum, unsigned nPut)
                                         reinterpret_cast<MONITORENUMPROC>(EnumeratorProc),
                                         reinterpret_cast<LPARAM>(this));
     if (rv) {
-        DBGTPrint(LTH_DBG_ASSIST, L" Could not move w:%08x to desired monitor %d\n", hWnd, dwDesiredNum);
+        DBGTPrint(TL_Error, L" Could not move w:%08x to desired monitor %d\n", hWnd, dwDesiredNum);
     }
     return FALSE == rv;
 }

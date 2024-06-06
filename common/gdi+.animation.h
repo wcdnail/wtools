@@ -1,14 +1,14 @@
 #pragma once
 
 #include "gdi+.image.ptr.h"
-#include <boost/noncopyable.hpp>
+#include <memory>
 
 namespace Ui
 {
-    class Animation: boost::noncopyable
+    class Animation
     {
     private:
-        typedef boost::scoped_array<UINT> UIntArray;
+        typedef std::unique_ptr<UINT[]> UIntArray;
 
     public:
         Animation(UINT start = 0, UINT step = 1, bool loop = true);

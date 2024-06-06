@@ -53,7 +53,7 @@ CScheme::Item const& CScheme::ItemDef(int index)
     };
     if (index < 0 || index >= IT_Count) {
         static constexpr Item dummy{L"INVALID ITEM", -1, -1, -1, -1, -1, -1};
-        DH::TPrintf(L"ERROR", L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
+        DH::TPrintf(TL_Error, L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
         return dummy;
     }
     return gs_item[index];
@@ -63,7 +63,7 @@ template <typename ReturnType, typename SelfRef>
 ReturnType& CScheme::getSizeRangeRef(SelfRef& thiz, int index)
 {
     if (index < 0 || index > NCM_Count - 1) {
-        DH::TPrintf(L"ERROR", L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
+        DH::TPrintf(TL_Error, L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
         static ReturnType dummy{NCM_Invalid};
         return dummy;
     }
@@ -85,7 +85,7 @@ ReturnType& CScheme::getSizeItemeRef(SelfRef& thiz, String const& name)
 {
     const auto it = thiz.m_SizesMap.find(name);
     if (it == thiz.m_SizesMap.cend()) {
-        DH::TPrintf(L"ERROR", L"%s: index [%s] out of range\n", __FUNCTIONW__, name.c_str());
+        DH::TPrintf(TL_Error, L"%s: index [%s] out of range\n", __FUNCTIONW__, name.c_str());
         static CSizePair dummy{};
         return dummy;
     }
@@ -156,27 +156,27 @@ bool CScheme::LoadDefaults()
     CNCMetrics tmpNCMetrics{};
     CFonts         tmpFonts{};
     if (!tmpColors.LoadDefaults()) {
-        DH::TPrintf(L"ERROR", L"%s: CColors::LoadDefaults failed\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: CColors::LoadDefaults failed\n", __FUNCTIONW__);
         return false;
     }
     if (!tmpNCMetrics.LoadDefaults()) {
-        DH::TPrintf(L"ERROR", L"%s: CNCMetrics::LoadDefaults failed\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: CNCMetrics::LoadDefaults failed\n", __FUNCTIONW__);
         return false;
     }
     if (!tmpFonts.LoadDefaults()) {
-        DH::TPrintf(L"ERROR", L"%s: CFonts::LoadDefaults failed\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: CFonts::LoadDefaults failed\n", __FUNCTIONW__);
         return false;
     }
     if (!tmpFonts.LoadValues(tmpNCMetrics)) {
-        DH::TPrintf(L"ERROR", L"%s: CFonts::LoadDefaults for CNCMetrcs failed\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: CFonts::LoadDefaults for CNCMetrcs failed\n", __FUNCTIONW__);
         return false;
     }
     if (!SystemParametersInfoW(SPI_GETGRADIENTCAPTIONS, 0, &bGradientCaptions, 0)) {
-        DH::TPrintf(L"ERROR", L"%s: SystemParametersInfoW failed\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: SystemParametersInfoW failed\n", __FUNCTIONW__);
         return false;
     }
     if (!SystemParametersInfoW(SPI_GETFLATMENU, 0, &bFlatMenus, 0)) {
-        DH::TPrintf(L"ERROR", L"%s: SystemParametersInfoW failed\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: SystemParametersInfoW failed\n", __FUNCTIONW__);
         return false;
     }
     {
@@ -189,7 +189,7 @@ bool CScheme::LoadDefaults()
     tmpColors.Swap(m_Color);
     m_bFlatMenus = bFlatMenus != FALSE;
     m_bGradientCaptions = bGradientCaptions != FALSE;
-    DH::TPrintf(L"SUCCESS", L"%s\n", __FUNCTIONW__);
+    DH::TPrintf(0, L"%s: OK\n", __FUNCTIONW__);
     return true;
 }
 
@@ -199,7 +199,7 @@ bool CScheme::LoadValues(CRegistry const& regScheme)
     DWORD  bFlatMenus{FALSE};
     CColors tmpColors{};
     if (!tmpColors.LoadValues(regScheme)) {
-        DH::TPrintf(L"ERROR", L"%s: CColors::LoadValues failed\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: CColors::LoadValues failed\n", __FUNCTIONW__);
         return false;
     }
     tmpColors.Swap(m_Color);
@@ -217,15 +217,15 @@ bool CScheme::LoadSizes(StrView sName, CRegistry const& regScheme)
     CNCMetrics tmpNCMetrics{};
     CFonts         tmpFonts{};
     if (!tmpNCMetrics.LoadValues(regScheme)) {
-        DH::TPrintf(L"ERROR", L"%s: CNCMetrics::LoadValues failed\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: CNCMetrics::LoadValues failed\n", __FUNCTIONW__);
         return false;
     }
     if (!tmpFonts.LoadValues(regScheme)) {
-        DH::TPrintf(L"ERROR", L"%s: CFonts::LoadDefaults failed\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: CFonts::LoadDefaults failed\n", __FUNCTIONW__);
         return false;
     }
     if (!tmpFonts.LoadValues(tmpNCMetrics)) {
-        DH::TPrintf(L"ERROR", L"%s: CFonts::LoadDefaults for CNCMetrcs failed\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: CFonts::LoadDefaults for CNCMetrcs failed\n", __FUNCTIONW__);
         return false;
     }
     auto& sizes{m_SizesMap[{sName.data(), sName.length()}]};

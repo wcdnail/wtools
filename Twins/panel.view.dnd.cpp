@@ -23,7 +23,7 @@ namespace Twins
         : DropMultiple(::LoadCursor(ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDC_DROP_MULTIPLE)))
         , DropSingle(::LoadCursor(ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDC_DROP_SINGLE)))
         , DropNo(::LoadCursor(ModuleHelper::GetResourceInstance(), MAKEINTRESOURCE(IDC_DROP_NO)))
-        , Current(NULL)
+        , Current(nullptr)
     {}
 
     DragnDropHelper::~DragnDropHelper()
@@ -37,13 +37,13 @@ namespace Twins
 
         HRESULT hr = ::RegisterDragDrop(Owner, dtarget);
 
-        DH::TPrintf(L"DRAGDROP", L"registering - 0x%x `%s`\n", hr, Str::ErrorCode<wchar_t>::SystemMessage(hr));
+        DH::TPrintf(0, L"DRAGDROP: registering - 0x%x `%s`\n", hr, Str::ErrorCode<>::SystemMessage(hr));
 
         if (SUCCEEDED(hr))
         {
             DTarget = dtarget;
 
-            FORMATETC ftetc = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL }; 
+            FORMATETC ftetc = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL }; 
             DTarget->AddSuportedFormat(ftetc); 
         }
 
@@ -88,7 +88,7 @@ namespace Twins
             DragDetected = false;
 
             STGMEDIUM dmy = {0};
-            OnStop(point, dmy, NULL, NULL);
+            OnStop(point, dmy, nullptr, nullptr);
         }
 
         ::ReleaseCapture();
@@ -104,7 +104,7 @@ namespace Twins
         //
         //Selection.Swap(selection);
 
-        DH::TPrintf(L"DRAGDROP: beg %s\n", IsMultipleSelection() ? L"multiple" : L"single");
+        DH::TPrintf(0, L"DRAGDROP: beg %s\n", IsMultipleSelection() ? L"multiple" : L"single");
 
         //Cursor.Current = IsMultipleSelection() ? Cursor.DropMultiple : Cursor.DropSingle;
         //::SetCursor(Cursor.DropNo);
@@ -114,7 +114,7 @@ namespace Twins
 
     void DragnDropHelper::OnStop(CPoint const& pt, STGMEDIUM& medium, FORMATETC* format, DWORD* effect)
     {
-        DH::TPrintf(L"DRAGDROP", L"end\n");
+        DH::TPrintf(0, L"DRAGDROP: end\n");
         //::SetCursor(Owner.GetDefaultCursor());
     }
 
@@ -143,14 +143,14 @@ namespace Twins
         bs += sizeof(wchar_t) * 2;
 
         HGLOBAL hgl = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, bs);
-        if ( NULL == hgl )
-            return NULL;
+        if ( nullptr == hgl )
+            return nullptr;
 
         BYTE* buffer = (BYTE*)::GlobalLock(hgl);
-        if (NULL == buffer)
+        if (nullptr == buffer)
         {
             ::GlobalFree(hgl);
-            return NULL;
+            return nullptr;
         }
 
         DROPFILES* drop = (DROPFILES*)buffer;
@@ -179,7 +179,7 @@ namespace Twins
                                   , COLORREF crColorKey=GetSysColor(COLOR_WINDOW)
                                   )
     {
-        if(pDragSourceHelper == NULL)
+        if(pDragSourceHelper == nullptr)
             return E_FAIL;
 
         SHDRAGIMAGE di;
@@ -199,22 +199,19 @@ namespace Twins
 
     HRESULT DragnDropHelper::BeginDrag(Fl::List const& files, CPoint const& pt) const
     {
-        CComPtr<Dnd::DropSource> source(new Dnd::DropSource());
-        CComPtr<Dnd::DataObject> object(new Dnd::DataObject(source));
-
-        HGLOBAL buffer = PrepareHDROP(files, pt);
-        if (!buffer)
+        CComPtr<Dnd::DropSource> const source{new Dnd::DropSource()};
+        CComPtr<Dnd::DataObject> const object{new Dnd::DataObject(source)};
+        HGLOBAL const                  buffer{PrepareHDROP(files, pt)};
+        if (!buffer) {
             return E_INVALIDARG;
-
-        STGMEDIUM medium = {0};
+        }
+        STGMEDIUM medium{0};
         medium.tymed = TYMED_HGLOBAL;
         medium.hGlobal = buffer;
-
-        FORMATETC format = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL }; 
-        HRESULT hr = object->SetData(&format, &medium, TRUE);
-        DH::TPrintf("DragDrop", "Data 0x%x\n", hr);
-        if (SUCCEEDED(hr))
-        {
+        FORMATETC format{ CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+        HRESULT       hr{object->SetData(&format, &medium, TRUE)};
+        DH::TPrintf(0, "DragDrop", "Data 0x%x\n", hr);
+        if (SUCCEEDED(hr)) {
 #if 1
             CComPtr<IDragSourceHelper> helper;
             if (SUCCEEDED(helper.CoCreateInstance(CLSID_DragDropHelper))) {
@@ -222,17 +219,16 @@ namespace Twins
                 CPoint pn = pt;
                 Owner.ClientToScreen(&pn);
                 hr = helper->InitializeFromWindow(Owner, &pn, object);
-                //hr = InitializeHelper(helper, NULL, pt, )
-                DH::TPrintf("DragDrop", "Help 0x%x\n", hr);
+                //hr = InitializeHelper(helper, nullptr, pt, )
+                DH::TPrintf(0, "DragDrop", "Help 0x%x\n", hr);
             }
 #endif
             DWORD dwEffect = 0;
             hr = ::DoDragDrop(object, source, DROPEFFECT_COPY, &dwEffect);
-            DH::TPrintf("DragDrop", "DoDD 0x%x\n", hr);
+            DH::TPrintf(0, "DragDrop", "DoDD 0x%x\n", hr);
         }
-        else
-        {
-            ::GlobalFree(buffer);
+        else {
+            GlobalFree(buffer);
         }
 
         return hr;

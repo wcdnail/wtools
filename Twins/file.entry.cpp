@@ -92,7 +92,7 @@ namespace Fl
             temp.Swap(*this);
         }
         else if (!silent) {
-            DH::TPrintf("DirEntry", "'%S' %d %s\n", p.c_str(), ec.value(), ec.message().c_str());
+            DH::TPrintf(0, "DirEntry: '%S' %d %s\n", p.c_str(), ec.value(), ec.message().c_str());
         }
     }
 
@@ -112,7 +112,7 @@ namespace Fl
             temp.Swap(*this);
         }
         else {
-            DH::TPrintf("DirEntry", "'%S %S' %d %s\n", dirpath, ninfo.Filename, ec.value(), ec.message().c_str());
+            DH::TPrintf(0, "DirEntry: '%S %S' %d %s\n", dirpath, ninfo.Filename, ec.value(), ec.message().c_str());
         }
     }
 
@@ -172,7 +172,7 @@ namespace Fl
     void Entry::DebugDump() const
     {
 #ifdef _DEBUG
-        DH::TPrintf(L"DirEntry", L"| %08x | %20I64u | %s\n", Flags, Size, Root.c_str());
+        DH::TPrintf(0, L"DirEntry: | %08x | %20I64u | %s\n", Flags, Size, Root.c_str());
 #endif
     }
 

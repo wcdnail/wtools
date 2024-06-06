@@ -2,14 +2,13 @@
 
 #include "wcdafx.api.h"
 #include "history.deque.h"
-#include <boost/noncopyable.hpp>
 #include <filesystem>
 #include <string>
 #include <map>
 
 namespace CF
 {
-    class DirManager: boost::noncopyable
+    class DirManager
     {
     public:
         using  Path = std::filesystem::path;

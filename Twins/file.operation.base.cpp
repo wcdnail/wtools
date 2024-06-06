@@ -106,7 +106,7 @@ namespace Twins
 
         ProcessEntry(source, destpath, p);
 
-        DH::TPrintf(L"PrcEntry: (%s) - %d\n", source.GetPath().c_str(), p.Error.value());
+        DH::TPrintf(0, L"PrcEntry: (%s) - %d\n", source.GetPath().c_str(), p.Error.value());
         return ((p.Error && p.Flags.Check(SpecFlags::SkipError)) ? true : !p.Error);
     }
 
@@ -161,7 +161,7 @@ namespace Twins
 
     bool OperationBase::OnDirectory(Fl::Entry const& source, Fs::path const& destpath, Params& p) const
     {
-        DH::TPrintf(L"PrcFoldr: (%s) BEGIN\n", source.GetPath().c_str());
+        DH::TPrintf(0, L"PrcFoldr: (%s) BEGIN\n", source.GetPath().c_str());
 
         if (OnParseDirectoryStart(source, destpath, p))
         {
@@ -176,7 +176,7 @@ namespace Twins
             OnParseDirectoryDone(source, destpath, p);
         }
 
-        DH::TPrintf(L"PrcFoldr: (%s) END\n", source.GetPath().c_str());
+        DH::TPrintf(0, L"PrcFoldr: (%s) END\n", source.GetPath().c_str());
         return ((p.Error && p.Flags.Check(SpecFlags::SkipError)) ? true : !p.Error);
     }
 

@@ -1,11 +1,10 @@
 #include "pch.hxx"
 #include "rez/resource.h"
-#include <dh.tracing.h>
-#include <dh.tracing.defs.h>
-#include <wtl.compositor/wtl.compositor.h>
 #include <clr.dracula.h>
-#include <err.printer.h>
-#include <debug.assistance.h>
+#include <dh.tracing.h>
+#include <wtl.compositor/wtl.compositor.h>
+#include <dev.assistance/err.printer.h>
+#include <dev.assistance/debug.assistance.h>
 #include <gtest/gtest.h>
 
 struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg>, // WTL::CDialogResize<CTestWinUIDlg>
@@ -33,7 +32,7 @@ struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg>, // WTL::CDialogResize<CTestWin
         MoveWindow(rcWin, TRUE);
 
         m_normal.dwExStyle |= WS_EX_COMPOSITED | WS_EX_LAYERED;
-        m_normal.MakeItNorm(m_hWnd);
+        m_normal.MakeItNorm(m_hWnd, MAKEINTRESOURCEW(IDI_WTL_APP));
 
         MoveToMonitor{}.Move(m_hWnd, 3 /*MoveToMonitor::FirstNotPrimary*/, PutAt::YCenter | PutAt::XCenter);
     }
@@ -60,7 +59,7 @@ struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg>, // WTL::CDialogResize<CTestWin
             OnCloseCmd(notifyCode, cmdId, hCtlWnd, bHandled);
             break;
         default:
-            DBGTPrint(LTH_WM_COMMAND, L"Unknown: n:%04d c:%04d w:%08x\n", notifyCode, cmdId, hCtlWnd);
+            DBGTPrint(0, L"WM_COMMAND Unknown: n:%04d c:%04d w:%08x\n", notifyCode, cmdId, hCtlWnd);
         }
         return 0;
     }

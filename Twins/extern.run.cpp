@@ -27,10 +27,10 @@ namespace Twins
             info.lpParameters   = arguments.c_str();
             info.nShow          = show;
 
-            bool rv = TRUE == ::ShellExecuteExW(&info);
+            bool    rv = TRUE == ::ShellExecuteExW(&info);
             HRESULT hr = ::GetLastError();
 
-            DH::TPrintf(L"RUNEXTRN: `%s (%s)` - %s - %p %p\n",
+            DH::TPrintf(0, L"RUNEXTRN: `%s (%s)` - %s - %p %p\n",
                 item.Name.c_str(), item.Path.c_str(), (rv ? L"OK" : L"FAIL"),
                 info.hInstApp, info.hProcess
             );

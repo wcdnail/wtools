@@ -32,7 +32,7 @@ bool CRegistry::Open(HKEY hRootKey, REGSAM samDesired, StrView path)
             code = static_cast<HRESULT>(GetLastError());
         }
         const auto codeText = Str::ErrorCode<>::SystemMessage(code);
-        DH::TPrintf(L"ERROR", L"%s: %s failed: %d '%s'\n", __FUNCTIONW__,
+        DH::TPrintf(TL_Error, L"%s: %s failed: %d '%s'\n", __FUNCTIONW__,
             bCreated ? L"RegCreateKeyExW" : L"RegOpenKeyExW",
             code, codeText.GetString());
         return false;
@@ -45,7 +45,7 @@ bool CRegistry::Open(HKEY hRootKey, REGSAM samDesired, StrView path)
 int CRegistry::ForEachValue(ForEachFn const& frRoutine) const
 {
     if (!m_hKey) {
-        DH::TPrintf(L"ERROR", L"%s: !m_hKey\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: !m_hKey\n", __FUNCTIONW__);
         return ResultFail;
     }
     HRESULT  code{ERROR_SUCCESS};
@@ -68,7 +68,7 @@ int CRegistry::ForEachValue(ForEachFn const& frRoutine) const
 bool CRegistry::GetValueImpl(StrView name, void* data, size_t dataSize) const
 {
     if (!m_hKey) {
-        DH::TPrintf(L"ERROR", L"%s: !m_hKey\n", __FUNCTIONW__);
+        DH::TPrintf(TL_Error, L"%s: !m_hKey\n", __FUNCTIONW__);
         return false;
     }
     DWORD  dwType{0};
@@ -77,18 +77,18 @@ bool CRegistry::GetValueImpl(StrView name, void* data, size_t dataSize) const
     code = RegQueryValueExW(m_hKey, name.data(), nullptr, &dwType, nullptr, &dwSize);
     if (ERROR_SUCCESS != code) {
         const auto codeText = Str::ErrorCode<>::SystemMessage(code);
-        DH::TPrintf(L"ERROR", L"%s: RegQueryValueExW failed: %d '%s'\n", __FUNCTIONW__,
+        DH::TPrintf(TL_Error, L"%s: RegQueryValueExW failed: %d '%s'\n", __FUNCTIONW__,
             code, codeText.GetString());
         return false;
     }
     if (dataSize < dwSize) {
-        DH::TPrintf(L"ERROR", L"%s: dataSize < dwSize [%d < %d]\n", __FUNCTIONW__, dataSize, dwSize);
+        DH::TPrintf(TL_Error, L"%s: dataSize < dwSize [%d < %d]\n", __FUNCTIONW__, dataSize, dwSize);
         return false;
     }
     code = RegQueryValueExW(m_hKey, name.data(), nullptr, &dwType, static_cast<LPBYTE>(data), &dwSize);
     if (ERROR_SUCCESS != code) {
         const auto codeText = Str::ErrorCode<>::SystemMessage(code);
-        DH::TPrintf(L"ERROR", L"%s: RegQueryValueExW failed: %d '%s'\n", __FUNCTIONW__,
+        DH::TPrintf(TL_Error, L"%s: RegQueryValueExW failed: %d '%s'\n", __FUNCTIONW__,
             code, codeText.GetString());
         return false;
     }

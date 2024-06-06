@@ -8,16 +8,16 @@
 #  include <dh.tracing.h>
 #  include <dh.tracing.defs.h>
 #  include <dev.assistance/dev.assist.h>
-#  define DBG_DUMP_WMESSAGE(HDR, CAPT, pMsg)                            \
+#  define DBG_DUMP_WMESSAGE(LEV, CAPT, pMsg)                            \
     do {                                                                 \
         auto msgStr = DH::MessageToStrignW(pMsg);                         \
-        DBGTPrint(HDR L" %12s [[ %s ]]\n", CAPT, msgStr.c_str());          \
+        DBGTPrint(LEV, L"%12s [[ %s ]]\n", CAPT, msgStr.c_str());          \
     }                                                                       \
     while (false)
-#  define DBG_DUMP_WMESSAGE_EXT(HDR, CAPT, hWnd, uMsg, wParam, lParam)  \
+#  define DBG_DUMP_WMESSAGE_EXT(LEV, CAPT, hWnd, uMsg, wParam, lParam)  \
     do {                                                                 \
         auto msgStr = DH::MessageToStrignW(hWnd, uMsg, wParam, lParam);   \
-        DBGTPrint(HDR L" %12s [[ %s ]]\n", CAPT, msgStr.c_str());          \
+        DBGTPrint(LEV, L"%12s [[ %s ]]\n", CAPT, msgStr.c_str());          \
     }                                                                       \
     while (false)
 #else

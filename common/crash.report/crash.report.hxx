@@ -9,7 +9,6 @@
 
 #include <cerrno>
 #include <exception>
-#include <boost/exception/all.hpp>
 
 #ifdef _WIN32
 #include <comdef.h>

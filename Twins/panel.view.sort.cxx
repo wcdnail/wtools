@@ -147,13 +147,12 @@ namespace Twins
         std::sort(beg, end, Sort::Helper(items, column, ascending));
         Index.swap(temp);
 
-        DH::TPrintf(L"SORTING", L"%d %2.8f sec.\n", static_cast<int>(count), tm.Seconds());
+        DH::TPrintf(0, L"SORTING", L"%d %2.8f sec.\n", static_cast<int>(count), tm.Seconds());
     }
 
     int FSort::FindIndexByName(FItemVector const& items, std::wstring const& name) const
     {
         DH::Timer tm;
-
         struct pred
         {
             pred(FItemVector const& items, std::wstring const& name)
@@ -170,12 +169,9 @@ namespace Twins
             FItemVector const& Items;
             std::wstring const& Name;
         };
-
-        IndexVector::const_iterator it = std::find_if(Index.begin(), Index.end(), pred(items, name));
-        int rv = (it == Index.end() ? -1 : (int)std::distance(Index.begin(), it));
-
-        DH::TPrintf(L"FINDBYNM", L"%d %2.8f sec.\n", (int)items.size(), tm.Seconds());
-
+        auto const it{std::ranges::find_if(Index, pred(items, name))};
+        int const  rv{it == Index.end() ? -1 : static_cast<int>(std::distance(Index.begin(), it))};
+        DH::TPrintf(0, L"FINDBYNM: %d %2.8f sec.\n", (int)items.size(), tm.Seconds());
         return rv;
     }
 }

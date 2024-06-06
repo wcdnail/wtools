@@ -5,7 +5,7 @@
 #include "resz/resource.h"
 #include <string.utils.format.h>
 #include <dev.assistance/dev.assist.h>
-#include <UT/debug.assistance.h>
+#include <dev.assistance/debug.assistance.h>
 #include <atldlgs.h>
 
 void CPageAppearance::ImportMenuInit(WTL::CMenu& cMenu)

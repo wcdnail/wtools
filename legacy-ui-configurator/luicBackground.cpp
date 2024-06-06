@@ -59,7 +59,7 @@ HRESULT CPageBackground::WallpaperInit()
             break;
         }
         COMStrPtr pDevicePathPtr(pDevicePath, CoTaskMemFree);
-        DBGTPrint(LTH_DESK_WALLPPR L" DevicePth: '%s'\n", pDevicePath);
+        DBGTPrint(0, L"DevicePth: '%s'\n", pDevicePath);
         PWSTR pWallpaperPath;
         code = m_pWallpaper->GetWallpaper(pDevicePath, &pWallpaperPath);
         if (FAILED(code)) {
@@ -69,7 +69,7 @@ HRESULT CPageBackground::WallpaperInit()
         COMStrPtr pWallpaperPathPtr(pWallpaperPath, CoTaskMemFree);
         DESKTOP_WALLPAPER_POSITION pos = DWPOS_CENTER;
         m_pWallpaper->GetPosition(&pos);
-        DBGTPrint(LTH_DESK_WALLPPR L" Wallpaper: '%s' %d\n", pWallpaperPath, pos);
+        DBGTPrint(0, L"Wallpaper: '%s' %d\n", pWallpaperPath, pos);
         GdipImagePtr image{Gdiplus::Image::FromFile(pWallpaperPath, FALSE)};
         if (!image) {
             code = static_cast<HRESULT>(GetLastError());
@@ -85,8 +85,8 @@ HRESULT CPageBackground::WallpaperInit()
         Gdiplus::RectF rcImage;
         Gdiplus::Unit units;
         image->GetBounds(&rcImage, &units);
-        CRect rcWallpaper = FromRectF(rcImage);
-        DBGTPrint(LTH_DESK_WALLPPR, L"Wallpaper: %d x %d [%d]\n", rcWallpaper.Width(), rcWallpaper.Height(), units);
+        CRect const rcWallpaper{FromRectF(rcImage)};
+        DBGTPrint(0, L"Wallpaper: %d x %d [%d]\n", rcWallpaper.Width(), rcWallpaper.Height(), units);
         imageVec.emplace_back(std::move(image));
         break; // ##TODO: only one will be enough
     }

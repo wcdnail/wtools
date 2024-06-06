@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "wtl.compositor.h"
-#include "dh.tracing.defs.h"
+#include "dh.tracing.h"
 #include "dev.assistance/dev.assist.h"
 #include <windows.ui.composition.interop.h>
 #include <winrt/windows.ui.composition.h>
@@ -121,7 +121,7 @@ namespace CF::UI
         }
         catch (winrt::hresult_error const& ex) {
             winrt::hstring msg = ex.message();
-            DH::TPrintf(DH::ModuleName(), L"winrt::init_apartment FAILED 0x%08X '%s'\n", ex.code().value, msg.c_str());
+            DH::TPrintf(TL_Module, L"winrt::init_apartment FAILED 0x%08X '%s'\n", ex.code().value, msg.c_str());
         }
     }
 
@@ -284,7 +284,7 @@ namespace CF::UI
             msg.wParam = wParam;
             msg.lParam = lParam;
             auto msgStr = DH::MessageToStrignW(&msg);
-            DBGTPrint(LTH_CONTROL L" -WM- [[ %s ]]\n", msgStr.c_str());
+            DBGTPrint(0, L"Compositor: -WM- [[ %s ]]\n", msgStr.c_str());
         }
 #endif
         return FALSE;

@@ -2,8 +2,6 @@
 
 #include "sensor.h"
 #include "query.thread.h"
-#include <boost/noncopyable.hpp>
-#include <boost/thread/mutex.hpp>
 
 namespace Assist
 {
