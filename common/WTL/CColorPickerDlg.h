@@ -29,17 +29,18 @@ struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
     IColorObserver& GetMasterObserver() const;
 
     WCDAFX_API void MoveWindow(unsigned nPosFlags);
+    WCDAFX_API void FollowMaster(LPWINDOWPOS pWndPos);
 
 private:
     friend WTL::CIndirectDialogImpl<CColorPickerDlg>;
     friend WTL::CDialogResize<CColorPickerDlg>;
 
-    ATL::CWindow     m_wndMaster;
     CColorPicker   m_ColorPicker;
     CRect              m_rcPlace;
     bool            m_bModalLoop;
     unsigned         m_nPosFlags;
     WTL::CFont           m_vFont;
+    CRect             m_rcMaster;
 
     const WTL::_AtlDlgResizeMap* GetDlgResizeMap() const;
     void PrepareRect(ATL::CWindow wndParent);

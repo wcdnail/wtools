@@ -97,6 +97,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         MSG_WM_DRAWITEM(OnDrawItem)
         MSG_WM_NOTIFY(OnNotify)
         MSG_WM_COMMAND(OnCommand)
+        MSG_WM_WINDOWPOSCHANGED(OnWindowPosChanged)
         REFLECT_NOTIFICATIONS()
         CHAIN_MSG_MAP(WTL::CDialogResize<CDefaultWin32Dlg>)
     END_MSG_MAP()
@@ -160,6 +161,12 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         else {
             SetMsgHandled(FALSE);
         }
+    }
+
+    void OnWindowPosChanged(LPWINDOWPOS pWndPos)
+    {
+        m_cpDlg.FollowMaster(pWndPos);
+        SetMsgHandled(FALSE);
     }
 
     HRESULT ThemedInit(PCWSTR pszClasses = L"BUTTON;EDIT;MENU;SCROLLBAR")
