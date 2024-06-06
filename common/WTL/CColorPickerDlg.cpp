@@ -120,7 +120,7 @@ void CColorPickerDlg::DoInitControls()
     else {
         nPickerX  += DRGB_CX + 2;
         nPickerCX -= DRGB_CX + 2;
-        CONTROL_CTEXT(_T("Color Picker"), IDC_DRAGBAR, 3, 4, DRGB_CX, nPickerCY-6, SS_OWNERDRAW, 0)
+        CONTROL_CTEXT(_T("Color Picker"), IDC_DRAGBAR, 1, 4, DRGB_CX+2, nPickerCY-6, SS_OWNERDRAW, 0)
     }
     CONTROL_CONTROL(_T(""), IDC_COLORPICKER, _T("WCCF::CColorPicker"), 0, nPickerX, 2, nPickerCX, nPickerCY, 0)
 }
@@ -234,13 +234,16 @@ BOOL CColorPickerDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         CenterWindow();
     }
     if (!m_bModalLoop) {
-        WTL::CFontHandle const hFont{GetFont()};
-        WTL::CLogFont       hLogFont{};
-        hFont.GetLogFont(hLogFont);
-        hLogFont.lfEscapement = 900;
-        hLogFont.lfWeight = FW_BLACK;
-        hLogFont.lfHeight -= 3;
-        m_vFont.Attach(hLogFont.CreateFontIndirectW());
+        HRESULT const hCode{ThemedInit()};
+        if (FAILED(hCode)) {
+            DH::TPrintf(LTH_COLORPICKER, L" ThemedInit failed: 0x%08x %s\n",
+                hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
+        }
+        // nHeight = -MulDiv(PointSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
+        m_vFont.CreateFontW(-(DRGB_CX), 0, 900, 0, FW_BLACK,
+            0, 0, 0, RUSSIAN_CHARSET, 0, 0,
+            CLEARTYPE_NATURAL_QUALITY, 0, 
+            L"Arial Black");
         m_ColorPicker.GetMasterColor().AddObserver(*this);
     }
     DlgResize_Init(m_bModalLoop, true, 0);
@@ -274,29 +277,86 @@ void CColorPickerDlg::OnCommand(UINT uNotifyCode, int nID, HWND)
     }
 }
 
-void CColorPickerDlg::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI) const
+HRESULT CColorPickerDlg::ThemedInit()
+{
+    // All class names are in $(PROJECT_DIR)\resz\ClassesNames.txt
+    //
+    // Short list:
+    // BUTTON, CLOCK, COMBOBOX, COMMUNICATIONS, CONTROLPANEL, DATEPICKER, DRAGDROP, 
+    // EDIT, EXPLORERBAR, FLYOUT, GLOBALS, HEADER, LISTBOX, LISTVIEW, MENU, MENUBAND, 
+    // NAVIGATION, PAGE, PROGRESS, REBAR, SCROLLBAR, SEARCHEDITBOX, SPIN, STARTPANEL, 
+    // STATUS, TAB, TASKBAND, TASKBAR, TASKDIALOG, TEXTSTYLE, TOOLBAR, TOOLTIP, 
+    // TRACKBAR, TRAYNOTIFY, TREEVIEW, WINDOW
+    //
+    // https://learn.microsoft.com/en-us/windows/win32/controls/parts-and-states?redirectedfrom=MSDN
+    //
+    if (!m_hWnd) {
+        return S_FALSE;
+    }
+    if (!IsThemingSupported()) {
+        return S_FALSE;
+    }
+    ATLASSERT(::IsWindow(m_hWnd));
+    static const PCWSTR pszClasses{L"WINDOW"};
+    const HTHEME hTheme{::OpenThemeDataEx(m_hWnd, pszClasses, OTD_FORCE_RECT_SIZING | OTD_NONCLIENT)};
+    if (!hTheme) {
+        auto const code{static_cast<HRESULT>(GetLastError())};
+        return code;
+    }
+    m_hTheme = hTheme;
+    return S_OK;
+}
+
+void CColorPickerDlg::DrawDragBar(int nID, WTL::CDCHandle dc, CRect& rcItem)
+{
+    ATL::CStringW sItem{};
+    dc.GradientFillRect(rcItem, 0x000000, m_ColorPicker.GetColorRef(), false);
+    if (GetDlgItem(nID).GetWindowTextW(sItem) < 1) {
+        return ;
+    }
+    int const iSave{dc.SaveDC()};
+    dc.SetTextColor(0xffffff);
+    dc.SetBkMode(TRANSPARENT);
+    dc.SelectFont(m_vFont);
+    CRect rcText{rcItem};
+    DTTOPTS constexpr dtOptions{
+        /* dwSize;              */ sizeof(dtOptions),
+        /* dwFlags;             */ DTT_TEXTCOLOR | DTT_SHADOWCOLOR | DTT_SHADOWTYPE | DTT_SHADOWOFFSET | DTT_GLOWSIZE,
+        /* crText;              */ 0xffffff,
+        /* crBorder;            */ 0,
+        /* crShadow;            */ 0x000000,
+        /* iTextShadowType;     */ TST_CONTINUOUS,
+        /* ptShadowOffset;      */ { 3, 2 },
+        /* iBorderSize;         */ 0,
+        /* iFontPropId;         */ 0,
+        /* iColorPropId;        */ 0,
+        /* iStateId;            */ 0,
+        /* fApplyOverlay;       */ FALSE,
+        /* iGlowSize;           */ 32,
+        /* pfnDrawTextCallback; */ nullptr,
+        /* lParam;              */ 0
+    };
+    DrawThemeTextEx(dc, 0, 0, sItem.GetString(), sItem.GetLength(), DT_BOTTOM | DT_SINGLELINE, rcText, &dtOptions);
+    dc.RestoreDC(iSave);
+}
+
+void CColorPickerDlg::OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
 {
     switch (nID) {
     case IDC_DRAGBAR: {
-        WTL::CDCHandle   dc{pDI->hDC};
-        CRect        rcItem{pDI->rcItem};
-        ATL::CStringW sItem{};
-        dc.GradientFillRect(rcItem, 0x000000, m_ColorPicker.GetColorRef(), false);
-        if (GetDlgItem(IDC_DRAGBAR).GetWindowTextW(sItem) < 1) {
-            break;
+        WTL::CDCHandle const dc{pDI->hDC};
+        CRect            rcItem{pDI->rcItem};
+        HDC          dcBuffered{nullptr};
+        if(IsBufferedPaintSupported()) {
+            m_BufferedPaint.Begin(dc, rcItem, m_dwFormat, &m_PaintParams, &dcBuffered);
+            if (dcBuffered) {
+                DrawDragBar(nID, dcBuffered, rcItem);
+            }
+            m_BufferedPaint.End();
         }
-        int const iSave{dc.SaveDC()};
-        //CPoint pt{rcItem.BottomRight()};
-        dc.SetTextColor(0xffffff);
-        dc.SetBkMode(TRANSPARENT);
-        dc.SelectFont(m_vFont);
-        CRect rcText{rcItem};
-        //std::swap(rcText.left, rcText.right);
-        //std::swap(rcText.top, rcText.bottom);
-        //dc.DrawTextW(sItem.GetString(), sItem.GetLength(), rcText, DT_CALCRECT);
-        //dc.TextOutW(pt.x, pt.y, sItem.GetString(), sItem.GetLength());
-        dc.DrawTextW(sItem.GetString(), sItem.GetLength(), rcText, DT_BOTTOM | DT_SINGLELINE);
-        dc.RestoreDC(iSave);
+        if (!dcBuffered) {
+            DrawDragBar(nID, dc, rcItem);
+        }
         break;
     }
     }

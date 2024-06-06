@@ -37,7 +37,7 @@ namespace Twins
 
         HRESULT hr = ::RegisterDragDrop(Owner, dtarget);
 
-        DH::TPrintf(L"DRAGDROP: registering - 0x%x `%s`\n", hr, Str::ErrorCode<wchar_t>::SystemMessage(hr));
+        DH::TPrintf(L"DRAGDROP", L"registering - 0x%x `%s`\n", hr, Str::ErrorCode<wchar_t>::SystemMessage(hr));
 
         if (SUCCEEDED(hr))
         {
@@ -114,7 +114,7 @@ namespace Twins
 
     void DragnDropHelper::OnStop(CPoint const& pt, STGMEDIUM& medium, FORMATETC* format, DWORD* effect)
     {
-        DH::TPrintf(L"DRAGDROP: end \n");
+        DH::TPrintf(L"DRAGDROP", L"end\n");
         //::SetCursor(Owner.GetDefaultCursor());
     }
 
@@ -212,26 +212,23 @@ namespace Twins
 
         FORMATETC format = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL }; 
         HRESULT hr = object->SetData(&format, &medium, TRUE);
-        DH::TPrintf(_T("DragDrop: Data 0x%x\n"), hr);
+        DH::TPrintf("DragDrop", "Data 0x%x\n", hr);
         if (SUCCEEDED(hr))
         {
-#if 0
+#if 1
             CComPtr<IDragSourceHelper> helper;
-            if (SUCCEEDED(helper.CoCreateInstance(CLSID_DragDropHelper)))
-            {
-// ##TODO: Init helper"))
-                
-                //CPoint pn = pt;
-                //Owner.ClientToScreen(&pn);
-                //hr = helper->InitializeFromWindow(Owner, &pn, object);
+            if (SUCCEEDED(helper.CoCreateInstance(CLSID_DragDropHelper))) {
+                // ##TODO: Init helper"))
+                CPoint pn = pt;
+                Owner.ClientToScreen(&pn);
+                hr = helper->InitializeFromWindow(Owner, &pn, object);
                 //hr = InitializeHelper(helper, NULL, pt, )
-                //DH::TPrintf(_T("DragDrop: Help 0x%x\n"), hr);
+                DH::TPrintf("DragDrop", "Help 0x%x\n", hr);
             }
 #endif
-
             DWORD dwEffect = 0;
             hr = ::DoDragDrop(object, source, DROPEFFECT_COPY, &dwEffect);
-            DH::TPrintf(_T("DragDrop: DoDD 0x%x\n"), hr);
+            DH::TPrintf("DragDrop", "DoDD 0x%x\n", hr);
         }
         else
         {

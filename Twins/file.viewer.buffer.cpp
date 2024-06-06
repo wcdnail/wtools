@@ -69,7 +69,7 @@ namespace Fv
             def.size = readed;
         }
 
-        DH::TPrintf(L"FvBuffer: read >%I64u #%I64u = %I64u (%S(%d))\n"
+        DH::TPrintf(L"FvBuffer", L"read >%I64u #%I64u = %I64u (%S(%d))\n"
             , lrOffset.QuadPart, index, def.size
             , error.message().c_str(), error.value()
             );

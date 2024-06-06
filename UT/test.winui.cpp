@@ -1,10 +1,11 @@
 #include "pch.hxx"
-#include "dh.tracing.h"
-#include "dh.tracing.defs.h"
-#include "wtl.compositor/wtl.compositor.h"
-#include "clr.dracula.h"
-#include "err.printer.h"
-#include "debug.assistance.h"
+#include "rez/resource.h"
+#include <dh.tracing.h>
+#include <dh.tracing.defs.h>
+#include <wtl.compositor/wtl.compositor.h>
+#include <clr.dracula.h>
+#include <err.printer.h>
+#include <debug.assistance.h>
 #include <gtest/gtest.h>
 
 struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg>, // WTL::CDialogResize<CTestWinUIDlg>
@@ -51,24 +52,23 @@ struct CTestWinUIDlg: CDialogImpl<CTestWinUIDlg>, // WTL::CDialogResize<CTestWin
 
     LRESULT OnCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
-        WORD notifyCode = HIWORD(wParam);
-        WORD      cmdId = LOWORD(wParam);
-        HWND    hCtlWnd = reinterpret_cast<HWND>(lParam);
+        WORD const notifyCode{HIWORD(wParam)};
+        WORD const      cmdId{LOWORD(wParam)};
+        HWND const    hCtlWnd{reinterpret_cast<HWND>(lParam)};
         switch (cmdId) {
         case IDCANCEL:
             OnCloseCmd(notifyCode, cmdId, hCtlWnd, bHandled);
             break;
         default:
-            DBGTPrint(LTH_WM_COMMAND L" Unknown: n:%04d c:%04d w:%08x\n", notifyCode, cmdId, hCtlWnd);
+            DBGTPrint(LTH_WM_COMMAND, L"Unknown: n:%04d c:%04d w:%08x\n", notifyCode, cmdId, hCtlWnd);
         }
         return 0;
-    }    
+    }
 
     LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
     {
         PrepareWindow();
         ShowWindow(SW_SHOW);
-
         EnableComposition(*this);
         return TRUE;
     }

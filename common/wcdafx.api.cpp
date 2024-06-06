@@ -19,6 +19,7 @@ struct LoadDLLResources
 
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "atls.lib")
+#pragma comment(lib, "shlwapi.lib")
 
 HMODULE MyInstance = nullptr;
 

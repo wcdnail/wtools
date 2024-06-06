@@ -157,7 +157,7 @@ namespace Conf
         if (!tv.Get(store)) {
             return true;
         }
-        return *Pointee == temp;
+        return temp == *Pointee;
     }
 
     template <typename T> 

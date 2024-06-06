@@ -67,7 +67,7 @@ namespace Twins
             error = temp->Create(m_hWnd, rcTemp);
             if (error)
             {
-                DH::TPrintf("FileView: create view failed - %s (%d)\n"
+                DH::TPrintf("FileView", "create view failed - %s (%d)\n"
                     , error.value(), error.message().c_str());
 
                 return error;
@@ -341,15 +341,12 @@ namespace Twins
 
     LRESULT FileViewer::OnClosePage(LPNMHDR pnmh)
     {
-        if (pnmh && (pnmh->hwndFrom == GetTabCtrl()))
-        {
-            NMCTCITEM* nmh = (NMCTCITEM*)pnmh;
-            DH::TPrintf(L"FileView: OnClosePage %d\n", nmh->iItem);
-
+        if (pnmh && (pnmh->hwndFrom == GetTabCtrl())) {
+            NMCTCITEM const* nmh{reinterpret_cast<NMCTCITEM*>(pnmh)};
+            DH::TPrintf(L"FileView", L"OnClosePage %d\n", nmh->iItem);
             CloseTab(nmh->iItem);
             ExitIfEmpty();
         }
-
         return 0;
     }
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#if 0
 #include "basic.debug.console.h"
 #include <atlctrls.h>
 
@@ -32,3 +33,4 @@ namespace DH
         void OnCommand(UINT notifyCode, int id, HWND) override;
     };
 }
+#endif // 0

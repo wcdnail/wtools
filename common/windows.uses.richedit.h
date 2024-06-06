@@ -1,41 +1,38 @@
 #pragma once 
 
-#include "string.utils.error.code.h"
+#include <string.utils.error.code.h>
 #include <stdexcept>
 #include <sstream>
 #include <atlctrls.h>
-#include <boost/noncopyable.hpp>
 
-namespace Initialize
+struct ScopedInitRichEdit: boost::noncopyable
 {
-    struct RichEdit: boost::noncopyable
+    ScopedInitRichEdit(); /* throw(std::runtime_error) */
+    ~ScopedInitRichEdit(); /* throw() */
+
+private:
+    HMODULE Lib;
+};
+
+inline ScopedInitRichEdit::ScopedInitRichEdit() /* throw(std::runtime_error) */
+    : Lib(nullptr)
+{
+    Lib = ::LoadLibrary(WTL::CRichEditCtrl::GetLibraryName());
+    if (!Lib)
     {
-        RichEdit(); /* throw(std::runtime_error) */
-        ~RichEdit(); /* throw() */
+        HRESULT hr = ::GetLastError();
 
-    private:
-        HMODULE Lib;
-    };
+        std::ostringstream message;
+        message << "ScopedInitRichEdit initialize failed: " << std::hex << hr << " " 
+                << Str::ErrorCode<char>::SystemMessage(hr);
 
-    inline RichEdit::RichEdit() /* throw(std::runtime_error) */
-        : Lib(NULL)
-    {
-        Lib = ::LoadLibrary(WTL::CRichEditCtrl::GetLibraryName());
-        if (!Lib)
-        {
-            HRESULT hr = ::GetLastError();
-
-            std::ostringstream message;
-            message << "RichEdit initialize failed: " << std::hex << hr << " " 
-                    << Str::ErrorCode<char>::SystemMessage(hr);
-
-            throw std::runtime_error(message.str());
-        }
+        throw std::runtime_error(message.str());
     }
+}
 
-    inline RichEdit::~RichEdit() /* throw() */
-    {
-        if (Lib)
-            ::FreeLibrary(Lib);
+inline ScopedInitRichEdit::~ScopedInitRichEdit() /* throw() */
+{
+    if (Lib) {
+        FreeLibrary(Lib);
     }
 }

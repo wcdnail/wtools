@@ -121,7 +121,7 @@ namespace CF::UI
         }
         catch (winrt::hresult_error const& ex) {
             winrt::hstring msg = ex.message();
-            DH::TCPrintf(DH::Category::Module(), L"winrt::init_apartment FAILED 0x%08X '%s'\n", ex.code().value, msg.c_str());
+            DH::TPrintf(DH::ModuleName(), L"winrt::init_apartment FAILED 0x%08X '%s'\n", ex.code().value, msg.c_str());
         }
     }
 

@@ -88,12 +88,12 @@ namespace Fl
     {
         Entry temp;
         Error ec = InitFromPath(p.c_str(), temp);
-
-        if (!ec)
+        if (!ec) {
             temp.Swap(*this);
-
-        else if (!silent)
-            DH::TPrintf("DirEntry: `%S` %d %s\n", p.c_str(), ec.value(), ec.message().c_str());
+        }
+        else if (!silent) {
+            DH::TPrintf("DirEntry", "'%S' %d %s\n", p.c_str(), ec.value(), ec.message().c_str());
+        }
     }
 
     Entry::Entry(wchar_t const* dirpath, Twins::DirectoryNotify const& ninfo)
@@ -108,11 +108,12 @@ namespace Fl
     {
         Entry temp;
         Error ec = InitFromNotify(dirpath, ninfo, temp);
-
-        if (!ec)
+        if (!ec) {
             temp.Swap(*this);
-        else
-            DH::TPrintf("DirEntry: `%S %S` %d %s\n", dirpath, ninfo.Filename, ec.value(), ec.message().c_str());
+        }
+        else {
+            DH::TPrintf("DirEntry", "'%S %S' %d %s\n", dirpath, ninfo.Filename, ec.value(), ec.message().c_str());
+        }
     }
 
     Entry::Entry(Entry const& rhs)
@@ -171,7 +172,7 @@ namespace Fl
     void Entry::DebugDump() const
     {
 #ifdef _DEBUG
-        DH::TPrintf(L"DirEntry: | %08x | %20I64u | %s\n", Flags, Size, Root.c_str());
+        DH::TPrintf(L"DirEntry", L"| %08x | %20I64u | %s\n", Flags, Size, Root.c_str());
 #endif
     }
 

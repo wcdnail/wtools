@@ -4,10 +4,10 @@
 #include "resz/resource.h"
 #include <icons.dll.h>
 #include <dh.tracing.h>
-#include <windows.uses.ole.h>
-#include <windows.uses.commoncontrols.h>
 #include <string.utils.format.h>
+#include <windows.uses.ole.h>
 #include <windows.uses.gdi+.h>
+#include <windows.uses.commoncontrols.h>
 #include <combaseapi.h>
 
 #if 0
@@ -47,7 +47,7 @@ void SetMFStatus(int status, PCWSTR format, ...)
 void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
 {
     ATL::CStringA msg = Str::ErrorCode<char>::SystemMessage(code);
-    DH::TCPrintf(DH::Category::Module(), "%s %s\n", caption.GetString(), msg.GetString());
+    DH::TPrintf(DH::ModuleName(), L"%S %S\n", caption.GetString(), msg.GetString());
 
     if (showMBox) {
         ATL::CStringA userMsg;
@@ -59,7 +59,7 @@ void ReportError(ATL::CStringA&& caption, HRESULT code, bool showMBox/* = false*
 void ReportError(ATL::CStringW&& caption, HRESULT code, bool showMBox/* = false*/, UINT mbType/* = MB_ICONERROR*/)
 {
     ATL::CStringW msg = Str::ErrorCode<wchar_t>::SystemMessage(code);
-    DH::TCPrintf(DH::Category::Module(), L"%s %s\n", caption.GetString(), msg.GetString());
+    DH::TPrintf(DH::ModuleName(), L"%s %s\n", caption.GetString(), msg.GetString());
 
     if (showMBox) {
         ATL::CStringW userMsg;
@@ -74,10 +74,10 @@ int WINAPI _tWinMain(HINSTANCE instHnd, HINSTANCE, LPTSTR, int showCmd)
     HRESULT hr = S_FALSE;
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT);
     try {
-        OLE               ole;
-        CommonControls cctrls;
-        GdiPlus          gdip;
-        CLUIApp           app;
+        ScopedInitOLE         ole{};
+        ScopedInitControls cctrls{};
+        ScopedInitGdiplus    gdip{};
+        CLUIApp               app{};
         hr = app.Run(instHnd, showCmd);
     }
     catch(std::exception const& ex) {

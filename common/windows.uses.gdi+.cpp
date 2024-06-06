@@ -7,7 +7,7 @@
 
 #pragma comment(lib, "GDIPLUS")
 
-GdiPlus::GdiPlus(int requiredver)
+ScopedInitGdiplus::ScopedInitGdiplus(int requiredver)
     : Id(0)
 {
     Gdiplus::GdiplusStartupInput input;
@@ -17,17 +17,17 @@ GdiPlus::GdiPlus(int requiredver)
     if (Gdiplus::Ok != rv) {
         std::stringstream message;
         message << "Initialization ERROR\nGdiplus::GdiplusStartup failed - " 
-                << rv << " - " << GdiPlus::StatusString(rv);
+                << rv << " - " << ScopedInitGdiplus::StatusString(rv);
         throw std::runtime_error(message.str());
     }
 }
 
-GdiPlus::~GdiPlus()
+ScopedInitGdiplus::~ScopedInitGdiplus()
 {
     Gdiplus::GdiplusShutdown(Id);
 }
 
-PCSTR GdiPlus::StatusString(int status)
+PCSTR ScopedInitGdiplus::StatusString(int status)
 {
     switch (status)
     {

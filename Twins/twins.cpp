@@ -76,9 +76,9 @@ namespace Twins
     {
         HRESULT rv = 0;
 
-        Initialize::OLE cole;
-        Initialize::CommonControls ccontrols(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
-        Initialize::RichEdit richedit;
+        ScopedInitOLE           cole{};
+        ScopedInitControls ccontrols{ICC_COOL_CLASSES | ICC_BAR_CLASSES};
+        ScopedInitRichEdit  richedit{};
 
         rv = AtlModule.Init(nullptr, baseAddress);
         if (FAILED(rv))

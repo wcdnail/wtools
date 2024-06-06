@@ -30,6 +30,7 @@ namespace Runtime
             {
                 DWORD        Major;
                 DWORD        Minor;
+                DWORD        Build;
                 String DisplayName;
 
             private:
@@ -49,7 +50,7 @@ namespace Runtime
             void Initialize();
 
             static Endianness GetEndian();
-            static wchar_t const* GetEndianString();
+            static PCWSTR GetEndianString();
 
         private:
             friend InfoStore;

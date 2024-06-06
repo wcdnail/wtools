@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "dc.rich.edit.impl.h"
+
+#if 0
 #include "tator/resource.h"
 #include <fstream>
 
@@ -155,3 +157,4 @@ namespace DH
         }
     }
 }
+#endif // 0

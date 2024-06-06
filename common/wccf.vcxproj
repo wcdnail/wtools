@@ -420,6 +420,12 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='product|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\basic.debug.console.cpp" />
+    <ClCompile Include="dev.assistance\debug.console\dc.listview.impl.cpp" />
+    <ClCompile Include="dev.assistance\debug.console\dc.rich.edit.impl.cpp" />
+    <ClCompile Include="dev.assistance\debug.console\debug.console.cpp" />
+    <ClCompile Include="dev.assistance\debug.console\debug.output.listener.cpp" />
+    <ClCompile Include="dev.assistance\debug.console\WinDebugMonitor.cpp" />
     <ClCompile Include="dev.assistance\dev.assist.cpp" />
     <ClCompile Include="dh.timer.cpp" />
     <ClCompile Include="dh.tracing.cpp" />
@@ -481,6 +487,14 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClInclude Include="crash.report\run.context.info.h" />
     <ClInclude Include="crash.report\stack.walker.h" />
     <ClInclude Include="crash.report\string.buffer.h" />
+    <ClInclude Include="dev.assistance\debug.console\basic.debug.console.h" />
+    <ClInclude Include="dev.assistance\debug.console\dc.listview.impl.h" />
+    <ClInclude Include="dev.assistance\debug.console\dc.rich.edit.impl.h" />
+    <ClInclude Include="dev.assistance\debug.console\debug.console.h" />
+    <ClInclude Include="dev.assistance\debug.console\debug.output.listener.h" />
+    <ClInclude Include="dev.assistance\debug.console\ostream.listener.h" />
+    <ClInclude Include="dev.assistance\debug.console\resources\resource.h" />
+    <ClInclude Include="dev.assistance\debug.console\WinDebugMonitor.h" />
     <ClInclude Include="dev.assistance\dev.assist.h" />
     <ClInclude Include="dev.assistance\list.view.exstyles.h" />
     <ClInclude Include="dev.assistance\list.view.styles.h" />
@@ -580,10 +594,12 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="cf-resources\cf-res.rc" />
+    <ResourceCompile Include="dev.assistance\debug.console\resources\debug.console.2.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="cf-resources\cheks.bmp" />
     <Image Include="cf-resources\menuimg-pro24.bmp" />
+    <Image Include="dev.assistance\debug.console\resources\debug.console.2.def.tb.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

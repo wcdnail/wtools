@@ -1,9 +1,9 @@
 #pragma once 
 
-struct GdiPlus
+struct ScopedInitGdiplus
 {
-    GdiPlus(int requiredver = 1);
-    ~GdiPlus();
+    ScopedInitGdiplus(int requiredver = 1);
+    ~ScopedInitGdiplus();
 
     static PCSTR StatusString(int status);
 

@@ -15,6 +15,9 @@
       <Filter>infrastructure</Filter>
     </ClCompile>
     <ClCompile Include="UT.entry.cxx" />
+    <ClCompile Include="debug.assistance.cpp">
+      <Filter>infrastructure</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rez\resource.h">

@@ -13,26 +13,26 @@ Win567Impl const& Win567()
 template<class ResultType> 
 ResultType Win567Impl::LoadProcAddress(PCWSTR dllName, PCSTR procName)
 {
-    HMODULE dll = ::GetModuleHandleW(dllName);
+    HMODULE dll{GetModuleHandleW(dllName)};
     if (nullptr == dll) {
-        dll = ::LoadLibraryW(dllName);
+        dll = LoadLibraryW(dllName);
         // ##TODO: Check for leaks
         if (nullptr == dll) {
-            HRESULT hr = static_cast<HRESULT>(::GetLastError());
-            auto err = Str::ErrorCode<>::SystemMessage(hr);
-            DH::TPrintf(L"567Feats: Can't load `%s` - %d `%s`\n", dllName, hr, err.GetString());
+            auto const  hr{static_cast<HRESULT>(::GetLastError())};
+            auto const err{Str::ErrorCode<>::SystemMessage(hr)};
+            DH::TPrintf(L"567Feats", L"Can't load `%s` - %d `%s`\n", dllName, hr, err.GetString());
             return nullptr;
         }
     }
 
-    FARPROC rv = ::GetProcAddress(dll, procName);
+    FARPROC const rv{GetProcAddress(dll, procName)};
     if (nullptr == rv) {
-        HRESULT hr = static_cast<HRESULT>(::GetLastError());
-        auto err = Str::ErrorCode<>::SystemMessage(hr);
-        DH::TPrintf(L"567Feats: `%S`@`%s` - %d `%s`\n", procName, dllName, hr, err.GetString());
+        auto const  hr{static_cast<HRESULT>(::GetLastError())};
+        auto const err{Str::ErrorCode<>::SystemMessage(hr)};
+        DH::TPrintf(L"567Feats", L"`%S`@`%s` - %d `%s`\n", procName, dllName, hr, err.GetString());
         return nullptr;
     }
-    DH::TPrintf(L"567Feats: `%S`@`%s` OK\n", procName, dllName);
+    DH::TPrintf(L"567Feats", L"`%S`@`%s` OK\n", procName, dllName);
     return cast_ptr_to_ptr<ResultType>(rv);
 }
 

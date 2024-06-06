@@ -5,15 +5,15 @@
 #include <sstream>
 #include <ole2.h>
 
-struct OLE
+struct ScopedInitOLE
 {
-    OLE(); /* throw(std::runtime_error) */
-    ~OLE(); /* throw() */
+    ScopedInitOLE(); /* throw(std::runtime_error) */
+    ~ScopedInitOLE(); /* throw() */
 };
 
-inline OLE::OLE() /* throw(std::runtime_error) */
+inline ScopedInitOLE::ScopedInitOLE() /* throw(std::runtime_error) */
 {
-    HRESULT hr = ::OleInitialize(NULL);
+    HRESULT hr = ::OleInitialize(nullptr);
     if (FAILED(hr))
     {
         std::stringstream message;
@@ -24,7 +24,7 @@ inline OLE::OLE() /* throw(std::runtime_error) */
     }
 }
 
-inline OLE::~OLE() /* throw() */
+inline ScopedInitOLE::~ScopedInitOLE() /* throw() */
 {
     ::OleUninitialize();
 }

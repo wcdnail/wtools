@@ -112,7 +112,7 @@ PageType* CMainView::PagesGetT(int numba) const
 {
     const auto& it = m_PagesMap.find(numba);
     if (it == m_PagesMap.cend()) {
-        DBGTPrint(LTH_CONTROL L" Page #%d does not EXIST!\n", numba);
+        DBGTPrint(LTH_CONTROL, L"Page #%d does not EXIST!\n", numba);
         return nullptr;
     }
     return static_cast<PageType*>(it->second.get());

@@ -178,7 +178,7 @@ namespace CF::Colorized
 #ifdef _DEBUG
         CStringW text;
         GetWindowTextW(text);
-        DBGTPrint(LTH_COLORIZER L" - %p %s...\n", m_hWnd, text.GetString());
+        DBGTPrint(LTH_COLORIZER, L"- %p %s...\n", m_hWnd, text.GetString());
 #endif
         SetMsgHandled(FALSE);
     }
@@ -188,7 +188,7 @@ namespace CF::Colorized
 #ifdef _DEBUG
         CStringW text;
         GetWindowTextW(text);
-        DBGTPrint(LTH_COLORIZER L" + %p %s...\n", hwnd, text.GetString());
+        DBGTPrint(LTH_COLORIZER, L"+ %p %s...\n", hwnd, text.GetString());
 #endif
         EnumChildWindows(hwnd, reinterpret_cast<WNDENUMPROC>(InitItem), reinterpret_cast<LPARAM>(this));
     }
@@ -206,7 +206,7 @@ namespace CF::Colorized
         const auto fact = CtrlFactory().find(_class);
         bool      exist = fact != CtrlFactory().end();
         if (!exist) {
-            DBGTPrint(LTH_COLORIZER L" >> %p '%s' not EXIST <<\n", hwnd, _class.GetString());
+            DBGTPrint(LTH_COLORIZER, L">> %p '%s' not EXIST <<\n", hwnd, _class.GetString());
         }
         if (exist && !already) {
             ::ShowWindow(hwnd, SW_HIDE);

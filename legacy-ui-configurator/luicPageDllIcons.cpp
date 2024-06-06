@@ -423,7 +423,7 @@ bool CPageDllIcons::ExportIconGDIP(int it, bool needBig, std::wstring const& fil
     //GetEncoderClsid(L"image/jpeg", &encoderClsid);
     auto status = pBitmap->Save(filename.c_str(), &Gdiplus::ImageFormatIcon);
     if (Gdiplus::Ok != status) {
-        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %S", it, filename.c_str(), GdiPlus::StatusString(status));
+        SetMFStatus(STA_Error, L"Export #%d icon to '%s' failed! %S", it, filename.c_str(), ScopedInitGdiplus::StatusString(status));
         return false;
     }
     return true;

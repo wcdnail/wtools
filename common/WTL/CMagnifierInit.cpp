@@ -17,21 +17,21 @@ CMagnifierInit& CMagnifierInit::Instance()
 CMagnifierInit::CMagnifierInit()
 {
     if (MagInitialize()) {
-        DH::TPrintf(LTH_GLOBALS L" MagInitialize OK\n");
+        DH::TPrintf(LTH_GLOBALS, L" MagInitialize OK\n");
         return ;
     }
     auto const hCode{static_cast<HRESULT>(GetLastError())};
     auto const  sMsg{Str::ErrorCode<>::SystemMessage(hCode)};
-    DH::TPrintf(LTH_GLOBALS L" MagInitialize failed: 0x%08x %s\n", hCode, sMsg.GetString());
+    DH::TPrintf(LTH_GLOBALS, L" MagInitialize failed: 0x%08x %s\n", hCode, sMsg.GetString());
 }
 
 CMagnifierInit::~CMagnifierInit()
 {
     if (MagUninitialize()) {
-        DH::TPrintf(LTH_GLOBALS L" MagUninitialize OK\n");
+        DH::TPrintf(LTH_GLOBALS, L" MagUninitialize OK\n");
         return ;
     }
     auto const hCode{static_cast<HRESULT>(GetLastError())};
     auto const  sMsg{Str::ErrorCode<>::SystemMessage(hCode)};
-    DH::TPrintf(LTH_GLOBALS L" MagUninitialize failed: 0x%08x %s\n", hCode, sMsg.GetString());
+    DH::TPrintf(LTH_GLOBALS, L" MagUninitialize failed: 0x%08x %s\n", hCode, sMsg.GetString());
 }

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "pch.hxx"
 #include "debug.assistance.h"
 #include "rez/resource.h"
 #include "err.printer.h"
@@ -74,10 +74,10 @@ BOOL MoveToMonitor::MoveAttempt(MONITORINFOEXW const& monInfo) const
         CRect rcNew;
         GetWindowRect(hWnd, rcNew);
         if (rcWin != FromCRect<LONG>(rcNew)) {
-            DBGTPrint(LTH_DBG_ASSIST L" WARNING: window rect changed!\n");
+            DBGTPrint(LTH_DBG_ASSIST, L" WARNING: window rect changed!\n");
         }
     }
-    DBGTPrint(LTH_DBG_ASSIST L" w:%08x moved to '%s'\n", hWnd, monInfo.szDevice);
+    DBGTPrint(LTH_DBG_ASSIST, L" w:%08x moved to '%s'\n", hWnd, monInfo.szDevice);
     return FALSE;
 }
 
@@ -103,7 +103,7 @@ bool MoveToMonitor::Move(HWND hWndClient, DWORD dwNum, unsigned nPut)
                                         reinterpret_cast<MONITORENUMPROC>(EnumeratorProc),
                                         reinterpret_cast<LPARAM>(this));
     if (rv) {
-        DBGTPrint(LTH_DBG_ASSIST L" Could not move w:%08x to desired monitor %d\n", hWnd, dwDesiredNum);
+        DBGTPrint(LTH_DBG_ASSIST, L" Could not move w:%08x to desired monitor %d\n", hWnd, dwDesiredNum);
     }
     return FALSE == rv;
 }

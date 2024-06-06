@@ -1,6 +1,7 @@
 #pragma once
 
 #include <wcdafx.api.h>
+#include <atltheme.h>
 
 struct CColorStatic: private ATL::CWindowImpl<CColorStatic, WTL::CStatic>,
                      private WTL::CBufferedPaintImpl<CColorStatic>

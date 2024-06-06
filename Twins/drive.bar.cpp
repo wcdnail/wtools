@@ -178,30 +178,26 @@ namespace Twins
 
     LRESULT DriveBar::OnComboNotify(LPNMHDR nmh)
     {
-        unsigned code = LOWORD(nmh->code);
-        if (WM_KEYUP == code)
-        {
-            int data = HIWORD(nmh->code);
-
-            //if ((data >= 'A') && (data <= 'Z'))
-                //OnComboCommand(CBN_SELENDOK, 0, NULL);
-
-            DH::TPrintf(L"DRIVENFY: Notify %p == %x `%c`\n", nmh->code, code, data);
+        unsigned const code{LOWORD(nmh->code)};
+        if (WM_KEYUP == code) {
+            int const data{HIWORD(nmh->code)};
+            //if ((data >= 'A') && (data <= 'Z')) {
+            //    OnComboCommand(CBN_SELENDOK, 0, NULL);
+            //}
+            DH::TPrintf(L"DrvNotify", L"%p == %x `%c`\n", nmh->code, code, data);
         }
-
-        
         return 0;
     }
 
     void DriveBar::OnComboCommand(UINT code, int, HWND win)
     {
-        if (CBN_SELENDOK == code)
-        {
+        if (CBN_SELENDOK == code) {
             int drive = Combo.GetCurSel();
             SetCurrentDrive(drive, false);
         }
-        else if (CBN_SELENDCANCEL == code)
+        else if (CBN_SELENDCANCEL == code) {
             SetCurrentDrive(ActiveDrive, true);
+        }
     }
 
     void DriveBar::CancelDropdownCombo()

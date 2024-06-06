@@ -7,15 +7,19 @@
 #include <color.stuff.h>
 #include <dh.tracing.h>
 #include <dh.tracing.defs.h>
+#include <string.utils.error.code.h>
 #include <dev.assistance/dev.assist.h>
 #include <dev.assistance/debug.console/debug.console.h>
 #include <atlwin.h>
 #include <atlddx.h>
+#include <atltheme.h>
 #include <atlcrack.h>
 
 struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
                          WTL::CDialogResize<CDefaultWin32Dlg>,
                          WTL::CWinDataExchange<CDefaultWin32Dlg>,
+                         WTL::CThemeImpl<CColorPickerDlg>,
+                         WTL::CBufferedPaintImpl<CColorPickerDlg>,
                          WTL::CMessageFilter
 {
     enum { IDD = IDD_DIALOG1 };
@@ -27,12 +31,12 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
     CColorCellEx     m_crCell1{0x000000, RGB_MAX_INT};
     CColorPickerDlg    m_cpDlg{0x1f2f3f};
 
-    BOOL              m_brLeft{TRUE};
-    BOOL           m_brXCenter{FALSE};
+    BOOL              m_brLeft{FALSE};
+    BOOL           m_brXCenter{TRUE};
     BOOL             m_brRight{FALSE};
-    BOOL               m_brTop{TRUE};
+    BOOL               m_brTop{FALSE};
     BOOL           m_brYCenter{FALSE};
-    BOOL            m_brBottom{FALSE};
+    BOOL            m_brBottom{TRUE};
     ATL::CString    m_sMvFlags{};
     UINT         m_cpMoveFlags{0};
 
@@ -104,7 +108,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         case NM_CUSTOMDRAW:     //
             break;              // -- skip
         default:
-            DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+            DBGTPrint(LTH_WM_NOTIFY, L" id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
             break;
         }
         SetMsgHandled(FALSE);
@@ -136,7 +140,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
             m_cpDlg.MoveWindow(m_cpMoveFlags);
             return ;
         default:
-            DBGTPrint(LTH_WM_COMMAND L" id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+            DBGTPrint(LTH_WM_COMMAND, L" id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
             break;
         }
         SetMsgHandled(FALSE);
@@ -158,8 +162,45 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         }
     }
 
+    HRESULT ThemedInit(PCWSTR pszClasses = L"BUTTON;EDIT;MENU;SCROLLBAR")
+    {
+        // All class names are in $(PROJECT_DIR)\resz\ClassesNames.txt
+        //
+        // Short list:
+        // BUTTON, CLOCK, COMBOBOX, COMMUNICATIONS, CONTROLPANEL, DATEPICKER, DRAGDROP, 
+        // EDIT, EXPLORERBAR, FLYOUT, GLOBALS, HEADER, LISTBOX, LISTVIEW, MENU, MENUBAND, 
+        // NAVIGATION, PAGE, PROGRESS, REBAR, SCROLLBAR, SEARCHEDITBOX, SPIN, STARTPANEL, 
+        // STATUS, TAB, TASKBAND, TASKBAR, TASKDIALOG, TEXTSTYLE, TOOLBAR, TOOLTIP, 
+        // TRACKBAR, TRAYNOTIFY, TREEVIEW, WINDOW
+        //
+        // https://learn.microsoft.com/en-us/windows/win32/controls/parts-and-states?redirectedfrom=MSDN
+        //
+        if (!m_hWnd) {
+            return S_FALSE;
+        }
+        if (!IsThemingSupported()) {
+            return S_FALSE;
+        }
+        ATLASSERT(::IsWindow(m_hWnd));
+        const HTHEME hTheme{::OpenThemeDataEx(m_hWnd, pszClasses, OTD_FORCE_RECT_SIZING | OTD_NONCLIENT)};
+        if (!hTheme) {
+            auto const code{static_cast<HRESULT>(GetLastError())};
+            return code;
+        }
+        m_hTheme = hTheme;
+        return S_OK;
+    }
+
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     {
+        static const
+        PCWSTR   pszClasses{L"BUTTON;EDIT;MENU;SCROLLBAR"};
+        HRESULT const hCode{ThemedInit(pszClasses)};
+        if (FAILED(hCode)) {
+            DH::TPrintf(LTH_CONTROL L" ThemedInit['%s'] failed: 0x%08x %s\n", pszClasses,
+                hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
+        }
+
         CRect         rcLog{};
         ATL::CWindow wndLog{GetDlgItem(IDC_DEBUG_CONSOLE)};
         wndLog.GetWindowRect(rcLog);

@@ -77,8 +77,8 @@ int DetermineWndClass(HWND hWnd)
         {  WTL::CMonthCalendarCtrl::GetWndClassName(), WClass::MonthCalendarCtrl },
         {       WTL::CRichEditCtrl::GetWndClassName(), WClass::RichEditCtrl },
     };
-    wchar_t  _class[512] = { 0 };
-    UINT    classNameLen = ::RealGetWindowClassW(hWnd, _class, _countof(_class) - 1);
+    wchar_t     _class[512]{0};
+    UINT const classNameLen{RealGetWindowClassW(hWnd, _class, _countof(_class) - 1)};
     for (const auto it: wtlClasses) {
         if (0 == _wcsnicmp(_class, it.name, classNameLen)) {
             return it.id;
@@ -97,8 +97,8 @@ void WinDebugDump(HWND hWnd, PCWSTR prefix)
     temp.GetWindowTextW(text);
     id.Format(L"%04d", temp.GetDlgCtrlID());
     temp.Detach();
-    ::RealGetWindowClassW(hWnd, _class, _countof(_class) - 1);
-    DH::TCPrintf(DH::Category::WTL(), L"%s %p::'%s'(%d) [%s:%s]\n", prefix, hWnd, 
+    RealGetWindowClassW(hWnd, _class, _countof(_class) - 1);
+    DH::TPrintf(L"WTL", L"%s %p::'%s'(%d) [%s:%s]\n", prefix, hWnd, 
         _class, DetermineWndClass(hWnd),
         text.GetString(), id.GetString()
     );
@@ -110,7 +110,7 @@ struct CItem;
 using CItemPtr = std::unique_ptr<CItem>;
 using CItemMap = std::map<HWND, CItemPtr>;
 
-struct CTestDlg : public CDialogImpl<CTestDlg, CWindow>
+struct CTestDlg: public CDialogImpl<CTestDlg, CWindow>
               // public WTL::CDialogResize<CMainFrame>
 {
     using  Thiz = CTestDlg;

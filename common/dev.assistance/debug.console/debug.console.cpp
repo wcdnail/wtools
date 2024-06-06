@@ -6,7 +6,6 @@
 #include <string.utils.error.code.h>
 #include <fstream>
 
-
 namespace DH
 {
     bool DebugConsole::SetPrivilege(HANDLE hToken, PCWSTR pszPrivilege, bool bEnable)
@@ -55,6 +54,7 @@ namespace DH
         return false;
     }
 
+#if 0
     class DebugConsoleImpl: public BasicDebugConsole
     {
     public:
@@ -128,6 +128,7 @@ namespace DH
     {
         console_.DestroyWindow();
     }
+#endif
 
     DebugConsole& DebugConsole::Instance()
     {
@@ -138,8 +139,6 @@ namespace DH
     DebugConsole::~DebugConsole() = default;
 
     DebugConsole::DebugConsole()
-      //: impl_{new DebugConsoleImpl(*this)}
-      //: impl_{new DCRichEditImpl(*this)}
         : impl_{new DCListViewImpl(*this)}
     {
     }

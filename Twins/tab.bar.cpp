@@ -11,13 +11,13 @@
 namespace Twins
 {
     TabBar::TabBar(int flags /*= Normal*/)
-        : CF::DoubleBuffered(0xf8e0ca, true) // CONF: panel tabs double buffering
+        : CF::DoubleBuffered(/*0xf8e0ca, */true) // CONF: panel tabs double buffering
         , Items()
         , ClickFunctor()
         , IconSize(16, 16)
         , Flags(flags)
-        , HotItem(NULL)
-        , SelItem(NULL)
+        , HotItem(nullptr)
+        , SelItem(nullptr)
         , TabPos(-1)
         , MyFont(CreateFont(-11, 0, 0, 0, FW_NORMAL, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Tahoma")))
         , MyTextColor(0xdfdfdf)
@@ -65,11 +65,11 @@ namespace Twins
     void TabBar::Clear()
     {
         Items.clear();
-        HotItem = NULL;
-        ::InvalidateRect(m_hWnd, NULL, FALSE);
+        HotItem = nullptr;
+        ::InvalidateRect(m_hWnd, nullptr, FALSE);
     }
 
-    void TabBar::Add(int id, PCWSTR name, int width /*= -1*/, HICON icon /*= NULL*/, UINT dflags /*= DT_LEFT | DT_VCENTER | DT_SINGLELINE*/)
+    void TabBar::Add(int id, PCWSTR name, int width /*= -1*/, HICON icon /*= nullptr*/, UINT dflags /*= DT_LEFT | DT_VCENTER | DT_SINGLELINE*/)
     {
         TabBarItem newItem;
 
@@ -83,7 +83,7 @@ namespace Twins
         Items.push_back(newItem);
     }
 
-    void TabBar::Add(PCWSTR name, UINT dflags/* = DT_LEFT | DT_VCENTER | DT_SINGLELINE*/, HICON icon/* = NULL*/, int id/* = -1*/)
+    void TabBar::Add(PCWSTR name, UINT dflags/* = DT_LEFT | DT_VCENTER | DT_SINGLELINE*/, HICON icon/* = nullptr*/, int id/* = -1*/)
     {
         Add((-1 == id ? (int)Items.size() : id), name, -1, icon, dflags);
     }
@@ -93,7 +93,7 @@ namespace Twins
         if ((id >= 0) && (id < (int)Items.size()))
         {
             Items[id].pos.y = width;
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
             return true;
         }
 
@@ -114,10 +114,9 @@ namespace Twins
     {
         WTL::CPaintDC paintDc(m_hWnd);
         CF::BufferedPaint bufferedPaint(paintDc, GetSecondDc(), IsDoubleBuffered(), m_hWnd);
-        CDC& curDc = bufferedPaint.GetCurrentDc();
-        if (!curDc.m_hDC)
-        {
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+        WTL::CDCHandle curDc = bufferedPaint.GetCurrentDc();
+        if (!curDc.m_hDC) {
+            InvalidateRect(nullptr, FALSE);
             return ;
         }
 
@@ -257,25 +256,25 @@ namespace Twins
         if (it != Items.end())
         {
             it->icon = icon;
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
         }
     }
 
     void TabBar::ClearSelected()
     {
-        SetSelected(NULL);
+        SetSelected(nullptr);
     }
 
     void TabBar::SetHotByPtr(TabBarItem const* itPtr)
     {
         HotItem = itPtr;
-        ::InvalidateRect(m_hWnd, NULL, FALSE);
+        ::InvalidateRect(m_hWnd, nullptr, FALSE);
     }
 
     void TabBar::SetSelected(TabBarItem const* itPtr)
     {
         SelItem = itPtr;
-        ::InvalidateRect(m_hWnd, NULL, FALSE);
+        ::InvalidateRect(m_hWnd, nullptr, FALSE);
     }
 
     void TabBar::OnLButtonDown(UINT flags, CPoint point)
@@ -318,7 +317,7 @@ namespace Twins
 
     void TabBar::OnMouseLeave()
     {
-        SetHotByPtr(NULL);
+        SetHotByPtr(nullptr);
     }
 
     void TabBar::SetHot(int id)
@@ -329,7 +328,7 @@ namespace Twins
 
     void TabBar::ClearHot()
     {
-        SetSelected(NULL);
+        SetSelected(nullptr);
     }
 
     TabBar::ClickCallback& TabBar::OnClick()
@@ -340,7 +339,7 @@ namespace Twins
     void TabBar::SetIconSize(int cx, int cy)
     {
         IconSize.SetSize(cx, cy);
-        ::InvalidateRect(m_hWnd, NULL, FALSE);
+        ::InvalidateRect(m_hWnd, nullptr, FALSE);
     }
 
     LRESULT TabBar::WM_CONTEXTMENU_ToParent(UINT message, WPARAM wParam, LPARAM lParam) const
@@ -366,7 +365,7 @@ namespace Twins
     {
         //DH::TPrintf(L"DialogCd: %s\n", message ? DH::MessageToStrignW(message) : L"--None");
 
-        if (NULL != message)
+        if (nullptr != message)
         {
             switch (message->message)
             {
@@ -383,7 +382,7 @@ namespace Twins
     {
         if (SetTabPos(TabPos + x, false))
         {
-            SetHotByPtr(NULL);
+            SetHotByPtr(nullptr);
             ::SendMessage(GetParent(), WM_NEXTDLGCTL, (0 == TabPos ? 0 : 1), 0);
         }
 
@@ -452,6 +451,6 @@ namespace Twins
 
     void TabBar::OnKillFocus(HWND next)
     {
-        SetHotByPtr(NULL);
+        SetHotByPtr(nullptr);
     }
 }

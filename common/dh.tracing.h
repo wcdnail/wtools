@@ -1,12 +1,9 @@
-//
-// Nu tracing stuff
-// 
-
 #pragma once
 
 #include "wcdafx.api.h"
 #include "dh.timer.h"
 #include "strint.h"
+#include <sal.h>
 #include <utility>
 #include <string>
 
@@ -28,25 +25,12 @@ namespace DH
     WCDAFX_API void PrintLogHeader();
     WCDAFX_API double LogUpTime();
 
-    class TraceCategory
-    {
-    public:
-        DELETE_COPY_MOVE_OF(TraceCategory);
-
-        WCDAFX_API TraceCategory(PCWSTR name);
-        WCDAFX_API ~TraceCategory();
-        WString const& GetName() const;
-
-    private:
-        WString Name;
-    };
-
     struct ScopedThreadLog
     {
         DELETE_COPY_MOVE_OF(ScopedThreadLog);
 
-        WCDAFX_API ScopedThreadLog(PCWSTR message);
-        WCDAFX_API ScopedThreadLog(_Printf_format_string_params_(1) int, PCWSTR format, ...);
+        WCDAFX_API ScopedThreadLog(std::wstring_view svLevel);
+        WCDAFX_API ScopedThreadLog(int, _Printf_format_string_ std::wstring_view svFormat, ...);
         WCDAFX_API ~ScopedThreadLog();
 
     private:
@@ -54,21 +38,11 @@ namespace DH
         wchar_t Message[1024];
     };
 
-    namespace Category
-    {
-        WCDAFX_API DH::TraceCategory const& Module();
-        WCDAFX_API DH::TraceCategory const& Exception();
-        WCDAFX_API DH::TraceCategory const& WTL();
-    }
-
-    WCDAFX_API void Printf(_In_z_ _Printf_format_string_ PCSTR format, ...);
-    WCDAFX_API void Printf(_In_z_ _Printf_format_string_ PCWSTR format, ...);
+    WCDAFX_API void Printf(std::string_view svLevel, _Printf_format_string_ std::string_view svFormat, ...);
+    WCDAFX_API void Printf(std::wstring_view svLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
     
-    WCDAFX_API void TPrintf(_In_z_ _Printf_format_string_ PCSTR format, ...);
-    WCDAFX_API void TPrintf(_In_z_ _Printf_format_string_ PCWSTR format, ...);
-    
-    WCDAFX_API void TCPrintf(TraceCategory const& cat, _In_z_ _Printf_format_string_ PCSTR format, ...);
-    WCDAFX_API void TCPrintf(TraceCategory const& cat, _In_z_ _Printf_format_string_ PCWSTR format, ...);
+    WCDAFX_API void TPrintf(std::string_view svLevel, _Printf_format_string_ std::string_view svFormat, ...);
+    WCDAFX_API void TPrintf(std::wstring_view svLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
 
     namespace Impl
     {
@@ -104,16 +78,17 @@ namespace DH
         //::memset(dest, 0, CountValue * sizeof(CharType));
         Impl::CopyCharsForPrinting(dest, CountValue - 1, source, sl);
     }
+
+    WCDAFX_API WString const& ModuleName();
+    WCDAFX_API WString const& ModuleDir();
 }
 
 #ifdef _DEBUG
 #   define DBGPrint(...)            DH::Printf(__VA_ARGS__)
 #   define DBGTPrint(...)           DH::TPrintf(__VA_ARGS__)
-#   define DBGCPrint(Category, ...) DH::TCPrintf(Category, __VA_ARGS__)
-    static const bool DebugTrue = true;
+    static bool constexpr DebugTrue = true;
 #else
     inline void DBGPrint(...)       {}
     inline void DBGTPrint(...)      {}
-    inline void DBGCPrint( ...)     {}
-    static const bool DebugTrue = false;
+    static bool constexpr DebugTrue = false;
 #endif

@@ -54,7 +54,7 @@ namespace CF
         else {
             caption.Format(L"%d", id);
         }
-        DBGTPrint(format, hWnd, caption.GetString(), prevClass.GetString(), thisClass);
+        DBGTPrint(LTH_CONTROL, format, hWnd, caption.GetString(), prevClass.GetString(), thisClass);
     }
 #else
 #  define traceCtrl(...)
@@ -62,12 +62,12 @@ namespace CF
 
     void ControlBase::OnContruct(PCTSTR thisClass)
     {
-        traceCtrl(m_hWnd, m_prevClass, thisClass, LTH_CONTROL L"  ++ %p [%s] '%s' ==> '%s'\n");
+        traceCtrl(m_hWnd, m_prevClass, thisClass, L"++ %p [%s] '%s' ==> '%s'\n");
     }
 
     void ControlBase::OnDestroy(PCTSTR thisClass)
     {
-        traceCtrl(m_hWnd, m_prevClass, thisClass, LTH_CONTROL L"  -- %p [%s] '%s' <== '%s'\n");
+        traceCtrl(m_hWnd, m_prevClass, thisClass, L"-- %p [%s] '%s' <== '%s'\n");
     }
 
     BOOL ControlBase::OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
@@ -86,7 +86,7 @@ namespace CF
             msg.wParam = wParam;
             msg.lParam = lParam;
             auto msgStr = DH::MessageToStrignW(&msg);
-            DBGTPrint(LTH_CONTROL L" -WM- [[ %s ]]\n", msgStr.c_str());
+            DBGTPrint(LTH_CONTROL, L"-WM- [[ %s ]]\n", msgStr.c_str());
         }
 #endif
         SetMsgHandled(FALSE);

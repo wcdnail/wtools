@@ -213,7 +213,7 @@ namespace Twins
 
     int MainFrame::OnButtonCommand(TabBar& buttons, int id, PCTSTR text)
     {
-        DH::TPrintf(L"PnButton: %2d `%s`\n", id, text);
+        DH::TPrintf(L"PnButton", L"%2d `%s`\n", id, text);
         buttons.ClearHot();
         Commands().GetCommand(id).Callback();
         return id;
@@ -223,7 +223,7 @@ namespace Twins
     {
         if (0 == code)
         {
-            DH::TPrintf(L"Mainframe: OnCommand %d %d\n", code, id);
+            DH::TPrintf(L"Mainframe", L"OnCommand %d %d\n", code, id);
 
             Command::Definition const& def = Command::Manager::Instance().GetCommand(id);
             def.Callback();

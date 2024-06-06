@@ -481,7 +481,7 @@ namespace Twins
         {
             Fl::List files;
             //if (GetSelected(files) > 0)
-                //State.ViewFiles(files, NULL);
+                //State.ViewFiles(files, nullptr);
         }
         else if (ResultGotoEntry == id || ResultEntryesToPanel == id)
         {
@@ -536,25 +536,25 @@ namespace Twins
 
     static bool ContainWildcards(std::wstring const& pattern)
     {
-// ##TODO: Find full wildcard list."))
+        // ##TODO: Find full wildcard list."))
         return std::wstring::npos != pattern.find_first_of(L"*?");
     }
 
     static ATL::CTime GetTimeFrom(WTL::CDateTimePickerCtrl const& datePick, WTL::CDateTimePickerCtrl const& timePick)
     {
-        SYSTEMTIME date = {0};
+        SYSTEMTIME date{0};
         datePick.GetSystemTime(&date);
 
-        SYSTEMTIME time = {0};
+        SYSTEMTIME time{0};
         timePick.GetSystemTime(&time);
 
-        return ATL::CTime((int)date.wYear
-                        , (int)date.wMonth
-                        , (int)date.wDay
-                        , (int)time.wHour
-                        , (int)time.wMinute
-                        , (int)time.wSecond
-                        , -1);
+        return ATL::CTime{static_cast<int>(date.wYear),
+                          static_cast<int>(date.wMonth),
+                          static_cast<int>(date.wDay),
+                          static_cast<int>(time.wHour),
+                          static_cast<int>(time.wMinute),
+                          static_cast<int>(time.wSecond),
+                          -1};
     }
 
     static void AdjustTimeRange(WTL::CDateTimePickerCtrl& picker, LPNMDATETIMECHANGE nm, bool greater)
@@ -573,25 +573,25 @@ namespace Twins
 
     LRESULT FindDialog::OnBegDateChanged(LPNMHDR pnmh)
     {
-        AdjustTimeRange(EndDate, (LPNMDATETIMECHANGE)pnmh, false);
+        AdjustTimeRange(EndDate, reinterpret_cast<LPNMDATETIMECHANGE>(pnmh), false);
         return 0;
     }
 
     LRESULT FindDialog::OnEndDateChanged(LPNMHDR pnmh)
     {
-        AdjustTimeRange(BegDate, (LPNMDATETIMECHANGE)pnmh, true);
+        AdjustTimeRange(BegDate, reinterpret_cast<LPNMDATETIMECHANGE>(pnmh), true);
         return 0;
     }
 
     LRESULT FindDialog::OnBegTimeChanged(LPNMHDR pnmh)
     {
-        AdjustTimeRange(EndTime, (LPNMDATETIMECHANGE)pnmh, false);
+        AdjustTimeRange(EndTime, reinterpret_cast<LPNMDATETIMECHANGE>(pnmh), false);
         return 0;
     }
 
     LRESULT FindDialog::OnEndTimeChanged(LPNMHDR pnmh)
     {
-        AdjustTimeRange(BegTime, (LPNMDATETIMECHANGE)pnmh, false);
+        AdjustTimeRange(BegTime, reinterpret_cast<LPNMDATETIMECHANGE>(pnmh), false);
         return 0;
     }
 
@@ -609,13 +609,13 @@ namespace Twins
 
     LRESULT FindDialog::OnIncSize(LPNMHDR pnmh)
     {
-        IncrementValue(IDC_EB_SIZE, ((LPNMUPDOWN)pnmh)->iDelta);
+        IncrementValue(IDC_EB_SIZE, reinterpret_cast<LPNMUPDOWN>(pnmh)->iDelta);
         return 0;
     }
 
     LRESULT FindDialog::OnIncNotOlder(LPNMHDR pnmh)
     {
-        IncrementValue(IDC_EB_NOTOLDER, ((LPNMUPDOWN)pnmh)->iDelta);
+        IncrementValue(IDC_EB_NOTOLDER, reinterpret_cast<LPNMUPDOWN>(pnmh)->iDelta);
         return 0;
     }
 
@@ -670,14 +670,11 @@ namespace Twins
     {
         if (UseDatetimeRange)
         {
-            ATL::CTime minTime = GetTimeFrom(BegDate, BegTime);
-            ATL::CTime maxTime = GetTimeFrom(EndDate, EndTime);
-
-            DH::TPrintf(L"Searchin: Datetime range in [%s .. %s]\n"
-                , minTime.Format(L"%d.%m.%Y %H:%M:%S")
-                , maxTime.Format(L"%d.%m.%Y %H:%M:%S")
-                );
-
+            ATL::CTime const minTime{GetTimeFrom(BegDate, BegTime)};
+            ATL::CTime const maxTime{GetTimeFrom(EndDate, EndTime)};
+            DH::TPrintf(L"Searching", L"Datetime range in [%s .. %s]\n",
+                minTime.Format(L"%d.%m.%Y %H:%M:%S"),
+                maxTime.Format(L"%d.%m.%Y %H:%M:%S"));
             MinDatetime = minTime;
             MaxDatetime = maxTime;
         }
@@ -685,8 +682,8 @@ namespace Twins
 
     void FindDialog::PrepareNotOlder() {
         if (UseNotOlder) {
-            int  unit = cast_from_ptr<int>(NotOlderUnit.GetItemDataPtr(NotOlderUnit.GetCurSel()));
-            int value = GetDlgItemInt(IDC_EB_NOTOLDER, NULL, FALSE);
+            int const   unit{cast_from_ptr<int>(NotOlderUnit.GetItemDataPtr(NotOlderUnit.GetCurSel()))};
+            UINT const value{GetDlgItemInt(IDC_EB_NOTOLDER, nullptr, FALSE)};
 
             ATL::CTimeSpan span;
             switch (unit) {
@@ -699,17 +696,16 @@ namespace Twins
             case NotOlderSeconds: span = CTimeSpan(0, 0, 0, value); break;
             }
             NotOlderTime = CTime::GetCurrentTime() - span;
-            DH::TPrintf(L"Searchin: NotOlderTime %s\n", NotOlderTime.Format(L"%d.%m.%Y %H:%M:%S"));
+            DH::TPrintf(L"Searching", L"NotOlderTime %s\n", NotOlderTime.Format(L"%d.%m.%Y %H:%M:%S"));
         }
     }
 
     void FindDialog::PrepareSize()
     {
         if (UseSize) {
-            int optype = cast_from_ptr<int>(SizeOp.GetItemDataPtr(SizeOp.GetCurSel()));
-            int   unit = cast_from_ptr<int>(SizeUnit.GetItemDataPtr(SizeUnit.GetCurSel()));
-            uint64_t size = (uint64_t)GetDlgItemInt(IDC_EB_SIZE, NULL, FALSE);
-
+            int const   optype{cast_from_ptr<int>(SizeOp.GetItemDataPtr(SizeOp.GetCurSel()))};
+            int const     unit{cast_from_ptr<int>(SizeUnit.GetItemDataPtr(SizeUnit.GetCurSel()))};
+            uint64_t const size{(uint64_t)GetDlgItemInt(IDC_EB_SIZE, nullptr, FALSE)};
             SizeComparand = size * unit;
             SizeOperator  = optype;
         }
@@ -815,8 +811,9 @@ namespace Twins
             ResultsCaption.SetWindowTextW(status);
         }
           
-        if (error)
-            DH::TPrintf(L"Searchin: %d -> `%s` (%S)\n", error.value(), path.c_str(), error.message().c_str());
+        if (error) {
+            DH::TPrintf(L"Searching", L"%d -> `%s` (%S)\n", error.value(), path.c_str(), error.message().c_str());
+        }
     }
 
     HTREEITEM FindDialog::AppendToTree(HTREEITEM rootItem, HTREEITEM insertAfter, std::wstring const& name, int iconIndex)
@@ -853,7 +850,7 @@ namespace Twins
 
     void FindDialog::FindEnumerator::OnEntry(Item const& entry) 
     {
-        HTREEITEM inserted = NULL;
+        HTREEITEM inserted = nullptr;
         bool isEntryDirectory = entry.IsDir();
 
         FindDialog::FsPath entryPath = entry.Args.Root.c_str();
@@ -903,7 +900,7 @@ namespace Twins
                            ? ::wcsstr((wchar_t*)name.c_str(), PatternString.c_str()) 
                            : ::StrStrIW((wchar_t*)name.c_str(), PatternString.c_str())
                            ;
-            result = NULL != subst;
+            result = nullptr != subst;
         }
         else
         {
@@ -1026,7 +1023,7 @@ namespace Twins
 
     void FindDialog::StoreFileData(HTREEITEM it, FsPath const& path)
     {
-        if (NULL != it)
+        if (nullptr != it)
         {
             Files.PushBack(path);
             int dex = Files.Count()-1;

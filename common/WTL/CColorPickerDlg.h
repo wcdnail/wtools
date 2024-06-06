@@ -1,14 +1,16 @@
 #pragma once
 
 #include "CColorPicker.h"
+#include "IColorObserver.h"
 #include <wcdafx.api.h>
 #include <rect.putinto.h>
 #include <atltypes.h>
-
-#include "IColorObserver.h"
+#include <atltheme.h>
 
 struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
                         private WTL::CDialogResize<CColorPickerDlg>,
+                        private WTL::CThemeImpl<CColorPickerDlg>,
+                        private WTL::CBufferedPaintImpl<CColorPickerDlg>,
                         private WTL::CMessageFilter,
                         private IColorObserver
 {
@@ -49,7 +51,9 @@ private:
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDestroy();
     void OnCommand(UINT uNotifyCode, int nID, HWND);
-    void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI) const;
+    HRESULT ThemedInit();
+    void DrawDragBar(int nID, WTL::CDCHandle dc, CRect& rcItem);
+    void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
     UINT OnNcHitTest(CPoint point) const;
 };
 

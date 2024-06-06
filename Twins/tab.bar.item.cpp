@@ -17,7 +17,7 @@ namespace Twins
     {
     }
 
-    void TabBarItem::Draw(CDC& dc, CRect const& rc, CSize const& iconSize) const
+    void TabBarItem::Draw(WTL::CDCHandle dc, CRect const& rc, CSize const& iconSize) const
     {
         CSize textBounds;
         dc.GetTextExtent(name, name.GetLength(), &textBounds);

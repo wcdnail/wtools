@@ -1,10 +1,11 @@
 #include "pch.hxx"
 #include "windows.gui.leaks.h"
 #include "err.printer.h"
-#include "dh.tracing.h"
-#include <gtest/gtest.h>
+#include <dh.tracing.h>
 #include <windows.uses.commoncontrols.h>
 #include <windows.uses.richedit.h>
+#include <windows.uses.ole.h>
+#include <gtest/gtest.h>
 #include <exception>
 
 #pragma comment(lib, "comctl32.lib")
@@ -36,13 +37,14 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE, PTSTR lpCmdLine, int nShowC
 #else
 int _tmain(int argc, TCHAR* argv[])
 {
-    HINSTANCE hInstance = GetModuleHandleW(nullptr);
+    HINSTANCE const hInstance{GetModuleHandleW(nullptr)};
 #endif
     try {
         //winrt::init_apartment(winrt::apartment_type::multi_threaded);
 
-        Initialize::CommonControls ccontrols(ICC_COOL_CLASSES | ICC_BAR_CLASSES);
-        Initialize::RichEdit richedit;
+        ScopedInitOLE           cole{};
+        ScopedInitControls ccontrols{ICC_COOL_CLASSES | ICC_BAR_CLASSES};
+        ScopedInitRichEdit  richedit{};
 
         CAppModule AtlModule;
         HRESULT rv = AtlModule.Init(nullptr, hInstance);

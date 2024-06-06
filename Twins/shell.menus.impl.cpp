@@ -14,8 +14,7 @@ namespace Twins
     {
         static void HandleHresult(HRESULT hr, PCWSTR format, ...)
         {
-            if (FAILED(hr))
-            {
+            if (FAILED(hr)) {
                 CStringW message;
 
                 va_list ap;
@@ -23,8 +22,8 @@ namespace Twins
                 message.FormatV(format, ap);
                 va_end(ap);
 
-                message.AppendFormat(L" %08x (%s)", hr, Str::ErrorCode<wchar_t>::SystemMessage(hr));
-                DH::TPrintf(L"%s\n", message);
+                message.AppendFormat(L" %08x (%s)", hr, Str::ErrorCode<>::SystemMessage(hr));
+                DH::TPrintf(L"ERROR", L"%s\n", message);
 
                 throw _com_error(hr);
             }

@@ -142,6 +142,24 @@
     <ClCompile Include="wtl.compositor\wtl.compositor.cpp">
       <Filter>wtl.compositor</Filter>
     </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\basic.debug.console.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\dc.listview.impl.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\dc.rich.edit.impl.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\debug.console.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\debug.output.listener.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
+    <ClCompile Include="dev.assistance\debug.console\WinDebugMonitor.cpp">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -454,6 +472,30 @@
     <ClInclude Include="wtl.compositor\wtl.compositor.h">
       <Filter>wtl.compositor</Filter>
     </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\basic.debug.console.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\dc.listview.impl.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\dc.rich.edit.impl.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\debug.console.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\debug.output.listener.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\ostream.listener.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\WinDebugMonitor.h">
+      <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="dev.assistance\debug.console\resources\resource.h">
+      <Filter>dev.assistance\debug.console\resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">
@@ -489,6 +531,12 @@
     <Filter Include="wtl.compositor">
       <UniqueIdentifier>{43c6e3f2-5efa-4930-971b-4a4506d9042c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dev.assistance\debug.console">
+      <UniqueIdentifier>{2d89f866-e842-4625-80e5-248d214bdfae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dev.assistance\debug.console\resources">
+      <UniqueIdentifier>{7e04f646-de9d-4bd8-9c6c-162376601658}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="wccf.def" />
@@ -497,6 +545,9 @@
     <ResourceCompile Include="cf-resources\cf-res.rc">
       <Filter>cf-resources</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="dev.assistance\debug.console\resources\debug.console.2.rc">
+      <Filter>dev.assistance\debug.console\resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="cf-resources\cheks.bmp">
@@ -504,6 +555,9 @@
     </Image>
     <Image Include="cf-resources\menuimg-pro24.bmp">
       <Filter>cf-resources</Filter>
+    </Image>
+    <Image Include="dev.assistance\debug.console\resources\debug.console.2.def.tb.bmp">
+      <Filter>dev.assistance\debug.console\resources</Filter>
     </Image>
   </ItemGroup>
 </Project>

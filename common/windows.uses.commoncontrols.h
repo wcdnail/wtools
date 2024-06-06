@@ -5,13 +5,13 @@
 #include <stdexcept>
 #include <commctrl.h>
 
-struct CommonControls
+struct ScopedInitControls
 {
-    CommonControls(DWORD flags = ICC_COOL_CLASSES | ICC_BAR_CLASSES); /* throw(std::runtime_error) */
-    ~CommonControls(); /* throw() */
+    ScopedInitControls(DWORD flags = ICC_COOL_CLASSES | ICC_BAR_CLASSES); /* throw(std::runtime_error) */
+    ~ScopedInitControls(); /* throw() */
 };
 
-inline CommonControls::CommonControls(DWORD flags/* = ICC_BAR_CLASSES*/) /* throw(std::runtime_error) */
+inline ScopedInitControls::ScopedInitControls(DWORD flags/* = ICC_BAR_CLASSES*/) /* throw(std::runtime_error) */
 {
     ::SetLastError(3);
 
@@ -28,6 +28,6 @@ inline CommonControls::CommonControls(DWORD flags/* = ICC_BAR_CLASSES*/) /* thro
     }
 }
 
-inline CommonControls::~CommonControls() /* throw() */
+inline ScopedInitControls::~ScopedInitControls() /* throw() */
 {
 }

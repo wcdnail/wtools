@@ -79,11 +79,11 @@ namespace Twins
 
         void Enumerator::ThreadProc()
         {
-            DH::ScopedThreadLog lg(L"DRIVENUM:");
+            DH::ScopedThreadLog lg(L"DRIVENUM");
             HANDLE events[] = { enumerate_, break_ };
             for (;;) {
-                DWORD eventId = ::WaitForMultipleObjects(_countof(events), events, FALSE, INFINITE);
-                if (WAIT_OBJECT_0 == eventId) {
+                DWORD const dwSignal{WaitForMultipleObjects(_countof(events), events, FALSE, INFINITE)};
+                if (WAIT_OBJECT_0 == dwSignal) {
                     EnumProc();
                 }
                 else {
@@ -140,7 +140,7 @@ namespace Twins
                         default:
                             continue;
                         }
-                        DH::TPrintf(_T("DRIVENUM: %d %s [%s] (0x%08x %s(%d) 0x%08x)\n"),
+                        DH::TPrintf(L"DRIVENUM", L"%d %s [%s] (0x%08x %s(%d) 0x%08x)\n",
                             type, path, label, serial, fs, length, flags);
                         Item info;
                         info.num = count++;
@@ -156,28 +156,23 @@ namespace Twins
                         temp.emplace_back(std::move(info));
                     }
                 }
-
                 {
                     std::lock_guard lk(itemsMx_);
                     items_.swap(temp);
                     icons_.Destroy();
                     icons_.Attach(tempIcons.Detach());
                 }
-
-                if (onEnumDone_)
+                if (onEnumDone_) {
                     onEnumDone_(items_);
-
+                }
                 return true;
             }
-            catch (std::exception const& ex)
-            {
-                DH::TPrintf("DRIVENUM: ERROR <%s>\n", ex.what());
+            catch (std::exception const& ex) {
+                DH::TPrintf("DRIVENUM", "ERROR <%s>\n", ex.what());
             }
-            catch (...)
-            {
-                DH::TPrintf("DRIVENUM: UNKNOWN ERROR\n");
+            catch (...) {
+                DH::TPrintf(L"DRIVENUM", L"UNKNOWN ERROR\n");
             }
-
             return false;
         }
 

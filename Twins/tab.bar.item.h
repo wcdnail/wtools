@@ -17,7 +17,7 @@ namespace Twins
         TabBarItem();
         ~TabBarItem();
 
-        void Draw(CDC& dc, CRect const& rc, CSize const& iconSize) const;
+        void Draw(WTL::CDCHandle dc, CRect const& rc, CSize const& iconSize) const;
 
         int Left() const;
         int Right() const;

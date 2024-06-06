@@ -79,14 +79,14 @@ HRESULT CPageBackground::WallpaperInit()
         auto status = image->GetLastStatus();
         if (Gdiplus::Status::Ok != status) {
             code = ERROR_ACCESS_DENIED;
-            SetMFStatus(code, L"Gdiplus::Image::FromFile '%s' failure: %s", pWallpaperPath, GdiPlus::StatusString(status));
+            SetMFStatus(code, L"Gdiplus::Image::FromFile '%s' failure: %s", pWallpaperPath, ScopedInitGdiplus::StatusString(status));
             break;
         }
         Gdiplus::RectF rcImage;
         Gdiplus::Unit units;
         image->GetBounds(&rcImage, &units);
         CRect rcWallpaper = FromRectF(rcImage);
-        DBGTPrint(LTH_DESK_WALLPPR L" Wallpaper: %d x %d [%d]\n", rcWallpaper.Width(), rcWallpaper.Height(), units);
+        DBGTPrint(LTH_DESK_WALLPPR, L"Wallpaper: %d x %d [%d]\n", rcWallpaper.Width(), rcWallpaper.Height(), units);
         imageVec.emplace_back(std::move(image));
         break; // ##TODO: only one will be enough
     }

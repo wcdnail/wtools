@@ -537,7 +537,7 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
         }
         break;
     }
-    DBGTPrint(LTH_WM_NOTIFY L" id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+    DBGTPrint(LTH_WM_NOTIFY, L" id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
     SetMsgHandled(FALSE);
     return 0;
 }
@@ -574,7 +574,7 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, HWND)
     case EN_MAXTEXT:
         return ;
     default:
-        DBGTPrint(LTH_WM_COMMAND L" id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+        DBGTPrint(LTH_WM_COMMAND, L" id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
         break;
     }
     SetMsgHandled(FALSE);
@@ -630,7 +630,7 @@ void CColorPicker::Impl::GetColorFromWindowDC(CPoint const& pt, bool bStoreToHis
     wnd.ScreenToClient(&ptWin);
     COLORREF const  crPixel{dc.GetPixel(ptWin)};
     _SetColor(crPixel, m_imSpectrum.GetColor().m_A, bStoreToHistory, true);
-    DBGTPrint(LTH_COLORPICKER L" [%p] {%d, %d} ==> 0x%08x\n", wnd.m_hWnd, pt.x, pt.y, crPixel);
+    DBGTPrint(LTH_COLORPICKER, L" [%p] {%d, %d} ==> 0x%08x\n", wnd.m_hWnd, pt.x, pt.y, crPixel);
 }
 
 void CColorPicker::Impl::GetColorFromDesktopDC(CPoint const& pt, bool bStoreToHistory)
@@ -639,7 +639,7 @@ void CColorPicker::Impl::GetColorFromDesktopDC(CPoint const& pt, bool bStoreToHi
     COLORREF const  crPixel{dc.GetPixel(pt)};
     ::ReleaseDC(nullptr, dc);
     _SetColor(crPixel, m_imSpectrum.GetColor().m_A, bStoreToHistory, true);
-    DBGTPrint(LTH_COLORPICKER L" {%d, %d} ==> 0x%08x\n", pt.x, pt.y, crPixel);
+    DBGTPrint(LTH_COLORPICKER, L" {%d, %d} ==> 0x%08x\n", pt.x, pt.y, crPixel);
 }
 
 void CColorPicker::Impl::ColorpickEnd(UINT, CPoint const& pt, bool bSelect)

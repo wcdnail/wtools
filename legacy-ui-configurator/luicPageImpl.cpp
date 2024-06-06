@@ -180,7 +180,7 @@ void CPageImpl::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     switch(nID) {
     case IDCANCEL:
         DBG_DUMP_WMESSAGE_EXT(LTH_CANCEL, m_Caption.c_str(), m_hWnd, 0, 0, 0);
-        DBGTPrint(LTH_WM_COMMAND L" ** CANCEL ** request\n");
+        DBGTPrint(LTH_WM_COMMAND, L"** CANCEL ** request\n");
         // ##TODO: PREVENT destroy this!
         // ##TODO: No - Nicht - Nein - DestroyWindow() here!!!
         return;
