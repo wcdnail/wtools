@@ -218,41 +218,6 @@ BOOL CColorPickerDlg::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
     return FALSE;
 }
 
-void CColorPickerDlg::PrepareRect(ATL::CWindow wndParent)
-{
-    if (!wndParent.m_hWnd) {
-        return ;
-    }
-    CRect      rcMy{};
-    CRect  rcMaster{};
-    HWND   hWndLoop{nullptr};
-    HWND hWndMaster{wndParent.m_hWnd};
-    while (nullptr != (hWndLoop = ::GetParent(hWndMaster))) {
-        hWndMaster = hWndLoop;
-    }
-    ::GetWindowRect(hWndMaster, rcMaster);
-    GetWindowRect(rcMy);
-
-    LONG const    nCX{rcMy.Width()};
-    LONG const    nCY{rcMy.Height()};
-    CPoint       ptLT{0, 0};
-
-    if (m_nPosFlags & Rc::Top)          {
-        if (m_nPosFlags & Rc::XCenter)  { ptLT.y = rcMaster.top - nCY; }
-        else                            { ptLT.y = rcMaster.top; } }
-    else if (m_nPosFlags & Rc::Bottom)  {
-        if (m_nPosFlags & Rc::XCenter)  { ptLT.y = rcMaster.bottom; }
-        else                            { ptLT.y = rcMaster.bottom - nCY; } }
-    else if (m_nPosFlags & Rc::YCenter) { ptLT.y = rcMaster.top + (rcMaster.Height() - nCY) / 2; }
-
-    if (m_nPosFlags & Rc::Left)         { ptLT.x = rcMaster.left - 2 - nCX; }
-    else if (m_nPosFlags & Rc::Right)   { ptLT.x = rcMaster.right + 2; }
-    else if (m_nPosFlags & Rc::XCenter) { ptLT.x = rcMaster.left + (rcMaster.Width() - nCX) / 2; }
-
-    CPoint const ptRB{ptLT.x + nCX, ptLT.y + nCY};
-    m_rcPlace.SetRect(ptLT, ptRB);
-}
-
 BOOL CColorPickerDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
     UNREFERENCED_PARAMETER(wndFocus);
@@ -262,12 +227,11 @@ BOOL CColorPickerDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         ATLASSERT(pLoop != nullptr);
         pLoop->AddMessageFilter(this);
     }
-    PrepareRect(m_wndMaster);
-    if (m_rcPlace.IsRectEmpty()) {
-        CenterWindow(m_wndMaster);
+    if (m_wndMaster.m_hWnd) {
+        MoveWindow(m_nPosFlags);
     }
     else {
-        MoveWindow(m_rcPlace, FALSE);
+        CenterWindow();
     }
     if (!m_bModalLoop) {
         WTL::CFontHandle const hFont{GetFont()};
@@ -343,4 +307,49 @@ UINT CColorPickerDlg::OnNcHitTest(CPoint pt) const
     CRect rc{};
     GetDlgItem(IDC_DRAGBAR).GetWindowRect(rc);
     return rc.PtInRect(pt) ? HTCAPTION : HTCLIENT;
+}
+
+void CColorPickerDlg::PrepareRect(ATL::CWindow wndParent)
+{
+    if (!wndParent.m_hWnd) {
+        return ;
+    }
+    CRect      rcMy{};
+    CRect  rcMaster{};
+    HWND   hWndLoop{nullptr};
+    HWND hWndMaster{wndParent.m_hWnd};
+    while (nullptr != (hWndLoop = ::GetParent(hWndMaster))) {
+        hWndMaster = hWndLoop;
+    }
+    ::GetWindowRect(hWndMaster, rcMaster);
+    GetWindowRect(rcMy);
+
+    LONG const    nCX{rcMy.Width()};
+    LONG const    nCY{rcMy.Height()};
+    CPoint       ptLT{0, 0};
+
+    if (m_nPosFlags & Rc::Top)          {
+        if (m_nPosFlags & Rc::XCenter)  { ptLT.y = rcMaster.top - nCY; }
+        else                            { ptLT.y = rcMaster.top; } }
+    else if (m_nPosFlags & Rc::Bottom)  {
+        if (m_nPosFlags & Rc::XCenter)  { ptLT.y = rcMaster.bottom; }
+        else                            { ptLT.y = rcMaster.bottom - nCY; } }
+    else if (m_nPosFlags & Rc::YCenter) { ptLT.y = rcMaster.top + (rcMaster.Height() - nCY) / 2; }
+
+    if (m_nPosFlags & Rc::Left)         { ptLT.x = rcMaster.left - 2 - nCX; }
+    else if (m_nPosFlags & Rc::Right)   { ptLT.x = rcMaster.right + 2; }
+    else if (m_nPosFlags & Rc::XCenter) { ptLT.x = rcMaster.left + (rcMaster.Width() - nCX) / 2; }
+
+    CPoint const ptRB{ptLT.x + nCX, ptLT.y + nCY};
+    m_rcPlace.SetRect(ptLT, ptRB);
+}
+
+void CColorPickerDlg::MoveWindow(unsigned nPosFlags)
+{
+    if (!m_wndMaster.m_hWnd) {
+        return ;
+    }
+    m_nPosFlags = nPosFlags;
+    PrepareRect(m_wndMaster);
+    WndSuper::MoveWindow(m_rcPlace, FALSE);
 }

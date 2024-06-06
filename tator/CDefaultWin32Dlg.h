@@ -132,6 +132,8 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         case IDC_RADIO_BOTTOM:
             DoDataExchange(DDX_SAVE);
             UpdateMoveFlags();
+        case IDC_BN_MOVEPICKER:
+            m_cpDlg.MoveWindow(m_cpMoveFlags);
             return ;
         default:
             DBGTPrint(LTH_WM_COMMAND L" id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
@@ -192,13 +194,14 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         m_btnMyColor2.AddObservers(m_cpDlg.GetMasterColor());
         m_btnMyColor3.AddObservers(m_cpDlg.GetMasterColor());
 
-        m_cpDlg.Show(m_hWnd, Rc::Bottom | Rc::XCenter, false);
+        DoDataExchange(DDX_LOAD);
+        UpdateMoveFlags();
+
+        m_cpDlg.Show(m_hWnd, m_cpMoveFlags, false);
 
         m_crCell1.SetColor(0x7f3a21, RGB_MAX_INT);
         m_crCell1.SetHolder(GetDlgItem(IDC_COLOR1));
 
-        DoDataExchange(DDX_LOAD);
-        UpdateMoveFlags();
         DlgResize_Init(false, true, 0);
         return TRUE;
     }

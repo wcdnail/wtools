@@ -7,13 +7,13 @@ namespace Rc
 {
     enum AlignConsts
     {
-        Left        = 0x00,
-        Top         = 0x00,
-        XCenter     = 0x01,
-        Right       = 0x02,
-        YCenter     = 0x04,
-        Bottom      = 0x08,
-        Fill        = 0x10,
+        Left        = 0x01,
+        Top         = 0x02,
+        XCenter     = 0x04,
+        Right       = 0x08,
+        YCenter     = 0x10,
+        Bottom      = 0x20,
+        Fill        = 0x40,
         Center      = XCenter | YCenter,
         AlignMask   = 0xff
     };

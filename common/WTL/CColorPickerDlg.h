@@ -12,6 +12,8 @@ struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
                         private WTL::CMessageFilter,
                         private IColorObserver
 {
+    using WndSuper = WTL::CIndirectDialogImpl<CColorPickerDlg>;
+
     DELETE_COPY_MOVE_OF(CColorPickerDlg);
 
     WCDAFX_API ~CColorPickerDlg() override;
@@ -23,6 +25,8 @@ struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
     COLORREF GetColor() const;
     IColor& GetMasterColor() const;
     IColorObserver& GetMasterObserver() const;
+
+    WCDAFX_API void MoveWindow(unsigned nPosFlags);
 
 private:
     friend WTL::CIndirectDialogImpl<CColorPickerDlg>;
