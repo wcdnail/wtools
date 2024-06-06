@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "luicNCMetric.h"
-#include "luicRegistry.h"
 #include "luicFonts.h"
+#include <win32.registry.h>
 #include "dh.tracing.h"
 
 CNCMetrics::~CNCMetrics() = default;
@@ -30,7 +30,7 @@ CNCMetrics::Range const& CNCMetrics::DefaultRange(int index)
     };
     if (index < 0 || index > _countof(gs_ranges) - 1) {
         static constexpr Range dummy{ 1, 1, 1 };
-        DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+        DH::TPrintf(L"ERROR", L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
         return dummy;
     }
     return gs_ranges[index];
@@ -51,7 +51,7 @@ PCWSTR CNCMetrics::Title(int index)
         L"Padded BorderWidth"
     };
     if (index < 0 || index > _countof(gs_name) - 1) {
-        DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+        DH::TPrintf(L"ERROR", L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
         return L"INVALID METRIC";
     }
     return gs_name[index];
@@ -165,7 +165,7 @@ ReturnType& CNCMetrics::getRefByIndex(SelfRef& thiz, int index)
     default:
         break;
     }
-    DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+    DH::TPrintf(L"ERROR", L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
     static ReturnType dummy{NCM_Invalid};
     return dummy;
 }

@@ -1429,7 +1429,7 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex, BOOL fTrackSel
     bool  fValid = true;
     COLORREF clr = 0;
     if (m_nCurrentSel == CUSTOM_BOX_VALUE) {
-        clr = m_rMaster.m_clrCurrent;
+        clr = m_rMaster.m_clrDefault; // m_clrCurrent;
     }
     else if (m_nCurrentSel == DEFAULT_BOX_VALUE) {
         clr = m_rMaster.m_clrDefault;

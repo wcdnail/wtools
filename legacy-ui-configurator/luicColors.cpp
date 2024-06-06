@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "luicColors.h"
-#include "luicRegistry.h"
+#include <win32.registry.h>
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
@@ -56,7 +56,7 @@ PCWSTR CColors::Title(int index)
         TEXT("MenuBar")                 // 30 = COLOR_MENUBAR
     };
     if (index < 0 || index > CLR_Count - 1) {
-        DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+        DH::TPrintf(L"ERROR", L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
         return L"INVALID COLOR";
     }
     return gs_name[index];
@@ -127,7 +127,7 @@ ReturnType& CColors::getRefByIndex(SelfRef& thiz, int index)
 {
     if (index < 0 || index > CLR_Count - 1) {
         static ReturnType dummy{};
-        DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+        DH::TPrintf(L"ERROR", L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
         return dummy;
     }
     return thiz.m_Pair[index];
@@ -159,7 +159,7 @@ bool CColorPair::Reset(COLORREF color)
     if (!hBrush) {
         const auto code = static_cast<HRESULT>(GetLastError());
         const auto codeText = Str::ErrorCode<wchar_t>::SystemMessage(code);
-        DH::TPrintf(L"%s: ERROR: CreateSolidBrush failed: %d '%s'\n", __FUNCTIONW__, code, codeText.GetString());
+        DH::TPrintf(L"ERROR", L"%s: CreateSolidBrush failed: %d '%s'\n", __FUNCTIONW__, code, codeText.GetString());
         return false;
     }
     m_Color = color;

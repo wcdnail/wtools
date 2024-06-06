@@ -127,6 +127,9 @@
     <ClCompile Include="dev.assistance\debug.console\dc.listview.impl.cpp">
       <Filter>dev.assistance\debug.console</Filter>
     </ClCompile>
+    <ClCompile Include="win32.registry.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -296,6 +299,9 @@
     </ClInclude>
     <ClInclude Include="dev.assistance\debug.console\IDA-defs.h">
       <Filter>dev.assistance\debug.console</Filter>
+    </ClInclude>
+    <ClInclude Include="win32.registry.h">
+      <Filter>Unsorted</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

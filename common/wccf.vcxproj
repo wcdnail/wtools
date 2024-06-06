@@ -454,6 +454,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClCompile Include="strint.cpp" />
     <ClCompile Include="wcdafx.api.cpp" />
     <ClCompile Include="win-5-6-7.features.cpp" />
+    <ClCompile Include="win32.registry.cpp" />
     <ClCompile Include="windows.gdi.base.cpp" />
     <ClCompile Include="windows.gdi.rects.cpp" />
     <ClCompile Include="windows.popup.hint.cpp" />
@@ -554,6 +555,7 @@ rem xcopy /F/Y "$(TargetDir)..\akelpad.$(PlatformShortName).$(ConfigurationName)
     <ClInclude Include="trect.h" />
     <ClInclude Include="wcdafx.api.h" />
     <ClInclude Include="win-5-6-7.features.h" />
+    <ClInclude Include="win32.registry.h" />
     <ClInclude Include="windows.error.h" />
     <ClInclude Include="windows.gdi.base.h" />
     <ClInclude Include="windows.gdi.rects.h" />

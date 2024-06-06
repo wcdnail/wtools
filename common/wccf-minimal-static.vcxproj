@@ -62,6 +62,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="string.utils.format.cpp" />
+    <ClCompile Include="win32.registry.cpp" />
     <ClCompile Include="windows.uses.gdi+.cpp" />
     <ClCompile Include="windows.wtl.buffered.paint.cpp" />
     <ClCompile Include="WTL\CAppModuleRef.cpp" />
@@ -118,6 +119,7 @@
     <ClInclude Include="shell.imagelist.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="string.utils.format.h" />
+    <ClInclude Include="win32.registry.h" />
     <ClInclude Include="windows.uses.gdi+.h" />
     <ClInclude Include="windows.wtl.buffered.paint.h" />
     <ClInclude Include="WTL\CAppModuleRef.h" />

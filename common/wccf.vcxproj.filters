@@ -160,6 +160,7 @@
     <ClCompile Include="dev.assistance\debug.console\WinDebugMonitor.cpp">
       <Filter>dev.assistance\debug.console</Filter>
     </ClCompile>
+    <ClCompile Include="win32.registry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -496,6 +497,7 @@
     <ClInclude Include="dev.assistance\debug.console\resources\resource.h">
       <Filter>dev.assistance\debug.console\resources</Filter>
     </ClInclude>
+    <ClInclude Include="win32.registry.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="info">

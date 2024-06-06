@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "luicSchemeManager.h"
-#include "luicRegistry.h"
 #include "luicUtils.h"
 #include <dh.tracing.h>
+#include <win32.registry.h>
 #include <string.utils.error.code.h>
 #include <string.utils.format.h>
 #include <functional>
@@ -19,7 +19,7 @@ ReturnType& CSchemeManager::getSchemeRef(SelfRef& thiz, int index)
 {
     if (index < 0 || index > static_cast<int>(thiz.m_Schemes.size()) - 1) {
         static ReturnType dummy{};
-        DH::TPrintf(L"%s: ERROR: index [%d] out of range\n", __FUNCTIONW__, index);
+        DH::TPrintf(L"ERROR", L"%s: index [%d] out of range\n", __FUNCTIONW__, index);
         return dummy;
     }
     return thiz.m_Schemes[index];
@@ -50,13 +50,13 @@ int CSchemeManager::LoadRegistry()
 {
     HRESULT                code{S_OK};
     SchemeVec       tempSchemes{};
-    const CRegistry regClassics{HKEY_CURRENT_USER, REG_ClassicSchemes};
+    const CRegistry regClassics{HKEY_CURRENT_USER, KEY_READ, REG_ClassicSchemes};
     if (!regClassics.IsOk()) {
         return IT_Invalid;
     }
     tempSchemes.reserve(m_Schemes.size() + 1);
     const int nCount = regClassics.ForEachValue([this, &tempSchemes](HKEY hKey, PCWSTR szSchemename, int nLen) -> bool {
-        const CRegistry regScheme{hKey, szSchemename};
+        const CRegistry regScheme{hKey, KEY_READ, szSchemename};
         const String        sName{szSchemename, static_cast<size_t>(nLen)};
         const int          nCount{CountWithSameName(sName)};
         auto pScheme = std::make_shared<CScheme>(sName, nCount);
@@ -64,7 +64,7 @@ int CSchemeManager::LoadRegistry()
             return false;
         }
         const int nSizeCount = regScheme.ForEachValue([&pScheme, &tempSchemes](HKEY hKey, PCWSTR szSizeName, int nLen) -> bool {
-            const CRegistry regSizes{hKey, szSizeName};
+            const CRegistry regSizes{hKey, KEY_READ, szSizeName};
             const String       sName{szSizeName, static_cast<size_t>(nLen)};
             if (!pScheme->LoadSizes(sName, regSizes)) {
                 return false;

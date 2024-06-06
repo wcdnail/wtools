@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "luicRegistry.h"
+#include "win32.registry.h"
 #include <dh.tracing.h>
 #include <string.utils.error.code.h>
 
@@ -11,20 +11,20 @@ CRegistry::CRegistry()
 {
 }
 
-CRegistry::CRegistry(HKEY hRootKey, StrView path)
-    : CRegistry()
+CRegistry::CRegistry(HKEY hRootKey, REGSAM samDesired, StrView path)
+    : CRegistry{}
 {
-    Open(hRootKey, path);
+    Open(hRootKey, samDesired, path);
 }
 
-bool CRegistry::Open(HKEY hRootKey, StrView path)
+bool CRegistry::Open(HKEY hRootKey, REGSAM samDesired, StrView path)
 {
     bool bCreated{false};
     HRESULT  code{S_OK};
     HKEY   tmpKey{nullptr};
-    code = RegOpenKeyExW(hRootKey, path.data(), 0, KEY_ALL_ACCESS, &tmpKey);
+    code = RegOpenKeyExW(hRootKey, path.data(), 0, samDesired, &tmpKey);
     if (ERROR_SUCCESS != code) {
-        code = RegCreateKeyExW(hRootKey, path.data(), 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &tmpKey, nullptr);
+        code = RegCreateKeyExW(hRootKey, path.data(), 0, nullptr, 0, samDesired, nullptr, &tmpKey, nullptr);
         bCreated = true;
     }
     if (!tmpKey) {
@@ -32,7 +32,7 @@ bool CRegistry::Open(HKEY hRootKey, StrView path)
             code = static_cast<HRESULT>(GetLastError());
         }
         const auto codeText = Str::ErrorCode<>::SystemMessage(code);
-        DH::TPrintf(L"%s: ERROR: %s failed: %d '%s'\n", __FUNCTIONW__,
+        DH::TPrintf(L"ERROR", L"%s: %s failed: %d '%s'\n", __FUNCTIONW__,
             bCreated ? L"RegCreateKeyExW" : L"RegOpenKeyExW",
             code, codeText.GetString());
         return false;
@@ -45,7 +45,7 @@ bool CRegistry::Open(HKEY hRootKey, StrView path)
 int CRegistry::ForEachValue(ForEachFn const& frRoutine) const
 {
     if (!m_hKey) {
-        DH::TPrintf(L"%s: ERROR:!m_hKey\n", __FUNCTIONW__);
+        DH::TPrintf(L"ERROR", L"%s: !m_hKey\n", __FUNCTIONW__);
         return ResultFail;
     }
     HRESULT  code{ERROR_SUCCESS};
@@ -68,7 +68,7 @@ int CRegistry::ForEachValue(ForEachFn const& frRoutine) const
 bool CRegistry::GetValueImpl(StrView name, void* data, size_t dataSize) const
 {
     if (!m_hKey) {
-        DH::TPrintf(L"%s: ERROR:!m_hKey\n", __FUNCTIONW__);
+        DH::TPrintf(L"ERROR", L"%s: !m_hKey\n", __FUNCTIONW__);
         return false;
     }
     DWORD  dwType{0};
@@ -77,18 +77,18 @@ bool CRegistry::GetValueImpl(StrView name, void* data, size_t dataSize) const
     code = RegQueryValueExW(m_hKey, name.data(), nullptr, &dwType, nullptr, &dwSize);
     if (ERROR_SUCCESS != code) {
         const auto codeText = Str::ErrorCode<>::SystemMessage(code);
-        DH::TPrintf(L"%s: ERROR: RegQueryValueExW failed: %d '%s'\n", __FUNCTIONW__,
+        DH::TPrintf(L"ERROR", L"%s: RegQueryValueExW failed: %d '%s'\n", __FUNCTIONW__,
             code, codeText.GetString());
         return false;
     }
     if (dataSize < dwSize) {
-        DH::TPrintf(L"%s: ERROR: dataSize < dwSize [%d < %d]\n", __FUNCTIONW__, dataSize, dwSize);
+        DH::TPrintf(L"ERROR", L"%s: dataSize < dwSize [%d < %d]\n", __FUNCTIONW__, dataSize, dwSize);
         return false;
     }
     code = RegQueryValueExW(m_hKey, name.data(), nullptr, &dwType, static_cast<LPBYTE>(data), &dwSize);
     if (ERROR_SUCCESS != code) {
         const auto codeText = Str::ErrorCode<>::SystemMessage(code);
-        DH::TPrintf(L"%s: ERROR: RegQueryValueExW failed: %d '%s'\n", __FUNCTIONW__,
+        DH::TPrintf(L"ERROR", L"%s: RegQueryValueExW failed: %d '%s'\n", __FUNCTIONW__,
             code, codeText.GetString());
         return false;
     }

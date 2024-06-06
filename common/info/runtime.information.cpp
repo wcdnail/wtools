@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "runtime.information.h"
 #include "dh.tracing.h"
+#include "win32.registry.h"
 #include "string.utils.error.code.h"
 #include "string.utils.env.vars.h"
 #include <boost/config.hpp>
@@ -9,7 +10,7 @@
 #include <cstdint>
 #include <cstring>
 
-#define _OS_DISPNAME_LEGACY 0
+#define _OS_DISPNAME_LEGACY 3
 
 #ifdef _MSC_VER
 #  pragma warning(disable: 4191) // 4191: 'reinterpret_cast': unsafe conversion from 'FARPROC' to 'GPI'
@@ -21,7 +22,7 @@
 
 #ifdef _WIN32
 #  include <atlstr.h>
-#  if (_OS_DISPNAME_LEGACY == 0)
+#  if (_OS_DISPNAME_LEGACY == 2)
 #    include <winnt.h>
 #  endif // (_OS_DISPNAME_LEGACY)
 #endif // _WIN32
@@ -572,7 +573,7 @@ namespace Runtime
         this->Version.Major = vi.dwMajorVersion;
         this->Version.Minor = vi.dwMinorVersion;
         this->Version.DisplayName = Win32DisplayTitle(vi, si);
-#else
+#elif (_OS_DISPNAME_LEGACY == 2)
         RTL_OSVERSIONINFOEXW rtlVerInfo{0};
         ULONG          rtlVerInfoStatus{0xC0000002L}; // STATUS_NOT_IMPLEMENTED
         using PRtlGetVersion = ULONG(*)(PRTL_OSVERSIONINFOEXW);
@@ -611,7 +612,34 @@ namespace Runtime
         this->Version.Minor = rtlVerInfo.dwMinorVersion;
         this->Version.Build = rtlVerInfo.dwBuildNumber;
         this->Version.DisplayName = temp.str();
+#else
+        DWORD         dwMajorVersion{0};
+        DWORD         dwMinorVersion{0};
+        DWORD           dwBuildNumba{0};
+        wchar_t     szBuildNumba[64]{L"666"};
+        wchar_t    szProductName[64]{L"Windows/Ўмидоус"};
+        wchar_t szDisplayVersion[64]{L"Trololo..."};
 
+        CRegistry const regVer{HKEY_LOCAL_MACHINE, KEY_READ, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"};
+        if (regVer.IsOk()) {
+            regVer.GetArray(L"CurrentBuildNumber", szBuildNumba);
+            regVer.GetArray(L"ProductName", szProductName);
+            regVer.GetArray(L"DisplayVersion", szDisplayVersion);
+            regVer.GetValue<DWORD>(L"CurrentMajorVersionNumber", dwMajorVersion);
+            regVer.GetValue<DWORD>(L"CurrentMinorVersionNumber", dwMinorVersion);
+            dwBuildNumba = std::wcstoul(szBuildNumba, nullptr, 10);
+        }
+
+        StringStream temp{};
+        temp << szProductName << L" " << szDisplayVersion
+                << L" v" << dwMajorVersion
+                << L"." << dwMinorVersion
+                << L"." << szBuildNumba
+            ;
+        this->Version.Major = dwMajorVersion;
+        this->Version.Minor = dwMinorVersion;
+        this->Version.Build = dwBuildNumba;
+        this->Version.DisplayName = temp.str();
 #endif // (_OS_DISPNAME_LEGACY)
 #endif // _WIN32
     }

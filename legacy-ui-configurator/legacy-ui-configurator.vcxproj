@@ -256,7 +256,6 @@
     <ClInclude Include="luicPageDlgTemplate.h" />
     <ClInclude Include="luicPageDllIcons.h" />
     <ClInclude Include="luicPageImpl.h" />
-    <ClInclude Include="luicRegistry.h" />
     <ClInclude Include="luicScheme.h" />
     <ClInclude Include="luicSchemeManager.h" />
     <ClInclude Include="luicScreenSaver.h" />
@@ -300,7 +299,6 @@
     <ClCompile Include="luicPageDlgTemplate.cpp" />
     <ClCompile Include="luicPageDllIcons.cpp" />
     <ClCompile Include="luicPageImpl.cpp" />
-    <ClCompile Include="luicRegistry.cpp" />
     <ClCompile Include="luicScheme.cpp" />
     <ClCompile Include="luicSchemeManager.cpp" />
     <ClCompile Include="luicScreenSaver.cpp" />
