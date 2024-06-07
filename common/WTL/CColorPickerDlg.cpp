@@ -17,6 +17,8 @@ CColorPickerDlg::CColorPickerDlg(COLORREF crColor)
     ,     m_rcPlace{0, 0, 0, 0}
     ,  m_bModalLoop{false}
     ,   m_nPosFlags{Rc::Right}
+    ,   m_wndMaster{nullptr}
+    ,    m_rcMaster{}
 {
 }
 
@@ -38,6 +40,8 @@ bool CColorPickerDlg::Show(HWND hWndMaster, unsigned nPosFlags, bool bModal)
     }
     m_bModalLoop = bModal;
     m_nPosFlags = nPosFlags;
+    m_wndMaster = hWndMaster;   // in DoModal hWndMaster passed to DialogBoxIndirectParam
+                                // BUT My::GetParrent will return NULL!
     if (m_bModalLoop) {
         auto const nRes{DoModal(hWndMaster)};
         return nRes == IDOK;
@@ -225,7 +229,7 @@ BOOL CColorPickerDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
         ATLASSERT(pLoop != nullptr);
         pLoop->AddMessageFilter(this);
     }
-    if (GetParent()) {
+    if (m_wndMaster) {
         MoveWindow(m_nPosFlags);
     }
     else {
@@ -366,10 +370,10 @@ UINT CColorPickerDlg::OnNcHitTest(CPoint pt) const
     return rc.PtInRect(pt) ? HTCAPTION : HTCLIENT;
 }
 
-void CColorPickerDlg::PrepareRect(ATL::CWindow wndParent)
+bool CColorPickerDlg::PrepareRect(ATL::CWindow wndParent)
 {
     if (!wndParent.m_hWnd) {
-        return ;
+        return false;
     }
     CRect      rcMy{};
     HWND   hWndLoop{nullptr};
@@ -398,6 +402,7 @@ void CColorPickerDlg::PrepareRect(ATL::CWindow wndParent)
 
     CPoint const ptRB{ptLT.x + nCX, ptLT.y + nCY};
     m_rcPlace.SetRect(ptLT, ptRB);
+    return true;
 }
 
 void CColorPickerDlg::MoveWindow(unsigned nPosFlags)
@@ -406,8 +411,9 @@ void CColorPickerDlg::MoveWindow(unsigned nPosFlags)
         return ;
     }
     m_nPosFlags = nPosFlags;
-    PrepareRect(GetParent());
-    WndSuper::MoveWindow(m_rcPlace, FALSE);
+    if (PrepareRect(m_wndMaster)) {
+        WndSuper::MoveWindow(m_rcPlace, FALSE);
+    }
 }
 
 void CColorPickerDlg::FollowMaster(LPWINDOWPOS pWndPos)

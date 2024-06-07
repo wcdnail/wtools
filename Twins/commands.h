@@ -1,7 +1,7 @@
 #pragma once
 
 #include "command.h"
-#include <boost/noncopyable.hpp>
+#include <wcdafx.api.h>
 #include <map>
 #include <string>
 
@@ -9,9 +9,11 @@ namespace Twins
 {
     namespace Command
     {
-        class Manager: boost::noncopyable
+        class Manager
         {
         public:
+            DELETE_COPY_MOVE_OF(Manager);
+
             typedef Definition::Handler CommandHandler;
             typedef std::map<int, Definition> CommandMap;
 

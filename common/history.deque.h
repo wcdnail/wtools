@@ -1,16 +1,13 @@
 #pragma once
 
-#include <reflection/ref.std.h>
 #include "strint.h"
-#include <boost/noncopyable.hpp>
-#include <deque>
-#include <algorithm>
-#ifdef _WIN32
+#include <reflection/ref.std.h>
 #include <atlstr.h>
 #include <atlctrls.h>
-#endif 
+#include <deque>
+#include <algorithm>
 
-struct HistoryDeque: boost::noncopyable
+struct HistoryDeque
 {
     typedef WString String;
     typedef std::deque<String> Deque;
@@ -33,10 +30,8 @@ struct HistoryDeque: boost::noncopyable
     template <class Archive>
     void Serialize(Archive& archive);
 
-#ifdef _WIN32
     void LoadFrom(WTL::CComboBox& combo);
     int LoadTo(WTL::CComboBox& combo) const;
-#endif 
 };
 
 inline HistoryDeque::HistoryDeque() 
@@ -72,7 +67,6 @@ inline void HistoryDeque::Serialize(Archive& archive)
     archive & Storage;
 }
 
-#ifdef _WIN32
 inline void HistoryDeque::LoadFrom(WTL::CComboBox& combo)
 {
     HistoryDeque temp;
@@ -104,4 +98,3 @@ inline int HistoryDeque::LoadTo(WTL::CComboBox& combo) const
     combo.SetWindowText(text);
     return last;
 }
-#endif

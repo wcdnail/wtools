@@ -9,14 +9,12 @@
 #include <atlwin.h>
 #include <atlcrack.h>
 #include <string>
-#include <boost/noncopyable.hpp>
 
 namespace Twins
 {
     typedef CWinTraits<WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, WS_EX_ACCEPTFILES> Panel0Traits;
 
-    class Panel: boost::noncopyable,
-                 ATL::CWindowImpl<Panel, ATL::CWindow, Panel0Traits>,
+    class Panel: ATL::CWindowImpl<Panel, ATL::CWindow, Panel0Traits>,
                  CDialogResize<Panel>
     {
         typedef ATL::CWindowImpl<Panel, ATL::CWindow, Panel0Traits> Super;

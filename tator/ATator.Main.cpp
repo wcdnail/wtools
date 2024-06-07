@@ -165,7 +165,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
         }
     }
 
-    DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT | DH::DEBUG_DEVCON_OUT);
+    DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT | DH::DEBUG_DEVCON_OUT | DH::DEBUG_EXTRA_INFO);
     hCode = Run(lpstrCmdLine, nCmdShow);
     _Module.Term();
     OleUninitialize();

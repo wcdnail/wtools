@@ -2,12 +2,10 @@
 
 #include <map>
 #include <atlstr.h>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace Twins
 {
-    struct DirectoryNotify: boost::noncopyable
+    struct DirectoryNotify
     {
         int FirstAction;
         int LastAction;

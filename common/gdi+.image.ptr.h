@@ -1,18 +1,21 @@
 #pragma once
 
 #include "windows.resource.data.h"
+#include <wcdafx.api.h>
 #include <gdiplus.h>
 #include <atltypes.h>
 #include <memory>
 
 namespace Ui
 {
-    class ImagePtr: boost::noncopyable
+    class ImagePtr
     {
     private:
         typedef std::unique_ptr<GUID[]> GUIDs;
 
     public:
+        DELETE_COPY_MOVE_OF(ImagePtr);
+
         ImagePtr();
         ImagePtr(PCTSTR name, PCTSTR type, HMODULE module = nullptr);
         ImagePtr(PCWSTR fileName);

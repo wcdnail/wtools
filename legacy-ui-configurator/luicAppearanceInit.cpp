@@ -22,7 +22,7 @@ void CPageAppearance::ImportMenuInit(WTL::CMenu& cMenu)
 
 void CPageAppearance::InitResizeMap()
 {
-    static const WTL::_AtlDlgResizeMap ctrlResizeMap[] = {
+    static WTL::_AtlDlgResizeMap constexpr ctrlResizeMap[]{
         { IDC_APP_THEME_CAP,                DLSZ_MOVE_Y },
         { IDC_APP_THEME_SEL,                DLSZ_SIZE_X | DLSZ_MOVE_Y },
         { IDC_APP_THEME_NAME_EDIT,          DLSZ_SIZE_X | DLSZ_MOVE_Y },

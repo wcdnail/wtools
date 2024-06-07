@@ -3,7 +3,7 @@
 #ifdef _WIN32
 
 #include "strint.h"
-#include <boost/system/error_code.hpp>
+#include <system_error>
 
 namespace Ntfs
 {

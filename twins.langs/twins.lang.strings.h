@@ -2,17 +2,13 @@
 
 #include "twins.langs.api.h"
 #include "string.text.ids.h"
+#include <tchar.h>
 #include <string>
 #include <map>
-#include <boost/noncopyable.hpp>
-
-#ifdef _WIN32
-#  include <tchar.h>
-#endif
 
 namespace Twins
 {
-    class Strings: boost::noncopyable
+    class Strings
     {
     public:
         _TWINS_LANG_API static Strings const& Instance();

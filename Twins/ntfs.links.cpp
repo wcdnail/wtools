@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "ntfs.links.h"
-#include <boost/shared_ptr.hpp>
 #include <winioctl.h>
 
 namespace Ntfs

@@ -82,9 +82,6 @@
 
 #endif
 
-#include <boost/config.hpp>
-#include <boost/noncopyable.hpp>
-
 #include <memory>
 #include <string>
 #include <vector>

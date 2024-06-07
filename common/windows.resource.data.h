@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
 #include <objidl.h>
 #include <atlcomcli.h>
 
@@ -8,7 +7,7 @@ namespace Res
 {
     class Custom;
 
-    class Data: boost::noncopyable
+    class Data
     {
     public:
         Data();

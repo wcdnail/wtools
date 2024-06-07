@@ -1,8 +1,8 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
 #include <cstdint>
 #include <filesystem>
+#include <system_error>
 #include <memory>
 
 namespace Fv

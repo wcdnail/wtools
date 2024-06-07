@@ -1,13 +1,14 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
+#include <wcdafx.api.h>
 
 namespace Twins
 {
-    class DirectoryWatch: boost::noncopyable
+    class DirectoryWatch
     {
     public:
+        DELETE_COPY_MOVE_OF(DirectoryWatch);
+
         struct Error;
         typedef std::shared_ptr<void> Handle;
 

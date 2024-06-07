@@ -2,16 +2,15 @@
 #include "dialogz.find.h"
 #include "twins.state.h"
 #include "file.list.h"
-#include "brute_cast.h"
+#include "res/resource.h"
+#include <brute_cast.h>
 #include <shell.imagelist.h>
 #include <twins.langs/twins.lang.strings.h>
 #include <dh.tracing.h>
 #include <wtl.controls.helpers.h>
 #include <atldlgs.h>
 #include <atlconv.h>
-#include <boost/regex.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include "res/resource.h"
+#include <regex>
 
 namespace Twins
 {
@@ -38,13 +37,11 @@ namespace Twins
         /* мегабайт          */ SizeInMegs = SizeInKils * SizeInKils,
         /* гигабайт          */ SizeInGigs = SizeInMegs * SizeInKils,
 
-        /*                   */ TextPatRegExBasic = boost::regex_constants::basic,
-        /*                   */ TextPatRegExExtended = boost::regex_constants::extended,
-        /*                   */ TextPatRegExNormal = boost::regex_constants::normal,
-        /*                   */ TextPatRegExEmacs = boost::regex_constants::emacs,
-        /*                   */ TextPatRegExAwk = boost::regex_constants::awk,
-        /*                   */ TextPatRegExGrep = boost::regex_constants::grep,
-        /*                   */ TextPatRegExEgrep = boost::regex_constants::egrep,
+        /*                   */ TextPatRegExBasic = std::regex_constants::basic,
+        /*                   */ TextPatRegExExtended = std::regex_constants::extended,
+        /*                   */ TextPatRegExAwk = std::regex_constants::awk,
+        /*                   */ TextPatRegExGrep = std::regex_constants::grep,
+        /*                   */ TextPatRegExEgrep = std::regex_constants::egrep,
     };
 
     FindDialog::FindDialog(PCWSTR dirpath, Config& config, AppState& state)
@@ -241,8 +238,8 @@ namespace Twins
 
         Helpers::AddTo(TextPatternRxType, TextPatRegExBasic, _LS(StrId_Simple));
         Helpers::AddTo(TextPatternRxType, TextPatRegExExtended, _LS(StrId_Extended)); 
-        Helpers::AddTo(TextPatternRxType, TextPatRegExNormal, _LS(StrId_Normal));
-        Helpers::AddTo(TextPatternRxType, TextPatRegExEmacs, _LS(StrId_Emacs));
+        //Helpers::AddTo(TextPatternRxType, TextPatRegExNormal, _LS(StrId_Normal));
+        //Helpers::AddTo(TextPatternRxType, TextPatRegExEmacs, _LS(StrId_Emacs));
         Helpers::AddTo(TextPatternRxType, TextPatRegExAwk, _LS(StrId_Awk));
         Helpers::AddTo(TextPatternRxType, TextPatRegExGrep, _LS(StrId_Grep));
         Helpers::AddTo(TextPatternRxType, TextPatRegExEgrep, _LS(StrId_Egrep));
@@ -506,30 +503,27 @@ namespace Twins
 
     static void EscapeRegex(WString& pattern)
     {
-        boost::replace_all(pattern, L"\\", L"\\\\");
-        boost::replace_all(pattern, L"^",  L"\\^");
-        boost::replace_all(pattern, L".",  L"\\.");
-        boost::replace_all(pattern, L"$",  L"\\$");
-        boost::replace_all(pattern, L"|",  L"\\|");
-        boost::replace_all(pattern, L"(",  L"\\(");
-        boost::replace_all(pattern, L")",  L"\\)");
-        boost::replace_all(pattern, L"[",  L"\\[");
-        boost::replace_all(pattern, L"]",  L"\\]");
-        boost::replace_all(pattern, L"*",  L"\\*");
-        boost::replace_all(pattern, L"+",  L"\\+");
-        boost::replace_all(pattern, L"?",  L"\\?");
-        boost::replace_all(pattern, L"/",  L"\\/");
+        pattern = std::regex_replace(pattern, std::wregex{L"\\"}, L"\\\\");
+        pattern = std::regex_replace(pattern, std::wregex{L"^"},  L"\\^");
+        pattern = std::regex_replace(pattern, std::wregex{L"."},  L"\\.");
+        pattern = std::regex_replace(pattern, std::wregex{L"$"},  L"\\$");
+        pattern = std::regex_replace(pattern, std::wregex{L"|"},  L"\\|");
+        pattern = std::regex_replace(pattern, std::wregex{L"("},  L"\\(");
+        pattern = std::regex_replace(pattern, std::wregex{L")"},  L"\\)");
+        pattern = std::regex_replace(pattern, std::wregex{L"["},  L"\\[");
+        pattern = std::regex_replace(pattern, std::wregex{L"]"},  L"\\]");
+        pattern = std::regex_replace(pattern, std::wregex{L"*"},  L"\\*");
+        pattern = std::regex_replace(pattern, std::wregex{L"+"},  L"\\+");
+        pattern = std::regex_replace(pattern, std::wregex{L"?"},  L"\\?");
+        pattern = std::regex_replace(pattern, std::wregex{L"/"},  L"\\/");
     }
 
     static WString RxFromWildcards(std::wstring const& pattern)
     {
         WString rx = pattern;
-
         EscapeRegex(rx);
-
-        boost::replace_all(rx, L"\\?", L".");
-        boost::replace_all(rx, L"\\*", L".*");
-
+        rx = std::regex_replace(rx, std::wregex{L"\\?"}, L".");
+        rx = std::regex_replace(rx, std::wregex{L"\\*"}, L".*");
         rx = L"^" + rx + L"$";
         return rx;
     }
@@ -660,7 +654,7 @@ namespace Twins
             TextSearchRxFlags = cast_from_ptr<unsigned>(TextPatternRxType.GetItemDataPtr(TextPatternRxType.GetCurSel()));
 
             if (TextSearchIgnoringCase)
-                TextSearchRxFlags |= boost::regex_constants::icase;
+                TextSearchRxFlags |= std::regex_constants::icase;
 
             TextSearchRxPattern = CW2A(TextPatternString.c_str()).m_psz;
         }
@@ -896,16 +890,15 @@ namespace Twins
 
         if (PatternRx.empty())
         {
-            wchar_t* subst = CaseSensitive 
-                           ? ::wcsstr((wchar_t*)name.c_str(), PatternString.c_str()) 
-                           : ::StrStrIW((wchar_t*)name.c_str(), PatternString.c_str())
+            wchar_t const * subst = CaseSensitive 
+                                       ? ::wcsstr(const_cast<wchar_t*>(name.c_str()), PatternString.c_str()) 
+                                       : ::StrStrIW((wchar_t*)name.c_str(), PatternString.c_str())
                            ;
             result = nullptr != subst;
         }
-        else
-        {
-            boost::wregex pattern(PatternRx, CaseSensitive ? boost::regex::normal : boost::regex::icase);
-            result = boost::regex_match(name, pattern);
+        else {
+            std::wregex const pattern{PatternRx, CaseSensitive ? std::regex::basic : std::regex::icase};
+            result = std::regex_match(name, pattern);
         }
 
         return result;
@@ -998,15 +991,15 @@ namespace Twins
 
         if (input.is_open())
         {
-            boost::regex rx;
-            rx.assign(TextSearchRxPattern, (boost::regex_constants::syntax_option_type)TextSearchRxFlags);
+            std::regex rx;
+            rx.assign(TextSearchRxPattern, (std::regex_constants::syntax_option_type)TextSearchRxFlags);
 
             int linenum = 1;
             std::string line;
             while(std::getline(input, line))
             {
-                boost::smatch what;
-                result = boost::regex_search(line, what, rx);
+                std::smatch what;
+                result = std::regex_search(line, what, rx);
                 if (result)
                 {
                     //DH::TPrintf("Searchin: `%s` at %d:%d `%s`\n"

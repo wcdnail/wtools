@@ -1,10 +1,9 @@
 #pragma once
 
 #include <reflection/ref.std.h>
-#include <string>
-#include <boost/noncopyable.hpp>
-#include <boost/scoped_array.hpp>
 #include <atlstr.h>
+#include <string>
+#include <memory>
 
 namespace Fl
 {
@@ -16,11 +15,11 @@ namespace Twins
 {
     class ViewStatus;
 
-    class SelectHelper: boost::noncopyable
+    class SelectHelper
     {
     public:
         typedef int Bit;
-        typedef boost::scoped_array<Bit> SelectionSet;
+        typedef std::unique_ptr<Bit[]> SelectionSet;
         typedef std::vector<std::wstring> StringVec;
         typedef Ref::Container<StringVec> RefStringVec;
 
@@ -34,7 +33,7 @@ namespace Twins
         void Unset(int i);
         void Toggle(int i);
         void Toggle(int start, int count);
-        void SelectByRegEx(Fl::List const& items, bool mark, ViewStatus& status, HWND parent = NULL);
+        void SelectByRegEx(Fl::List const& items, bool mark, ViewStatus& status, HWND parent = nullptr);
         int FirstUnselected(int count) const;
         bool GetSelection(Fl::List const& source, Fl::List& files, Fl::Entry const& hot) const;
 

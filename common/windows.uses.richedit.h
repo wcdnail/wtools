@@ -1,12 +1,15 @@
 #pragma once 
 
+#include <wcdafx.api.h>
 #include <string.utils.error.code.h>
 #include <stdexcept>
 #include <sstream>
 #include <atlctrls.h>
 
-struct ScopedInitRichEdit: boost::noncopyable
+struct ScopedInitRichEdit
 {
+    DELETE_COPY_MOVE_OF(ScopedInitRichEdit);
+
     ScopedInitRichEdit(); /* throw(std::runtime_error) */
     ~ScopedInitRichEdit(); /* throw() */
 

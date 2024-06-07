@@ -1,7 +1,6 @@
 #pragma once
 
 #include "file.list.h"
-#include <boost/noncopyable.hpp>
 #include <atlcrack.h>
 #include <atlcomcli.h>
 #include <objidl.h>
@@ -12,7 +11,7 @@ namespace Twins
 {
     class PanelView;
 
-    class DragnDropHelper: boost::noncopyable
+    class DragnDropHelper
     {
     public:
         DragnDropHelper(PanelView& owner);
@@ -25,7 +24,7 @@ namespace Twins
     private:
         friend class PanelView;
 
-        static const unsigned InvalidTick = (unsigned)-2;
+        static constexpr unsigned InvalidTick = static_cast<unsigned>(-2);
 
         struct CursorSet
         {

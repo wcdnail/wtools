@@ -1,17 +1,17 @@
 #pragma once
 
 #include "file.viewer.types.h"
-#include "strint.h"
+#include <strint.h>
 #include <atlstr.h>
-#include <boost/shared_array.hpp>
+#include <memory>
 #include <map>
 
 namespace Fv
 {
-    class FileBuffer: boost::noncopyable
+    class FileBuffer
     {
     public:
-        static const SizeType npos = 0xffffffffffffffff;
+        static SizeType constexpr npos{0xffffffffffffffff};
 
         FileBuffer();
         ~FileBuffer();
@@ -32,7 +32,7 @@ namespace Fv
         bool IsBinary() const;
 
     private:
-        typedef boost::shared_array<Byte> ByteArray;
+        typedef std::unique_ptr<Byte[]> ByteArray;
 
         struct DataBlock
         {

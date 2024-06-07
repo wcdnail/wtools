@@ -1,26 +1,27 @@
 #pragma once
 
+#include <wcdafx.api.h>
 #include <deque>
 #include <string>
-#include <boost/thread/mutex.hpp>
-#include <boost/noncopyable.hpp>
 #include <atlwin.h>
 #include <atlcrack.h>
 #include <atlgdi.h>
+#include <mutex>
 
 namespace Ui
 {
     class StatusBar: ATL::CWindowImpl<StatusBar, CWindow>
-                   , boost::noncopyable
     {
     private:
         DECLARE_WND_CLASS_EX(_T("[WCD]StatusBar"), CS_VREDRAW | CS_HREDRAW, COLOR_WINDOW-1)
 
     public:
+        DELETE_COPY_MOVE_OF(StatusBar);
+
         typedef ATL::CWindowImpl<StatusBar, CWindow> Super;
 
+        ~StatusBar() override;
         StatusBar();
-        ~StatusBar();
 
         using Super::ShowWindow;
         using Super::SubclassWindow;

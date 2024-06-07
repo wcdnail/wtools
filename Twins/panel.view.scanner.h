@@ -1,9 +1,9 @@
 #pragma once
 
 #include "panel.view.item.h"
+#include <wcdafx.api.h>
 #include <dir.manager.h>
 #include <settings.h>
-#include <boost/noncopyable.hpp>
 #include <cstdint>
 #include <thread>
 #include <memory>
@@ -15,8 +15,10 @@ namespace Twins
 {
     class FView;
 
-    struct FScanner: boost::noncopyable
+    struct FScanner
     {
+        DELETE_COPY_MOVE_OF(FScanner);
+
         using  Callback = std::function<void(double)>;
         using DataArray = std::unique_ptr<uint8_t[]>;
 

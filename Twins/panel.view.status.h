@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
 #include "strint.h"
 #include <atlctrls.h>
 
@@ -15,7 +14,7 @@ namespace Twins
     class SelectHelper;
     struct FScanner;
 
-    class ViewStatus: boost::noncopyable
+    class ViewStatus
     {
     public:
         typedef unsigned __int64 SizeType;

@@ -29,15 +29,15 @@ namespace Fv
     {
         BlockStore::const_iterator it = Blocks.find(index);
         if (it == Blocks.end()) {
-            ByteArray const bytes{new Byte[static_cast<size_t>(BlockSize)]};
+            ByteArray bytes{new Byte[static_cast<size_t>(BlockSize)]};
             memset(bytes.get(), 0, (size_t)BlockSize);
 
             DataBlock def;
-            def.bytes = bytes;
+            def.bytes.swap(bytes);
             def.size = 0;
 
             ReadBlock(index, def);
-            it = Blocks.insert(std::make_pair(index, def)).first;
+            it = Blocks.emplace(std::make_pair(index, std::move(def))).first;
         }
         return it->second.bytes;
     }

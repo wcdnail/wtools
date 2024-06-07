@@ -1,12 +1,11 @@
 #pragma once
 
 #include "panel.view.item.h"
-#include <boost/noncopyable.hpp>
 #include <vector>
 
 namespace Twins
 {
-    struct FSort: boost::noncopyable
+    struct FSort
     {
         typedef std::vector<int> IndexVector;
 

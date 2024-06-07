@@ -10,7 +10,6 @@
 #include "panel.view.status.h"
 #include "panel.view.dnd.h"
 #include <settings.h>
-#include <boost/noncopyable.hpp>
 #include <atltypes.h>
 #include <atlctrls.h>
 #include <atlgdi.h>
@@ -25,8 +24,7 @@ namespace Twins
                       | WS_EX_ACCEPTFILES
                       > PVTraits;
 
-    class PanelView: boost::noncopyable,
-                     ATL::CWindowImpl<PanelView, ATL::CWindow, PVTraits>,
+    class PanelView: ATL::CWindowImpl<PanelView, ATL::CWindow, PVTraits>,
                      WTL::CDialogResize<PanelView>
     {
         DECLARE_WND_CLASS_EX(_T("[Twins]PanelView"), CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS, COLOR_WINDOW)

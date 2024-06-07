@@ -1,28 +1,28 @@
 #pragma once
 
+#include <wcdafx.api.h>
 #include <reflection/ref.std.h>
 #include <wtl.combobox.h>
-#include <string>
-#include <vector>
-#include <boost/noncopyable.hpp>
-#include <boost/thread/mutex.hpp>
 #include <atltypes.h>
 #include <atlwin.h>
 #include <atlcrack.h>
 #include <atlctrls.h>
 #include <atlframe.h>
 #include <atlgdi.h>
+#include <mutex>
+#include <string>
+#include <vector>
 
 namespace Ui
 {
-
     class CommandLine: ATL::CWindowImpl<CommandLine>
-                     , boost::noncopyable
     {
     private:
         DECLARE_WND_CLASS_EX(_T("[WCD]CommandLine"), CS_VREDRAW | CS_HREDRAW, COLOR_WINDOW-1)
         
     public:
+        DELETE_COPY_MOVE_OF(CommandLine);
+
         typedef ATL::CWindowImpl<CommandLine> Super;
         typedef std::vector<std::wstring> HistoryStore;
         typedef Ref::Container<HistoryStore> RefHistoryStore;
@@ -32,8 +32,8 @@ namespace Ui
         CancelCallback OnCancel;
         RefHistoryStore History;
 
+        ~CommandLine() override;
         CommandLine(EnterCallback const& onEnter);
-        ~CommandLine();
 
         using Super::ShowWindow;
         using Super::SetFocus;
@@ -63,7 +63,6 @@ namespace Ui
         void OnDestroy();
         void OnSize(UINT type, CSize sz);
         void OnSetFocus(CWindow prev);
-        void OnCommand(UINT code, int id, CWindow control);
         LRESULT OnEndEditNotify(LPNMHDR nmh);
         LRESULT OnSelEndCancel(LPNMHDR nmh);
         void ToHistory(CString const& text);

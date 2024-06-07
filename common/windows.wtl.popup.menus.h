@@ -1,15 +1,17 @@
 #pragma once
 
+#include <wcdafx.api.h>
 #include <atlwin.h>
 #include <atltypes.h>
 #include <atluser.h>
-#include <boost/noncopyable.hpp>
 
 namespace CF
 {
-    class PopupMenu: boost::noncopyable
+    class PopupMenu
     {
     public:
+        DELETE_COPY_MOVE_OF(PopupMenu);
+
         PopupMenu();
         PopupMenu(int); // do nothing
         ~PopupMenu();

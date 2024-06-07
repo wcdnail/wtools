@@ -40,10 +40,11 @@ private:
     bool            m_bModalLoop;
     unsigned         m_nPosFlags;
     WTL::CFont           m_vFont;
+    ATL::CWindow     m_wndMaster;
     CRect             m_rcMaster;
 
     const WTL::_AtlDlgResizeMap* GetDlgResizeMap() const;
-    void PrepareRect(ATL::CWindow wndParent);
+    bool PrepareRect(ATL::CWindow wndParent);
     void DoInitTemplate();
     void DoInitControls();
     void OnColorUpdate(IColor const& clrSource) override;

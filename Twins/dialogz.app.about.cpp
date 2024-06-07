@@ -161,7 +161,6 @@ namespace Twins
         temp << "\r\n• " << info.Executable.Version.ProductName << " " << info.Executable.Version.ProductVersion << " " << info.TargetOs
              << "\r\n  ( " << info.Compiler
              << "\r\n  , " << info.CLib
-             << "\r\n  , BOOST " << info.BoostVersion
              << "\r\n  )"
              ;
 

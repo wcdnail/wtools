@@ -3,10 +3,10 @@
 /////////////////////////////////////////////////////////////////////
 // class to show shell contextmenu of files/folders/shell objects
 // developed by R. Engels 2003
-// adopted by M. Nikonov 2012.
+// adopted in 2012
 /////////////////////////////////////////////////////////////////////
 
-#include <boost/noncopyable.hpp>
+#include <wcdafx.api.h>
 #include <atlstr.h>
 #include <atluser.h>
 #include <atlcomcli.h>
@@ -21,9 +21,11 @@ namespace Twins
 {
     namespace ShellImpl
     {
-        class ContextMenu: boost::noncopyable
+        class ContextMenu
         {
         public:
+            DELETE_COPY_MOVE_OF(ContextMenu);
+
             ContextMenu();
             ~ContextMenu();
 

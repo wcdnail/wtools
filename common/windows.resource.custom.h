@@ -1,15 +1,17 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
+#include <wcdafx.api.h>
 #include <wtypes.h>
 #include <atlstr.h>
 #include <atlapp.h>
 
 namespace Res
 {
-    class Custom: boost::noncopyable
+    class Custom
     {
     public:
+        DELETE_COPY_MOVE_OF(Custom);
+
         Custom();
         Custom(PCTSTR name, PCTSTR type, HMODULE module = ModuleHelper::GetResourceInstance());
         ~Custom();

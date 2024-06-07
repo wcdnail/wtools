@@ -8,15 +8,16 @@
 #include "file.viewer.h"
 #include "command.line.h"
 #include "dialogz.find.h"
+#include <wcdafx.api.h>
 #include <settings.h>
 #include <history.deque.h>
 #include <shell.imagelist.h>
-#include <boost/noncopyable.hpp>
 #include <atlstr.h>
 #include <atluser.h>
 #include <atlwin.h>
 #include <string>
 #include <memory>
+
 
 namespace Obsolete
 {
@@ -28,9 +29,11 @@ namespace Obsolete
     class PanelView;
     class AppConfigDialog;
 
-    class AppState: boost::noncopyable
+    class AppState
     {
     public:
+        DELETE_COPY_MOVE_OF(AppState);
+
         AppState(MainFrame& mainFrame);
         ~AppState();
 

@@ -1,11 +1,10 @@
 #include "stdafx.h"
 #include "runtime.information.h"
 #include "dh.tracing.h"
+#include "dh.tracing.defs.h"
 #include "win32.registry.h"
 #include "string.utils.error.code.h"
 #include "string.utils.env.vars.h"
-#include <boost/config.hpp>
-#include <boost/version.hpp>
 #include <filesystem>
 #include <cstdint>
 #include <cstring>
@@ -27,22 +26,29 @@
 #  endif // (_OS_DISPNAME_LEGACY)
 #endif // _WIN32
 
-#define _MKWIDE_(S)  L#S
-#define _MK_WIDE(S) _MKWIDE_(S)
+#ifdef _MSC_VER
+#  define CF_COMPILER L"msvc v" DH_WSTRINGIZE(_MSC_VER)
+#  define CF_STDLIB   L"c++ v" DH_WSTRINGIZE(_MSVC_LANG)
+#else
+#  define CF_COMPILER L"compiler unknown"
+#  define CF_STDLIB   L"c++ v" DH_WSTRINGIZE(__cplusplus)
+#endif // _MSC_VER
+
+#ifdef _WIN32
+#  ifdef _WIN64
+#    define CF_PLATFORM L"win32 x64 " DH_WSTRINGIZE(_WIN32_WINNT)
+#  else
+#    define CF_PLATFORM L"win32 " DH_WSTRINGIZE(_WIN32_WINNT)
+#  endif
+#else
+#  define CF_PLATFORM L"platform unknown"
+#endif // _WIN32
 
 namespace Runtime
 {
-    wchar_t const* InfoStore::Compiler      = _MK_WIDE(BOOST_COMPILER);
-    wchar_t const* InfoStore::CLib          = _MK_WIDE(BOOST_STDLIB);
-    wchar_t const* InfoStore::BoostVersion  = _MK_WIDE(BOOST_LIB_VERSION);
-    wchar_t const* InfoStore::TargetOs      = _MK_WIDE(BOOST_PLATFORM)
-#ifdef _WIN32
-#  ifdef _WIN64
-        L" x64"
-#  endif
-        L" " _MK_WIDE(BOOST_STRINGIZE(_WIN32_WINNT))
-#endif
-        ;
+    PCWSTR InfoStore::Compiler      {CF_COMPILER};
+    PCWSTR InfoStore::CLib          {CF_STDLIB};
+    PCWSTR InfoStore::TargetOs      {CF_PLATFORM};
 
 #ifdef _WIN32
     namespace
@@ -369,25 +375,24 @@ namespace Runtime
     void InfoStore::SimpleReport(OStream& stream) const
     {
         stream 
-         << L"Compiler                            : " << Compiler << L"\n"
-            L"C library                           : " << CLib << L"\n"
-            L"Boost version                       : " << BoostVersion << L"\n"
-            L"Target os                           : " << TargetOs << L"\n"
-            L"System endian                       : " << System.GetEndianString() << L"\n"
-            L"System cpu info                     : " << System.CpuType << " x" << System.CpuNum << L"\n"
-            L"System page size                    : " << System.PageSize << L"\n"
-            L"System allocation granularity       : " << System.AllocationGranularity << L"\n"
-            L"System name                         : " << System.Version.DisplayName.c_str() << L"\n"
-            L"System version                      : " << System.Version.Major << "." << System.Version.Minor << L"\n"
-            L"System root                         : " << System.RootDirectory.c_str() << L"\n"
-            L"Home directory                      : " << System.HomeDirectory.c_str() << L"\n"
-            L"Executable directory                : " << Executable.Directory.c_str() << L"\n"
-            L"Executable name                     : " << Executable.Filename.c_str() << L"\n"
-            L"Executable product name             : " << Executable.Version.ProductName.c_str() << L"\n"
-            L"Executable version                  : " << Executable.Version.ProductVersion.c_str() << L"\n"
-            L"Executable special build            : " << Executable.Version.SpecialBuild.c_str() << L"\n"
-            L"Host name                           : " << Host.Name.c_str() << L"\n"
-            L"User name                           : " << User.Name.c_str() << L"\n"
+         << L"Compiler                              : " << Compiler << L"\n"
+            L"C library                             : " << CLib << L"\n"
+            L"Target os                             : " << TargetOs << L"\n"
+            L"System endian                         : " << System.GetEndianString() << L"\n"
+            L"System cpu info                       : " << System.CpuType << " x" << System.CpuNum << L"\n"
+            L"System page size                      : " << System.PageSize << L"\n"
+            L"System allocation granularity         : " << System.AllocationGranularity << L"\n"
+            L"System name                           : " << System.Version.DisplayName.c_str() << L"\n"
+            L"System version                        : " << System.Version.Major << "." << System.Version.Minor << L"\n"
+            L"System root                           : " << System.RootDirectory.c_str() << L"\n"
+            L"Home directory                        : " << System.HomeDirectory.c_str() << L"\n"
+            L"Executable directory                  : " << Executable.Directory.c_str() << L"\n"
+            L"Executable name                       : " << Executable.Filename.c_str() << L"\n"
+            L"Executable product name               : " << Executable.Version.ProductName.c_str() << L"\n"
+            L"Executable version                    : " << Executable.Version.ProductVersion.c_str() << L"\n"
+            L"Executable special build              : " << Executable.Version.SpecialBuild.c_str() << L"\n"
+            L"Host name                             : " << Host.Name.c_str() << L"\n"
+            L"User name                             : " << User.Name.c_str() << L"\n"
          ;
     }
 
@@ -550,11 +555,11 @@ namespace Runtime
     {
 #ifdef _WIN32
         SYSTEM_INFO si{0};
-#if _WIN32_WINNT >= 0x0501
-        GetNativeSystemInfo(&si);
-#else
+//#if _WIN32_WINNT >= 0x0501
+//        GetNativeSystemInfo(&si);
+//#else
         GetSystemInfo(&si);
-#endif // _WIN32_WINNT >= 0x0501
+//#endif // _WIN32_WINNT >= 0x0501
 
         this->CpuType = si.dwProcessorType;
         this->CpuNum = si.dwNumberOfProcessors;

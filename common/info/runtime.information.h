@@ -115,10 +115,9 @@ namespace Runtime
             ~UserInfo();
         };
 
-        static WCDAFX_API wchar_t const* Compiler;
-        static WCDAFX_API wchar_t const* CLib;
-        static WCDAFX_API wchar_t const* BoostVersion;
-        static WCDAFX_API wchar_t const* TargetOs;
+        static WCDAFX_API PCWSTR Compiler;
+        static WCDAFX_API PCWSTR CLib;
+        static WCDAFX_API PCWSTR TargetOs;
 
         SystemInfo System;
         ExecutableInfo Executable;

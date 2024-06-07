@@ -2,12 +2,11 @@
 
 #include "drive.enum.h"
 #include "tab.bar.h"
-#include <boost/noncopyable.hpp>
+#include "res/resource.h"
 #include <atlapp.h>
 #include <atlframe.h>
 #include <atlcrack.h>
 #include <atluser.h>
-#include "res/resource.h"
 
 namespace Twins
 {
@@ -32,8 +31,8 @@ namespace Twins
         typedef CDialogResize<MainFrame> SuperResizer;
         typedef CUpdateUI<MainFrame> SuperUiUpdater;
 
+        ~MainFrame() override;
         MainFrame();
-        virtual ~MainFrame();
 
         using Super::CreateEx;
         using Super::UpdateWindow;
@@ -46,9 +45,9 @@ namespace Twins
         {
         public:
             typedef CSplitterWindowImpl<SplitterCtrl> Super;
-            
+
+            ~SplitterCtrl() override;
             SplitterCtrl();
-            ~SplitterCtrl();
 
             BOOL OnEraseBkgnd(CDCHandle);
             void DrawSplitterBar(CDCHandle dc);
@@ -69,7 +68,7 @@ namespace Twins
         TabBar ToolBar;
         TabBar ButtonBar;
 
-        virtual BOOL PreTranslateMessage(MSG*);
+        BOOL PreTranslateMessage(MSG*) override;
         int OnCreate(LPCREATESTRUCT);
         void OnDestroy();
         BOOL OnEraseBkgnd(CDCHandle dc);
@@ -78,7 +77,7 @@ namespace Twins
         void OnKeyDown(UINT code, UINT rep, UINT flags);
         void OnCommand(UINT code, int id, CWindow);
         void SetupMenu();
-        virtual BOOL OnIdle();
+        BOOL OnIdle() override;
         int OnButtonCommand(TabBar& buttons, int id, PCTSTR text);
 
         BEGIN_MSG_MAP_EX(MainFrame)

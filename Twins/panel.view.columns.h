@@ -2,8 +2,8 @@
 
 #include "file.list.h"
 #include "panel.view.item.h"
+#include <wcdafx.api.h>
 #include <reflection/ref.std.h>
-#include <boost/noncopyable.hpp>
 #include <vector>
 #include <string>
 #include <atltypes.h>
@@ -15,9 +15,11 @@ namespace Twins
     class PanelHeader;
     struct FSort;
 
-    class PanelColumns: boost::noncopyable
+    class PanelColumns
     {
     public:
+        DELETE_COPY_MOVE_OF(PanelColumns);
+
         typedef std::vector<int> UserColumns;
         typedef Ref::Container<UserColumns> RefUserColumns;
 

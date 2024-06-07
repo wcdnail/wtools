@@ -1,12 +1,9 @@
 #include "stdafx.h"
 #include "file.entry.h"
 #include <dh.tracing.h>
-#include <boost/regex_fwd.hpp>
-#include <boost/regex.hpp>
-#include <boost/filesystem/operations.hpp>
-#ifdef _WIN32
+#include <regex>
+#include <filesystem>
 #include <shlwapi.h>
-#endif 
 
 namespace Twins 
 { 
@@ -207,9 +204,9 @@ namespace Fl
 
     bool Entry::IsRxMatch(std::wstring const& regexp, bool ignoreCase) const
     {
-        boost::wregex rex(regexp, (ignoreCase ? boost::wregex::icase : boost::wregex::normal));
-        boost::wcmatch m;
-        if (boost::regex_match(Filename.c_str(), m, rex))
+        std::wregex const rex{regexp, (ignoreCase ? std::wregex::icase : std::wregex::basic)};
+        std::wcmatch m;
+        if (std::regex_match(Filename.c_str(), m, rex))
             return true;
 
         return false;

@@ -1,14 +1,14 @@
 #pragma once
 
 #include "panel.h"
-#include "dh.tracing.h"
 #include "extern.item.h"
 #include "command.line.h"
 #include "twins.main.frame.h"
-#include "windows.gui.leaks.h"
+#include <wcdafx.api.h>
+#include <dh.tracing.h>
+#include <windows.gui.leaks.h>
 #include <shell.imagelist.h>
 #include <settings.h>
-#include <boost/noncopyable.hpp>
 
 namespace Twins
 {
@@ -16,8 +16,10 @@ namespace Twins
 
     Application& App();
 
-    struct Application: boost::noncopyable
+    struct Application
     {
+        DELETE_COPY_MOVE_OF(Application);
+
         using ScopedTLPtr = std::unique_ptr<DH::ScopedThreadLog>;
         using GuiLeaksPtr = std::unique_ptr<CF::GUILeaks>;
 
@@ -40,8 +42,8 @@ namespace Twins
         MainFrame             AppFrame;
         Ui::CommandLine    Commandline;
         int              ActivePanelId;
-        Panel                   Panels[2];
-        int                ButtonBarId[8];
+        Panel                Panels[2];
+        int             ButtonBarId[8];
 
         HRESULT Run(HINSTANCE baseAddress, int showCmd);
         bool RunSome(CString const& rawLine);

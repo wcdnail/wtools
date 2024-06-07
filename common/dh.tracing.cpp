@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "dh.tracing.h"
+#include "dh.tracing.defs.h"
 #include "dh.timer.h"
 #include "string.utils.format.h"
 #include "info/runtime.information.h"
@@ -253,12 +254,12 @@ namespace DH
         if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT)) {
             OutputDebugStringA(sLine.GetString());
         }
+        if (LogCtx::instance().isBitSet(LOG_ENABLED)) {
+            LogCtx::instance().puts(std::move(sLine));
+        }
         if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT)) {
             sLine = sTID + sCategory + sText;
             DH::DebugConsole::Instance().PutsNarrow({sLine.GetString(), static_cast<size_t>(sLine.GetLength())});
-        }
-        if (LogCtx::instance().isBitSet(LOG_ENABLED)) {
-            LogCtx::instance().puts(std::move(sLine));
         }
     }
 
@@ -272,20 +273,16 @@ namespace DH
         if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT)) {
             OutputDebugStringW(sLine.GetString());
         }
+        if (LogCtx::instance().isBitSet(LOG_ENABLED)) {
+            LogCtx::instance().putws(std::move(sLine));
+        }
         if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT)) {
             sLine = sTID + sCategory + sText;
             DH::DebugConsole::Instance().PutsWide({sLine.GetString(), static_cast<size_t>(sLine.GetLength())});
         }
-        if (LogCtx::instance().isBitSet(LOG_ENABLED)) {
-            LogCtx::instance().putws(std::move(sLine));
-        }
     }
 
     #define TRACE_LEVEL_LEN         16
-    #define TRACE__STRINGIZE(V)     #V
-    #define TRACE_STRINGIZE(V)      TRACE__STRINGIZE(V)
-    #define TRACE__WSTRINGIZE(V)    L#V
-    #define TRACE_WSTRINGIZE(V)     TRACE__WSTRINGIZE(V)
 
     template <typename Char>
     struct TTTraits {};
@@ -294,7 +291,7 @@ namespace DH
     {
         static inline const PCSTR  FmtTS{"%0*.8f "};
         static inline const PCSTR FmtTID{"[%06d] "};
-        static inline const PCSTR FmtCat{"%-" TRACE_STRINGIZE(TRACE_LEVEL_LEN) "s "};
+        static inline const PCSTR FmtCat{"%-" DH_STRINGIZE(TRACE_LEVEL_LEN) "s "};
 
         static BOOL StrTruncate(char* szBuffer, UINT nLen, std::string_view svText, DWORD dwFlags)
         {
@@ -306,7 +303,7 @@ namespace DH
     {
         static inline const PCWSTR  FmtTS{L"%0*.8f "};
         static inline const PCWSTR FmtTID{L"[%06d] "};
-        static inline const PCWSTR FmtCat{L"%-" TRACE_WSTRINGIZE(TRACE_LEVEL_LEN) L"s "};
+        static inline const PCWSTR FmtCat{L"%-" DH_WSTRINGIZE(TRACE_LEVEL_LEN) L"s "};
 
         static BOOL StrTruncate(wchar_t* szBuffer, UINT nLen, std::wstring_view svText, DWORD dwFlags)
         {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
-#include <boost/system/error_code.hpp>
+#include <filesystem>
+#include <system_error>
 
 namespace Fl
 {
@@ -9,19 +9,11 @@ namespace Fl
     class List;
 }
 
-namespace boost
-{
-    namespace filesystem
-    {
-        class path;
-    }
-}
-
 namespace Twins
 {
     class PromptDialog;
     
-    namespace Sy = boost::system;
+    namespace Sy = std;
     namespace Fs = std::filesystem;
 
     typedef Sy::error_code OperationResult;
