@@ -12,7 +12,7 @@ struct CColorPickerDlg: private WTL::CIndirectDialogImpl<CColorPickerDlg>,
                         private WTL::CThemeImpl<CColorPickerDlg>,
                         private WTL::CBufferedPaintImpl<CColorPickerDlg>,
                         private WTL::CMessageFilter,
-                        private IColorObserver
+                        public  IColorObserver
 {
     using WndSuper = WTL::CIndirectDialogImpl<CColorPickerDlg>;
 

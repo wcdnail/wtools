@@ -24,6 +24,7 @@ namespace DH
 
     public:
         static constexpr DWORD dwCurrentPID{static_cast<DWORD>(-1)};
+        static constexpr DWORD dwCurrentTID{static_cast<DWORD>(-1)};
 
         enum { WM_SYNC_STRINGS = WM_USER + 1 };
 
@@ -38,14 +39,16 @@ namespace DH
 
         struct StringItem
         {
+            unsigned  level_;
             StringPair pair_;
+            DWORD       tid_;
             DWORD       pid_;
             double       ts_;
 
             ~StringItem();
-            StringItem(StringPair&& pair, DWORD dwPID);
-            StringItem(std::string_view nrView, DWORD dwPID);
-            StringItem(std::wstring_view wdView, DWORD dwPID);
+            StringItem(unsigned level, StringPair&& pair, DWORD dwTID, DWORD dwPID);
+            StringItem(unsigned level, std::string_view nrView, DWORD dwTID, DWORD dwPID);
+            StringItem(unsigned level, std::wstring_view wdView, DWORD dwTID, DWORD dwPID);
 
             std::wstring GetText() const;
         };
@@ -78,10 +81,10 @@ namespace DH
         Parameters& GetParameters();
         void SetParameters(int cx, int cy, int align, int fsize, char const* fname);
 
-        void PutsNarrow(std::string_view nrView, DWORD dwPID);
-        void PutsWide(std::wstring_view wdView, DWORD dwPID);
-        void FormatVNarrow(DWORD dwPID, std::string_view nrFormat, va_list vaList);
-        void FormatVWide(DWORD dwPID, std::wstring_view nrFormat, va_list vaList);
+        void PutsNarrow(unsigned nLevel, std::string_view nrView, DWORD dwTID, DWORD dwPID);
+        void PutsWide(unsigned nLevel, std::wstring_view wdView, DWORD dwTID, DWORD dwPID);
+        void FormatVNarrow(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::string_view nrFormat, va_list vaList);
+        void FormatVWide(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::wstring_view nrFormat, va_list vaList);
         StringQue const& GetCache() const;
         virtual void Clean() const;
 
@@ -123,8 +126,8 @@ namespace DH
         virtual HWND CreateConsole() = 0;
 
         virtual void PreWrite() = 0;
-        virtual void WriteNarrow(std::string&, double, DWORD) = 0;
-        virtual void WriteWide(std::wstring&, double, DWORD) = 0;
+        virtual void WriteNarrow(StringItem& siItem) = 0;
+        virtual void WriteWide(StringItem& siItem) = 0;
         virtual void PostWrite();
 
         virtual void OnCommand(UINT notifyCode, int id, HWND);

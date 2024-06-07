@@ -230,7 +230,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
         CenterWindow();
 
-        m_crCell1.AddObserver(m_cpDlg.GetMasterObserver());
+        m_crCell1.AddObserver(m_cpDlg);
         m_crCell1.AddObserver(m_btnMyColor1);
         m_crCell1.AddObserver(m_btnMyColor2);
         m_crCell1.AddObserver(m_btnMyColor3);

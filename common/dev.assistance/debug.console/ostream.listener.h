@@ -63,7 +63,7 @@ namespace DH
     template <class CT, class CHTraits>
     inline std::streamsize std_ostream_listener<CT, CHTraits>::xsputn(CT const* string, std::streamsize len)
     {
-        console_.Puts<CT>(std::basic_string_view<CT>{string, static_cast<size_t>(len)});
+        console_.Puts<CT>(0, std::basic_string_view<CT>{string, static_cast<size_t>(len)});
         return len;
     }
 
@@ -71,7 +71,7 @@ namespace DH
     inline typename std_ostream_listener<CT, CHTraits>::int_type std_ostream_listener<CT, CHTraits>::overflow(int_type v)
     {
         CT const ch[2] = { static_cast<CT>(v), 0 };
-        console_.Puts<CT>(std::basic_string_view<CT>{ch, static_cast<size_t>(1)});
+        console_.Puts<CT>(0, std::basic_string_view<CT>{ch, static_cast<size_t>(1)});
         return v;
     }
 }

@@ -1,14 +1,13 @@
 #include "stdafx.h"
 #include "CColorPickerDlg.h"
 #include "CAppModuleRef.h"
+#include "IColor.h"
 #include <string.utils.error.code.h>
 #include <dh.tracing.defs.h>
 #include <dh.tracing.h>
 
 #define _NEED_WMESSAGE_DUMP 1
 #include <debug.dump.msg.h>
-
-#include "IColor.h"
 
 CColorPickerDlg::~CColorPickerDlg() = default;
 
@@ -145,7 +144,7 @@ const WTL::_AtlDlgResizeMap* CColorPickerDlg::GetDlgResizeMap() const
 
 void CColorPickerDlg::OnColorUpdate(IColor const& clrSource)
 {
-    UNREFERENCED_PARAMETER(clrSource);
+    m_ColorPicker.SetColor(clrSource.GetColorRef(), clrSource.GetAlpha(), false, false);
     GetDlgItem(IDC_DRAGBAR).InvalidateRect(nullptr, FALSE);
 }
 

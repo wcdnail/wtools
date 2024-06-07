@@ -15,6 +15,8 @@ namespace
         DCCI_Num = 0,
         DCCI_TS,
         DCCI_PID,
+        DCCI_TID,
+        DCCI_Level,
         DCCI_Text,
         DCCI_COUNT
     };
@@ -72,20 +74,31 @@ namespace DH
         static TCHAR hdrText0[]{_T("#")};
         static TCHAR hdrText1[]{_T("TS")};
         static TCHAR hdrText2[]{_T("PID")};
-        static TCHAR hdrText3[]{_T("Debug")};
+        static TCHAR hdrText3[]{_T("TID")};
+        static TCHAR hdrText4[]{_T("Level")};
+        static TCHAR hdrText5[]{_T("...")};
         static ColumnItem colItems[DCCI_COUNT]{
             { 32, hdrText0, _countof(hdrText0)},
             {128, hdrText1, _countof(hdrText1)},
             { 64, hdrText2, _countof(hdrText1)},
-            {512, hdrText3, _countof(hdrText2)}
+            { 64, hdrText3, _countof(hdrText2)},
+            { 96, hdrText4, _countof(hdrText2)},
+            {512, hdrText5, _countof(hdrText2)}
         };
         int const nCCX{rc.Width()};
         int constexpr nScrollSpace{32};
         colItems[DCCI_Num].nWidth = nCCX / 16;
-        colItems[DCCI_TS].nWidth = nCCX / 8;
+        colItems[DCCI_TS].nWidth = nCCX / 9;
         colItems[DCCI_PID].nWidth = nCCX / 12;
-        colItems[DCCI_Text].nWidth = nCCX - 
-            (colItems[DCCI_Num].nWidth + colItems[DCCI_TS].nWidth + colItems[DCCI_PID].nWidth + nScrollSpace);
+        colItems[DCCI_TID].nWidth = nCCX / 12;
+        colItems[DCCI_Level].nWidth = nCCX / 10;
+        colItems[DCCI_Text].nWidth = nCCX -
+            (colItems[DCCI_Num].nWidth +
+             colItems[DCCI_TS].nWidth +
+             colItems[DCCI_PID].nWidth +
+             colItems[DCCI_TID].nWidth +
+             colItems[DCCI_Level].nWidth +
+             nScrollSpace);
 
         LVCOLUMNW lvColumn{0};
         for (int i = 0; i < DCCI_COUNT; i++) {
@@ -155,7 +168,7 @@ namespace DH
         sMessage.Format(L"%s failed: 0x%08x %s\r\n", sFunc.GetString(), hCode,
             Str::ErrorCode<>::SystemMessage(hCode).GetString());
         if (console_) {
-            PutsWide(sMessage.GetString(), dwCurrentPID);
+            PutsWide(TL_Error, sMessage.GetString(), dwCurrentTID, dwCurrentPID);
         }
         else {
             DH::TPrintf(TL_Error, L"%s", sMessage.GetString());
@@ -225,11 +238,16 @@ namespace DH
     static bool InsertLVItem(WTL::CListViewCtrl&  ctlConsole,
                              int                        nPos,
                              String<Char>&&             sNum,
+                             unsigned                 nLevel,
                              String<Char>&             sTime,
+                             String<Char>&              sTID,
                              String<Char>&              sPID,
                              String<Char>&             sText)
     {
         using ItemStruct = typename ListViewItemTraits<Char>::ItemStruct;
+
+        String<Char> sLevel{};
+        DH::StrTraceLevel(nLevel, sLevel);
 
         ItemStruct lvItem{0};
         lvItem.mask = LVIF_TEXT;
@@ -249,6 +267,18 @@ namespace DH
         lvItem.cchTextMax = static_cast<int>(sPID.length()) + 1;
         lvItem.pszText = sPID.data();
         lvItem.iSubItem = DCCI_PID;
+        if (-1 == ListViewItemTraits<Char>::SetItem(ctlConsole, lvItem)) {
+            return false;
+        }
+        lvItem.cchTextMax = static_cast<int>(sTID.length()) + 1;
+        lvItem.pszText = sTID.data();
+        lvItem.iSubItem = DCCI_TID;
+        if (-1 == ListViewItemTraits<Char>::SetItem(ctlConsole, lvItem)) {
+            return false;
+        }
+        lvItem.cchTextMax = static_cast<int>(sLevel.length()) + 1;
+        lvItem.pszText = sLevel.data();
+        lvItem.iSubItem = DCCI_Level;
         if (-1 == ListViewItemTraits<Char>::SetItem(ctlConsole, lvItem)) {
             return false;
         }
@@ -273,26 +303,34 @@ namespace DH
         return result;
     }
 
-    void DCListViewImpl::WriteNarrow(std::string& nrString, double dTs, DWORD dwPID)
+    void DCListViewImpl::WriteNarrow(StringItem& siItem)
     {
+        if (siItem.level_ & TL_NoDCOutput) {
+            return ;
+        }
         int  nPos{console_.GetItemCount()};
-        auto  sTS{std::to_string(dTs)};
-        auto sPID{std::to_string(dwPID)};
-        auto sVec{SplitByLines<char>(nrString)};
+        auto  sTS{std::to_string(siItem.ts_)};
+        auto sTID{std::to_string(siItem.tid_)};
+        auto sPID{std::to_string(siItem.pid_)};
+        auto sVec{SplitByLines<char>(siItem.pair_.first)};
         for (auto& it: sVec) {
-            InsertLVItem<char>(console_, nPos, std::to_string(nPos), sTS, sPID, it);
+            InsertLVItem<char>(console_, nPos, std::to_string(nPos), siItem.level_, sTS, sTID, sPID, it);
             ++nPos;
         }
     }
 
-    void DCListViewImpl::WriteWide(std::wstring& wdString, double dTs, DWORD dwPID)
+    void DCListViewImpl::WriteWide(StringItem& siItem)
     {
+        if (siItem.level_ & TL_NoDCOutput) {
+            return ;
+        }
         int  nPos{console_.GetItemCount()};
-        auto  sTS{std::to_wstring(dTs)};
-        auto sPID{std::to_wstring(dwPID)};
-        auto sVec{SplitByLines<wchar_t>(wdString)};
+        auto  sTS{std::to_wstring(siItem.ts_)};
+        auto sTID{std::to_wstring(siItem.tid_)};
+        auto sPID{std::to_wstring(siItem.pid_)};
+        auto sVec{SplitByLines<wchar_t>(siItem.pair_.second)};
         for (auto& it: sVec) {
-            InsertLVItem<wchar_t>(console_, nPos, std::to_wstring(nPos), sTS, sPID, it);
+            InsertLVItem<wchar_t>(console_, nPos, std::to_wstring(nPos), siItem.level_, sTS, sTID, sPID, it);
             ++nPos;
         }
     }

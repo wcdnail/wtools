@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "debug.output.listener.h"
 #include "debug.console.h"
+#include <dh.trace.level.h>
 #include <string.utils.error.code.h>
 #include <aclapi.h>
 #include <sddl.h>
@@ -11,6 +12,7 @@ namespace DH
     using HandlePtr = std::shared_ptr<void>;
 
     static constexpr DWORD dwCurrentPID{static_cast<DWORD>(-1)};
+    static constexpr DWORD dwCurrentTID{static_cast<DWORD>(-1)};
 
 #if 0
     static HandlePtr CreateSecurityDesc(DebugConsole const& rMaster, SECURITY_ATTRIBUTES& secAttrs)
@@ -44,12 +46,12 @@ namespace DH
         secAttrs.nLength = sizeof(secAttrs);
         secAttrs.lpSecurityDescriptor = pSD;
         secAttrs.bInheritHandle = TRUE;
-        rMaster.FormatWide(dwCurrentPID, L"%s OK\n", __FUNCTIONW__);
+        rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"%s OK\n", __FUNCTIONW__);
         return HandlePtr{pSD, LocalFree};
 
     reportError:
         auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
-        rMaster.FormatWide(dwCurrentPID, L"ERROR: %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
+        rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"ERROR: %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
         return {};
     }
 
@@ -72,11 +74,11 @@ namespace DH
         }
         if (!hMutex) {
             auto const hCode = static_cast<HRESULT>(GetLastError());
-            rMaster.FormatWide(dwCurrentPID, L"ERROR: CreateDbgMutex['%s'] failed: 0x%08x %s\n", sTemp.GetString(),
+            rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"ERROR: CreateDbgMutex['%s'] failed: 0x%08x %s\n", sTemp.GetString(),
                 hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
             return {};
         }
-        rMaster.FormatWide(dwCurrentPID, L"%s['%s'] OK\n", __FUNCTIONW__, sTemp.GetString());
+        rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"%s['%s'] OK\n", __FUNCTIONW__, sTemp.GetString());
         return HandlePtr{hMutex, CloseHandle};
     }
 #endif
@@ -94,11 +96,11 @@ namespace DH
         }
         if (!mappingRaw) {
             hCode = static_cast<HRESULT>(GetLastError());
-            rMaster.FormatWide(dwCurrentPID, L"ERROR: CreateFileMapping['%s'] failed: 0x%08x %s\n", sTemp.GetString(),
+            rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"ERROR: CreateFileMapping['%s'] failed: 0x%08x %s\n", sTemp.GetString(),
                 hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
             return {};
         }
-        rMaster.FormatWide(dwCurrentPID, L"%s['%s'] OK\n", __FUNCTIONW__, sTemp.GetString());
+        rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"%s['%s'] OK\n", __FUNCTIONW__, sTemp.GetString());
         return HandlePtr{mappingRaw, CloseHandle};
     }
 
@@ -107,11 +109,11 @@ namespace DH
         HANDLE const hMemory{MapViewOfFile(hMapped, PAGE_READONLY, 0, 0, dwSize)};
         if (!hMemory) {
             auto const hCode = static_cast<HRESULT>(GetLastError());
-            rMaster.FormatWide(dwCurrentPID, L"ERROR: MapViewOfFile failed: 0x%08x %s\n",
+            rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"ERROR: MapViewOfFile failed: 0x%08x %s\n",
                 hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
             return {};
         }
-        rMaster.FormatWide(dwCurrentPID, L"%s OK\n", __FUNCTIONW__);
+        rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"%s OK\n", __FUNCTIONW__);
         return HandlePtr{hMemory, UnmapViewOfFile};
     }
 
@@ -127,11 +129,11 @@ namespace DH
         HANDLE const hEvent{CreateEventW(pSecurity, static_cast<BOOL>(bManualReset), static_cast<BOOL>(bInitial), sTemp.GetString())};
         if (!hEvent) {
             auto const hCode = static_cast<HRESULT>(GetLastError());
-            rMaster.FormatWide(dwCurrentPID, L"ERROR: CreateEvent failed: 0x%08x %s\n",
+            rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"ERROR: CreateEvent failed: 0x%08x %s\n",
                 hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
             return {};
         }
-        rMaster.FormatWide(dwCurrentPID, L"%s['%s'][%d, %d] OK\n", __FUNCTIONW__, sTemp.GetString(), bManualReset, bInitial);
+        rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"%s['%s'][%d, %d] OK\n", __FUNCTIONW__, sTemp.GetString(), bManualReset, bInitial);
         return HandlePtr{hEvent, CloseHandle};
     }
 
@@ -180,11 +182,11 @@ namespace DH
             goto reportError;
         }
 
-        rMaster.FormatWide(dwCurrentPID, L"%s OK\n", __FUNCTIONW__);
+        rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"%s OK\n", __FUNCTIONW__);
         return ;
     reportError:
         auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
-        rMaster.FormatWide(dwCurrentPID, L"ERROR: %s[%s] failed: 0x%08x %s\n", __FUNCTIONW__,
+        rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"ERROR: %s[%s] failed: 0x%08x %s\n", __FUNCTIONW__,
             sFunc.GetString(), hCode, sMessage.GetString());
     }
 
@@ -192,11 +194,11 @@ namespace DH
     {
         DWORD const dwCode{SetSecurityInfo(hObject, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, nullptr, nullptr)};
         if (ERROR_SUCCESS != dwCode) {
-            rMaster.FormatWide(dwCurrentPID, L"ERROR: %s[SetSecurityInfo[%p]] failed: 0x%08x %s\n", __FUNCTIONW__, hObject,
+            rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"ERROR: %s[SetSecurityInfo[%p]] failed: 0x%08x %s\n", __FUNCTIONW__, hObject,
                 dwCode, Str::ErrorCode<>::SystemMessage(dwCode).GetString());
         }
         else {
-            rMaster.FormatWide(dwCurrentPID, L"%s[%p] OK\n", __FUNCTIONW__, hObject);
+            rMaster.FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"%s[%p] OK\n", __FUNCTIONW__, hObject);
         }
     }
 
@@ -257,7 +259,7 @@ namespace DH
     bool DebugOutputListener::Start(PCWSTR pszWindowName, bool bGlobal)
     {
         if (IsDebuggerPresent()) {
-            master_.PutsWide(L"WARNING: IsDebuggerPresent == TRUE\n");
+            master_.PutsWide(TL_Warning, L"IsDebuggerPresent == TRUE\n");
         }
         if (thrdListener_.joinable()) {
             return true;
@@ -295,7 +297,7 @@ namespace DH
                 return ;
             case WAIT_OBJECT_0+1: {
                 auto const* pData = static_cast<DataBuffer const*>(shmemPtr_.get());
-                master_.PutsNarrow(pData->szText, pData->dwPid);
+                master_.PutsNarrow(TL_DebugOut, pData->szText, dwCurrentTID, pData->dwPid);
                 ResetEvent(dataReady_.get());
                 ResetEvent(buffReady_.get());
                 break;

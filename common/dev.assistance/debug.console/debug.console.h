@@ -14,6 +14,7 @@ namespace DH
         using HandlePtr = std::shared_ptr<void>;
 
         static constexpr DWORD dwCurrentPID{static_cast<DWORD>(-1)};
+        static constexpr DWORD dwCurrentTID{static_cast<DWORD>(-1)};
 
         DELETE_COPY_MOVE_OF(DebugConsole);
 
@@ -36,12 +37,12 @@ namespace DH
         WCDAFX_API void SetTitleText(char const*) const;
         WCDAFX_API void SetTitleText(wchar_t const*) const;
 
-        WCDAFX_API void PutsNarrow(std::string_view, DWORD dwPID = dwCurrentPID) const;
-        WCDAFX_API void PutsWide(std::wstring_view, DWORD dwPID = dwCurrentPID) const;
-        WCDAFX_API void FormatVNarrow(DWORD dwPID, std::string_view nrFormat, va_list vaList) const;
-        WCDAFX_API void FormatVWide(DWORD dwPID, std::wstring_view wdFormat, va_list vaList) const;
-        WCDAFX_API void FormatNarrow(DWORD dwPID, std::string_view nrFormat, ...) const;
-        WCDAFX_API void FormatWide(DWORD dwPID, std::wstring_view wdFormat, ...) const;
+        WCDAFX_API void PutsNarrow(unsigned nLevel, std::string_view nrString, DWORD dwTID = dwCurrentTID, DWORD dwPID = dwCurrentPID) const;
+        WCDAFX_API void PutsWide(unsigned nLevel, std::wstring_view wdString, DWORD dwTID = dwCurrentTID, DWORD dwPID = dwCurrentPID) const;
+        WCDAFX_API void FormatVNarrow(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::string_view nrFormat, va_list vaList) const;
+        WCDAFX_API void FormatVWide(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::wstring_view wdFormat, va_list vaList) const;
+        WCDAFX_API void FormatNarrow(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::string_view nrFormat, ...) const;
+        WCDAFX_API void FormatWide(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::wstring_view wdFormat, ...) const;
         WCDAFX_API std::wstring GetStrings(std::wstring_view svSeparator) const;
 
         WCDAFX_API void AskPathAndSave() const;
@@ -50,7 +51,7 @@ namespace DH
         WCDAFX_API void Destroy() const;
 
         template <class CT>
-        void Puts(std::basic_string_view<CT> tView) const;
+        void Puts(unsigned nLevel, std::basic_string_view<CT> tText, DWORD dwTID = dwCurrentTID, DWORD dwPID = dwCurrentPID) const;
 
         WCDAFX_API BOOL SubclassWindow(HWND hWnd) const;
 
@@ -67,14 +68,14 @@ namespace DH
     };
 
     template <>
-    inline void DebugConsole::Puts<char>(std::basic_string_view<char> nrView) const
+    inline void DebugConsole::Puts<char>(unsigned nLevel, std::basic_string_view<char> tText, DWORD dwTID, DWORD dwPID) const
     {
-        this->PutsNarrow(nrView);
+        this->PutsNarrow(nLevel, tText, dwTID, dwPID);
     }
 
     template <>
-    inline void DebugConsole::Puts<wchar_t>(std::basic_string_view<wchar_t> wdView) const
+    inline void DebugConsole::Puts<wchar_t>(unsigned nLevel, std::basic_string_view<wchar_t> tText, DWORD dwTID, DWORD dwPID) const
     {
-        this->PutsWide(wdView);
+        this->PutsWide(nLevel, tText, dwTID, dwPID);
     }
 }

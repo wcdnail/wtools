@@ -6,6 +6,7 @@
 enum TraceLevel: unsigned
 {
     TL_Trace = 0,
+    TL_DebugOut,    // captured OutputDebugString
     TL_Info,
     TL_Notify,
     TL_Warning,
@@ -14,9 +15,9 @@ enum TraceLevel: unsigned
     TL_Module,
     TL_COUNT,
 
-    TL_LevelMask  = 0x0000ffff,
-    TL_FlagMask   = 0xffff0000,
-    TL_NoDCOutput = 0x80000000,
+    TL_LevelMask    = 0x0000ffff,
+    TL_FlagMask     = 0xffff0000,
+    TL_NoDCOutput   = 0x80000000,
 };
 
 namespace DH

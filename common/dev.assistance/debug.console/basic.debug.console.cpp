@@ -127,23 +127,25 @@ namespace DH
 
     BasicDebugConsole::StringItem::~StringItem() = default;
 
-    BasicDebugConsole::StringItem::StringItem(StringPair&& pair, DWORD dwPID)
-        : pair_{std::move(pair)}
-        ,  pid_{dwPID}
-        ,   ts_{DH::LogUpTime()}
+    BasicDebugConsole::StringItem::StringItem(unsigned level, StringPair&& pair, DWORD dwTID, DWORD dwPID)
+        : level_{level}
+        ,  pair_{std::move(pair)}
+        ,   tid_{dwTID}
+        ,   pid_{dwPID}
+        ,    ts_{DH::LogUpTime()}
     {
         if (dwCurrentPID == pid_) {
             pid_ = GetCurrentProcessId();
         }
     }
 
-    BasicDebugConsole::StringItem::StringItem(std::string_view nrView, DWORD dwPID)
-        : StringItem(std::make_pair(std::string{nrView.data(), nrView.length()}, std::wstring{}), dwPID)
+    BasicDebugConsole::StringItem::StringItem(unsigned level, std::string_view nrView, DWORD dwTID, DWORD dwPID)
+        : StringItem{level, std::make_pair(std::string{nrView.data(), nrView.length()}, std::wstring{}), dwTID, dwPID}
     {
     }
 
-    BasicDebugConsole::StringItem::StringItem(std::wstring_view wdView, DWORD dwPID)
-        : StringItem(std::make_pair(std::string{}, std::wstring{wdView.data(), wdView.length()}), dwPID)
+    BasicDebugConsole::StringItem::StringItem(unsigned level, std::wstring_view wdView, DWORD dwTID, DWORD dwPID)
+        : StringItem{level, std::make_pair(std::string{}, std::wstring{wdView.data(), wdView.length()}), dwTID, dwPID}
     {
     }
 
@@ -159,10 +161,10 @@ namespace DH
         return {sTemp.GetString(), static_cast<size_t>(sTemp.GetLength())};
     }
 
-    void BasicDebugConsole::PutsNarrow(std::string_view nrView, DWORD dwPID)
+    void BasicDebugConsole::PutsNarrow(unsigned nLevel, std::string_view nrView, DWORD dwTID, DWORD dwPID)
     {
         {
-            StringItem sItem{nrView, dwPID};
+            StringItem sItem{nLevel, nrView, dwTID, dwPID};
             std::lock_guard<std::recursive_mutex> lk(cacheMx_);
             cache_.emplace_back(std::move(sItem));
         }
@@ -171,10 +173,10 @@ namespace DH
         }
     }
 
-    void BasicDebugConsole::PutsWide(std::wstring_view wdView, DWORD dwPID)
+    void BasicDebugConsole::PutsWide(unsigned nLevel, std::wstring_view wdView, DWORD dwTID, DWORD dwPID)
     {
         {
-            StringItem sItem{wdView, dwPID};
+            StringItem sItem{nLevel, wdView, dwTID, dwPID};
             std::lock_guard<std::recursive_mutex> lk(cacheMx_);
             cache_.emplace_back(std::move(sItem));
         }
@@ -183,18 +185,18 @@ namespace DH
         }
     }
 
-    void BasicDebugConsole::FormatVNarrow(DWORD dwPID, std::string_view nrFormat, va_list vaList)
+    void BasicDebugConsole::FormatVNarrow(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::string_view nrFormat, va_list vaList)
     {
         ATL::CStringA sTemp;
         sTemp.FormatV(nrFormat.data(), vaList);
-        PutsNarrow(std::string_view{sTemp.GetString(), static_cast<size_t>(sTemp.GetLength())}, dwPID);
+        PutsNarrow(nLevel, std::string_view{sTemp.GetString(), static_cast<size_t>(sTemp.GetLength())}, dwTID, dwPID);
     }
 
-    void BasicDebugConsole::FormatVWide(DWORD dwPID, std::wstring_view nrFormat, va_list vaList)
+    void BasicDebugConsole::FormatVWide(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::wstring_view nrFormat, va_list vaList)
     {
         ATL::CStringW sTemp;
         sTemp.FormatV(nrFormat.data(), vaList);
-        PutsWide(std::wstring_view{sTemp.GetString(), static_cast<size_t>(sTemp.GetLength())}, dwPID);
+        PutsWide(nLevel, std::wstring_view{sTemp.GetString(), static_cast<size_t>(sTemp.GetLength())}, dwTID, dwPID);
     }
 
     void BasicDebugConsole::Clean() const
@@ -218,13 +220,13 @@ namespace DH
         ATLASSERT(false);
     }
 
-    void BasicDebugConsole::WriteNarrow(std::string&, double, DWORD)
+    void BasicDebugConsole::WriteNarrow(StringItem&)
     {
         DH::Printf(0, L"ERROR", L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
         ATLASSERT(false);
     }
 
-    void BasicDebugConsole::WriteWide(std::wstring&, double, DWORD)
+    void BasicDebugConsole::WriteWide(StringItem&)
     {
         DH::Printf(0, L"ERROR", L"%s(%d): '%s' NOT IMPLEMENTED\n", __FILEW__, __LINE__, __FUNCTIONW__);
         ATLASSERT(false);
@@ -240,12 +242,8 @@ namespace DH
         while (!cache_.empty()) {
             StringItem& sp = cache_.front();
             PreWrite();
-            if (sp.pair_.first.empty()) {
-                WriteWide(sp.pair_.second, sp.ts_, sp.pid_);
-            }
-            else {
-                WriteNarrow(sp.pair_.first, sp.ts_, sp.pid_);
-            }
+            if (sp.pair_.first.empty()) { WriteWide(sp); }
+            else                        { WriteNarrow(sp); }
             PostWrite();
             cache_.pop_front();
         }

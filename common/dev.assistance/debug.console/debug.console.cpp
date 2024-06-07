@@ -50,7 +50,7 @@ namespace DH
         return true;
     reportError:
         auto const sMessage{Str::ErrorCode<>::SystemMessage(hCode)};
-        FormatWide(dwCurrentPID, L"ERROR: %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
+        FormatWide(TL_Error, dwCurrentTID, dwCurrentPID, L"ERROR: %s failed: 0x%08x %s\n", sFunc.GetString(), hCode, sMessage.GetString());
         return false;
     }
 
@@ -216,39 +216,39 @@ namespace DH
         ::SetWindowTextW(impl_->m_hWnd, string);
     }
 
-    void DebugConsole::PutsNarrow(std::string_view nrString, DWORD dwPID) const
+    void DebugConsole::PutsNarrow(unsigned nLevel, std::string_view nrString, DWORD dwTID, DWORD dwPID) const
     {
-        impl_->PutsNarrow(nrString, dwPID);
+        impl_->PutsNarrow(nLevel, nrString, dwTID, dwPID);
     }
 
-    void DebugConsole::PutsWide(std::wstring_view wdString, DWORD dwPID) const
+    void DebugConsole::PutsWide(unsigned nLevel, std::wstring_view wdString, DWORD dwTID, DWORD dwPID) const
     {
-        impl_->PutsWide(wdString, dwPID);
+        impl_->PutsWide(nLevel, wdString, dwTID, dwPID);
     }
 
-    void DebugConsole::FormatVNarrow(DWORD dwPID, std::string_view nrFormat, va_list vaList) const
+    void DebugConsole::FormatVNarrow(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::string_view nrFormat, va_list vaList) const
     {
-        impl_->FormatVNarrow(dwPID, nrFormat, vaList);
+        impl_->FormatVNarrow(nLevel, dwTID, dwPID, nrFormat, vaList);
     }
 
-    void DebugConsole::FormatVWide(DWORD dwPID, std::wstring_view wdFormat, va_list vaList) const
+    void DebugConsole::FormatVWide(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::wstring_view wdFormat, va_list vaList) const
     {
-        impl_->FormatVWide(dwPID, wdFormat, vaList);
+        impl_->FormatVWide(nLevel, dwTID, dwPID, wdFormat, vaList);
     }
 
-    void DebugConsole::FormatNarrow(DWORD dwPID, std::string_view nrFormat, ...) const
+    void DebugConsole::FormatNarrow(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::string_view nrFormat, ...) const
     {
         va_list vaList;
         va_start(vaList, nrFormat);
-        impl_->FormatVNarrow(dwPID, nrFormat, vaList);
+        impl_->FormatVNarrow(nLevel, dwTID, dwPID, nrFormat, vaList);
         va_end(vaList);
     }
 
-    void DebugConsole::FormatWide(DWORD dwPID, std::wstring_view wdFormat, ...) const
+    void DebugConsole::FormatWide(unsigned nLevel, DWORD dwTID, DWORD dwPID, std::wstring_view wdFormat, ...) const
     {
         va_list vaList;
         va_start(vaList, wdFormat);
-        impl_->FormatVWide(dwPID, wdFormat, vaList);
+        impl_->FormatVWide(nLevel, dwTID, dwPID, wdFormat, vaList);
         va_end(vaList);
     }
 

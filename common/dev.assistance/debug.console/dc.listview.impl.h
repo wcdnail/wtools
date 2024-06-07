@@ -25,8 +25,8 @@ namespace DH
         void Save(char const* filePathName) const override;
         HWND CreateConsole() override;
         void PreWrite() override;
-        void WriteNarrow(std::string& nrString, double, DWORD) override;
-        void WriteWide(std::wstring& wdString, double, DWORD) override;
+        void WriteNarrow(StringItem& siItem) override;
+        void WriteWide(StringItem& siItem) override;
         void ClearSelection();
         bool ScrollTo(int nPos, bool bCentered);
         void PostWrite() override;

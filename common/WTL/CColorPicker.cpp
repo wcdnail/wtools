@@ -47,9 +47,9 @@ int CColorPicker::GetAlpha() const
     return m_pImpl->GetAlpha();
 }
 
-void CColorPicker::SetColor(COLORREF crColor, int nAlpha) const
+void CColorPicker::SetColor(COLORREF crColor, int nAlpha, bool bStoreToHistory, bool bNotifyObservers) const
 {
-    m_pImpl->_SetColor(crColor, nAlpha, false, true);
+    m_pImpl->_SetColor(crColor, nAlpha, bStoreToHistory /*false*/, bNotifyObservers /*true*/);
 }
 
 IColor& CColorPicker::GetMasterColor() const

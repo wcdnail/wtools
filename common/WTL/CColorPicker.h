@@ -31,7 +31,7 @@ struct CColorPicker: private CCustomControl<CColorPicker>,
 
     WCDAFX_API COLORREF GetColorRef() const;
     WCDAFX_API int GetAlpha() const;
-    WCDAFX_API void SetColor(COLORREF crColor, int nAlpha = 255) const;
+    WCDAFX_API void SetColor(COLORREF crColor, int nAlpha, bool bStoreToHistory, bool bNotifyObservers) const;
 
     WCDAFX_API IColor& GetMasterColor() const;
     WCDAFX_API IColorObserver& GetMasterObserver() const;
