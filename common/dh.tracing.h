@@ -31,7 +31,7 @@ namespace DH
         DELETE_COPY_MOVE_OF(ScopedThreadLog);
 
         WCDAFX_API ScopedThreadLog(std::wstring_view svLevel);
-        WCDAFX_API ScopedThreadLog(int, _Printf_format_string_ std::wstring_view svFormat, ...);
+        WCDAFX_API ScopedThreadLog(int, _In_z_ _Printf_format_string_ std::wstring_view svFormat, ...);
         WCDAFX_API ~ScopedThreadLog();
 
     private:
@@ -39,11 +39,11 @@ namespace DH
         wchar_t Message[1024];
     };
 
-    WCDAFX_API void Printf(unsigned nLevel, _Printf_format_string_ std::string_view svFormat, ...);
-    WCDAFX_API void Printf(unsigned nLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
+    WCDAFX_API void Printf(unsigned nLevel, _In_z_ _Printf_format_string_ std::string_view svFormat, ...);
+    WCDAFX_API void Printf(unsigned nLevel, _In_z_ _Printf_format_string_ std::wstring_view svFormat, ...);
     
-    WCDAFX_API void TPrintf(unsigned nLevel, _Printf_format_string_ std::string_view svFormat, ...);
-    WCDAFX_API void TPrintf(unsigned nLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
+    WCDAFX_API void TPrintf(unsigned nLevel, _In_z_ _Printf_format_string_ std::string_view svFormat, ...);
+    WCDAFX_API void TPrintf(unsigned nLevel, _In_z_ _Printf_format_string_ std::wstring_view svFormat, ...);
 
     namespace Impl
     {

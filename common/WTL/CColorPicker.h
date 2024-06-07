@@ -53,5 +53,4 @@ private:
     int OnCreate(LPCREATESTRUCT lpCreateStruct);
     void OnDestroy();
     void OnSize(UINT nType, CSize size) const;
-    void OnWindowPosChanged(LPWINDOWPOS pWPos);
 };

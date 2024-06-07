@@ -57,6 +57,7 @@ private:
     void DrawDragBar(int nID, WTL::CDCHandle dc, CRect& rcItem);
     void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI);
     UINT OnNcHitTest(CPoint point) const;
+    void OnWindowPosx(LPWINDOWPOS pWPos);
 };
 
 inline HRESULT CColorPickerDlg::Initialize()

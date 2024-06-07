@@ -108,6 +108,7 @@
     <ClInclude Include="dev.assistance\notify.codes.h" />
     <ClInclude Include="dev.assistance\virtual.keys.consts.h" />
     <ClInclude Include="dev.assistance\window.messages.consts.h" />
+    <ClInclude Include="dev.assistance\window.pos.flags.h" />
     <ClInclude Include="dh.timer.h" />
     <ClInclude Include="dh.trace.level.h" />
     <ClInclude Include="dh.tracing.defs.h" />

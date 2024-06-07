@@ -8,40 +8,44 @@ namespace DH
 {
     enum WindowTypes: uint64_t
     {
-        UnknownCtl   = 0x0000000000000000,
-        StaticClt    = 0x0000000000000001,
-        EditClt      = 0x0000000000000002,
-        ButtonClt    = 0x0000000000000004,
-        ListBoxCtl   = 0x0000000000000008,
-        ComboBoxCtl  = 0x0000000000000010,
-        ToolBarCtl   = 0x0000000000000020,
-        ReBarCtl     = 0x0000000000000040,
-        StatusBarClt = 0x0000000000000080,
-        CommonCtl    = 0x8000000000000000,
+        WT_Unknown = static_cast<uint64_t>(-1),
+        WT_Static = 0,
+        WT_Edit,
+        WT_Button,
+        WT_ListBox,
+        WT_ComboBox,
+        WT_ToolBar,
+        WT_ReBar,
+        WT_StatusBar,
     };
 
-    WCDAFX_API uint64_t GetWindowType(HWND winHandle);
+    WCDAFX_API uint64_t GetWindowType(HWND hWnd);
 
     // Window message constant to string...
-    WCDAFX_API PCSTR WM_C2SA(UINT);
-    WCDAFX_API PCWSTR WM_C2SW(UINT);
+    WCDAFX_API PCSTR WMNumToStrA(UINT);
+    WCDAFX_API PCWSTR WMNumToStrW(UINT);
 
     // Virtual key constant to string...
-    WCDAFX_API PCSTR VK_C2SA(UINT);
-    WCDAFX_API PCWSTR VK_C2SW(UINT);
+    WCDAFX_API PCSTR VirtKeyToStrA(UINT);
+    WCDAFX_API PCWSTR VirtKeyToStrW(UINT);
 
     // Window notify code constant to string...
-    WCDAFX_API PCSTR WM_NC_C2SA(UINT, HWND);
-    WCDAFX_API PCSTR WM_NC_C2SA(UINT);
-    WCDAFX_API PCWSTR WM_NC_C2SW(UINT, HWND);
-    WCDAFX_API PCWSTR WM_NC_C2SW(UINT);
+    WCDAFX_API PCSTR NotifyCodeToStrA(UINT, HWND);
+    WCDAFX_API PCSTR NotifyCodeToStrA(UINT);
+    WCDAFX_API PCWSTR NotifyCodeToStrW(UINT, HWND);
+    WCDAFX_API PCWSTR NotifyCodeToStrW(UINT);
 
     // List view styles constants to string...
-    WCDAFX_API LString LvStyleStringA(DWORD);
-    WCDAFX_API LString LvStyleExStringA(DWORD);
-    WCDAFX_API WString LvStyleStringW(DWORD);
-    WCDAFX_API WString LvStyleExStringW(DWORD);
+    WCDAFX_API LString LvStyleStrA(DWORD);
+    WCDAFX_API LString LvStyleExStrA(DWORD);
+    WCDAFX_API WString LvStyleStrW(DWORD);
+    WCDAFX_API WString LvStyleExStrW(DWORD);
 
+    // Window Position Flags SWP_***
+    WCDAFX_API LString WinPosFlagsStrA(UINT);
+    WCDAFX_API WString WinPosFlagsStrW(UINT);
+
+    // 'Dumpers'
     WCDAFX_API WString MessageToStrignW(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     WCDAFX_API WString MessageToStrignW(const PMSG pMsg);
 }
@@ -51,11 +55,11 @@ namespace DH
 #endif
 
 #ifdef UNICODE
-#  define VK_C2ST             VK_C2SW
-#  define LvStyleStringT      LvStyleStringW
-#  define LvStyleExStringT    LvStyleExStringW
+#  define VK_C2ST             VirtKeyToStrW
+#  define LvStyleStringT      LvStyleStrW
+#  define LvStyleExStringT    LvStyleExStrW
 #else
-#  define VK_C2ST             VK_C2SA
-#  define LvStyleStringA      LvStyleStringW
-#  define LvStyleExStringA    LvStyleExStringW
+#  define VK_C2ST             VirtKeyToStrA
+#  define LvStyleStrA      LvStyleStrW
+#  define LvStyleExStrA    LvStyleExStrW
 #endif

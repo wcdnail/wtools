@@ -537,7 +537,7 @@ LRESULT CColorPicker::Impl::OnNotify(int nID, LPNMHDR pnmh)
         }
         break;
     }
-    DBGTPrint(0, L"WM_NOTIFY id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+    DBGTPrint(0, L"WM_NOTIFY id:%-4d nc:%-5d %s\n", nID, pnmh->code, DH::NotifyCodeToStrW(pnmh->code));
     SetMsgHandled(FALSE);
     return 0;
 }
@@ -574,7 +574,7 @@ void CColorPicker::Impl::OnCommand(UINT uNotifyCode, int nID, HWND)
     case EN_MAXTEXT:
         return ;
     default:
-        DBGTPrint(0, L"WM_COMMAND id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+        DBGTPrint(0, L"WM_COMMAND id:%-4d nc:%-5d %s\n", nID, uNotifyCode, DH::NotifyCodeToStrW(uNotifyCode));
         break;
     }
     SetMsgHandled(FALSE);

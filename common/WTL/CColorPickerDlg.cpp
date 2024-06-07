@@ -164,6 +164,7 @@ BOOL CColorPickerDlg::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
     UNREFERENCED_PARAMETER(hWnd);
     switch(dwMsgMapID) {
     case 0:
+        MSG_WM_WINDOWPOSCHANGING(OnWindowPosx)
         MSG_WM_GETDLGCODE(CCPD_OnGetDlgCode)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestroy)
@@ -429,4 +430,14 @@ void CColorPickerDlg::FollowMaster(LPWINDOWPOS pWndPos)
     WndSuper::MoveWindow(m_rcPlace, FALSE);
 
     m_rcMaster.SetRect(pWndPos->x, pWndPos->y, pWndPos->x + pWndPos->cx, pWndPos->y + pWndPos->cy);
+}
+
+void CColorPickerDlg::OnWindowPosx(LPWINDOWPOS pWPos)
+{
+    SetMsgHandled(FALSE);
+    if (!pWPos) {
+        return ;
+    }
+    // Prevent double-buffered painting artefacts during window movin
+    pWPos->flags |= SWP_NOREDRAW;
 }
