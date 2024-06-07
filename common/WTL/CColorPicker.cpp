@@ -74,6 +74,7 @@ BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     UNREFERENCED_PARAMETER(bHandled);
     switch(dwMsgMapID) {
     case 0:
+        MSG_WM_WINDOWPOSCHANGED(OnWindowPosChanged)
         MSG_WM_CREATE(OnCreate)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_SIZE(OnSize)
@@ -124,4 +125,13 @@ void CColorPicker::OnSize(UINT nType, CSize size) const
         CRect rc{0, 0, size.cx, size.cy};
         m_pImpl->MoveWindow(rc);
     }
+}
+
+void CColorPicker::OnWindowPosChanged(LPWINDOWPOS pWPos)
+{
+    SetMsgHandled(FALSE);
+    if (!pWPos) {
+        return ;
+    }
+    ATLTRACE(_T("WPCHANGED: %p\n"), pWPos->flags);
 }
