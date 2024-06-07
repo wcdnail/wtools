@@ -39,11 +39,11 @@ namespace DH
         wchar_t Message[1024];
     };
 
-    WCDAFX_API void Printf(int nLevel, _Printf_format_string_ std::string_view svFormat, ...);
-    WCDAFX_API void Printf(int nLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
+    WCDAFX_API void Printf(unsigned nLevel, _Printf_format_string_ std::string_view svFormat, ...);
+    WCDAFX_API void Printf(unsigned nLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
     
-    WCDAFX_API void TPrintf(int nLevel, _Printf_format_string_ std::string_view svFormat, ...);
-    WCDAFX_API void TPrintf(int nLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
+    WCDAFX_API void TPrintf(unsigned nLevel, _Printf_format_string_ std::string_view svFormat, ...);
+    WCDAFX_API void TPrintf(unsigned nLevel, _Printf_format_string_ std::wstring_view svFormat, ...);
 
     namespace Impl
     {

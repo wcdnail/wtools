@@ -106,7 +106,7 @@ namespace DH
             return ;
         }
         auto const hCode = static_cast<HRESULT>(GetLastError());
-        DH::TPrintf(TL_Error, L"%s failed: 0x%08x %s\r\n", pszCaption,
+        DH::TPrintf(TL_Error | TL_NoDCOutput, L"%s failed: 0x%08x %s\r\n", pszCaption,
             hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
     }
 
@@ -134,16 +134,9 @@ namespace DH
                 Str::ErrorCode<>::SystemMessage(hCode).GetString());
             DH::TPrintf(TL_Error, L"%s", sFunc.GetString());
         }
-        console_.Create(m_hWnd, rc, nullptr,
-            WS_CHILD | WS_VISIBLE |
-            // LVS_OWNERDRAWFIXED |
-            // LVS_OWNERDATA |
-            LVS_REPORT | LVS_NOSORTHEADER |
-            LVS_SHOWSELALWAYS |
+        console_.Create(m_hWnd, rc, nullptr, WS_CHILD | WS_VISIBLE |
+            LVS_REPORT | LVS_NOSORTHEADER | LVS_SHOWSELALWAYS |
             LVS_SHAREIMAGELISTS,
-            LVS_EX_FULLROWSELECT |
-            //LVS_EX_INFOTIP | 
-            //LVS_EX_HEADERDRAGDROP |
             0, ID_LOG_CTL
         );
         if (!console_) {
@@ -151,10 +144,9 @@ namespace DH
             sFunc.Format(L"CreateWindowEx('%s')", WTL::CListViewCtrl::GetWndClassName());
             goto reportError;
         }
-        ::DefWindowProc(console_.m_hWnd, WM_CREATE, 0, 0L);
-        
         console_.SetView(LV_VIEW_DETAILS);
         console_.SetFont(consoleFont_, FALSE);
+        console_.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
         SetupColumns(rc);
 
         return console_;

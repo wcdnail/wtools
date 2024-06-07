@@ -200,8 +200,6 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     {
-        DH::TPrintf(TL_Warning, L"TEST NO CR!!!");
-
         static const
         PCWSTR   pszClasses{L"BUTTON;EDIT;MENU;SCROLLBAR"};
         HRESULT const hCode{ThemedInit(pszClasses)};

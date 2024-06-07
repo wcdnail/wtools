@@ -244,7 +244,7 @@ namespace DH
 #pragma endregion
 #pragma region Tracers
 
-    static inline void printString(ATL::CStringA&& sTS, ATL::CStringA&& sTID, ATL::CStringA&& sCategory, ATL::CStringA&& sText)
+    static inline void printString(unsigned nLevel, ATL::CStringA&& sTS, ATL::CStringA&& sTID, ATL::CStringA&& sCategory, ATL::CStringA&& sText)
     {
         ATL::CStringA sLine{};
         if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT | LOG_ENABLED)) {
@@ -257,13 +257,13 @@ namespace DH
         if (LogCtx::instance().isBitSet(LOG_ENABLED)) {
             LogCtx::instance().puts(std::move(sLine));
         }
-        if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT)) {
+        if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT) && !(nLevel & TL_NoDCOutput)) {
             sLine = sTID + sCategory + sText;
             DH::DebugConsole::Instance().PutsNarrow({sLine.GetString(), static_cast<size_t>(sLine.GetLength())});
         }
     }
 
-    static inline void printString(ATL::CStringW&& sTS, ATL::CStringW&& sTID, ATL::CStringW&& sCategory, ATL::CStringW&& sText)
+    static inline void printString(unsigned nLevel, ATL::CStringW&& sTS, ATL::CStringW&& sTID, ATL::CStringW&& sCategory, ATL::CStringW&& sText)
     {
         ATL::CStringW sLine{};
         if (LogCtx::instance().isBitSet(DEBUG_WIN32_OUT | LOG_ENABLED)) {
@@ -276,7 +276,7 @@ namespace DH
         if (LogCtx::instance().isBitSet(LOG_ENABLED)) {
             LogCtx::instance().putws(std::move(sLine));
         }
-        if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT)) {
+        if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT) && !(nLevel & TL_NoDCOutput)) {
             sLine = sTID + sCategory + sText;
             DH::DebugConsole::Instance().PutsWide({sLine.GetString(), static_cast<size_t>(sLine.GetLength())});
         }
@@ -328,7 +328,7 @@ namespace DH
     }
 
     template <typename Char>
-    static std::basic_string<Char> strLevel(int nLevel)
+    static std::basic_string<Char> strLevel(unsigned nLevel)
     {
         std::basic_string<Char> szLevel;
         StrTraceLevel(nLevel, szLevel);
@@ -336,7 +336,7 @@ namespace DH
     }
 
     template <typename Char>
-    static void printStringT(int nLevel,
+    static void printStringT(unsigned nLevel,
        _Printf_format_string_ std::basic_string_view<Char> svFormat,
         va_list ap)
     {
@@ -344,10 +344,10 @@ namespace DH
         auto  sTID{Str::Elipsis<Char>::Format(TTTraits<Char>::FmtTID, GetCurrentThreadId())};
         auto  sLev{Str::Elipsis<Char>::Format(TTTraits<Char>::FmtCat, strLevel<Char>(nLevel).c_str())};
         auto sText{Str::Elipsis<Char>::FormatV(svFormat.data(), ap)};
-        printString(std::move(sTS), std::move(sTID), std::move(sLev), std::move(sText));
+        printString(nLevel, std::move(sTS), std::move(sTID), std::move(sLev), std::move(sText));
     }
 
-    void TPrintf(int nLevel, _Printf_format_string_ std::string_view svFormat, ...)
+    void TPrintf(unsigned nLevel, _Printf_format_string_ std::string_view svFormat, ...)
     {
         UNREFERENCED_PARAMETER(nLevel);
         va_list ap;
@@ -356,7 +356,7 @@ namespace DH
         va_end(ap);
     }
 
-    void TPrintf(int nLevel, _Printf_format_string_ std::wstring_view svFormat, ...)
+    void TPrintf(unsigned nLevel, _Printf_format_string_ std::wstring_view svFormat, ...)
     {
         UNREFERENCED_PARAMETER(nLevel);
         va_list ap;
@@ -365,23 +365,23 @@ namespace DH
         va_end(ap);
     }
 
-    void Printf(int nLevel, _Printf_format_string_ std::string_view svFormat, ...)
+    void Printf(unsigned nLevel, _Printf_format_string_ std::string_view svFormat, ...)
     {
         UNREFERENCED_PARAMETER(nLevel);
         auto sLev{Str::Elipsis<char>::Format(TTTraits<char>::FmtCat, strLevel<char>(nLevel).c_str())};
         va_list ap;
         va_start(ap, svFormat);
-        printString({}, {}, std::move(sLev), Str::Elipsis<char>::FormatV(svFormat.data(), ap));
+        printString(nLevel, {}, {}, std::move(sLev), Str::Elipsis<char>::FormatV(svFormat.data(), ap));
         va_end(ap);
     }
 
-    void Printf(int nLevel, _Printf_format_string_ std::wstring_view svFormat, ...)
+    void Printf(unsigned nLevel, _Printf_format_string_ std::wstring_view svFormat, ...)
     {
         UNREFERENCED_PARAMETER(nLevel);
         auto sLev{Str::Elipsis<wchar_t>::Format(TTTraits<wchar_t>::FmtCat, strLevel<wchar_t>(nLevel).c_str())};
         va_list ap;
         va_start(ap, svFormat);
-        printString({}, {}, std::move(sLev), Str::Elipsis<wchar_t>::FormatV(svFormat.data(), ap));
+        printString(nLevel, {}, {}, std::move(sLev), Str::Elipsis<wchar_t>::FormatV(svFormat.data(), ap));
         va_end(ap);
     }
 

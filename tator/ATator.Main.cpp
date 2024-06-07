@@ -7,6 +7,8 @@
 #include "dh.tracing.h"
 #include <WTL/CAppModuleRef.h>
 #include <fstream>
+#include <stdexcept>
+#include <system_error>
 
 /**
  * https://learn.microsoft.com/en-us/cpp/c-runtime-library/crt-library-features?view=msvc-170
@@ -166,7 +168,17 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
     }
 
     DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT | DH::DEBUG_DEVCON_OUT | DH::DEBUG_EXTRA_INFO);
-    hCode = Run(lpstrCmdLine, nCmdShow);
+    try {
+        hCode = Run(lpstrCmdLine, nCmdShow);
+    }
+    catch (std::system_error const& ex) {
+        hCode = ex.code().value();
+        MessageBoxA(nullptr, ex.what(), "SystemError", MB_ICONSTOP);
+    }
+    catch (std::exception const& ex) {
+        hCode = -1;
+        MessageBoxA(nullptr, ex.what(), "Exception", MB_ICONSTOP);
+    }
     _Module.Term();
     OleUninitialize();
     return static_cast<int>(hCode);

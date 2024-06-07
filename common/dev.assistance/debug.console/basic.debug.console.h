@@ -118,7 +118,7 @@ namespace DH
         std_ostream_listener<wchar_t> wcerrListener_;
         DebugOutputListener     debugOutputListener_;
         StringQue                             cache_;
-        std::mutex                          cacheMx_;
+        std::recursive_mutex                cacheMx_;
 
         virtual HWND CreateConsole() = 0;
 

@@ -2,7 +2,6 @@
 #include "basic.debug.console.h"
 #include "debug.console.h"
 #include <string.utils.error.code.h>
-#include <dh.tracing.defs.h>
 #include <dh.tracing.h>
 #include <trect.h>
 #include <string>
@@ -164,7 +163,7 @@ namespace DH
     {
         {
             StringItem sItem{nrView, dwPID};
-            std::lock_guard<std::mutex> lk(cacheMx_);
+            std::lock_guard<std::recursive_mutex> lk(cacheMx_);
             cache_.emplace_back(std::move(sItem));
         }
         if (m_hWnd) {
@@ -176,7 +175,7 @@ namespace DH
     {
         {
             StringItem sItem{wdView, dwPID};
-            std::lock_guard<std::mutex> lk(cacheMx_);
+            std::lock_guard<std::recursive_mutex> lk(cacheMx_);
             cache_.emplace_back(std::move(sItem));
         }
         if (m_hWnd) {
@@ -237,7 +236,7 @@ namespace DH
 
     void BasicDebugConsole::LoadStringsFromCache()
     {
-        std::lock_guard<std::mutex> lk(cacheMx_);
+        std::lock_guard<std::recursive_mutex> lk(cacheMx_);
         while (!cache_.empty()) {
             StringItem& sp = cache_.front();
             PreWrite();
