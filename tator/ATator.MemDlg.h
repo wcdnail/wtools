@@ -30,14 +30,14 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
         IDC_DLG_ICON,
     };
 
-    CColorPicker m_ccColorPicker;
+    CColorPicker m_ccColorPicker{0xffffff};
 
     BOOL PreTranslateMessage(MSG* pMsg) override;
 
     HRESULT Initialize();
 
     BEGIN_DDX_MAP(CTatorMainDlg)
-        END_DDX_MAP()
+    END_DDX_MAP()
 
     BEGIN_DIALOG(0, 0, DIALOG_CX, DIALOG_CY)
         DIALOG_CAPTION(_T("TATOR [XYZ]"))
@@ -60,6 +60,7 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
     END_DLGRESIZE_MAP()
 
     BEGIN_MSG_MAP(CTatorMainDlg)
+        MSG_WM_WINDOWPOSCHANGING(OnWindowPosx)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestroy)
         COMMAND_ID_HANDLER(IDOK, OnCloseCmd)
@@ -71,6 +72,7 @@ struct CTatorMainDlg: WTL::CIndirectDialogImpl<CTatorMainDlg>,
     BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
     void OnDestroy();
     LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+    void OnWindowPosx(LPWINDOWPOS pWPos);
 };
 
 inline BOOL CTatorMainDlg::PreTranslateMessage(MSG* pMsg)
@@ -136,4 +138,10 @@ inline LRESULT CTatorMainDlg::OnCloseCmd(WORD, WORD wID, HWND, BOOL&)
     EndDialog(wID);
 #endif
     return 0;
+}
+
+inline void CTatorMainDlg::OnWindowPosx(LPWINDOWPOS pWPos)
+{
+    SetMsgHandled(FALSE);
+    CColorPicker::OnWindowPosChanging(pWPos);
 }

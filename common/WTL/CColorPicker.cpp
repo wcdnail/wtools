@@ -67,6 +67,16 @@ int& CColorPicker::RasterCX()
     return Impl::gs_nRasterCX;
 }
 
+void CColorPicker::OnWindowPosChanging(LPWINDOWPOS pWPos)
+{
+    if (!pWPos || (pWPos->flags & SWP_NOMOVE)) {
+        return ;
+    }
+    //ATLTRACE(L"PCD: %s\n", DH::WinPosFlagsStrW(pWPos->flags).c_str());
+    // Prevent double-buffered painting artefacts during window movin
+    pWPos->flags |= SWP_NOREDRAW;
+}
+
 BOOL CColorPicker::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
     BOOL bHandled{TRUE};

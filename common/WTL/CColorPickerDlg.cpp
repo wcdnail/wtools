@@ -435,9 +435,5 @@ void CColorPickerDlg::FollowMaster(LPWINDOWPOS pWndPos)
 void CColorPickerDlg::OnWindowPosx(LPWINDOWPOS pWPos)
 {
     SetMsgHandled(FALSE);
-    if (!pWPos) {
-        return ;
-    }
-    // Prevent double-buffered painting artefacts during window movin
-    pWPos->flags |= SWP_NOREDRAW;
+    CColorPicker::OnWindowPosChanging(pWPos);
 }

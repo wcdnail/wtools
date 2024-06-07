@@ -139,7 +139,7 @@ namespace DH
     {
         std::streamsize const len{::GetWindowTextLengthA(console_)};
         if (len > 0) {
-            // TODO: save rich text (RTF)!
+            // ##TODO: save rich text (RTF)!
             std::string buffer(static_cast<std::string::size_type>(len)+1, '\0');
             int const storedLen{::GetWindowTextA(console_, &buffer[0], static_cast<int>(len))};
             if (storedLen > 0) {

@@ -37,6 +37,7 @@ struct CColorPicker: private CCustomControl<CColorPicker>,
     WCDAFX_API IColorObserver& GetMasterObserver() const;
 
     WCDAFX_API static int& RasterCX();
+    WCDAFX_API static void OnWindowPosChanging(LPWINDOWPOS pWPos);
 
     using WndSuper::m_hWnd;
     using WndSuper::IsWindow;

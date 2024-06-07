@@ -244,6 +244,11 @@ namespace DH
 #pragma endregion
 #pragma region Tracers
 
+    bool IsDebugConsoleOutpuEnabled()
+    {
+        return LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT);
+    }
+
     static inline void printString(unsigned nLevel, ATL::CStringA&& sTS, ATL::CStringA&& sTID, DWORD dwTID, ATL::CStringA&& sLev, ATL::CStringA&& sText)
     {
         ATL::CStringA sLine{};
@@ -257,7 +262,7 @@ namespace DH
         if (LogCtx::instance().isBitSet(LOG_ENABLED)) {
             LogCtx::instance().puts(std::move(sLine));
         }
-        if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT)) {
+        if (IsDebugConsoleOutpuEnabled()) {
             DH::DebugConsole::Instance().PutsNarrow(nLevel, {sText.GetString(), static_cast<size_t>(sText.GetLength())}, dwTID);
         }
     }
@@ -275,7 +280,7 @@ namespace DH
         if (LogCtx::instance().isBitSet(LOG_ENABLED)) {
             LogCtx::instance().putws(std::move(sLine));
         }
-        if (LogCtx::instance().isBitSet(DEBUG_DEVCON_OUT)) {
+        if (IsDebugConsoleOutpuEnabled()) {
             DH::DebugConsole::Instance().PutsWide(nLevel, {sText.GetString(), static_cast<size_t>(sText.GetLength())}, dwTID);
         }
     }

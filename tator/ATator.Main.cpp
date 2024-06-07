@@ -1,14 +1,14 @@
 ﻿#include "stdafx.h"
 #include "ATator.MemDlg.h"
 #include "CDefaultWin32Dlg.h"
-#include "windows.gui.leaks.h"
-#include "string.utils.format.h"
-#include "string.utils.error.code.h"
-#include "dh.tracing.h"
+#include <windows.gui.leaks.h>
+#include <string.utils.format.h>
+#include <string.utils.error.code.h>
+#include <dh.tracing.h>
 #include <WTL/CAppModuleRef.h>
-#include <fstream>
-#include <stdexcept>
 #include <system_error>
+#include <exception>
+#include <fstream>
 
 /**
  * https://learn.microsoft.com/en-us/cpp/c-runtime-library/crt-library-features?view=msvc-170
@@ -78,16 +78,15 @@ static HRESULT GetErrorCode(HRESULT code)                   // если диал
 
 static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 {
-    HRESULT  code = ERROR_SUCCESS;
-    int      nRet = 0;
-    bool   bError = false;
+    HRESULT  code{ERROR_SUCCESS};
+    bool   bError{false};
+    int      nRet{0};
 
-    WTL::CMessageLoop theLoop;
+    WTL::CMessageLoop theLoop{};
     _Module.AddMessageLoop(&theLoop);
 
     if constexpr (true) {
         CDefaultWin32Dlg dlg;
-      //CTatorMainDlg dlg;
         if (ERROR_SUCCESS != (code = dlg.Initialize())) {
             bError = true;
         }
@@ -100,8 +99,7 @@ static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
         }
     }
     else {
-      //CTatorMainDlg dlg;
-        CDefaultWin32Dlg dlg;
+        CTatorMainDlg dlg;
         if (ERROR_SUCCESS != (code = dlg.Initialize())) {
             bError = true;
         }
@@ -121,8 +119,8 @@ static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
     }
     if (bError) {
         code = GetErrorCode(code);
-        ATL::CString codeMessage = Str::ErrorCode<TCHAR>::SystemMessage(code);
-        ATL::CString  strMessage;
+        ATL::CString const codeMessage{Str::ErrorCode<TCHAR>::SystemMessage(code)};
+        ATL::CString strMessage{};
         strMessage.Format(_T("Не могу создать диалоговое окно.\r\n[%s]"), codeMessage.GetString());
         MessageBox(GetActiveWindow(), strMessage.GetString(), _T("FATAL"), MB_ICONSTOP);
         return static_cast<int>(code);
@@ -158,7 +156,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
         MessageBox(GetActiveWindow(), strMessage.GetString(), _T("WARNING"), MB_ICONWARNING);
     }
 
-    if constexpr (false) {
+    if (!IsDebuggerPresent()) {
         if (!DH::DebugConsole::Instance().ReceiveDebugOutput(L"", false)) {
             ATL::CString strMessage{};
             strMessage.Format(_T("Ошибка запуска загрузчика отладочных сообщений DebugConsole:\r\n\r\n%s"),
@@ -166,8 +164,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int 
             MessageBox(GetActiveWindow(), strMessage.GetString(), _T("WARNING"), MB_ICONWARNING);
         }
     }
+    DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT | DH::DEBUG_EXTRA_INFO | DH::DEBUG_DEVCON_OUT);
 
-    DH::InitDebugHelpers(DH::DEBUG_WIN32_OUT | DH::DEBUG_DEVCON_OUT | DH::DEBUG_EXTRA_INFO);
     try {
         hCode = Run(lpstrCmdLine, nCmdShow);
     }

@@ -200,6 +200,9 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     {
+        ModifyStyle(0xffffffff, WS_OVERLAPPEDWINDOW);
+        ModifyStyleEx(0xffffffff, WS_EX_APPWINDOW);
+
         static const
         PCWSTR   pszClasses{L"BUTTON;EDIT;MENU;SCROLLBAR"};
         HRESULT const hCode{ThemedInit(pszClasses)};
@@ -250,7 +253,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         m_crCell1.SetColor(0x7f3a21, RGB_MAX_INT);
         m_crCell1.SetHolder(GetDlgItem(IDC_COLOR1));
 
-        DlgResize_Init(false, true, 0);
+        DlgResize_Init(true, true, 0);
         return TRUE;
     }
 };

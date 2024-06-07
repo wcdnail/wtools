@@ -76,7 +76,7 @@ namespace DH
         static TCHAR hdrText2[]{_T("PID")};
         static TCHAR hdrText3[]{_T("TID")};
         static TCHAR hdrText4[]{_T("Level")};
-        static TCHAR hdrText5[]{_T("...")};
+        static TCHAR hdrText5[]{_T("Debug")};
         static ColumnItem colItems[DCCI_COUNT]{
             { 32, hdrText0, _countof(hdrText0)},
             {128, hdrText1, _countof(hdrText1)},
@@ -394,7 +394,6 @@ namespace DH
         UNREFERENCED_PARAMETER(filePathName);
         //std::streamsize const len{::GetWindowTextLengthA(console_)};
         //if (len > 0) {
-        //    // TODO: save rich text (RTF)!
         //    std::string buffer(static_cast<std::string::size_type>(len)+1, '\0');
         //    int const storedLen{::GetWindowTextA(console_, &buffer[0], static_cast<int>(len))};
         //    if (storedLen > 0) {

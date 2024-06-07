@@ -13,13 +13,13 @@ namespace DH
     BasicDebugConsole::Parameters::~Parameters() = default;
 
     BasicDebugConsole::BasicDebugConsole(DebugConsole const& owner)
-        : params_("Liberation Mono", 11, cf::put_at::right | cf::put_at::bottom, 600, 240) // "Cascadia Mono Light"
-        , consoleHandle_(nullptr)
-        , coutListener_(owner, std::cout)
-        , cerrListener_(owner, std::cerr)
-        , wcoutListener_(owner, std::wcout)
-        , wcerrListener_(owner, std::wcerr)
-        , debugOutputListener_(owner)
+        :              params_{"Liberation Mono", 11, cf::put_at::right | cf::put_at::bottom, 600, 240} // "Cascadia Mono Light"
+        ,       consoleHandle_{nullptr}
+        ,        coutListener_{owner, std::cout}
+        ,        cerrListener_{owner, std::cerr}
+        ,       wcoutListener_{owner, std::wcout}
+        ,       wcerrListener_{owner, std::wcerr}
+        , debugOutputListener_{owner}
     {
     }
 
@@ -137,6 +137,9 @@ namespace DH
         if (dwCurrentPID == pid_) {
             pid_ = GetCurrentProcessId();
         }
+        if (dwCurrentTID == tid_) {
+            tid_ = GetCurrentThreadId();
+        }
     }
 
     BasicDebugConsole::StringItem::StringItem(unsigned level, std::string_view nrView, DWORD dwTID, DWORD dwPID)
@@ -251,44 +254,35 @@ namespace DH
 
     std::string BasicDebugConsole::GenerateLogFilename()
     {
-        char moduleName[2048] = {0};
-        ::GetModuleFileNameA(nullptr, moduleName, _countof(moduleName)-1);
-
-        std::string logFilename = moduleName;
-        std::string::size_type l = logFilename.length();
-        std::string::size_type n = logFilename.rfind('\\');
-        if ( std::string::npos != n )
-        {
+        char moduleName[512]{0};
+        GetModuleFileNameA(nullptr, moduleName, _countof(moduleName)-1); // ##TODO: check moduleName == NULL
+        std::string  logFilename{moduleName};
+        std::string::size_type l{logFilename.length()};
+        std::string::size_type n{logFilename.rfind('\\')};
+        if (std::string::npos != n) {
             ++n;
             logFilename = logFilename.substr(n, l-n);
         }
-
         l = logFilename.length();
         n = logFilename.rfind('.');
-        if ( std::string::npos != n )
-        {
+        if (std::string::npos != n) {
             logFilename = logFilename.substr(0, l-(l-n));
         }
-
         __time64_t ts = ::_time64(&ts);
         tm localTime = {0};
-        if (0 == ::_localtime64_s(&localTime, &ts))
-        {
+        if (0 == _localtime64_s(&localTime, &ts)) {
             char timeStr[256] = {0};
-            const size_t rv = ::strftime(timeStr, _countof(timeStr), "%d_%m_%Y__%H_%M_%S", &localTime);
-            if (rv > 0)
-            {
+            const size_t rv = strftime(timeStr, _countof(timeStr), "%d_%m_%Y__%H_%M_%S", &localTime);
+            if (rv > 0) {
                 logFilename += ".";
                 logFilename += timeStr;
             }
         }
-
         char tickCountStr[256] = {0};
-        if (0 == ::_i64toa_s(::GetTickCount(), tickCountStr, _countof(tickCountStr), 10)) {
+        if (0 == _i64toa_s(::GetTickCount(), tickCountStr, _countof(tickCountStr), 10)) {
             logFilename += "_";
             logFilename += tickCountStr;
         }
-
         logFilename += ".txt";
         return logFilename;
     }
