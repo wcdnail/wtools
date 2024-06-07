@@ -16,22 +16,28 @@ CMake will be provided later.
 ### Build deps
 - [WTL](https://sourceforge.net/projects/wtl/)
 - [WIL](https://github.com/microsoft/wil)
-- [CLIPP](https://github.com/wcdnail/clipp) WARNING: use my fork instead original (TCHAR support)
-- [GTEST](https://github.com/google/googletest) (optional)
+- [CLIPP](https://github.com/wcdnail/clipp) WARNING: use this fork instead original (TCHAR support)
+- [boost-config](https://github.com/boostorg/config) compiler & stdlib macros
+- [GTEST](https://github.com/google/googletest) for UT
 
 ### Build prepare
 Clone VCPKG;
 
-WARNING: Use [my fork](https://github.com/wcdnail/wcpkg.git), there're CLIPP with TCHAR support
+WARNING: Use [this fork](https://github.com/wcdnail/wcpkg.git), there're CLIPP with TCHAR support
 
 Win CMD:
 ```cmd
 cd /D "c:\PATH\TO\VCPKG"
-setx VCPKG_ROOT=%CD%
+
+rem WARN: setup VCPKG_ROOT system wide
+setx VCPKG_ROOT %CD%
+
+rem setup VCPKG_ROOT env var for this cmd session
+set VCPKG_ROOT=%CD%
+
 call bootstrap-vcpkg.bat -disableMetrics
-vcpkg install wtl wil clipp
-rem optional
-vcpkg install gtest
+vcpkg install wtl wil clipp gtest boost-config
+
 rem ...
 rem See legacy alert
 vcpkg install boost

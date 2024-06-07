@@ -115,9 +115,9 @@ namespace Runtime
             ~UserInfo();
         };
 
-        static WCDAFX_API PCWSTR Compiler;
-        static WCDAFX_API PCWSTR CLib;
-        static WCDAFX_API PCWSTR TargetOs;
+        static WCDAFX_API PCSTR Compiler;
+        static WCDAFX_API PCSTR CLib;
+        static WCDAFX_API PCSTR TargetOs;
 
         SystemInfo System;
         ExecutableInfo Executable;

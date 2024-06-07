@@ -3,6 +3,9 @@
 #include <string.utils.error.code.h>
 #include <dh.tracing.h>
 #include <dh.tracing.defs.h>
+#include <string>
+#include <vector>
+#include <sstream>
 #include <fstream>
 
 namespace 
@@ -19,6 +22,15 @@ namespace
 
 namespace DH
 {
+    template <typename Char>
+    using String = std::basic_string<Char>;
+
+    template <typename Char>
+    using StrVec = std::vector<String<Char>>;
+
+    template <typename Char>
+    using SIStream = std::basic_istringstream<Char>;
+
     struct DCListViewImpl::StaticInit
     {
         static StaticInit& Instance()
@@ -220,12 +232,11 @@ namespace DH
     template <typename Char>
     static bool InsertLVItem(WTL::CListViewCtrl&  ctlConsole,
                              int                        nPos,
-                             std::basic_string<Char>&&  sNum,
-                             std::basic_string<Char>&& sTime,
-                             std::basic_string<Char>&&  sPID,
-                             std::basic_string<Char>&  sText)
+                             String<Char>&&             sNum,
+                             String<Char>&             sTime,
+                             String<Char>&              sPID,
+                             String<Char>&             sText)
     {
-        using    StrType = std::basic_string<Char>;
         using ItemStruct = typename ListViewItemTraits<Char>::ItemStruct;
 
         ItemStruct lvItem{0};
@@ -258,16 +269,40 @@ namespace DH
         return true;
     }
 
+    template <typename Char>
+    static StrVec<Char> SplitByLines(std::basic_string<Char> const& sText)
+    {
+        StrVec<Char>       result{};
+        String<Char>         line{};
+        SIStream<Char>        stm{sText};
+        while (std::getline<Char>(stm, line)) {
+            result.emplace_back(std::move(line)); 
+        }
+        return result;
+    }
+
     void DCListViewImpl::WriteNarrow(std::string& nrString, double dTs, DWORD dwPID)
     {
-        int const nPos{console_.GetItemCount()};
-        InsertLVItem<char>(console_, nPos, std::to_string(nPos), std::to_string(dTs), std::to_string(dwPID), nrString);
+        int  nPos{console_.GetItemCount()};
+        auto  sTS{std::to_string(dTs)};
+        auto sPID{std::to_string(dwPID)};
+        auto sVec{SplitByLines<char>(nrString)};
+        for (auto& it: sVec) {
+            InsertLVItem<char>(console_, nPos, std::to_string(nPos), sTS, sPID, it);
+            ++nPos;
+        }
     }
 
     void DCListViewImpl::WriteWide(std::wstring& wdString, double dTs, DWORD dwPID)
     {
-        int const   nPos{console_.GetItemCount()};
-        InsertLVItem<wchar_t>(console_, nPos, std::to_wstring(nPos), std::to_wstring(dTs), std::to_wstring(dwPID), wdString);
+        int  nPos{console_.GetItemCount()};
+        auto  sTS{std::to_wstring(dTs)};
+        auto sPID{std::to_wstring(dwPID)};
+        auto sVec{SplitByLines<wchar_t>(wdString)};
+        for (auto& it: sVec) {
+            InsertLVItem<wchar_t>(console_, nPos, std::to_wstring(nPos), sTS, sPID, it);
+            ++nPos;
+        }
     }
 
     void DCListViewImpl::ClearSelection()
