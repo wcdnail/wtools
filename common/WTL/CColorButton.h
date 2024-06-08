@@ -155,7 +155,9 @@
 #include "IColorObserver.h"
 #include <color.stuff.h>
 #include <wcdafx.api.h>
+#include <atlapp.h>
 #include <atlwin.h>
+#include <atltheme.h>
 #include <string>
 #include <memory>
 
@@ -171,11 +173,11 @@
 //
 //-----------------------------------------------------------------------------
 
-#define CPN_SELCHANGE        0x8000 /* Colour Picker Selection change */
-#define CPN_DROPDOWN         0x8001 /* Colour Picker drop down */
-#define CPN_CLOSEUP          0x8002 /* Colour Picker close up */
-#define CPN_SELENDOK         0x8003 /* Colour Picker end OK */
-#define CPN_SELENDCANCEL     0x8004 /* Colour Picker end (cancelled) */
+static UINT constexpr    CPN_SELCHANGE{0x8000}; /* Colour Picker Selection change */
+static UINT constexpr     CPN_DROPDOWN{0x8001}; /* Colour Picker drop down */
+static UINT constexpr      CPN_CLOSEUP{0x8002}; /* Colour Picker close up */
+static UINT constexpr     CPN_SELENDOK{0x8003}; /* Colour Picker end OK */
+static UINT constexpr CPN_SELENDCANCEL{0x8004}; /* Colour Picker end (cancelled) */
 
 struct NMCOLORBUTTON
 {
@@ -189,9 +191,11 @@ struct NMCOLORBUTTON
 // Class definition
 //
 //-----------------------------------------------------------------------------
-class CColorButton: public ATL::CWindowImpl<CColorButton>,
-                    public IColor,
-                    public IColorObserver
+class CColorButton: private ATL::CWindowImpl<CColorButton>,
+                    private WTL::CThemeImpl<CColorButton>,
+                    private WTL::CBufferedPaintImpl<CColorButton>,
+                    public  IColor,
+                    public  IColorObserver
 {
     // @access Types and enumerations
 public:
@@ -204,9 +208,6 @@ public:
 
     // @cmember General constructor
     CColorButton();
-
-    // @cmember Subclass the window
-    BOOL SubclassWindow(HWND hWnd);
 
     // @cmember Get the current color
     COLORREF GetColorRef() const override;
@@ -259,53 +260,46 @@ public:
     // @cmember Do we have default text
     BOOL HasDefaultText() const;
 
+    // @cmember Subclass the window
+    BOOL SubclassWindow(HWND hWnd);
+
 private:
     friend ATL::CWindowImpl<CColorButton>;
+    friend WTL::CThemeImpl<CColorButton>;
+    friend WTL::CBufferedPaintImpl<CColorButton>;
 
-    BEGIN_MSG_MAP(CColorButton)
-        if(PreProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult)) {
-            return TRUE;
-        }
-        MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove);
-        MESSAGE_HANDLER(WM_MOUSELEAVE, OnMouseLeave);
-        MESSAGE_HANDLER(OCM__BASE + WM_DRAWITEM, OnDrawItem)
-        REFLECTED_COMMAND_CODE_HANDLER(BN_CLICKED, OnClicked)
-    ALT_MSG_MAP(1)
-        MESSAGE_HANDLER(WM_PAINT, OnPickerPaint);
-        MESSAGE_HANDLER(WM_QUERYNEWPALETTE, OnPickerQueryNewPalette);
-        MESSAGE_HANDLER(WM_PALETTECHANGED, OnPickerPaletteChanged);
-    END_MSG_MAP()
+    BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) override;
 
     void _SetColor(COLORREF clrCurrent, int nAlpha);
     void OnColorUpdate(IColor const& clrSource) override;
 
-    // @access ATL Message handlers
+    bool DrawThemeBkgnd(WTL::CDCHandle dc, CRect& rcDraw, UINT uState, bool fPopupActive, bool fMouseOver);
+
+    void ButtonDraw(WTL::CDCHandle dc, CRect const& rc, UINT uState);
+    UINT GetButtonState() const;
+    void DoPaint(WTL::CDCHandle dc, RECT const& rc);
+
 protected:
-    BOOL PreProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult) const;
-
-    // @cmember Handle draw item
-    LRESULT OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-
     // @cmember Handle mouse move
-    LRESULT OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnMouseMove(UINT nFlags, CPoint pt);
 
     // @cmember Handle mouse leave
-    LRESULT OnMouseLeave(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnMouseLeave();
 
     // @cmember Handle key down for picker
-    LRESULT OnPickerKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnPickerKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) const;
 
     // @cmember Handle button up event for picker
-    LRESULT OnPickerLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnPickerLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) const;
 
     // @cmember Handle mouse move for picker
-    LRESULT OnPickerMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnPickerMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) const;
 
     // @cmember Handle paint for picker
-    LRESULT OnPickerPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) const;
+    LRESULT DoPickerPaint(WTL::CDCHandle) const;
 
     // @cmember Handle palette query for picker
-    LRESULT OnPickerQueryNewPalette(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnPickerQueryNewPalette();
 
     // @cmember Handle palette change for picker
     LRESULT OnPickerPaletteChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -315,14 +309,7 @@ public:
     // @cmember Handle on click
     LRESULT OnClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
-    // @access Protected static methods
 protected:
-    // @cmember Draw an arrow
-    static void DrawArrow(WTL::CDC& dc, const RECT& rect, int iDirection = 0, COLORREF clrArrow = RGB(0, 0, 0));
-
-    // @access Protected members
-protected:
-    struct CThemed;
     struct CPickerImpl;
 
     // @cmember Send WM_NOTIFY to parent enabler
@@ -351,9 +338,6 @@ protected:
 
     // @cmember The contained picker control
     std::unique_ptr<CPickerImpl> m_pPicker;
-
-    // @cmember The contained themed impl
-    std::unique_ptr<CThemed> m_pThemed;
 };
 
 inline COLORREF CColorButton::GetDefaultColor() const

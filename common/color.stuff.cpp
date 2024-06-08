@@ -38,14 +38,6 @@ namespace CF
         return color ^ 0xffffff;
     }
 
-    COLORREF ComplementColor(COLORREF color)
-    { 
-        return (0xff - (color & 0xff))
-            | ((0xff - ((color >> 8) & 0xff)) << 8)
-            | ((0xff - ((color >> 16) & 0xff)) << 16)
-            ;
-    }
-
     //
     // Refactored from https://github.com/jakebesworth/Simple-Color-Conversions/blob/master/color.c
     // by Jake Besworth

@@ -17,8 +17,9 @@
 #define IDC_PIC_CTL1                    1007
 #define IDC_COLOR1                      1008
 #define IDC_DEBUG_CONSOLE               1009
+#define IDC_DEBUG_CONSOLE2              1010
+#define IDC_DRAWER                      1010
 #define IDC_RADIO_LEFT                  1011
-#define IDC_PICKE_MV_FLAGS              1012
 #define IDC_PICKER_MV_FLAGS             1012
 #define IDC_RADIO_XCENTER               1013
 #define IDC_RADIO_RIGHT                 1014

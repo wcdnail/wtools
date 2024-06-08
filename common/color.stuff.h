@@ -75,7 +75,6 @@ namespace CF
     WCDAFX_API COLORREF IncreaseColor(COLORREF color, COLORREF R, COLORREF G, COLORREF B);
     WCDAFX_API COLORREF InvertColor(COLORREF color);
     WCDAFX_API COLORREF CalcContrastColor(COLORREF color, COLORREF tolerance = 0x10);
-    WCDAFX_API COLORREF ComplementColor(COLORREF color);
 
     WCDAFX_API void HSVtoRGB(double const dH, double const dS, double const dV, int& R, int& G, int& B);
     WCDAFX_API void RGBtoHSV(int const R, int const G, int const B, double& dH, double& dS, double& dV);

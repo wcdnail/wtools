@@ -99,6 +99,10 @@
 #include "CColorButton.h"
 #include "CColorPickerDlg.h"
 #include <color.stuff.h>
+#include <string.utils.error.code.h>
+#include <dh.tracing.h>
+#include <atlcrack.h>
+
 
 //
 // The Picker class name
@@ -156,73 +160,72 @@ static const CSize s_sizeBoxCore(14, 14);
 // made drawing and hit test 100000 times easier.
 //
 
-#define COLORBUTTON_NOTHEMES 0
-
 //-----------------------------------------------------------------------------
 //
-// Test for themes
+// @mfunc Draw the arrow of the button
+//
+// @parm WTL::CDC & | dc | Destination DC
+//
+// @parm const RECT & | rect | Rectangle of the control
+//
+// @parm int | iDirection | Direction
+//
+// @parm COLORREF | clrArrow | Color to draw the arrow.
+//
+// @rdesc None
 //
 //-----------------------------------------------------------------------------
-
-#if (COLORBUTTON_NOTHEMES == 1) || !defined (__ATLTHEME_H__)
-
-struct CColorButton::CThemed
+static void DrawArrow(WTL::CDCHandle dc, const RECT& rect, int iDirection, COLORREF clrArrow)
 {
-    HANDLE OpenThemeData(PCWSTR) { return INVALID_HANDLE_VALUE; }
-    bool DrawThemeBkgnd(CDCHandle, CRect&, UINT, bool, bool) { return false; }
-    BOOL ProcessWindowMessage(HWND, UINT, WPARAM, LPARAM, LRESULT&) { return FALSE; }
-};
-
-#else
-
-struct CColorButton::CThemed : public WTL::CThemeImpl<CThemed>
-{
-    CColorButton& m_rMaster;
-    HWND&            m_hWnd;
-
-    ~CThemed()
-    {
+    POINT ptsArrow[3];
+    switch (iDirection) {
+    case 0: // Down
+        ptsArrow[0].x = rect.left;
+        ptsArrow[0].y = rect.top;
+        ptsArrow[1].x = rect.right;
+        ptsArrow[1].y = rect.top;
+        ptsArrow[2].x = (rect.left + rect.right) / 2;
+        ptsArrow[2].y = rect.bottom;
+        break;
+    case 1: // Up
+        ptsArrow[0].x = rect.left;
+        ptsArrow[0].y = rect.bottom;
+        ptsArrow[1].x = rect.right;
+        ptsArrow[1].y = rect.bottom;
+        ptsArrow[2].x = (rect.left + rect.right) / 2;
+        ptsArrow[2].y = rect.top;
+        break;
+    case 2: // Left
+        ptsArrow[0].x = rect.right;
+        ptsArrow[0].y = rect.top;
+        ptsArrow[1].x = rect.right;
+        ptsArrow[1].y = rect.bottom;
+        ptsArrow[2].x = rect.left;
+        ptsArrow[2].y = (rect.top + rect.bottom) / 2;
+        break;
+    case 3: // Right
+        ptsArrow[0].x = rect.left;
+        ptsArrow[0].y = rect.top;
+        ptsArrow[1].x = rect.left;
+        ptsArrow[1].y = rect.bottom;
+        ptsArrow[2].x = rect.right;
+        ptsArrow[2].y = (rect.top + rect.bottom) / 2;
+        break;
     }
+    WTL::CBrush brArrow{};
+    WTL::CPen  penArrow{};
+    brArrow.CreateSolidBrush(clrArrow);
+    penArrow.CreatePen(PS_SOLID, 0, clrArrow);
 
-    CThemed(CColorButton& rMaster)
-        : m_rMaster{rMaster}
-        ,    m_hWnd{rMaster.m_hWnd}
-    {
-    }
+    HBRUSH const hbrOld{dc.SelectBrush(brArrow)};
+    HPEN const  hpenOld{dc.SelectPen(penArrow)};
 
-    DWORD GetExStyle() const throw()
-    {
-        return m_rMaster.GetExStyle();
-    }
+    dc.SetPolyFillMode(WINDING);
+    dc.Polygon(ptsArrow, 3);
 
-    bool DrawThemeBkgnd(WTL::CDCHandle dc, CRect& rcDraw, UINT uState, bool fPopupActive, bool fMouseOver)
-    {
-        if (!m_hTheme) {
-            return false;
-        }
-        //
-        // Draw the outer edge
-        //
-        UINT uFrameState = 0;
-        if ((uState & ODS_SELECTED) != 0 || fPopupActive) {
-            uFrameState |= PBS_PRESSED;
-        }
-        if ((uState & ODS_DISABLED) != 0) {
-            uFrameState |= PBS_DISABLED;
-        }
-        if ((uState & ODS_HOTLIGHT) != 0 || fMouseOver) {
-            uFrameState |= PBS_HOT;
-        }
-        else if ((uState & ODS_DEFAULT) != 0) {
-            uFrameState |= PBS_DEFAULTED;
-        }
-        DrawThemeBackground(dc, BP_PUSHBUTTON, uFrameState, &rcDraw, nullptr);
-        GetThemeBackgroundContentRect(dc, BP_PUSHBUTTON, uFrameState, &rcDraw, &rcDraw);
-        return true;
-    }
-};
-
-#endif
+    dc.SelectBrush(hbrOld);
+    dc.SelectPen(hpenOld);
+}
 
 //
 // THE FOLLOWING variables control the popup
@@ -313,7 +316,7 @@ struct CColorButton::CPickerImpl
     void EndPickerSelection(BOOL fOked);
 
     // @cmember Draw a cell
-    void DrawPickerCell(WTL::CDC& dc, int nIndex);
+    void DrawPickerCell(WTL::CDCHandle dc, int nIndex) const;
 
     // @cmember Send notification message
     void SendNotification(UINT nCode, COLORREF clr, BOOL fColorValid);
@@ -396,7 +399,6 @@ CColorButton::CColorButton()
     , m_fTrackSelection{false}
     ,      m_fMouseOver{false}
     ,         m_pPicker{std::make_unique<CPickerImpl>(*this)}
-    ,         m_pThemed{std::make_unique<CThemed>(*this)}
 {
 }
 
@@ -456,34 +458,29 @@ void CColorButton::SetDefaultText(UINT nID)
     }
 }
 
-BOOL CColorButton::PreProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult) const
+BOOL CColorButton::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 {
-    CHAIN_MSG_MAP_MEMBER((*m_pThemed))
+    BOOL bHandled = TRUE;
+    switch (dwMsgMapID) {
+    case 0:
+        MESSAGE_HANDLER(WM_PAINT, WTL::CBufferedPaintImpl<CColorButton>::OnPaint)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_MOUSELEAVE(OnMouseLeave)
+        REFLECTED_COMMAND_CODE_HANDLER(BN_CLICKED, OnClicked)
+        CHAIN_MSG_MAP(CThemeImpl<CColorButton>)
+        break;
+    case 1:
+        MSG_WM_PAINT(DoPickerPaint)
+        MSG_WM_QUERYNEWPALETTE(OnPickerQueryNewPalette)
+        MESSAGE_HANDLER(WM_PALETTECHANGED, OnPickerPaletteChanged)
+        break;
+    default:
+        ATLTRACE(static_cast<int>(ATL::atlTraceWindowing), 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID);
+        ATLASSERT(FALSE);
+        break;
+    }
     return FALSE;
 }
-
-//-----------------------------------------------------------------------------
-//
-// @mfunc Subclass the control
-//
-// @parm HWND | hWnd | Handle of the window to be subclassed
-// 
-// @rdesc Return value
-//
-//      @flag TRUE | Window was subclassed
-//      @flag FALSE | Window was not subclassed
-//
-//-----------------------------------------------------------------------------
-BOOL CColorButton::SubclassWindow(HWND hWnd)
-{
-    CWindowImpl<CColorButton>::SubclassWindow(hWnd);
-    ModifyStyle(0, BS_OWNERDRAW);
-    if (!m_pThemed->OpenThemeData(L"Button")) {
-        // TODO: report...
-    }
-    return TRUE;
-}
-
 
 //-----------------------------------------------------------------------------
 //
@@ -631,18 +628,20 @@ LRESULT CColorButton::OnClicked(WORD, WORD, HWND, BOOL&)
 // @rdesc Routine results
 //
 //-----------------------------------------------------------------------------
-LRESULT CColorButton::OnMouseMove(UINT, WPARAM, LPARAM, BOOL& bHandled)
+LRESULT CColorButton::OnMouseMove(UINT nFlags, CPoint pt)
 {
+    UNREFERENCED_PARAMETER(nFlags);
+    UNREFERENCED_PARAMETER(pt);
     if (!m_fMouseOver) {
         m_fMouseOver = true;
-        TRACKMOUSEEVENT tme;
-        tme.cbSize = sizeof (tme);
+        TRACKMOUSEEVENT tme{};
+        tme.cbSize = sizeof(tme);
         tme.dwFlags = TME_LEAVE;
         tme.hwndTrack = m_hWnd;
         _TrackMouseEvent(&tme);
-        InvalidateRect(nullptr);
+        InvalidateRect(nullptr, FALSE);
     }
-    bHandled = FALSE;
+    SetMsgHandled(FALSE);
     return FALSE;
 }
 
@@ -661,14 +660,40 @@ LRESULT CColorButton::OnMouseMove(UINT, WPARAM, LPARAM, BOOL& bHandled)
 // @rdesc Routine results
 //
 //-----------------------------------------------------------------------------
-LRESULT CColorButton::OnMouseLeave(UINT, WPARAM, LPARAM, BOOL& bHandled)
+LRESULT CColorButton::OnMouseLeave()
 {
     if (m_fMouseOver) {
         m_fMouseOver = false;
         InvalidateRect(nullptr);
     }
-    bHandled = FALSE;
+    SetMsgHandled(FALSE);
     return FALSE;
+}
+
+bool CColorButton::DrawThemeBkgnd(WTL::CDCHandle dc, CRect& rcDraw, UINT uState, bool fPopupActive, bool fMouseOver)
+{
+    if (!m_hTheme) {
+        return false;
+    }
+    //
+    // Draw the outer edge
+    //
+    UINT uFrameState = 0;
+    if ((uState & ODS_SELECTED) != 0 || fPopupActive) {
+        uFrameState |= PBS_PRESSED;
+    }
+    if ((uState & ODS_DISABLED) != 0) {
+        uFrameState |= PBS_DISABLED;
+    }
+    if ((uState & ODS_HOTLIGHT) != 0 || fMouseOver) {
+        uFrameState |= PBS_HOT;
+    }
+    else if ((uState & ODS_DEFAULT) != 0) {
+        uFrameState |= PBS_DEFAULTED;
+    }
+    DrawThemeBackground(dc, BP_PUSHBUTTON, uFrameState, &rcDraw, nullptr);
+    GetThemeBackgroundContentRect(dc, BP_PUSHBUTTON, uFrameState, &rcDraw, &rcDraw);
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -686,26 +711,18 @@ LRESULT CColorButton::OnMouseLeave(UINT, WPARAM, LPARAM, BOOL& bHandled)
 // @rdesc Routine results
 //
 //-----------------------------------------------------------------------------
-LRESULT CColorButton::OnDrawItem(UINT, WPARAM, LPARAM lParam, BOOL&)
+void CColorButton::ButtonDraw(WTL::CDCHandle dc, CRect const& rc, UINT uState)
 {
-    const auto lpItem{reinterpret_cast<LPDRAWITEMSTRUCT>(lParam)};
-    UINT const uState{lpItem->itemState};
-    CRect      rcDraw{lpItem->rcItem};
-    WTL::CDC       dc{lpItem->hDC};
+    CRect rcDraw{rc};
     //
     // If we have a theme
     //
     m_fPopupActive = false;
-    if (m_pThemed->DrawThemeBkgnd(dc.m_hDC, rcDraw, uState, m_fPopupActive, m_fMouseOver)) {
-    }
-    //
-    // Otherwise, we are old school
-    //
-    else {
+    if (!DrawThemeBkgnd(dc, rcDraw, uState, m_fPopupActive, m_fMouseOver)) {
         //
         // Draw the outer edge
         //
-        UINT uFrameState = DFCS_BUTTONPUSH | DFCS_ADJUSTRECT;
+        UINT uFrameState{DFCS_BUTTONPUSH | DFCS_ADJUSTRECT};
         if ((uState & ODS_SELECTED) != 0 || m_fPopupActive) {
             uFrameState |= DFCS_PUSHED;
         }
@@ -720,37 +737,38 @@ LRESULT CColorButton::OnDrawItem(UINT, WPARAM, LPARAM lParam, BOOL&)
             rcDraw.OffsetRect(1, 1);
         }
     }
+    int const nCXEdge{GetSystemMetrics(SM_CXEDGE)};
+    int const nCYEdge{GetSystemMetrics(SM_CYEDGE)};
+    rcDraw.DeflateRect(nCXEdge, nCYEdge);
+
     //
     // Draw focus
     //
     if ((uState & ODS_FOCUS) != 0 || m_fPopupActive) {
-        const CRect rcFocus(rcDraw.left, rcDraw.top,
-                            rcDraw.right - 1, rcDraw.bottom);
+        CRect const rcFocus{rcDraw.left, rcDraw.top, rcDraw.right - 1, rcDraw.bottom};
         dc.DrawFocusRect(&rcFocus);
     }
-    rcDraw.InflateRect(
-        -GetSystemMetrics(SM_CXEDGE),
-        -GetSystemMetrics(SM_CYEDGE));
+
+    rcDraw.DeflateRect(nCXEdge, nCYEdge);
     //
     // Draw the arrow
     //
     {
         CRect rcArrow;
-        rcArrow.left = rcDraw.right - g_ciArrowSizeX - ::GetSystemMetrics(SM_CXEDGE) / 2;
+        rcArrow.left = rcDraw.right - g_ciArrowSizeX - nCXEdge / 2;
         rcArrow.top = (rcDraw.bottom + rcDraw.top) / 2 - g_ciArrowSizeY / 2;
         rcArrow.right = rcArrow.left + g_ciArrowSizeX;
         rcArrow.bottom = (rcDraw.bottom + rcDraw.top) / 2 + g_ciArrowSizeY / 2;
 
-        DrawArrow(dc, rcArrow, 0,
-                  (uState & ODS_DISABLED) ? ::GetSysColor(COLOR_GRAYTEXT) : RGB(0, 0, 0));
-
-        rcDraw.right = rcArrow.left - ::GetSystemMetrics(SM_CXEDGE) / 2;
+        DrawArrow(dc, rcArrow, 0, (uState & ODS_DISABLED) ? GetSysColor(COLOR_GRAYTEXT) : RGB(0, 0, 0));
+        rcDraw.right = rcArrow.left - nCXEdge / 2;
     }
     //
     // Draw separator
     //
+    rcDraw.DeflateRect(1, 1);
     dc.DrawEdge(&rcDraw, EDGE_ETCHED, BF_RIGHT);
-    rcDraw.right -= (::GetSystemMetrics(SM_CXEDGE) * 2) + 1;
+    rcDraw.right -= (nCXEdge * 2) + 1;
     //
     // Draw color
     //
@@ -759,76 +777,69 @@ LRESULT CColorButton::OnDrawItem(UINT, WPARAM, LPARAM lParam, BOOL&)
         dc.ExtTextOut(0, 0, ETO_OPAQUE, &rcDraw, nullptr, 0, nullptr);
         dc.FrameRect(&rcDraw, static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH)));
     }
-    return 1;
+}
+
+UINT CColorButton::GetButtonState() const
+{
+    WTL::CButton const wBtn{m_hWnd};
+    UINT const      nBState{wBtn.GetState()};
+    UINT             nState{0};
+    if (!IsWindowEnabled()) {
+        nState |= ODS_DISABLED;
+    }
+    if (nBState & BST_FOCUS) {
+        nState |= ODS_FOCUS;
+    }
+    if (nBState & BST_PUSHED) {
+        nState |= ODS_SELECTED;
+    }
+    if (wBtn.GetButtonStyle() & BS_DEFPUSHBUTTON) {
+        nState |= ODS_DEFAULT;
+    }
+    return nState;
+}
+
+void CColorButton::DoPaint(WTL::CDCHandle dc, RECT const& rect)
+{
+    CRect const rc{rect};
+    if constexpr (true) {
+        COLORREF const crBackgnd{GetSysColor(COLOR_BTNFACE)};
+        dc.FillSolidRect(rc, crBackgnd);
+    }
+    else {
+        HRESULT const hCode{DrawThemeBackground(dc, CP_TRANSPARENTBACKGROUND, CBTBS_NORMAL, &rc, nullptr)};
+        if (FAILED(hCode)) {
+            DH::TPrintf(TL_Warning, L"DrawThemeBackground failed: 0x%08x %s\n",
+                hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
+        }
+    }
+    UINT const bState{GetButtonState()};
+    ButtonDraw(dc, rc, bState);
 }
 
 //-----------------------------------------------------------------------------
 //
-// @mfunc Draw the arrow of the button
+// @mfunc Subclass the control
 //
-// @parm WTL::CDC & | dc | Destination DC
+// @parm HWND | hWnd | Handle of the window to be subclassed
+// 
+// @rdesc Return value
 //
-// @parm const RECT & | rect | Rectangle of the control
-//
-// @parm int | iDirection | Direction
-//
-// @parm COLORREF | clrArrow | Color to draw the arrow.
-//
-// @rdesc None
+//      @flag TRUE | Window was subclassed
+//      @flag FALSE | Window was not subclassed
 //
 //-----------------------------------------------------------------------------
-
-void CColorButton::DrawArrow(WTL::CDC& dc, const RECT& rect,
-                             int iDirection, COLORREF clrArrow)
+BOOL CColorButton::SubclassWindow(HWND hWnd)
 {
-    POINT ptsArrow[3];
-    switch (iDirection) {
-    case 0: // Down
-        ptsArrow[0].x = rect.left;
-        ptsArrow[0].y = rect.top;
-        ptsArrow[1].x = rect.right;
-        ptsArrow[1].y = rect.top;
-        ptsArrow[2].x = (rect.left + rect.right) / 2;
-        ptsArrow[2].y = rect.bottom;
-        break;
-    case 1: // Up
-        ptsArrow[0].x = rect.left;
-        ptsArrow[0].y = rect.bottom;
-        ptsArrow[1].x = rect.right;
-        ptsArrow[1].y = rect.bottom;
-        ptsArrow[2].x = (rect.left + rect.right) / 2;
-        ptsArrow[2].y = rect.top;
-        break;
-    case 2: // Left
-        ptsArrow[0].x = rect.right;
-        ptsArrow[0].y = rect.top;
-        ptsArrow[1].x = rect.right;
-        ptsArrow[1].y = rect.bottom;
-        ptsArrow[2].x = rect.left;
-        ptsArrow[2].y = (rect.top + rect.bottom) / 2;
-        break;
-    case 3: // Right
-        ptsArrow[0].x = rect.left;
-        ptsArrow[0].y = rect.top;
-        ptsArrow[1].x = rect.left;
-        ptsArrow[1].y = rect.bottom;
-        ptsArrow[2].x = rect.right;
-        ptsArrow[2].y = (rect.top + rect.bottom) / 2;
-        break;
+    CWindowImpl<CColorButton>::SubclassWindow(hWnd);
+    //ModifyStyle(0, BS_OWNERDRAW);
+    PCWSTR const pszClasses{VSCLASS_COMBOBOX L";" VSCLASS_BUTTON};
+    if (!OpenThemeData(pszClasses)) {
+        auto const hCode{static_cast<HRESULT>(GetLastError())};
+        DH::TPrintf(TL_Warning, L"OpenThemeData['%s'] failed: 0x%08x %s\n", pszClasses,
+            hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
     }
-    WTL::CBrush brArrow{};
-    WTL::CPen  penArrow{};
-    brArrow.CreateSolidBrush(clrArrow);
-    penArrow.CreatePen(PS_SOLID, 0, clrArrow);
-
-    HBRUSH const hbrOld{dc.SelectBrush(brArrow)};
-    HPEN const  hpenOld{dc.SelectPen(penArrow)};
-
-    dc.SetPolyFillMode(WINDING);
-    dc.Polygon(ptsArrow, 3);
-
-    dc.SelectBrush(hbrOld);
-    dc.SelectPen(hpenOld);
+    return TRUE;
 }
 
 //-----------------------------------------------------------------------------
@@ -843,12 +854,11 @@ void CColorButton::DrawArrow(WTL::CDC& dc, const RECT& rect,
 //-----------------------------------------------------------------------------
 BOOL CColorButton::CPickerImpl::Picker()
 {
-    BOOL fOked = FALSE;
+    BOOL fOked{FALSE};
     //
     // See what version we are using
     //
-#if 1 // GetVersionEx is obsolete
-    OSVERSIONINFOEXW osvi = {};
+    OSVERSIONINFOEXW osvi{0};
     osvi.dwOSVersionInfoSize = sizeof(osvi);
     const DWORDLONG dwlConditionMask = VerSetConditionMask(
         VerSetConditionMask(
@@ -860,51 +870,43 @@ BOOL CColorButton::CPickerImpl::Picker()
     osvi.dwMajorVersion = HIBYTE(_WIN32_WINNT_WINXP);
     osvi.dwMinorVersion = LOBYTE(_WIN32_WINNT_WINXP);
     osvi.wServicePackMajor = 0;
-    const bool fIsXP = FALSE != VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR,
-                                                   dwlConditionMask);
-#else
-    OSVERSIONINFO osvi;
-    osvi .dwOSVersionInfoSize = sizeof (osvi);
-    ::GetVersionEx(&osvi);
-    const bool fIsXP = osvi .dwPlatformId == VER_PLATFORM_WIN32_NT &&
-        (osvi .dwMajorVersion > 5 || (osvi .dwMajorVersion == 5 &&
-        osvi .dwMinorVersion >= 1));
-#endif
+    const bool fIsXP{FALSE != VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR,
+                                                 dwlConditionMask)};
     //
     // Get the flat flag
     //
     m_fPickerFlat = FALSE;
-#if (_WIN32_WINNT >= 0x0501)
-    if (fIsXP)
-        ::SystemParametersInfo(SPI_GETFLATMENU, 0, &m_fPickerFlat, FALSE);
-#endif
+    if (fIsXP) {
+        SystemParametersInfoW(SPI_GETFLATMENU, 0, &m_fPickerFlat, FALSE);
+    }
     //
     // Get all the colors I need
     //
-    int nAlpha = 48;
-    m_clrBackground = ::GetSysColor(COLOR_MENU);
-    m_clrHiLightBorder = ::GetSysColor(COLOR_HIGHLIGHT);
+    int nAlpha{48};
+    m_clrBackground = GetSysColor(COLOR_MENU);
+    m_clrHiLightBorder = GetSysColor(COLOR_HIGHLIGHT);
     m_clrHiLight = m_clrHiLightBorder;
-#if (WINVER >= 0x0501)
-    if (fIsXP)
-        m_clrHiLight = ::GetSysColor(COLOR_MENUHILIGHT);
-#endif
-    m_clrHiLightText = ::GetSysColor(COLOR_HIGHLIGHTTEXT);
-    m_clrText = ::GetSysColor(COLOR_MENUTEXT);
+    if (fIsXP) {
+        m_clrHiLight = GetSysColor(COLOR_MENUHILIGHT);
+    }
+    m_clrHiLightText = GetSysColor(COLOR_HIGHLIGHTTEXT);
+    m_clrText = GetSysColor(COLOR_MENUTEXT);
     m_clrLoLight = RGB(
-        (GetRValue (m_clrBackground) * (255 - nAlpha) +
-            GetRValue (m_clrHiLightBorder) * nAlpha) >> 8,
-        (GetGValue (m_clrBackground) * (255 - nAlpha) +
-            GetGValue (m_clrHiLightBorder) * nAlpha) >> 8,
-        (GetBValue (m_clrBackground) * (255 - nAlpha) +
-            GetBValue (m_clrHiLightBorder) * nAlpha) >> 8);
+        (GetRValue(m_clrBackground) * (255 - nAlpha) +
+      GetRValue(m_clrHiLightBorder) * nAlpha) >> 8,
+        (GetGValue(m_clrBackground) * (255 - nAlpha) +
+      GetGValue(m_clrHiLightBorder) * nAlpha) >> 8,
+        (GetBValue(m_clrBackground) * (255 - nAlpha) +
+      GetBValue(m_clrHiLightBorder) * nAlpha) >> 8);
     //
     // Get the margins
     //
-    m_rectMargins.left = ::GetSystemMetrics(SM_CXEDGE);
-    m_rectMargins.top = ::GetSystemMetrics(SM_CYEDGE);
-    m_rectMargins.right = ::GetSystemMetrics(SM_CXEDGE);
-    m_rectMargins.bottom = ::GetSystemMetrics(SM_CYEDGE);
+    int const nCXEdge{GetSystemMetrics(SM_CXEDGE)};
+    int const nCYEdge{GetSystemMetrics(SM_CYEDGE)};
+    m_rectMargins.left = nCXEdge;
+    m_rectMargins.top = nCYEdge;
+    m_rectMargins.right = nCXEdge;
+    m_rectMargins.bottom = nCYEdge;
     //
     // Initialize some sizing parameters
     //
@@ -1387,7 +1389,7 @@ void CColorButton::CPickerImpl::FindPickerCellFromColor(COLORREF clr)
 //-----------------------------------------------------------------------------
 void CColorButton::CPickerImpl::OnMouseHover(int nIndex)
 {
-    WTL::CClientDC dc(m_wndPicker);
+    WTL::CClientDC const dc{m_wndPicker};
     //
     // Clamp the index
     //
@@ -1403,13 +1405,13 @@ void CColorButton::CPickerImpl::OnMouseHover(int nIndex)
         (m_nCurrentSel == DEFAULT_BOX_VALUE)) {
         int const nOldSel{m_nCurrentSel};
         m_nCurrentSel = INVALID_COLOR;
-        DrawPickerCell(dc, nOldSel);
+        DrawPickerCell(dc.m_hDC, nOldSel);
     }
     //
     // Set the current selection as row/col and draw (it will be drawn selected)
     //
     m_nCurrentSel = nIndex;
-    DrawPickerCell(dc, m_nCurrentSel);
+    DrawPickerCell(dc.m_hDC, m_nCurrentSel);
     //
     // Peek current
     //
@@ -1465,7 +1467,7 @@ void CColorButton::CPickerImpl::ChangePickerSelection(int nIndex, BOOL fTrackSel
 //-----------------------------------------------------------------------------
 void CColorButton::CPickerImpl::EndPickerSelection(BOOL fOked)
 {
-    ::ReleaseCapture();
+    ReleaseCapture();
     m_fOked = fOked;
 }
 
@@ -1481,7 +1483,7 @@ void CColorButton::CPickerImpl::EndPickerSelection(BOOL fOked)
 //
 //-----------------------------------------------------------------------------
 
-void CColorButton::CPickerImpl::DrawPickerCell(WTL::CDC& dc, int nIndex)
+void CColorButton::CPickerImpl::DrawPickerCell(WTL::CDCHandle dc, int nIndex) const
 {
     //
     // Get the drawing rect
@@ -1600,7 +1602,7 @@ void CColorButton::CPickerImpl::DrawPickerCell(WTL::CDC& dc, int nIndex)
             dc.ExtTextOut(0, 0, ETO_OPAQUE, rcDefColor, nullptr, 0, nullptr);
             dc.FrameRect(&rcDefColor, static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH)));
         }
-        HFONT hfontOld = dc.SelectFont(m_font);
+        HFONT const hfontOld{dc.SelectFont(m_font)};
         dc.SetTextColor(clrText);
         dc.SetBkMode(TRANSPARENT);
         dc.DrawText(pstrText->c_str(), static_cast<int>(pstrText->length()), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
@@ -1644,7 +1646,7 @@ void CColorButton::CPickerImpl::DrawPickerCell(WTL::CDC& dc, int nIndex)
 // @rdesc Routine results
 //
 //-----------------------------------------------------------------------------
-LRESULT CColorButton::OnPickerKeyDown(UINT, WPARAM wParam, LPARAM, BOOL& bHandled)
+LRESULT CColorButton::OnPickerKeyDown(UINT, WPARAM wParam, LPARAM, BOOL& bHandled) const
 {
     //
     // Get the key data
@@ -1738,20 +1740,20 @@ LRESULT CColorButton::OnPickerKeyDown(UINT, WPARAM wParam, LPARAM, BOOL& bHandle
 // @rdesc Routine results
 //
 //-----------------------------------------------------------------------------
-LRESULT CColorButton::OnPickerLButtonUp(UINT, WPARAM, LPARAM lParam, BOOL&)
+LRESULT CColorButton::OnPickerLButtonUp(UINT, WPARAM, LPARAM lParam, BOOL&) const
 {
     //
     // Where did the button come up at?
     //
-    CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-    const int nNewSelection = m_pPicker->PickerHitTest(pt);
+    CPoint const pt{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+    int const  nSel{m_pPicker->PickerHitTest(pt)};
     //
     // If valid, then change selection and end
     //
-    if (nNewSelection != m_pPicker->m_nCurrentSel) {
-        m_pPicker->OnMouseHover(nNewSelection);
+    if (nSel != m_pPicker->m_nCurrentSel) {
+        m_pPicker->OnMouseHover(nSel);
     }
-    m_pPicker->EndPickerSelection(nNewSelection != INVALID_COLOR);
+    m_pPicker->EndPickerSelection(nSel != INVALID_COLOR);
     return 0;
 }
 
@@ -1770,7 +1772,7 @@ LRESULT CColorButton::OnPickerLButtonUp(UINT, WPARAM, LPARAM lParam, BOOL&)
 // @rdesc Routine results
 //
 //-----------------------------------------------------------------------------
-LRESULT CColorButton::OnPickerMouseMove(UINT, WPARAM, LPARAM lParam, BOOL&)
+LRESULT CColorButton::OnPickerMouseMove(UINT, WPARAM, LPARAM lParam, BOOL&) const
 {
     //
     // Do a hit test
@@ -1803,7 +1805,7 @@ LRESULT CColorButton::OnPickerMouseMove(UINT, WPARAM, LPARAM lParam, BOOL&)
 // @rdesc Routine results
 //
 //-----------------------------------------------------------------------------
-LRESULT CColorButton::OnPickerPaint(UINT, WPARAM, LPARAM, BOOL&) const
+LRESULT CColorButton::DoPickerPaint(WTL::CDCHandle) const
 {
     WTL::CPaintDC dc{m_pPicker->m_wndPicker};
     CRect       rect{dc.m_ps.rcPaint};
@@ -1811,11 +1813,10 @@ LRESULT CColorButton::OnPickerPaint(UINT, WPARAM, LPARAM, BOOL&) const
     // Draw raised window edge (ex-window style WS_EX_WINDOWEDGE is sposed to do this,
     // but for some reason isn't
     //
-    //m_pPicker->m_wndPicker.GetClientRect(&rect);
     if (m_pPicker->m_fPickerFlat) {
         WTL::CPen pen;
         pen.CreatePen(PS_SOLID, 0, ::GetSysColor(COLOR_GRAYTEXT));
-        HPEN hpenOld = dc.SelectPen(pen);
+        HPEN const hpenOld{dc.SelectPen(pen)};
         dc.Rectangle(rect.left, rect.top, rect.Width(), rect.Height());
         dc.SelectPen(hpenOld);
     }
@@ -1826,19 +1827,19 @@ LRESULT CColorButton::OnPickerPaint(UINT, WPARAM, LPARAM, BOOL&) const
     // Draw the Default Area text
     // 
     if (HasDefaultText()) {
-        m_pPicker->DrawPickerCell(dc, DEFAULT_BOX_VALUE);
+        m_pPicker->DrawPickerCell(dc.m_hDC, DEFAULT_BOX_VALUE);
     }
     //
     // Draw colour cells
     // 
     for (int i = 0; i < m_pPicker->m_nNumColors; i++) {
-        m_pPicker->DrawPickerCell(dc, i);
+        m_pPicker->DrawPickerCell(dc.m_hDC, i);
     }
     //
     // Draw custom text
     //
     if (HasCustomText()) {
-        m_pPicker->DrawPickerCell(dc, CUSTOM_BOX_VALUE);
+        m_pPicker->DrawPickerCell(dc.m_hDC, CUSTOM_BOX_VALUE);
     }
     return 0;
 }
@@ -1858,10 +1859,11 @@ LRESULT CColorButton::OnPickerPaint(UINT, WPARAM, LPARAM, BOOL&) const
 // @rdesc Routine results
 //
 //-----------------------------------------------------------------------------
-LRESULT CColorButton::OnPickerQueryNewPalette(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&)
+LRESULT CColorButton::OnPickerQueryNewPalette()
 {
-    Invalidate();
-    return DefWindowProc(uMsg, wParam, lParam);
+    Invalidate(FALSE);
+    SetMsgHandled(FALSE);
+    return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1883,7 +1885,7 @@ LRESULT CColorButton::OnPickerPaletteChanged(UINT uMsg, WPARAM wParam, LPARAM lP
 {
     const LRESULT lResult = DefWindowProc(uMsg, wParam, lParam);
     if (reinterpret_cast<HWND>(wParam) != m_hWnd) {
-        Invalidate();
+        Invalidate(FALSE);
     }
     return lResult;
 }

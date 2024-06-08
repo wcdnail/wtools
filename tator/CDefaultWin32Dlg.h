@@ -20,7 +20,8 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
                          WTL::CWinDataExchange<CDefaultWin32Dlg>,
                          WTL::CThemeImpl<CColorPickerDlg>,
                          WTL::CBufferedPaintImpl<CColorPickerDlg>,
-                         WTL::CMessageFilter
+                         WTL::CMessageFilter,
+                         IColorObserver
 {
     enum { IDD = IDD_DIALOG1 };
 
@@ -31,12 +32,14 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
     CColorCellEx     m_crCell1{0x000000, RGB_MAX_INT};
     CColorPickerDlg    m_cpDlg{0x1f2f3f};
 
-    BOOL              m_brLeft{FALSE};
-    BOOL           m_brXCenter{TRUE};
+    WTL::CFont         m_vFont{};
+
+    BOOL              m_brLeft{TRUE};
+    BOOL           m_brXCenter{FALSE};
     BOOL             m_brRight{FALSE};
-    BOOL               m_brTop{FALSE};
+    BOOL               m_brTop{TRUE};
     BOOL           m_brYCenter{FALSE};
-    BOOL            m_brBottom{TRUE};
+    BOOL            m_brBottom{FALSE};
     ATL::CString    m_sMvFlags{};
     UINT         m_cpMoveFlags{0};
 
@@ -59,6 +62,12 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
     BOOL PreTranslateMessage(MSG* pMsg) override
     {
         return IsDialogMessageW(pMsg);
+    }
+
+    void OnColorUpdate(IColor const& clrSource) override
+    {
+        UNREFERENCED_ARG(clrSource);
+        GetDlgItem(IDC_DRAWER).InvalidateRect(nullptr, FALSE);
     }
 
     HRESULT Initialize()
@@ -88,6 +97,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         DLGRESIZE_CONTROL(IDC_BUTTON2, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(IDC_BUTTON3, DLSZ_MOVE_X)
         DLGRESIZE_CONTROL(IDC_COLOR1, DLSZ_MOVE_X)
+        DLGRESIZE_CONTROL(IDC_DRAWER, DLSZ_SIZE_X)
         DLGRESIZE_CONTROL(IDC_DEBUG_CONSOLE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
         DLGRESIZE_CONTROL(IDOK, DLSZ_MOVE_X | DLSZ_MOVE_Y)
     END_DLGRESIZE_MAP()
@@ -151,16 +161,6 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
     {
         EndDialog(wID);
         return 0;
-    }
-
-    void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
-    {
-        if (IDC_COLOR1 == nID) {
-            m_crCell1.Draw(pDI->hDC, pDI->rcItem, nullptr);
-        }
-        else {
-            SetMsgHandled(FALSE);
-        }
     }
 
     void OnWindowPosChanged(LPWINDOWPOS pWndPos)
@@ -233,6 +233,7 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
 
         CenterWindow();
 
+        m_crCell1.AddObserver(*this);
         m_crCell1.AddObserver(m_cpDlg);
         m_crCell1.AddObserver(m_btnMyColor1);
         m_crCell1.AddObserver(m_btnMyColor2);
@@ -253,7 +254,82 @@ struct CDefaultWin32Dlg: ATL::CDialogImpl<CDefaultWin32Dlg>,
         m_crCell1.SetColor(0x7f3a21, RGB_MAX_INT);
         m_crCell1.SetHolder(GetDlgItem(IDC_COLOR1));
 
+        // nHeight = -MulDiv(PointSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
+        m_vFont.CreateFontW(-(12), 0, /*900*/ 0, 0, FW_BLACK,
+            0, 0, 0, RUSSIAN_CHARSET, 0, 0,
+            CLEARTYPE_NATURAL_QUALITY, 0, 
+            L"Arial Black");
+
+        GetDlgItem(IDC_DRAWER).ModifyStyle(0, SS_OWNERDRAW);
+
         DlgResize_Init(true, true, 0);
         return TRUE;
+    }
+
+    void DrawItem(int nID, WTL::CDCHandle dc, CRect& rc)
+    {
+        switch (nID) {
+        case IDC_DRAWER:
+            break;
+        case IDC_COLOR1: 
+            m_crCell1.Draw(dc, rc, nullptr);
+            return ;
+        default:
+            return ;
+        }
+        ATL::CStringW sItem{};
+        dc.GradientFillRect(rc, 0x000000, m_crCell1.GetColorRef(), false);
+        if (GetDlgItem(nID).GetWindowTextW(sItem) < 1) {
+            return ;
+        }
+        int const iSave{dc.SaveDC()};
+        dc.SetTextColor(0xffffff);
+        dc.SetBkMode(TRANSPARENT);
+        dc.SelectFont(m_vFont);
+        CRect rcText{rc};
+        DTTOPTS constexpr dtOptions{
+            /* dwSize;              */ sizeof(dtOptions),
+            /* dwFlags;             */ DTT_TEXTCOLOR | DTT_SHADOWCOLOR | DTT_SHADOWTYPE | DTT_SHADOWOFFSET | DTT_GLOWSIZE,
+            /* crText;              */ 0xffffff,
+            /* crBorder;            */ 0,
+            /* crShadow;            */ 0x000000,
+            /* iTextShadowType;     */ TST_CONTINUOUS,
+            /* ptShadowOffset;      */ { 3, 2 },
+            /* iBorderSize;         */ 0,
+            /* iFontPropId;         */ 0,
+            /* iColorPropId;        */ 0,
+            /* iStateId;            */ 0,
+            /* fApplyOverlay;       */ FALSE,
+            /* iGlowSize;           */ 32,
+            /* pfnDrawTextCallback; */ nullptr,
+            /* lParam;              */ 0
+        };
+        DrawThemeTextEx(dc, 0, 0, sItem.GetString(), sItem.GetLength(), DT_CENTER | DT_VCENTER, rcText, &dtOptions);
+        dc.RestoreDC(iSave);
+    }
+
+    void OnDrawItem(int nID, LPDRAWITEMSTRUCT pDI)
+    {
+        switch (nID) {
+        case IDC_COLOR1:
+        case IDC_DRAWER:
+            break;
+        default:
+            SetMsgHandled(FALSE);
+            return ;
+        }
+        WTL::CDCHandle const dc{pDI->hDC};
+        CRect            rcItem{pDI->rcItem};
+        HDC          dcBuffered{nullptr};
+        if(IsBufferedPaintSupported()) {
+            m_BufferedPaint.Begin(dc, rcItem, m_dwFormat, &m_PaintParams, &dcBuffered);
+            if (dcBuffered) {
+                DrawItem(nID, dcBuffered, rcItem);
+            }
+            m_BufferedPaint.End();
+        }
+        if (!dcBuffered) {
+            DrawItem(nID, dc, rcItem);
+        }
     }
 };
