@@ -137,23 +137,21 @@ namespace Conf
     template <typename T> 
     inline bool VarT<T>::Get(StoragePtr const& store) const 
     {
-        std::wstring temp = store->GetString(Name);
-        if (!store->LastFailed())
-        {
+        std::wstring const temp{store->GetString(Name)};
+        if (!store->LastFailed()) {
             std::wstringstream input(temp);
             VarBase::SetupStream(input);
             input >> *Pointee;
             return true;
         }
-
         return false; 
     }
 
-    template <typename T> 
+    template <typename T>
     inline bool VarT<T>::IsEqual(StoragePtr const& store) const 
     { 
         T temp;
-        VarT<T> tv(temp, { Name.c_str(), Name.length() });
+        VarT<T> const tv{temp, {Name.c_str(), Name.length()}};
         if (!tv.Get(store)) {
             return true;
         }

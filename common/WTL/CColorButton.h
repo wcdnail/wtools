@@ -191,7 +191,7 @@ struct NMCOLORBUTTON
 // Class definition
 //
 //-----------------------------------------------------------------------------
-class CColorButton: private ATL::CWindowImpl<CColorButton>,
+class CColorButton: public  ATL::CWindowImpl<CColorButton, WTL::CButton>,
                     private WTL::CThemeImpl<CColorButton>,
                     private WTL::CBufferedPaintImpl<CColorButton>,
                     public  IColor,
@@ -199,7 +199,8 @@ class CColorButton: private ATL::CWindowImpl<CColorButton>,
 {
     // @access Types and enumerations
 public:
-    using String = std::basic_string<TCHAR>; // ATL::CString is great, but lacks some transactional behaviour
+    using   String = std::basic_string<TCHAR>; // ATL::CString is great, but lacks some transactional behaviour
+    using WndSuper = ATL::CWindowImpl<CColorButton, WTL::CButton>;
 
     DELETE_COPY_MOVE_OF(CColorButton);
 

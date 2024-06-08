@@ -384,7 +384,7 @@ LRESULT CPageAppearance::OnNotify(int idCtrl, LPNMHDR pnmh)
     SetMsgHandled(FALSE);
     if constexpr (false) {
         DBGTPrint(0, L"APPRNCE NTY: id:%-4d nc:%-4d %s\n", 
-            idCtrl, pnmh->code, DH::WM_NC_C2SW(pnmh->code));
+            idCtrl, pnmh->code, DH::NotifyCodeToStrW(pnmh->code));
     }
     return 0;
 }
@@ -684,7 +684,7 @@ void CPageAppearance::OnCommand(UINT uNotifyCode, int nID, HWND)
     SetMsgHandled(FALSE);
     if constexpr (true) {
         DBGTPrint(0, L"APPRNCE CMD: id:%-4d nc:%-4d %s\n", 
-            nID, uNotifyCode, DH::WM_NC_C2SW(uNotifyCode));
+            nID, uNotifyCode, DH::NotifyCodeToStrW(uNotifyCode));
     }
 }
 

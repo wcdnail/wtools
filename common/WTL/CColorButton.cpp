@@ -781,9 +781,8 @@ void CColorButton::ButtonDraw(WTL::CDCHandle dc, CRect const& rc, UINT uState)
 
 UINT CColorButton::GetButtonState() const
 {
-    WTL::CButton const wBtn{m_hWnd};
-    UINT const      nBState{wBtn.GetState()};
-    UINT             nState{0};
+    UINT const nBState{GetState()};
+    UINT        nState{0};
     if (!IsWindowEnabled()) {
         nState |= ODS_DISABLED;
     }
@@ -793,7 +792,7 @@ UINT CColorButton::GetButtonState() const
     if (nBState & BST_PUSHED) {
         nState |= ODS_SELECTED;
     }
-    if (wBtn.GetButtonStyle() & BS_DEFPUSHBUTTON) {
+    if (GetButtonStyle() & BS_DEFPUSHBUTTON) {
         nState |= ODS_DEFAULT;
     }
     return nState;
@@ -831,7 +830,7 @@ void CColorButton::DoPaint(WTL::CDCHandle dc, RECT const& rect)
 //-----------------------------------------------------------------------------
 BOOL CColorButton::SubclassWindow(HWND hWnd)
 {
-    CWindowImpl<CColorButton>::SubclassWindow(hWnd);
+    WndSuper::SubclassWindow(hWnd);
     //ModifyStyle(0, BS_OWNERDRAW);
     PCWSTR const pszClasses{VSCLASS_COMBOBOX L";" VSCLASS_BUTTON};
     if (!OpenThemeData(pszClasses)) {

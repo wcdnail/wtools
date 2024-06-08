@@ -18,25 +18,32 @@ namespace Twins
 {
     enum { PanelViewStatusHeight = 22 };
 
+    PanelView::~PanelView()
+    {
+        Scanner.SelectedName = GetHotFilename();
+        LastPath = Scanner.Path.FullPath().wstring();
+    }
+
     PanelView::PanelView(int id)
-        :       iHot(0)
-        ,    Scanner()
-        ,     Status()
-        ,     Cursor(::LoadCursor(NULL, IDC_ARROW))
-        ,   IconSize(16, 16)
-        ,    Renamer()
-        ,     MyFont(CreateFont(-13, 0, 0, 0, FW_MEDIUM, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Consolas")))
-        ,     iFirst(0)
-        ,     Header()
-        ,       Edit()
-        ,     Locker(PaintAreUnlocked)
-        ,     Search(*this)
-        ,   Selector()
-        , SnapshotDc()
-        ,  DragnDrop(*this)
-        ,     Sorter()
-        ,   LastPath()
-        ,    Options(::Settings(), std::wstring(L"Panel#") + std::to_wstring(id))
+        :       iHot{0}
+        ,    Scanner{}
+        ,     Status{}
+        ,     Cursor{LoadCursor(nullptr, IDC_ARROW)}
+        ,   IconSize{16, 16}
+        ,    Renamer{}
+        ,     MyFont{CreateFont(-13, 0, 0, 0, FW_MEDIUM, 0, 0, 0, RUSSIAN_CHARSET, 0, 0, DEFAULT_QUALITY, 0, _T("Consolas"))}
+        ,     iFirst{0}
+        ,     Header{}
+        ,       Edit{}
+        ,     Locker{PaintAreUnlocked}
+        ,     Search{*this}
+        ,   Selector{}
+        , SnapshotDc{}
+        , SnapshotBm{nullptr}
+        ,  DragnDrop{*this}
+        ,     Sorter{}
+        ,   LastPath{}
+        ,    Options{::Settings(), std::wstring(L"Panel#") + std::to_wstring(id)}
     {
         FromSettings(Options, Columns.iHot);
         FromSettings(Options, Columns.Used);
@@ -45,12 +52,6 @@ namespace Twins
         FromSettings(Options, LastPath);
 
         Scanner.UpdatePath(LastPath);
-    }
-
-    PanelView::~PanelView()
-    {
-        Scanner.SelectedName = GetHotFilename();
-        LastPath = Scanner.Path.FullPath().wstring();
     }
 
     void PanelView::ResetView(bool invalidate)
@@ -76,12 +77,12 @@ namespace Twins
         ::GetClientRect(m_hWnd, rc);
         
         CRect rcHeader(0, 0, rc.right, HeaderHeight);
-        if (Header.Create(m_hWnd, rcHeader, NULL, 0, 0, ID_HEADER)) {
+        if (Header.Create(m_hWnd, rcHeader, nullptr, 0, 0, ID_HEADER)) {
             Columns.OnCreate(Header);
             Header.OnClick() = std::bind(&PanelView::OnSort, this, std::placeholders::_1, std::placeholders::_2);
         }
 
-        Edit.Create(m_hWnd, rcDefault, NULL, WS_CHILD, WS_EX_CLIENTEDGE, ID_LABELEDIT);
+        Edit.Create(m_hWnd, rcDefault, nullptr, WS_CHILD, WS_EX_CLIENTEDGE, ID_LABELEDIT);
         Edit.SetFont(MyFont);
         Edit.OnEditDone() = std::bind(&PanelView::OnLabelEditDone, this, std::placeholders::_1, std::placeholders::_2);
 
@@ -117,7 +118,7 @@ namespace Twins
         ::InterlockedExchange(&Locker, PaintAreLocked);
 
         if (invalidate) {
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
         }
     }
 
@@ -126,7 +127,7 @@ namespace Twins
         ::InterlockedExchange(&Locker, PaintAreUnlocked);
 
         if (invalidate) {
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
         }
     }
 
@@ -269,7 +270,7 @@ namespace Twins
         if (rv)
         {
             if (invalidate)
-                ::InvalidateRect(m_hWnd, NULL, FALSE);
+                ::InvalidateRect(m_hWnd, nullptr, FALSE);
         }
 
         return rv;
@@ -298,7 +299,7 @@ namespace Twins
         iHot = next;
 
         if (invalidate)
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
     }
 
     int PanelView::GetItemFrom(CPoint const& point, CRect const& rc, int itemHeight) const
@@ -316,7 +317,7 @@ namespace Twins
         int next = GetItemFrom(point, rc, itemHeight);
 
         if ((-1 != next) && invalidate)
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
 
         return next;
     }
@@ -354,7 +355,7 @@ namespace Twins
             //    Selector.Clear(Entries, Status, m_hWnd);
 
             if (invl)
-                ::InvalidateRect(m_hWnd, NULL, FALSE);
+                ::InvalidateRect(m_hWnd, nullptr, FALSE);
         }
 
         return next;
@@ -385,7 +386,7 @@ namespace Twins
         if (iFirst != next)
         {
             iFirst = next;
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
         }
     }
 
@@ -426,7 +427,7 @@ namespace Twins
     int PanelView::OnSort(int id, PCWSTR)
     {
         if (Columns.DoSort(id, Header, Sorter, Scanner.Items))
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
 
         return 0;
     }
@@ -434,7 +435,7 @@ namespace Twins
     void PanelView::OnSetFocus(HWND)
     {
         SetCommandLinePath(Scanner.Path.FullPath().wstring());
-        ::InvalidateRect(m_hWnd, NULL, FALSE);
+        ::InvalidateRect(m_hWnd, nullptr, FALSE);
     }
 
     void PanelView::OnLoadContentBegin() 
@@ -486,14 +487,14 @@ namespace Twins
             EnsureVisible(id, invalidate);
 
             if (invalidate)
-                ::InvalidateRect(m_hWnd, NULL, FALSE);
+                ::InvalidateRect(m_hWnd, nullptr, FALSE);
         }
     }
 
     FItem* PanelView::GetHot() const
     {
         int i = Sorter.GetIndex(iHot);
-        return IsItemIndexValid(Scanner.Items, i) ? Scanner.Items[i] : NULL;
+        return IsItemIndexValid(Scanner.Items, i) ? Scanner.Items[i] : nullptr;
     }
 
     std::wstring PanelView::GetHotFilename() const
@@ -592,7 +593,7 @@ namespace Twins
         switch (code) {
         case SB_THUMBTRACK:
             iFirst = pos;
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
             break;
 
         case SB_LINEUP:
@@ -625,7 +626,7 @@ namespace Twins
     void PanelView::ClearSelection()
     {
         //Selector.Clear(Entries, Status, m_hWnd);
-        ::InvalidateRect(m_hWnd, NULL, FALSE);
+        ::InvalidateRect(m_hWnd, nullptr, FALSE);
     }
 
     bool PanelView::NeedReload(DirectoryNotifyMap const& nmap) const
@@ -662,7 +663,7 @@ namespace Twins
             if (Columns.OnContextMenu(Header, pn))
             {
                 Sorter.CreateIndex(Columns.iHot, Columns.Ascending[Columns.iHot], Scanner.Items);
-                ::InvalidateRect(m_hWnd, NULL, FALSE);
+                ::InvalidateRect(m_hWnd, nullptr, FALSE);
             }
 
             return ;
@@ -735,7 +736,7 @@ namespace Twins
         //Status.Count(Entries, Selector, m_hWnd, false);
 
         if (invalidate)
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
     }
 
     void PanelView::AddSubSelection(bool mark, bool invalidate /*= true*/)
@@ -745,13 +746,13 @@ namespace Twins
         //Status.Update(Entries, m_hWnd, false);
 
         if (invalidate)
-            ::InvalidateRect(m_hWnd, NULL, FALSE);
+            ::InvalidateRect(m_hWnd, nullptr, FALSE);
     }
 
     void PanelView::EnterItem()
     {
         FItem const* it = GetHot();
-        if (NULL != it)
+        if (nullptr != it)
         {
             std::filesystem::path p = Scanner.Path.FullPath();
 
@@ -765,7 +766,7 @@ namespace Twins
                 else
                     Scanner.Path.Cd(p.c_str(), false, Scanner.SelectedName);
 
-                Scanner.Fetch(NULL);
+                Scanner.Fetch(nullptr);
             }
         }
     }
@@ -774,7 +775,7 @@ namespace Twins
     {
         SelectToggleHot();
         MoveCursorUpDown(down);
-        ::InvalidateRect(m_hWnd, NULL, FALSE);
+        ::InvalidateRect(m_hWnd, nullptr, FALSE);
     }
 
     void PanelView::MoveCursorUpDown(bool down)
@@ -796,7 +797,7 @@ namespace Twins
 
     void PanelView::Invalidate() const
     {
-        ::InvalidateRect(Header, NULL, FALSE);
-        ::InvalidateRect(m_hWnd, NULL, FALSE);
+        ::InvalidateRect(Header, nullptr, FALSE);
+        ::InvalidateRect(m_hWnd, nullptr, FALSE);
     }
 }

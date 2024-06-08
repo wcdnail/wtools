@@ -4,16 +4,14 @@
 
 namespace Twins
 {
-    TabBarItem::TabBarItem()
-        : id(-1)
-        , icon(NULL)
-        , name()
-        , pos()
-        , dflags(DT_LEFT | DT_VCENTER | DT_SINGLELINE)
-    {
-    }
+    TabBarItem::~TabBarItem() = default;
 
-    TabBarItem::~TabBarItem()
+    TabBarItem::TabBarItem()
+        :     id{-1}
+        ,   icon{nullptr}
+        ,   name{}
+        ,    pos{}
+        , dflags{DT_LEFT | DT_VCENTER | DT_SINGLELINE}
     {
     }
 
@@ -25,17 +23,13 @@ namespace Twins
         CRect rcSmall = rc;
         rcSmall.DeflateRect(2, 0);
 
-        CRect rcItem(0, 0, min(textBounds.cx + iconSize.cx + 2, rcSmall.Width()), min(max(textBounds.cy, iconSize.cy), rcSmall.Height()));
-
-        unsigned align = (0 != (dflags & DT_VCENTER) ? Rc::YCenter : 0)
-                       | (0 != (dflags & DT_CENTER)  ? Rc::XCenter : 0)
-                       | (0 != (dflags & DT_RIGHT)   ? Rc::Right   : 0)
-                       ;
-
+        CRect rcItem{0, 0, min(textBounds.cx + iconSize.cx + 2, rcSmall.Width()), min(max(textBounds.cy, iconSize.cy), rcSmall.Height())};
+        unsigned const align = (0 != (dflags & DT_VCENTER) ? Rc::YCenter : 0)
+                             | (0 != (dflags & DT_CENTER)  ? Rc::XCenter : 0)
+                             | (0 != (dflags & DT_RIGHT)   ? Rc::Right   : 0);
         Rc::PutInto(rcSmall, rcItem, align);
 
-        if (NULL != icon)
-        {
+        if (nullptr != icon) {
             CRect rcIcon(0, 0, iconSize.cx, iconSize.cy);
             Rc::PutInto(rcItem, rcIcon, Rc::Left | Rc::YCenter);
 

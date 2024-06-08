@@ -43,8 +43,8 @@ namespace Twins
         CSize         IconSize;
         RenameCallback Renamer;
 
+        ~PanelView() override;
         PanelView(int id);
-        ~PanelView();
 
         using Super::Create;
         using Super::SetFocus;
@@ -136,7 +136,7 @@ namespace Twins
         void OnContextMenu(CWindow control, CPoint point);
         void OnRButtonUp(UINT flags, CPoint point);
         void SelectToggleHot();
-        int OnSort(int, PCWSTR = NULL);
+        int OnSort(int, PCWSTR = nullptr);
         int GetItemCount() const;
         int GetItemIndex(CPoint const& pt, CRect const& rc) const;
         int GetItemIndex(CPoint const& pt) const;
@@ -152,7 +152,7 @@ namespace Twins
             DLGRESIZE_CONTROL(ID_HEADER, DLSZ_SIZE_X)
         END_DLGRESIZE_MAP()
 
-        BEGIN_MSG_MAP_EX(PanelView)
+        BEGIN_MSG_MAP(PanelView)
             CHAIN_MSG_MAP_MEMBER(Search)
             CHAIN_MSG_MAP_MEMBER(DragnDrop)
             MSG_WM_CREATE(OnCreate)
