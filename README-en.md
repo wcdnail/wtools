@@ -1,5 +1,6 @@
 # WTools
 Misc Windows Tools
+(There're a lot of legacy, to solve install boost, to do not care COMMENT code)
 
 ## [WCD] Color Picker
 May be buGs with HSL/HSV colors, need investigating
@@ -21,9 +22,7 @@ CMake will be provided later.
 - [GTEST](https://github.com/google/googletest) for UT
 
 ### Build prepare
-Clone VCPKG;
-
-WARNING: Use [this fork](https://github.com/wcdnail/wcpkg.git), there're CLIPP with TCHAR support
+Clone VCPKG [this fork](https://github.com/wcdnail/wcpkg.git), there're CLIPP with TCHAR support
 
 Win CMD:
 ```cmd
@@ -37,14 +36,7 @@ set VCPKG_ROOT=%CD%
 
 call bootstrap-vcpkg.bat -disableMetrics
 vcpkg install wtl wil clipp gtest boost-config
-
-rem ...
-rem See legacy alert
-vcpkg install boost
 ```
-
-### Legacy alert
-There're a lot of legacy, to solve install boost, to do not care COMMENT code.
 
 ## Thanks to
 - [VCPKG team](https://github.com/microsoft/vcpkg)
