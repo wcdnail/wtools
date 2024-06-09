@@ -5,33 +5,30 @@
 #include <atlwin.h>
 #include <atlapp.h>
 
-template <typename Customer>
-struct CCustomControl: ATL::CWindowImpl<Customer>
+template <typename Customer, typename TBase = ATL::CWindow>
+struct CCustomControl: ATL::CWindowImpl<Customer, TBase>
 {
-    using WndSuper = ATL::CWindowImpl<Customer>;
+    using WndSuper = ATL::CWindowImpl<Customer, TBase>;
 
-    DELETE_MOVE_OF(CCustomControl);
+    DELETE_COPY_MOVE_OF(CCustomControl);
 
     ~CCustomControl() override;
+
+    virtual HRESULT PreCreateWindow() = 0;
 
 protected:
     CCustomControl();
     HRESULT PreCreateWindowImpl(ATOM& rAtom, ATL::CWndClassInfo const& clsInfo);
 };
 
-template <typename Customer>
-inline CCustomControl<Customer>::~CCustomControl() = default;
+template <typename Customer, typename TBase>
+inline CCustomControl<Customer, TBase>::~CCustomControl() = default;
 
-template <typename Customer>
-inline CCustomControl<Customer>::CCustomControl() = default;
+template <typename Customer, typename TBase>
+inline CCustomControl<Customer, TBase>::CCustomControl() = default;
 
-//inline HRESULT CCustomControl<Customer>::PreCreateWindow()
-//{
-//    return ERROR_CALL_NOT_IMPLEMENTED;
-//}
-
-template <typename Customer>
-inline HRESULT CCustomControl<Customer>::PreCreateWindowImpl(ATOM& rAtom, ATL::CWndClassInfo const& clsInfo)
+template <typename Customer, typename TBase>
+inline HRESULT CCustomControl<Customer, typename TBase>::PreCreateWindowImpl(ATOM& rAtom, ATL::CWndClassInfo const& clsInfo)
 {
     Customer* pThis{static_cast<Customer*>(this)};
     WTL::CStaticDataInitCriticalSectionLock lock{};

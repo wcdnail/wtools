@@ -1,12 +1,12 @@
 #pragma once
 
 #include "luicScheme.h"
-#include "luicFontDef.h"
 #include "luicPageImpl.h"
 #include "luicThemePreviewer.h"
 #include "luicSchemeManager.h"
 #include <WTL/CColorButton.h>
 #include <wcdafx.api.h>
+#include <win32.fonts.h>
 #include <atlctrls.h>
 #include <atlstr.h>
 

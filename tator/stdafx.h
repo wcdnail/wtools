@@ -13,23 +13,31 @@
 #include <WinSock2.h>
 #include <shellapi.h>
 
+// ATL
 #include <atlbase.h>
-#include <atlcom.h>
-#include <atlctl.h>
-
-#include <atlapp.h>
-#include <atlwin.h>
 #include <atltypes.h>
+#include <atlstr.h>
+#include <atlwin.h>
+#include <atlctl.h>
+#include <atlcom.h>
+#include <atlcomcli.h>
+#include <atlsimpcoll.h>
+
+// WTL
+#include <atlapp.h>
 #include <atlframe.h>
 #include <atlctrls.h>
 #include <atlctrlx.h>
+#include <atlctrlw.h>
 #include <atldlgs.h>
 #include <atlmisc.h>
-#include <atlctrlw.h>
 #include <atlprint.h>
 #include <atlfind.h>
 #include <atlcrack.h>
 #include <atlimage.h>
+#include <atltheme.h>
+#include <atlgdi.h>
+#include <atlddx.h>
 
 #define UNREFERENCED_ARG(a) (a)
 

@@ -57,3 +57,4 @@ There're a lot of legacy, to solve install boost, to do not care COMMENT code.
 - [Jake Besworth's Simple Color Conversions](https://github.com/jakebesworth/Simple-Color-Conversions/blob/master/color.c)
 - [Ken Zhang's (zhangyuwu's) OutputDebugString listener](https://www.codeproject.com/Articles/23776/Mechanism-of-OutputDebugString)
 - [DebugViewPP team](https://github.com/CobaltFusion/DebugViewPP)
+- [Font Combo team](https://www.codeproject.com/Articles/2014/Font-Combo)

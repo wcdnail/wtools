@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "luicFontDef.h"
+#include "win32.fonts.h"
 #include "dh.tracing.h"
 
 namespace
@@ -13,9 +13,9 @@ struct EnumFontProcArgs
 
     bool Parse(ENUMLOGFONTEXW const* lpelfe, NEWTEXTMETRICEX const* lpntme)
     {
-        FontStr    faceName = lpelfe->elfLogFont.lfFaceName;
-        CharsetPair charSet = std::make_pair<int, FontStr>(lpelfe->elfLogFont.lfCharSet, lpelfe->elfScript);
-        CFontDef*   fontDef = nullptr;
+        FontStr const faceName{lpelfe->elfLogFont.lfFaceName};
+        CharsetPair    charSet{std::make_pair<int, FontStr>(lpelfe->elfLogFont.lfCharSet, lpelfe->elfScript)};
+        CFontDef*      fontDef{nullptr};
         auto it = m_Map.find(faceName);
         if (it == m_Map.end()) {
             fontDef = &m_Map[faceName];
@@ -68,8 +68,8 @@ HRESULT CFontDef::LoadAll(FontMap& target)
     lfFont.lfCharSet = DEFAULT_CHARSET;
     lfFont.lfFaceName[0] = TEXT('\0');
     lfFont.lfPitchAndFamily = DEFAULT_PITCH;
-    auto  proc = reinterpret_cast<FONTENUMPROC>(FontEnumerator);
-    auto param = reinterpret_cast<LPARAM>(&args);
+    auto const  proc = reinterpret_cast<FONTENUMPROC>(FontEnumerator);
+    auto const param = reinterpret_cast<LPARAM>(&args);
     if (EnumFontFamiliesExW(args.m_ScreenDC, &lfFont, proc, param, 0) > 0) {
         target.swap(args.m_Map);
     }

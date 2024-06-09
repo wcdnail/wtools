@@ -25,8 +25,11 @@
 #define IDC_RADIO_TOP                   1015
 #define IDC_RADIO_YCENTER               1016
 #define IDC_RADIO_BOTTOM                1017
-#define IDC_EDIT1                       1018
 #define IDC_DRAWER_TEXT                 1018
+#define IDC_STA_DRAWER_PARAMS           1019
+#define IDC_DRAWER_FONT_SEL             1020
+#define IDC_COMBO2                      1021
+#define IDC_DRAWER_FONT_COMBO           1021
 #define ID_TATOR_EXPERIMENTATOR         40001
 #define ID_DC_BN_CLEAN                  40002
 #define ID_DC_BN_SAVE                   40003
@@ -37,7 +40,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        109
 #define _APS_NEXT_COMMAND_VALUE         40004
-#define _APS_NEXT_CONTROL_VALUE         1019
+#define _APS_NEXT_CONTROL_VALUE         1022
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

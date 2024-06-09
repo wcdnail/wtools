@@ -2,8 +2,8 @@
 
 #include "luicSchemeManager.h"
 #include "luicMainFrame.h"
-#include "luicFontDef.h"
-#include "settings.h"
+#include <settings.h>
+#include <win32.fonts.h>
 #include <atlapp.h>
 #include <mutex>
 

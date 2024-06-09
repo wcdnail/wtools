@@ -136,6 +136,18 @@
     <ClCompile Include="dev.assistance\debug.assistance.cpp">
       <Filter>dev.assistance</Filter>
     </ClCompile>
+    <ClCompile Include="windows.gdi.base.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="windows.gdi.rects.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
+    <ClCompile Include="WTL\CFontCombo.cpp">
+      <Filter>WTL</Filter>
+    </ClCompile>
+    <ClCompile Include="win32.fonts.cpp">
+      <Filter>Unsorted</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="info\runtime.information.h">
@@ -323,6 +335,21 @@
     </ClInclude>
     <ClInclude Include="dev.assistance\window.pos.flags.h">
       <Filter>dev.assistance</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.gdi.base.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.gdi.rects.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="windows.gui.leaks.h">
+      <Filter>Unsorted</Filter>
+    </ClInclude>
+    <ClInclude Include="WTL\CFontCombo.h">
+      <Filter>WTL</Filter>
+    </ClInclude>
+    <ClInclude Include="win32.fonts.h">
+      <Filter>Unsorted</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

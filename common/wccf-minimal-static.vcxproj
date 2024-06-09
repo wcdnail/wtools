@@ -64,7 +64,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="string.utils.format.cpp" />
+    <ClCompile Include="win32.fonts.cpp" />
     <ClCompile Include="win32.registry.cpp" />
+    <ClCompile Include="windows.gdi.base.cpp" />
+    <ClCompile Include="windows.gdi.rects.cpp" />
     <ClCompile Include="windows.uses.gdi+.cpp" />
     <ClCompile Include="windows.wtl.buffered.paint.cpp" />
     <ClCompile Include="WTL\CAppModuleRef.cpp" />
@@ -79,6 +82,7 @@
     <ClCompile Include="WTL\CCustomCtrl.cpp" />
     <ClCompile Include="WTL\CDCEx.cpp" />
     <ClCompile Include="WTL\CDDCtl.cpp" />
+    <ClCompile Include="WTL\CFontCombo.cpp" />
     <ClCompile Include="WTL\CMagnifierCtrl.cpp" />
     <ClCompile Include="WTL\CMagnifierInit.cpp" />
     <ClCompile Include="WTL\CSpectrumImage.cpp" />
@@ -126,7 +130,11 @@
     <ClInclude Include="shell.imagelist.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="string.utils.format.h" />
+    <ClInclude Include="win32.fonts.h" />
     <ClInclude Include="win32.registry.h" />
+    <ClInclude Include="windows.gdi.base.h" />
+    <ClInclude Include="windows.gdi.rects.h" />
+    <ClInclude Include="windows.gui.leaks.h" />
     <ClInclude Include="windows.uses.gdi+.h" />
     <ClInclude Include="windows.wtl.buffered.paint.h" />
     <ClInclude Include="WTL\CAppModuleRef.h" />
@@ -142,6 +150,7 @@
     <ClInclude Include="WTL\CCustomCtrl.h" />
     <ClInclude Include="WTL\CDCEx.h" />
     <ClInclude Include="WTL\CDDCtl.h" />
+    <ClInclude Include="WTL\CFontCombo.h" />
     <ClInclude Include="WTL\CMagnifierCtrl.h" />
     <ClInclude Include="WTL\CMagnifierInit.h" />
     <ClInclude Include="WTL\CSliderCtrl.h" />

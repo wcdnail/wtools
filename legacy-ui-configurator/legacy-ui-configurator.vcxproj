@@ -245,7 +245,6 @@
     <ClInclude Include="luicColors.h" />
     <ClInclude Include="luicDrawings.h" />
     <ClInclude Include="luicEffects.h" />
-    <ClInclude Include="luicFontDef.h" />
     <ClInclude Include="luicFonts.h" />
     <ClInclude Include="luicIniParser.h" />
     <ClInclude Include="luicMain.h" />
@@ -275,7 +274,6 @@
     <ClCompile Include="luicColors.cpp" />
     <ClCompile Include="luicDrawings.cpp" />
     <ClCompile Include="luicEffects.cpp" />
-    <ClCompile Include="luicFontDef.cpp" />
     <ClCompile Include="luicFonts.cpp" />
     <ClCompile Include="luicIni98Loader.cpp" />
     <ClCompile Include="luicMain.cpp" />

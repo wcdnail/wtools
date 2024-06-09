@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dh.tracing.h"
+#include <dh.tracing.h>
 #include <winuser.h>
 
 namespace CF
@@ -8,11 +8,13 @@ namespace CF
     class GUILeaks
     {
     public:
+        DELETE_COPY_MOVE_OF(GUILeaks);
+
         GUILeaks();
         ~GUILeaks();
 
         void StartCount();
-        void PrintCurrentState();
+        void PrintCurrentState() const;
 
     private:
         static void Load(DWORD& gdi, DWORD& usr);
@@ -42,10 +44,10 @@ namespace CF
     inline void GUILeaks::StartCount()
     {
         Load(gdiCount_, usrCount_);
-        DH::TPrintf(TL_Module, L"GuiLeaks: At beg - GDI %4d, USER %4d\n", gdiCount_, usrCount_);
+        DH::TPrintf(TL_Module, L"GuiLeaks: At start - GDI %d, USER %d\n", gdiCount_, usrCount_);
     }
 
-    inline void GUILeaks::PrintCurrentState()
+    inline void GUILeaks::PrintCurrentState() const
     {
         DWORD gdiCount = 0;
         DWORD usrCount = 0;

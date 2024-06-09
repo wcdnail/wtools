@@ -463,10 +463,10 @@ BOOL CColorButton::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     BOOL bHandled = TRUE;
     switch (dwMsgMapID) {
     case 0:
-        MESSAGE_HANDLER(WM_PAINT, WTL::CBufferedPaintImpl<CColorButton>::OnPaint)
         MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
         REFLECTED_COMMAND_CODE_HANDLER(BN_CLICKED, OnClicked)
+        CHAIN_MSG_MAP(WTL::CBufferedPaintImpl<CColorButton>)
         CHAIN_MSG_MAP(CThemeImpl<CColorButton>)
         break;
     case 1:
@@ -816,6 +816,18 @@ void CColorButton::DoPaint(WTL::CDCHandle dc, RECT const& rect)
     ButtonDraw(dc, rc, bState);
 }
 
+bool CColorButton::ThemedInit()
+{
+    PCWSTR const pszClasses{VSCLASS_BUTTON};
+    if (!OpenThemeData(pszClasses)) {
+        auto const hCode{static_cast<HRESULT>(GetLastError())};
+        DH::TPrintf(TL_Warning, L"OpenThemeData['%s'] failed: 0x%08x %s\n", pszClasses,
+            hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
+        return false;
+    }
+    return true;
+}
+
 //-----------------------------------------------------------------------------
 //
 // @mfunc Subclass the control
@@ -828,17 +840,15 @@ void CColorButton::DoPaint(WTL::CDCHandle dc, RECT const& rect)
 //      @flag FALSE | Window was not subclassed
 //
 //-----------------------------------------------------------------------------
-BOOL CColorButton::SubclassWindow(HWND hWnd)
+bool CColorButton::SubclassWindow(HWND hWnd)
 {
-    WndSuper::SubclassWindow(hWnd);
-    //ModifyStyle(0, BS_OWNERDRAW);
-    PCWSTR const pszClasses{VSCLASS_COMBOBOX L";" VSCLASS_BUTTON};
-    if (!OpenThemeData(pszClasses)) {
-        auto const hCode{static_cast<HRESULT>(GetLastError())};
-        DH::TPrintf(TL_Warning, L"OpenThemeData['%s'] failed: 0x%08x %s\n", pszClasses,
-            hCode, Str::ErrorCode<>::SystemMessage(hCode).GetString());
+    if (!WndSuper::SubclassWindow(hWnd)) {
+        return false;
     }
-    return TRUE;
+    if (!ThemedInit()) {
+        ModifyStyle(0, BS_OWNERDRAW);
+    }
+    return true;
 }
 
 //-----------------------------------------------------------------------------

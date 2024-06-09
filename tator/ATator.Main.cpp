@@ -4,8 +4,9 @@
 #include <windows.gui.leaks.h>
 #include <string.utils.format.h>
 #include <string.utils.error.code.h>
-#include <dh.tracing.h>
+#include <windows.gui.leaks.h>
 #include <WTL/CAppModuleRef.h>
+#include <dh.tracing.h>
 #include <system_error>
 #include <exception>
 #include <fstream>
@@ -131,6 +132,7 @@ static int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpstrCmdLine, int nCmdShow)
 {
+    CF::GUILeaks         guiLeaks{};
     CScopedAppRegistrator sAppReg{_Module};
 
     HRESULT hCode = S_OK;

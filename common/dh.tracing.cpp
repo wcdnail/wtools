@@ -23,10 +23,10 @@ namespace DH
         using LogStreamPtr = std::unique_ptr<std::ostream>;
         using      LogPath = std::filesystem::path;
 
-        static const Timer           LOG_Uptime;
-        static constexpr int LOG_UPTIME_PRECISS = 12;
-        static constexpr int    LOG_MAX_ROTATED = 3;
-        static constexpr UINT  LOG_DEF_CODEPAGE = CP_UTF8;
+        static const Timer           LOG_Uptime{};
+        static constexpr int LOG_UPTIME_PRECISS{12};
+        static constexpr int    LOG_MAX_ROTATED{3};
+        static constexpr UINT  LOG_DEF_CODEPAGE{CP_UTF8};
 
 #ifdef _DEBUG_XTRA
         class DebugNotifyOnce
@@ -116,7 +116,7 @@ namespace DH
 
     LogCtx& LogCtx::instance()
     {
-        static LogCtx self(LOG_MUTEX_GUARD);
+        static LogCtx self{DEBUG_WIN32_OUT};
         return self;
     }
 

@@ -262,7 +262,7 @@ public:
     BOOL HasDefaultText() const;
 
     // @cmember Subclass the window
-    BOOL SubclassWindow(HWND hWnd);
+    bool SubclassWindow(HWND hWnd);
 
 private:
     friend ATL::CWindowImpl<CColorButton>;
@@ -279,6 +279,7 @@ private:
     void ButtonDraw(WTL::CDCHandle dc, CRect const& rc, UINT uState);
     UINT GetButtonState() const;
     void DoPaint(WTL::CDCHandle dc, RECT const& rc);
+    bool ThemedInit();
 
 protected:
     // @cmember Handle mouse move
